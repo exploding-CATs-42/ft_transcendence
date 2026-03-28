@@ -11,6 +11,9 @@ const config = {
       precompress: false,
       fallback: "index.html"
     })
+    // files: {
+    //   routes: "src/web/routes"
+    // }
   }
 };
 

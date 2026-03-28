@@ -8,5 +8,12 @@
   "bracketSpacing": true,
   "arrowParens": "always",
   "proseWrap": "always",
-  "endOfLine": "lf"
+  "endOfLine": "lf",
+
+  "plugins": ["prettier-plugin-svelte"],
+  "svelteSortOrder": "options-scripts-markup-styles",
+  "svelteStrictMode": false,
+  "svelteAllowShorthand": true,
+  "svelteIndentScriptAndStyle": true,
+  "svelteBracketNewLine": false
 }
