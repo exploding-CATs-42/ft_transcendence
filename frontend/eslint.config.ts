@@ -1,31 +1,43 @@
-import js from "@eslint/js";
-import svelte from "eslint-plugin-svelte";
 import { defineConfig } from "eslint/config";
-import globals from "globals";
-import ts from "typescript-eslint";
 import svelteConfig from "./svelte.config.js";
-import tseslint from "typescript-eslint";
+import globals from "globals";
+import js from "@eslint/js";
+import ts from "typescript-eslint";
+import svelte from "eslint-plugin-svelte";
 
-export default defineConfig(
+export default defineConfig([
   js.configs.recommended,
-  ts.configs.recommended,
-  svelte.configs.recommended,
+  ...ts.configs.recommended,
+  ...svelte.configs.recommended,
   {
-    languageOptions: { globals: globals.browser },
-    rules: {
-      "no-undef": "off"
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        // for Sveltekit in non-SPA mode
+        ...globals.node
+      }
     }
   },
   {
-    files: ["**/*.svelte", "**/*.svelte.ts", "**/*.svelte.js"],
+    files: ["**/*.svelte"],
     languageOptions: {
       parserOptions: {
-        projectService: true,
-        extraFileExtensions: [".svelte"],
-        parser: ts.parser,
         svelteConfig
       }
     }
   },
-  tseslint.configs.recommended
-);
+  {
+    files: ["**/*.ts", "**/*.svelte"],
+    rules: {
+      // Modern JS
+      "no-var": "error",
+      "prefer-const": "error",
+
+      // Good TS hygiene
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        { argsIgnorePattern: "^_" }
+      ]
+    }
+  }
+]);
