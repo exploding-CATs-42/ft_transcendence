@@ -11,11 +11,7 @@ export default defineConfig([
   svelte.configs.recommended,
   {
     languageOptions: {
-      globals: {
-        ...globals.browser,
-        // for Sveltekit in non-SPA mode
-        ...globals.node
-      }
+      globals: globals.browser
     }
   },
   {
@@ -29,15 +25,13 @@ export default defineConfig([
   {
     files: ["**/*.ts", "**/*.svelte"],
     rules: {
-      // Modern JS
       "no-var": "error",
       "prefer-const": "error",
-
-      // Good TS hygiene
       "@typescript-eslint/no-unused-vars": [
         "error",
         { argsIgnorePattern: "^_" }
-      ]
+      ],
+      "svelte/no-navigation-without-resolve": "off"
     }
   }
 ]);

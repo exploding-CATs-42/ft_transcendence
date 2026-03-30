@@ -1,6 +1,8 @@
 <!-- -------- TS -------- -->
 <script lang="ts">
-  let { children } = $props();
+  import "../styles/global.css";
+
+  const { children } = $props();
 </script>
 
 <!-- -------- HTML -------- -->

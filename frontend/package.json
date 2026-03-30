@@ -1,26 +1,27 @@
 {
   "name": "exploding-cats",
   "type": "module",
-  "main": "main.ts",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite dev",
     "build": "vite build",
     "preview": "vite preview",
-    "check": "svelte-check",
+    "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
     "test": "vitest",
-    "lint": "eslint --fix .",
+    "lint": "prettier --check . && eslint .",
     "format": "prettier --write ."
   },
   "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "axios": "^1.13.6",
     "izitoast": "^1.4.0",
+    "modern-normalize": "^3.0.1",
     "phaser": "^3.90.0",
     "socket.io-client": "^4.8.3"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@sveltejs/adapter-static": "^3.0.10",
+    "@sveltejs/adapter-node": "^5.5.4",
     "@sveltejs/kit": "^2.55.0",
     "@sveltejs/vite-plugin-svelte": "^7.0.0",
     "@testing-library/svelte": "^5.3.1",

@@ -1,0 +1,27 @@
+@import url("https://fonts.googleapis.com/css2?family=Chewy&family=Knewave&display=swap");
+@import "./normalization.css";
+
+:root {
+  --transition: all 0.3s ease-in-out 0s;
+}
+
+input,
+textarea,
+button {
+  transition: var(--transition);
+}
+
+body {
+  font-family: "Chewy", sans-serif;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 14px;
+
+  line-height: 1.29;
+  letter-spacing: -0.02em;
+
+  background-image: url("/images/background.png");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+}
