@@ -1,0 +1,275 @@
+{
+  "linterOptions": {
+    "reportUnusedDisableDirectives": 1
+  },
+  "rules": {
+    "constructor-super": [2],
+    "for-direction": [2],
+    "getter-return": [
+      2,
+      {
+        "allowImplicit": false
+      }
+    ],
+    "no-async-promise-executor": [2],
+    "no-case-declarations": [2],
+    "no-class-assign": [2],
+    "no-compare-neg-zero": [2],
+    "no-cond-assign": [2, "except-parens"],
+    "no-const-assign": [2],
+    "no-constant-binary-expression": [2],
+    "no-constant-condition": [
+      2,
+      {
+        "checkLoops": "allExceptWhileTrue"
+      }
+    ],
+    "no-control-regex": [2],
+    "no-debugger": [2],
+    "no-delete-var": [2],
+    "no-dupe-args": [2],
+    "no-dupe-class-members": [2],
+    "no-dupe-else-if": [2],
+    "no-dupe-keys": [2],
+    "no-duplicate-case": [2],
+    "no-empty": [
+      2,
+      {
+        "allowEmptyCatch": false
+      }
+    ],
+    "no-empty-character-class": [2],
+    "no-empty-pattern": [
+      2,
+      {
+        "allowObjectPatternsAsParameters": false
+      }
+    ],
+    "no-empty-static-block": [2],
+    "no-ex-assign": [2],
+    "no-extra-boolean-cast": [2, {}],
+    "no-fallthrough": [
+      2,
+      {
+        "allowEmptyCase": false,
+        "reportUnusedFallthroughComment": false
+      }
+    ],
+    "no-func-assign": [2],
+    "no-global-assign": [
+      2,
+      {
+        "exceptions": []
+      }
+    ],
+    "no-import-assign": [2],
+    "no-invalid-regexp": [2, {}],
+    "no-irregular-whitespace": [
+      2,
+      {
+        "skipComments": false,
+        "skipJSXText": false,
+        "skipRegExps": false,
+        "skipStrings": true,
+        "skipTemplates": false
+      }
+    ],
+    "no-loss-of-precision": [2],
+    "no-misleading-character-class": [
+      2,
+      {
+        "allowEscape": false
+      }
+    ],
+    "no-new-native-nonconstructor": [2],
+    "no-nonoctal-decimal-escape": [2],
+    "no-obj-calls": [2],
+    "no-octal": [2],
+    "no-prototype-builtins": [2],
+    "no-redeclare": [
+      2,
+      {
+        "builtinGlobals": true
+      }
+    ],
+    "no-regex-spaces": [2],
+    "no-self-assign": [
+      0,
+      {
+        "props": true
+      }
+    ],
+    "no-setter-return": [2],
+    "no-shadow-restricted-names": [
+      2,
+      {
+        "reportGlobalThis": true
+      }
+    ],
+    "no-sparse-arrays": [2],
+    "no-this-before-super": [2],
+    "no-unassigned-vars": [2],
+    "no-undef": [
+      2,
+      {
+        "typeof": false
+      }
+    ],
+    "no-unexpected-multiline": [2],
+    "no-unreachable": [2],
+    "no-unsafe-finally": [2],
+    "no-unsafe-negation": [
+      2,
+      {
+        "enforceForOrderingRelations": false
+      }
+    ],
+    "no-unsafe-optional-chaining": [
+      2,
+      {
+        "disallowArithmeticOperators": false
+      }
+    ],
+    "no-unused-labels": [2],
+    "no-unused-private-class-members": [2],
+    "no-unused-vars": [0],
+    "no-useless-assignment": [2],
+    "no-useless-backreference": [2],
+    "no-useless-catch": [2],
+    "no-useless-escape": [
+      2,
+      {
+        "allowRegexCharacters": []
+      }
+    ],
+    "no-with": [2],
+    "preserve-caught-error": [
+      2,
+      {
+        "requireCatchParameter": false
+      }
+    ],
+    "require-yield": [2],
+    "use-isnan": [
+      2,
+      {
+        "enforceForIndexOf": false,
+        "enforceForSwitchCase": true
+      }
+    ],
+    "valid-typeof": [
+      2,
+      {
+        "requireStringLiterals": false
+      }
+    ],
+    "@typescript-eslint/ban-ts-comment": [2],
+    "no-array-constructor": [0],
+    "@typescript-eslint/no-array-constructor": [2],
+    "@typescript-eslint/no-duplicate-enum-values": [2],
+    "@typescript-eslint/no-empty-object-type": [2],
+    "@typescript-eslint/no-explicit-any": [2],
+    "@typescript-eslint/no-extra-non-null-assertion": [2],
+    "@typescript-eslint/no-misused-new": [2],
+    "@typescript-eslint/no-namespace": [2],
+    "@typescript-eslint/no-non-null-asserted-optional-chain": [2],
+    "@typescript-eslint/no-require-imports": [2],
+    "@typescript-eslint/no-this-alias": [2],
+    "@typescript-eslint/no-unnecessary-type-constraint": [2],
+    "@typescript-eslint/no-unsafe-declaration-merging": [2],
+    "@typescript-eslint/no-unsafe-function-type": [2],
+    "no-unused-expressions": [
+      0,
+      {
+        "allowShortCircuit": false,
+        "allowTernary": false,
+        "allowTaggedTemplates": false,
+        "enforceForJSX": false,
+        "ignoreDirectives": false
+      }
+    ],
+    "@typescript-eslint/no-unused-expressions": [
+      2,
+      {
+        "allowShortCircuit": false,
+        "allowTaggedTemplates": false,
+        "allowTernary": false
+      }
+    ],
+    "@typescript-eslint/no-unused-vars": [2],
+    "@typescript-eslint/no-wrapper-object-types": [2],
+    "@typescript-eslint/prefer-as-const": [2],
+    "@typescript-eslint/prefer-namespace-keyword": [2],
+    "@typescript-eslint/triple-slash-reference": [2],
+    "no-inner-declarations": [
+      0,
+      "functions",
+      {
+        "blockScopedFunctions": "allow"
+      }
+    ],
+    "svelte/comment-directive": [2],
+    "svelte/system": [2],
+    "svelte/infinite-reactive-loop": [2],
+    "svelte/no-at-debug-tags": [1],
+    "svelte/no-at-html-tags": [2],
+    "svelte/no-dom-manipulating": [2],
+    "svelte/no-dupe-else-if-blocks": [2],
+    "svelte/no-dupe-on-directives": [2],
+    "svelte/no-dupe-style-properties": [2],
+    "svelte/no-dupe-use-directives": [2],
+    "svelte/no-export-load-in-svelte-module-in-kit-pages": [2],
+    "svelte/no-immutable-reactive-statements": [2],
+    "svelte/no-inner-declarations": [
+      2,
+      "functions",
+      {
+        "blockScopedFunctions": "allow"
+      }
+    ],
+    "svelte/no-inspect": [1],
+    "svelte/no-navigation-without-resolve": [2],
+    "svelte/no-not-function-handler": [2],
+    "svelte/no-object-in-text-mustaches": [2],
+    "svelte/no-raw-special-elements": [2],
+    "svelte/no-reactive-functions": [2],
+    "svelte/no-reactive-literals": [2],
+    "svelte/no-reactive-reassign": [2],
+    "svelte/no-shorthand-style-property-overrides": [2],
+    "svelte/no-store-async": [2],
+    "svelte/no-svelte-internal": [2],
+    "svelte/no-unknown-style-directive-property": [2],
+    "svelte/no-unnecessary-state-wrap": [2],
+    "svelte/no-unused-props": [2],
+    "svelte/no-unused-svelte-ignore": [2],
+    "svelte/no-useless-children-snippet": [2],
+    "svelte/no-useless-mustaches": [2],
+    "svelte/prefer-svelte-reactivity": [2],
+    "svelte/prefer-writable-derived": [2],
+    "svelte/require-each-key": [2],
+    "svelte/require-event-dispatcher-types": [2],
+    "svelte/require-store-reactive-access": [2],
+    "svelte/valid-each-key": [2],
+    "svelte/valid-prop-names-in-kit-pages": [2]
+  },
+  "plugins": [
+    "@",
+    "@typescript-eslint:@typescript-eslint/eslint-plugin@8.57.2",
+    "svelte:eslint-plugin-svelte@3.16.0"
+  ],
+  "language": "@/js",
+  "languageOptions": {
+    "sourceType": "module",
+    "ecmaVersion": 2026,
+    "parser": "svelte-eslint-parser@1.6.0",
+    "parserOptions": {
+      "svelteConfig": {
+        "preprocess": "vite-preprocess",
+        "kit": {
+          "adapter": "@sveltejs/adapter-static"
+        }
+      }
+    }
+  },
+  "processor": "svelte/svelte"
+}
