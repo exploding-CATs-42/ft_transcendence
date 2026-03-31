@@ -1,0 +1,10 @@
+{
+    "name": "ft_transcendence",
+    "private": true,
+    "packageManager": "pnpm@10.0.0",
+    "scripts": {
+        "install:all": "pnpm install",
+        "dev:backend": "pnpm --filter backend dev",
+        "dev:frontend": "pnpm --filter frontend dev"
+    }
+}
