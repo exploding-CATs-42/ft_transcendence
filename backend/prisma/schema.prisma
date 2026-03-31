@@ -1,0 +1,101 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum GameStatus {
+  WAITING
+  IN_PROGRESS
+  FINISHED
+  CANCELLED
+}
+
+model User {
+  id           String   @id @default(uuid()) @db.Uuid
+  email        String   @unique @db.VarChar(320)
+  username     String   @unique @db.VarChar(50)
+  passwordHash String   @map("password_hash")
+  createdAt    DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  sessions     UserSession[]
+  createdGames Game[]        @relation("GameCreatedBy")
+  gamePlayers  GamePlayer[]
+
+  @@index([createdAt])
+  @@map("users")
+}
+
+model UserSession {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  tokenHash String   @unique @map("token_hash")
+  expiresAt DateTime @map("expires_at") @db.Timestamptz(6)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@index([expiresAt])
+  @@map("user_sessions")
+}
+
+model Game {
+  id          String     @id @default(uuid()) @db.Uuid
+  status      GameStatus @default(WAITING)
+  createdById String     @map("created_by_id") @db.Uuid
+  minPlayers  Int        @map("min_players")
+  maxPlayers  Int        @map("max_players")
+  startedAt   DateTime?  @map("started_at") @db.Timestamptz(6)
+  endedAt     DateTime?  @map("ended_at") @db.Timestamptz(6)
+  createdAt   DateTime   @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  createdBy User         @relation("GameCreatedBy", fields: [createdById], references: [id], onDelete: Restrict)
+  players   GamePlayer[]
+  moves     GameMove[]
+
+  @@index([createdById])
+  @@index([status])
+  @@index([createdAt])
+  @@map("games")
+}
+
+model GamePlayer {
+  id        String   @id @default(uuid()) @db.Uuid
+  gameId    String   @map("game_id") @db.Uuid
+  userId    String   @map("user_id") @db.Uuid
+  seatOrder Int      @map("seat_order")
+  isAlive   Boolean  @default(true) @map("is_alive")
+  isWinner  Boolean  @default(false) @map("is_winner")
+  joinedAt  DateTime @default(now()) @map("joined_at") @db.Timestamptz(6)
+
+  game       Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  user       User       @relation(fields: [userId], references: [id], onDelete: Restrict)
+  actedMoves GameMove[] @relation("MoveActor")
+
+  @@unique([gameId, userId])
+  @@unique([gameId, seatOrder])
+  @@index([userId])
+  @@index([gameId, isAlive])
+  @@map("game_players")
+}
+
+model GameMove {
+  id             String   @id @default(uuid()) @db.Uuid
+  gameId         String   @map("game_id") @db.Uuid
+  actorPlayerId  String   @map("actor_player_id") @db.Uuid
+  sequenceNumber Int      @map("sequence_number")
+  moveType       String   @map("move_type") @db.VarChar(100)
+  payloadJson    Json     @map("payload_json")
+  createdAt      DateTime @default(now()) @map("created_at") @db.Timestamptz(6)
+
+  game        Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  actorPlayer GamePlayer @relation("MoveActor", fields: [actorPlayerId], references: [id], onDelete: Restrict)
+
+  @@unique([gameId, sequenceNumber])
+  @@index([actorPlayerId])
+  @@index([gameId, createdAt])
+  @@map("game_moves")
+}
