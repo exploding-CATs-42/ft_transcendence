@@ -1,0 +1,45 @@
+{
+  "compilerOptions": {
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+    "target": "ES2023",
+    "lib": ["ES2023"],
+    "module": "ESNext",
+    "types": ["node"],
+    "skipLibCheck": true,
+
+    /* Bundler mode */
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "verbatimModuleSyntax": true,
+    "moduleDetection": "force",
+    "noEmit": true,
+
+    /* Linting */
+    "strict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "erasableSyntaxOnly": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "allowUnreachableCode": false,
+    "allowUnusedLabels": false,
+    "exactOptionalPropertyTypes": true,
+    "noImplicitOverride": true,
+    "noImplicitReturns": true,
+    "noUncheckedIndexedAccess": true,
+
+    // Aliases
+    "baseUrl": ".",
+    "paths": {
+      "types": ["src/web/@types/index"],
+      "types/*": ["src/web/@types/*"],
+      "components": ["src/web/components/index"],
+      "components/*": ["src/web/components/*"],
+      "pages": ["src/web/pages/index"],
+      "pages/*": ["src/web/pages/*"],
+      "assets": ["src/web/assets/index"],
+      "assets/*": ["src/web/assets/*"]
+    }
+  },
+  "include": ["vite.config.ts"]
+}
