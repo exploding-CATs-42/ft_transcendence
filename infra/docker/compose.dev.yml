@@ -8,6 +8,7 @@ services:
       - "${NGINX_PORT}:80"
     depends_on:
       - backend
+      - frontend
     networks:
       - transcendence_net
 
@@ -24,6 +25,26 @@ services:
         condition: service_healthy
     expose:
       - "3000"
+    volumes:
+      - ../../backend:/app
+      - backend_node_modules:/app/node_modules
+    command: pnpm dev
+    networks:
+      - transcendence_net
+  frontend:
+    build:
+      context: ../../frontend
+      dockerfile: Dockerfile
+    container_name: ft-frontend
+    env_file:
+      - ../env/.env
+      - ../../frontend/.env
+    expose:
+      - "5173"
+    volumes:
+      - ../../frontend:/app
+      - frontend_node_modules:/app/node_modules
+    command: pnpm dev --host 0.0.0.0
     networks:
       - transcendence_net
 
@@ -50,6 +71,8 @@ services:
 
 volumes:
   postgres_data:
+  backend_node_modules:
+  frontend_node_modules:
 
 networks:
   transcendence_net:

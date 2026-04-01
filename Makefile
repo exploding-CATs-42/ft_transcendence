@@ -20,14 +20,11 @@ ps:
 re:
 	$(COMPOSE) restart
 
-clean:
-	$(COMPOSE) down -v --remove-orphans
+
 
 db-shell:
 	docker exec -it ft-postgres psql -U transcendence -d transcendence
 
-reset:
-	$(COMPOSE) down -v --remove-orphans
-	$(COMPOSE) up --build -d
+
 
 .PHONY: all up build down logs ps re clean reset db-shell
