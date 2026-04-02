@@ -65,6 +65,8 @@ web_modules/
 *.tgz
 
 # dotenv environment variable files
+frontend.env
+backend.env
 .env
 .env.*
 !.env.example
