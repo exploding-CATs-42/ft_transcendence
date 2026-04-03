@@ -1,0 +1,147 @@
+{
+  "cards": [
+    {
+      "id": "exploding_kitten",
+      "type": "EXPLODING_KITTEN",
+      "name": "Exploding Kitten",
+      "description": "Show immediately. Unless you play a Defuse you are out. Reinsert the kitten anywhere into the draw pile in secret.",
+      "count": 4,
+      "playable": false,
+      "targetRequired": false,
+      "comboEligible": false,
+      "interruptible": false
+    },
+    {
+      "id": "defuse",
+      "type": "DEFUSE",
+      "name": "Defuse",
+      "description": "Play instead of dying when you draw an Exploding Kitten. Place Defuse in the discard pile, then secretly reinsert the kitten anywhere in the draw pile.",
+      "count": 6,
+      "playable": true,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "attack",
+      "type": "ATTACK",
+      "name": "Attack",
+      "description": "End your turn without drawing a card. Force the next player to take 2 turns in a row. Attacks stack — if the victim plays an Attack, all remaining turns transfer plus 2 more.",
+      "count": 4,
+      "playable": true,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "skip",
+      "type": "SKIP",
+      "name": "Skip",
+      "description": "Immediately end your turn without drawing a card. When played against an Attack, only ends 1 of the 2 owed turns.",
+      "count": 4,
+      "playable": true,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "favor",
+      "type": "FAVOR",
+      "name": "Favor",
+      "description": "Force any other player to give you 1 card from their hand. They choose which card to give you.",
+      "count": 4,
+      "playable": true,
+      "targetRequired": true,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "shuffle",
+      "type": "SHUFFLE",
+      "name": "Shuffle",
+      "description": "Randomly shuffle the draw pile so that no one knows the order of the cards.",
+      "count": 4,
+      "playable": true,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "see_the_future",
+      "type": "SEE_THE_FUTURE",
+      "name": "See the Future",
+      "description": "Privately view the top 3 cards of the draw pile and put them back in the same order. Do not show other players.",
+      "count": 5,
+      "playable": true,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "nope",
+      "type": "NOPE",
+      "name": "Nope",
+      "description": "Stop any action except an Exploding Kitten or a Defuse. Can be played at any time before an action resolves, even on another player's turn. A Nope can be Noped to create a Yup, and so on.",
+      "count": 5,
+      "playable": true,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": true
+    },
+    {
+      "id": "tacocat",
+      "type": "TACOCAT",
+      "name": "Tacocat",
+      "description": "Powerless on its own. Play two Tacocats as a pair to steal a random card from another player, or three as a triple to name the card you want.",
+      "count": 4,
+      "playable": false,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "hairy_potato_cat",
+      "type": "HAIRY_POTATO_CAT",
+      "name": "Hairy Potato Cat",
+      "description": "Powerless on its own. Play two Hairy Potato Cats as a pair to steal a random card from another player, or three as a triple to name the card you want.",
+      "count": 4,
+      "playable": false,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "beard_cat",
+      "type": "BEARD_CAT",
+      "name": "Beard Cat",
+      "description": "Powerless on its own. Play two Beard Cats as a pair to steal a random card from another player, or three as a triple to name the card you want.",
+      "count": 4,
+      "playable": false,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "cattermelon",
+      "type": "CATTERMELON",
+      "name": "Cattermelon",
+      "description": "Powerless on its own. Play two Cattermelons as a pair to steal a random card from another player, or three as a triple to name the card you want.",
+      "count": 4,
+      "playable": false,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    },
+    {
+      "id": "rainbow_ralphing_cat",
+      "type": "RAINBOW_RALPHING_CAT",
+      "name": "Rainbow-Ralphing Cat",
+      "description": "Powerless on its own. Play two Rainbow-Ralphing Cats as a pair to steal a random card from another player, or three as a triple to name the card you want.",
+      "count": 4,
+      "playable": false,
+      "targetRequired": false,
+      "comboEligible": true,
+      "interruptible": false
+    }
+  ]
+}
