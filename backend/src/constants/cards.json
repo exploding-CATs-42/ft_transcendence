@@ -9,7 +9,7 @@
       "playable": false,
       "targetRequired": false,
       "comboEligible": false,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "defuse",
@@ -20,7 +20,7 @@
       "playable": true,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "attack",
@@ -31,7 +31,7 @@
       "playable": true,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "skip",
@@ -42,7 +42,7 @@
       "playable": true,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "favor",
@@ -53,7 +53,7 @@
       "playable": true,
       "targetRequired": true,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "shuffle",
@@ -64,7 +64,7 @@
       "playable": true,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "see_the_future",
@@ -75,7 +75,7 @@
       "playable": true,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "nope",
@@ -86,7 +86,7 @@
       "playable": true,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": true
+      "playableOutOfTurn": true
     },
     {
       "id": "tacocat",
@@ -97,7 +97,7 @@
       "playable": false,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "hairy_potato_cat",
@@ -108,7 +108,7 @@
       "playable": false,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "beard_cat",
@@ -119,7 +119,7 @@
       "playable": false,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "cattermelon",
@@ -130,7 +130,7 @@
       "playable": false,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     },
     {
       "id": "rainbow_ralphing_cat",
@@ -141,7 +141,7 @@
       "playable": false,
       "targetRequired": false,
       "comboEligible": true,
-      "interruptible": false
+      "playableOutOfTurn": false
     }
   ]
 }
