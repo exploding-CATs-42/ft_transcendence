@@ -1,0 +1,11 @@
+{
+  "dealtCardsPerPlayer": 7,
+  "defusesDealtPerPlayer": 1,
+  "maxDefusesShuffledBack": 2,
+  "seeTheFutureCount": 3,
+  "totalDefuses": 6,
+  "minPlayers": 2,
+  "maxPlayers": 5,
+  "fasterVariantRemoveFraction": 0.33,
+  "nopeWindowMs": 3000
+}
