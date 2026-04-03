@@ -1,3 +1,4 @@
+COMPOSE = docker compose --env-file infra/env/.env -f infra/docker/compose.dev.yml
 all: build
 
 up:
@@ -27,4 +28,4 @@ clean:
 	docker builder prune -f
 
 
-.PHONY: all up build down logs ps re clean  db-shell
+.PHONY: all up build down logs ps re clean fclean db-shell
