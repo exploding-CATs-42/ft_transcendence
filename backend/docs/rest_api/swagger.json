@@ -1,0 +1,143 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Hello World API",
+    "description": "A simple Hello World API example using OpenAPI 3.0",
+    "version": "1.0.0"
+  },
+  "servers": [
+    {
+      "url": "https://api.example.com/v1",
+      "description": "Production server"
+    }
+  ],
+  "paths": {
+    "/hello": {
+      "get": {
+        "summary": "Say Hello",
+        "description": "Returns a Hello World greeting message",
+        "operationId": "getHello",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "query",
+            "description": "The name to greet",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "example": "World"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful greeting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelloResponse"
+                },
+                "example": {
+                  "message": "Hello, World!",
+                  "timestamp": "2026-04-04T12:00:00Z"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/hello/{name}": {
+      "get": {
+        "summary": "Say Hello to a specific person",
+        "description": "Returns a personalised Hello greeting",
+        "operationId": "getHelloByName",
+        "parameters": [
+          {
+            "name": "name",
+            "in": "path",
+            "description": "The name to greet",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "example": "Alice"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful greeting",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HelloResponse"
+                },
+                "example": {
+                  "message": "Hello, Alice!",
+                  "timestamp": "2026-04-04T12:00:00Z"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Name not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "HelloResponse": {
+        "type": "object",
+        "required": ["message", "timestamp"],
+        "properties": {
+          "message": {
+            "type": "string",
+            "description": "The greeting message",
+            "example": "Hello, World!"
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "description": "The time the greeting was generated",
+            "example": "2026-04-04T12:00:00Z"
+          }
+        }
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "required": ["error", "message"],
+        "properties": {
+          "error": {
+            "type": "string",
+            "description": "Error code",
+            "example": "BAD_REQUEST"
+          },
+          "message": {
+            "type": "string",
+            "description": "Human-readable error description",
+            "example": "Invalid parameter provided"
+          }
+        }
+      }
+    }
+  }
+}
