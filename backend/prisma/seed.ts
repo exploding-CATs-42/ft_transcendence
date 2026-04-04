@@ -187,11 +187,6 @@ async function main() {
 
   const activeGame = await prisma.game.create({
     data: {
-      playersJson: [
-        { userId: alice.id, seat: 0, status: "ACTIVE" },
-        { userId: bob.id, seat: 1, status: "ACTIVE" },
-        { userId: carol.id, seat: 2, status: "ACTIVE" },
-      ],
       createdAt: new Date(),
       startedAt: new Date(),
       memberships: {
@@ -207,10 +202,6 @@ async function main() {
   await prisma.game.create({
     data: {
       winnerUserId: alice.id,
-      playersJson: [
-        { userId: alice.id, seat: 0, status: "WINNER" },
-        { userId: dave.id, seat: 1, status: "EXPLODED" },
-      ],
       createdAt: new Date(Date.now() - 1000 * 60 * 60),
       startedAt: new Date(Date.now() - 1000 * 60 * 55),
       endedAt: new Date(Date.now() - 1000 * 60 * 40),
@@ -236,7 +227,6 @@ async function main() {
     data: {
       gameId: activeGame.id,
       actorUserId: alice.id,
-      sequenceNumber: 1,
       type: "PLAY_CARD",
       payloadJson: {
         action: "SEE_FUTURE",
@@ -249,7 +239,6 @@ async function main() {
     data: {
       gameId: activeGame.id,
       actorUserId: bob.id,
-      sequenceNumber: 2,
       type: "PLAY_CARD",
       payloadJson: {
         action: "ATTACK",
@@ -262,11 +251,10 @@ async function main() {
     data: {
       gameId: activeGame.id,
       actorUserId: carol.id,
-      sequenceNumber: 3,
       type: "PLAY_CARD",
       payloadJson: {
         action: "NOPE",
-        cancelledMoveSequence: 2,
+        cancelledMoveType: "PLAY_CARD",
       },
     },
   });
