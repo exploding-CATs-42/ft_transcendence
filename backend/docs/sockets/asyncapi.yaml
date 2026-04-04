@@ -1,0 +1,126 @@
+asyncapi: "3.0.0"
+
+info:
+  title: Hello World Event API
+  version: "1.0.0"
+  description: >
+    A simple Hello World example using AsyncAPI 3.0.
+    This API publishes greeting events and listens for greeting requests
+    over a message broker.
+
+servers:
+  production:
+    host: broker.example.com:5672
+    protocol: amqp
+    description: Production message broker
+
+channels:
+  hello/greetings:
+    address: hello/greetings
+    description: Channel where greeting messages are published
+    messages:
+      greetingMessage:
+        $ref: "#/components/messages/GreetingMessage"
+
+  hello/requests:
+    address: hello/requests
+    description: Channel where greeting requests are received
+    messages:
+      greetingRequest:
+        $ref: "#/components/messages/GreetingRequest"
+
+operations:
+  publishGreeting:
+    action: send
+    channel:
+      $ref: "#/channels/hello~1greetings"
+    summary: Publish a Hello World greeting
+    description: >
+      Sends a greeting message to all subscribers whenever
+      a new greeting is generated.
+    messages:
+      - $ref: "#/channels/hello~1greetings/messages/greetingMessage"
+
+  receiveGreetingRequest:
+    action: receive
+    channel:
+      $ref: "#/channels/hello~1requests"
+    summary: Receive a greeting request
+    description: >
+      Listens for incoming greeting requests from clients
+      and triggers a greeting message in response.
+    messages:
+      - $ref: "#/channels/hello~1requests/messages/greetingRequest"
+
+components:
+  messages:
+    GreetingMessage:
+      name: GreetingMessage
+      title: Greeting Message
+      summary: A Hello World greeting event
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GreetingPayload"
+      examples:
+        - name: HelloWorld
+          summary: A basic Hello World greeting
+          payload:
+            message: "Hello, World!"
+            recipient: "World"
+            timestamp: "2026-04-04T12:00:00Z"
+
+    GreetingRequest:
+      name: GreetingRequest
+      title: Greeting Request
+      summary: A request to generate a greeting
+      contentType: application/json
+      payload:
+        $ref: "#/components/schemas/GreetingRequestPayload"
+      examples:
+        - name: GreetAlice
+          summary: Request a greeting for Alice
+          payload:
+            name: "Alice"
+            language: "en"
+
+  schemas:
+    GreetingPayload:
+      type: object
+      required:
+        - message
+        - recipient
+        - timestamp
+      properties:
+        message:
+          type: string
+          description: The greeting message
+          example: "Hello, World!"
+        recipient:
+          type: string
+          description: The name of the person being greeted
+          example: "World"
+        timestamp:
+          type: string
+          format: date-time
+          description: When the greeting was generated
+          example: "2026-04-04T12:00:00Z"
+
+    GreetingRequestPayload:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The name of the person to greet
+          example: "Alice"
+        language:
+          type: string
+          description: Language code for the greeting
+          default: "en"
+          enum:
+            - en
+            - es
+            - fr
+            - de
+          example: "en"
