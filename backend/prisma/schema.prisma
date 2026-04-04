@@ -1,0 +1,132 @@
+generator client {
+  provider            = "prisma-client"
+  output              = "../src/generated/prisma"
+  runtime             = "nodejs"
+  moduleFormat        = "cjs"
+  importFileExtension = "ts"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum FriendshipStatus {
+  PENDING
+  ACCEPTED
+  BLOCKED
+
+  @@map("friendship_status")
+}
+
+model User {
+  id           String  @id @default(uuid()) @db.Uuid
+  email        String  @unique @db.VarChar(255)
+  username     String  @unique @db.VarChar(255)
+  passwordHash String  @map("password_hash") @db.VarChar(255)
+  avatarUrl    String? @map("avatar_url") @db.Text
+
+  sessions           UserSession[]
+  friendshipsAsLow   Friendship[]  @relation("FriendshipLowUser")
+  friendshipsAsHigh  Friendship[]  @relation("FriendshipHighUser")
+  friendshipRequests Friendship[]  @relation("FriendshipRequestedBy")
+  wonGames           Game[]        @relation("GameWinner")
+  gameMemberships    UserGame[]
+  moves              GameMove[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id               String   @id @default(uuid()) @db.Uuid
+  userId           String   @map("user_id") @db.Uuid
+  refreshTokenHash String   @unique @map("refresh_token_hash") @db.VarChar(255)
+  expiresAt        DateTime @map("expires_at")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_sessions")
+}
+
+model Friendship {
+  id            String           @id @default(uuid()) @db.Uuid
+  userLowId     String           @map("user_low_id") @db.Uuid
+  userHighId    String           @map("user_high_id") @db.Uuid
+  requestedById String           @map("requested_by_id") @db.Uuid
+  status        FriendshipStatus
+
+  userLow     User @relation("FriendshipLowUser", fields: [userLowId], references: [id], onDelete: Cascade)
+  userHigh    User @relation("FriendshipHighUser", fields: [userHighId], references: [id], onDelete: Cascade)
+  requestedBy User @relation("FriendshipRequestedBy", fields: [requestedById], references: [id], onDelete: Cascade)
+
+  @@unique([userLowId, userHighId])
+  @@index([requestedById])
+  @@map("friendships")
+}
+
+model Game {
+  id           String    @id @default(uuid()) @db.Uuid
+  winnerUserId String?   @map("winner_user_id") @db.Uuid
+  createdAt    DateTime  @default(now()) @map("created_at")
+  startedAt    DateTime? @map("started_at")
+  endedAt      DateTime? @map("ended_at")
+
+  winner      User?      @relation("GameWinner", fields: [winnerUserId], references: [id], onDelete: SetNull)
+  memberships UserGame[]
+  moves       GameMove[]
+
+  @@index([winnerUserId])
+  @@map("games")
+}
+
+model UserGame {
+  id     String @id @default(uuid()) @db.Uuid
+  userId String @map("user_id") @db.Uuid
+  gameId String @map("game_id") @db.Uuid
+
+  user User @relation(fields: [userId], references: [id], onDelete: Restrict)
+  game Game @relation(fields: [gameId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, gameId])
+  @@index([gameId])
+  @@map("users_games")
+}
+
+model GameMove {
+  id          String @id @default(uuid()) @db.Uuid
+  gameId      String @map("game_id") @db.Uuid
+  actorUserId String @map("actor_user_id") @db.Uuid
+  type        String @db.VarChar(100)
+  payloadJson Json   @map("payload_json")
+
+  game      Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
+  actorUser User       @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
+  moveCards MoveCard[]
+
+  @@index([actorUserId])
+  @@map("game_moves")
+}
+
+model Card {
+  id          String  @id @default(uuid()) @db.Uuid
+  name        String  @unique @db.VarChar(100)
+  type        String  @db.VarChar(100)
+  description String? @db.Text
+  imageUrl    String? @map("image_url") @db.Text
+
+  moveCards MoveCard[]
+
+  @@map("cards")
+}
+
+model MoveCard {
+  moveId String @map("move_id") @db.Uuid
+  cardId String @map("card_id") @db.Uuid
+
+  move GameMove @relation(fields: [moveId], references: [id], onDelete: Cascade)
+  card Card     @relation(fields: [cardId], references: [id], onDelete: Restrict)
+
+  @@id([moveId, cardId])
+  @@index([cardId])
+  @@map("move_card")
+}
