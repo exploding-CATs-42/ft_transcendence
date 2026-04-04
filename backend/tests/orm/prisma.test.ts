@@ -93,7 +93,7 @@ describe("Prisma ORM smoke tests", () => {
     expect(friendship.userHighId).toBe(high);
   });
 
-  it("creates ordered moves in a game", async () => {
+  it("creates moves in a game", async () => {
     const suffix = randomUUID().replace(/-/g, "");
 
     const actor = await prisma.user.create({
@@ -106,7 +106,6 @@ describe("Prisma ORM smoke tests", () => {
 
     const game = await prisma.game.create({
       data: {
-        playersJson: [{ userId: actor.id, seat: 0, status: "ACTIVE" }],
         memberships: {
           create: [{ userId: actor.id }],
         },
@@ -117,7 +116,6 @@ describe("Prisma ORM smoke tests", () => {
       data: {
         gameId: game.id,
         actorUserId: actor.id,
-        sequenceNumber: 1,
         type: "DRAW_CARD",
         payloadJson: { result: "SAFE_DRAW" },
       },
@@ -127,26 +125,18 @@ describe("Prisma ORM smoke tests", () => {
       data: {
         gameId: game.id,
         actorUserId: actor.id,
-        sequenceNumber: 2,
         type: "END_TURN",
-        payloadJson: { nextPlayerSeat: 1 },
+        payloadJson: { nextPlayer: "someone" },
       },
     });
 
-    expect(move1.sequenceNumber).toBe(1);
-    expect(move2.sequenceNumber).toBe(2);
+    const moves = await prisma.gameMove.findMany({
+      where: { gameId: game.id },
+    });
 
-    await expect(
-      prisma.gameMove.create({
-        data: {
-          gameId: game.id,
-          actorUserId: actor.id,
-          sequenceNumber: 2,
-          type: "DUPLICATE_MOVE",
-          payloadJson: {},
-        },
-      }),
-    ).rejects.toThrow();
+    expect(move1.id).toBeDefined();
+    expect(move2.id).toBeDefined();
+    expect(moves).toHaveLength(2);
   });
 
   it("links cards to a move", async () => {
@@ -172,7 +162,6 @@ describe("Prisma ORM smoke tests", () => {
 
     const game = await prisma.game.create({
       data: {
-        playersJson: [{ userId: actor.id, seat: 0, status: "ACTIVE" }],
         memberships: {
           create: [{ userId: actor.id }],
         },
@@ -183,7 +172,6 @@ describe("Prisma ORM smoke tests", () => {
       data: {
         gameId: game.id,
         actorUserId: actor.id,
-        sequenceNumber: 1,
         type: "PLAY_CARD",
         payloadJson: { action: "TEST_CARD" },
       },
