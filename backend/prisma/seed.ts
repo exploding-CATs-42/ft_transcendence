@@ -185,7 +185,7 @@ async function main() {
     });
   }
 
-  const activeGame = await prisma.game.create({
+  await prisma.game.create({
     data: {
       createdAt: new Date(),
       startedAt: new Date(),
@@ -209,63 +209,6 @@ async function main() {
         create: [{ userId: alice.id }, { userId: dave.id }],
       },
     },
-  });
-
-  const attackCard = await prisma.card.findUniqueOrThrow({
-    where: { name: "Attack" },
-  });
-
-  const seeFutureCard = await prisma.card.findUniqueOrThrow({
-    where: { name: "See the Future" },
-  });
-
-  const nopeCard = await prisma.card.findUniqueOrThrow({
-    where: { name: "Nope" },
-  });
-
-  const move1 = await prisma.gameMove.create({
-    data: {
-      gameId: activeGame.id,
-      actorUserId: alice.id,
-      type: "PLAY_CARD",
-      payloadJson: {
-        action: "SEE_FUTURE",
-        seenTopCards: ["Defuse", "Attack", "Exploding Kitten"],
-      },
-    },
-  });
-
-  const move2 = await prisma.gameMove.create({
-    data: {
-      gameId: activeGame.id,
-      actorUserId: bob.id,
-      type: "PLAY_CARD",
-      payloadJson: {
-        action: "ATTACK",
-        pendingTurnsForNextPlayer: 2,
-      },
-    },
-  });
-
-  const move3 = await prisma.gameMove.create({
-    data: {
-      gameId: activeGame.id,
-      actorUserId: carol.id,
-      type: "PLAY_CARD",
-      payloadJson: {
-        action: "NOPE",
-        cancelledMoveType: "PLAY_CARD",
-      },
-    },
-  });
-
-  await prisma.moveCard.createMany({
-    data: [
-      { moveId: move1.id, cardId: seeFutureCard.id },
-      { moveId: move2.id, cardId: attackCard.id },
-      { moveId: move3.id, cardId: nopeCard.id },
-    ],
-    skipDuplicates: true,
   });
 
   console.log("Seed completed");
