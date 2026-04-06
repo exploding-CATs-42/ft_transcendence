@@ -31,7 +31,6 @@ model User {
   friendshipRequests Friendship[]  @relation("FriendshipRequestedBy")
   wonGames           Game[]        @relation("GameWinner")
   gameMemberships    UserGame[]
-  moves              GameMove[]
 
   @@map("users")
 }
@@ -73,7 +72,6 @@ model Game {
 
   winner      User?      @relation("GameWinner", fields: [winnerUserId], references: [id], onDelete: SetNull)
   memberships UserGame[]
-  moves       GameMove[]
 
   @@index([winnerUserId])
   @@map("games")
@@ -92,21 +90,6 @@ model UserGame {
   @@map("users_games")
 }
 
-model GameMove {
-  id          String @id @default(uuid()) @db.Uuid
-  gameId      String @map("game_id") @db.Uuid
-  actorUserId String @map("actor_user_id") @db.Uuid
-  type        String @db.VarChar(100)
-  payloadJson Json   @map("payload_json")
-
-  game      Game       @relation(fields: [gameId], references: [id], onDelete: Cascade)
-  actorUser User       @relation(fields: [actorUserId], references: [id], onDelete: Restrict)
-  moveCards MoveCard[]
-
-  @@index([actorUserId])
-  @@map("game_moves")
-}
-
 model Card {
   id          String  @id @default(uuid()) @db.Uuid
   name        String  @unique @db.VarChar(100)
@@ -114,19 +97,5 @@ model Card {
   description String? @db.Text
   imageUrl    String? @map("image_url") @db.Text
 
-  moveCards MoveCard[]
-
   @@map("cards")
-}
-
-model MoveCard {
-  moveId String @map("move_id") @db.Uuid
-  cardId String @map("card_id") @db.Uuid
-
-  move GameMove @relation(fields: [moveId], references: [id], onDelete: Cascade)
-  card Card     @relation(fields: [cardId], references: [id], onDelete: Restrict)
-
-  @@id([moveId, cardId])
-  @@index([cardId])
-  @@map("move_card")
 }
