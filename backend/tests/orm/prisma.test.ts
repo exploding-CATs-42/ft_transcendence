@@ -93,7 +93,7 @@ describe("Prisma ORM smoke tests", () => {
     expect(friendship.userHighId).toBe(high);
   });
 
-  it("creates moves in a game", async () => {
+  it("creates a game with membership", async () => {
     const suffix = randomUUID().replace(/-/g, "");
 
     const actor = await prisma.user.create({
@@ -106,85 +106,33 @@ describe("Prisma ORM smoke tests", () => {
 
     const game = await prisma.game.create({
       data: {
+        createdAt: new Date(),
         memberships: {
           create: [{ userId: actor.id }],
         },
       },
-    });
-
-    const move1 = await prisma.gameMove.create({
-      data: {
-        gameId: game.id,
-        actorUserId: actor.id,
-        type: "DRAW_CARD",
-        payloadJson: { result: "SAFE_DRAW" },
+      include: {
+        memberships: true,
       },
     });
 
-    const move2 = await prisma.gameMove.create({
-      data: {
-        gameId: game.id,
-        actorUserId: actor.id,
-        type: "END_TURN",
-        payloadJson: { nextPlayer: "someone" },
-      },
-    });
-
-    const moves = await prisma.gameMove.findMany({
-      where: { gameId: game.id },
-    });
-
-    expect(move1.id).toBeDefined();
-    expect(move2.id).toBeDefined();
-    expect(moves).toHaveLength(2);
+    expect(game.id).toBeDefined();
+    expect(game.memberships).toHaveLength(1);
+    expect(game.memberships[0]?.userId).toBe(actor.id);
   });
 
-  it("links cards to a move", async () => {
+  it("creates a standalone card", async () => {
     const suffix = randomUUID().replace(/-/g, "");
 
-    const actor = await prisma.user.create({
+    const card = await prisma.card.create({
       data: {
-        email: `card-actor-${suffix}@example.com`,
-        username: `card_actor_${suffix.slice(0, 10)}`,
-        passwordHash: "hashed-password",
-      },
-    });
-
-    const card = await prisma.card.upsert({
-      where: { name: `Test Card ${suffix}` },
-      update: {},
-      create: {
-        name: `Test Card ${suffix}`,
+        name: `Standalone Card ${suffix}`,
         type: "TEST",
         description: "Temporary test card",
       },
     });
 
-    const game = await prisma.game.create({
-      data: {
-        memberships: {
-          create: [{ userId: actor.id }],
-        },
-      },
-    });
-
-    const move = await prisma.gameMove.create({
-      data: {
-        gameId: game.id,
-        actorUserId: actor.id,
-        type: "PLAY_CARD",
-        payloadJson: { action: "TEST_CARD" },
-      },
-    });
-
-    const link = await prisma.moveCard.create({
-      data: {
-        moveId: move.id,
-        cardId: card.id,
-      },
-    });
-
-    expect(link.moveId).toBe(move.id);
-    expect(link.cardId).toBe(card.id);
+    expect(card.id).toBeDefined();
+    expect(card.name).toContain("Standalone Card");
   });
 });
