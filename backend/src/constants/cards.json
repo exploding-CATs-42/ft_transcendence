@@ -19,7 +19,7 @@
       "count": 6,
       "playable": true,
       "targetRequired": false,
-      "comboEligible": true,
+      "comboEligible": false,
       "playableOutOfTurn": false
     },
     {
