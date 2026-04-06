@@ -15,7 +15,6 @@ export enum CardType {
 }
 
 export interface CardDefinition {
-  id: string;
   type: CardType;
   name: string;
   description: string;
