@@ -1,6 +1,12 @@
 import { CardInstance } from "./card";
 import { GameStatus } from "./game";
-import { TurnPhase, PendingAction, NopeChain, FavorState } from "./turn";
+import {
+  TurnPhase,
+  PendingAction,
+  PendingActionType,
+  NopeChain,
+  FavorState
+} from "./turn";
 
 export enum ServerEventType {
   GAME_STARTED = "GAME_STARTED",
@@ -8,10 +14,7 @@ export enum ServerEventType {
   CARD_PLAYED = "CARD_PLAYED",
   COMBO_PLAYED = "COMBO_PLAYED",
   NOPE_PLAYED = "NOPE_PLAYED",
-  NOPE_WINDOW_OPENED = "NOPE_WINDOW_OPENED",
-  NOPE_WINDOW_CLOSED = "NOPE_WINDOW_CLOSED",
-  ACTION_RESOLVED = "ACTION_RESOLVED",
-  ACTION_CANCELLED = "ACTION_CANCELLED",
+  NOPE_WINDOW_RESOLVED = "NOPE_WINDOW_RESOLVED",
   CARD_DRAWN = "CARD_DRAWN",
   EXPLODING_KITTEN_DRAWN = "EXPLODING_KITTEN_DRAWN",
   PLAYER_DEFUSED = "PLAYER_DEFUSED",
@@ -20,7 +23,6 @@ export enum ServerEventType {
   FAVOR_REQUESTED = "FAVOR_REQUESTED",
   FAVOR_RESOLVED = "FAVOR_RESOLVED",
   DECK_SHUFFLED = "DECK_SHUFFLED",
-  PHASE_CHANGED = "PHASE_CHANGED",
   GAME_OVER = "GAME_OVER"
 }
 
@@ -51,6 +53,34 @@ export interface PublicPlayerView {
   handSize: number;
   isAlive: boolean;
   turnOrder: number;
+}
+
+export interface CardPlayedPayload {
+  playerId: string;
+  cardType: string;
+  actionId: string;
+  nopeWindowExpiresAt: number;
+}
+
+export interface ComboPlayedPayload {
+  playerId: string;
+  cardTypes: string;
+  cardCount: number;
+  targetPlayerId: string;
+  actionId: string;
+  nopeWindowExpiresAt: number;
+}
+
+export interface NopePlayedPayload {
+  playerId: string;
+  actionId: string;
+  nopeWindowExpiresAt: number;
+}
+
+export interface NopeWindowResolvedPayload {
+  actionId: string;
+  type: PendingActionType;
+  executed: boolean;
 }
 
 export enum PrivateEventType {
