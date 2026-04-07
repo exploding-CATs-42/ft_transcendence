@@ -2,27 +2,87 @@
 
 ## ServerEventType (broadcast — server → all clients)
 
-| Value | Description |
+| Value | Payload | Description |
+|---|---|---|
+| GAME_STARTED | | Game moved from LOBBY to PLAYING |
+| TURN_CHANGED | | New player's turn began |
+| CARD_PLAYED | CardPlayedPayload | A single card was played. Nope window opens. Carries actionId and timer expiry |
+| COMBO_PLAYED | ComboPlayedPayload | A pair or triple was played. Nope window opens. Carries actionId and timer expiry |
+| NOPE_PLAYED | NopePlayedPayload | A Nope was played. Timer resets. Carries new expiry |
+| NOPE_WINDOW_RESOLVED | NopeWindowResolvedPayload | Timer expired. `executed: true` = effect happens, `executed: false` = cancelled by Nope |
+| CARD_DRAWN | | A player drew a card. Card type is NOT revealed to other players |
+| EXPLODING_KITTEN_DRAWN | | A player drew an Exploding Kitten |
+| PLAYER_DEFUSED | | A player survived with a Defuse |
+| PLAYER_ELIMINATED | | A player exploded and is out |
+| KITTEN_INSERTED | | Kitten was reinserted. Position is NOT revealed |
+| FAVOR_REQUESTED | | Favor resolved (not Noped), target must give a card |
+| FAVOR_RESOLVED | | Target gave a card. Card type revealed to all |
+| DECK_SHUFFLED | | Draw pile was shuffled |
+| GAME_OVER | | One player remaining. Includes winnerId |
+
+### Communication flow example
+
+A plays See the Future, no one Nopes:
+```
+Server → All          CARD_PLAYED { playerId, cardType, actionId, nopeWindowExpiresAt }
+                      ... timer expires ...
+Server → All          NOPE_WINDOW_RESOLVED { actionId, type: SEE_THE_FUTURE, executed: true }
+Server → Client A     SEE_THE_FUTURE_PEEK { cards }
+```
+
+A plays Skip, B Nopes it:
+```
+Server → All          CARD_PLAYED { playerId, cardType, actionId, nopeWindowExpiresAt }
+Server → All          NOPE_PLAYED { playerId: B, actionId, nopeWindowExpiresAt }
+                      ... timer expires ...
+Server → All          NOPE_WINDOW_RESOLVED { actionId, type: SKIP, executed: false }
+```
+
+## Broadcast Payload Interfaces
+
+### CardPlayedPayload
+
+Sent with CARD_PLAYED. Opens a Nope window.
+
+| Field | Description |
 |---|---|
-| GAME_STARTED | Game moved from LOBBY to PLAYING |
-| TURN_CHANGED | New player's turn began |
-| CARD_PLAYED | A single card was played (card goes to discard) |
-| COMBO_PLAYED | A pair or triple was played (cards go to discard) |
-| NOPE_PLAYED | A Nope was played. Timer resets. Payload includes new `nopeWindowExpiresAt` |
-| NOPE_WINDOW_OPENED | Timer started for a pending action. Payload includes `nopeWindowExpiresAt` |
-| NOPE_WINDOW_CLOSED | Timer expired. Action either resolved or was cancelled |
-| ACTION_RESOLVED | Pending action executed (`isNoped` was false) |
-| ACTION_CANCELLED | Pending action voided (`isNoped` was true) |
-| CARD_DRAWN | A player drew a card. Card type is NOT revealed to other players |
-| EXPLODING_KITTEN_DRAWN | A player drew an Exploding Kitten |
-| PLAYER_DEFUSED | A player survived with a Defuse |
-| PLAYER_ELIMINATED | A player exploded and is out |
-| KITTEN_INSERTED | Kitten was reinserted. Position is NOT revealed |
-| FAVOR_REQUESTED | Favor resolved (not Noped), target must give a card |
-| FAVOR_RESOLVED | Target gave a card. Card type revealed to all |
-| DECK_SHUFFLED | Draw pile was shuffled |
-| PHASE_CHANGED | Turn phase changed |
-| GAME_OVER | One player remaining. Includes winnerId |
+| playerId | Who played the card |
+| cardType | The type of card played |
+| actionId | UUID linking to the PendingAction |
+| nopeWindowExpiresAt | Epoch ms — when the Nope window auto-resolves |
+
+### ComboPlayedPayload
+
+Sent with COMBO_PLAYED. Opens a Nope window.
+
+| Field | Description |
+|---|---|
+| playerId | Who played the combo |
+| cardTypes | The card type used in the combo |
+| cardCount | 2 for pair, 3 for triple |
+| targetPlayerId | Who is being stolen from |
+| actionId | UUID linking to the PendingAction |
+| nopeWindowExpiresAt | Epoch ms — when the Nope window auto-resolves |
+
+### NopePlayedPayload
+
+Sent with NOPE_PLAYED. Resets the timer.
+
+| Field | Description |
+|---|---|
+| playerId | Who played the Nope |
+| actionId | UUID of the PendingAction being contested |
+| nopeWindowExpiresAt | New epoch ms — timer was reset |
+
+### NopeWindowResolvedPayload
+
+Sent with NOPE_WINDOW_RESOLVED. The window has closed.
+
+| Field | Description |
+|---|---|
+| actionId | UUID of the PendingAction that was resolved |
+| type | PendingActionType — what kind of action it was |
+| executed | `true` = effect happens (isNoped was false). `false` = cancelled (isNoped was true) |
 
 ## Public View Interfaces
 
@@ -90,7 +150,7 @@ What others see about a player.
 | GIVEN_AWAY | Card given via Favor |
 | EXPLODED | Entire hand discarded on elimination |
 
-## Payload Interfaces
+## Private Payload Interfaces
 
 | Interface | Fields | Notes |
 |---|---|---|
