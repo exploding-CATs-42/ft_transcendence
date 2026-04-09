@@ -134,7 +134,7 @@
 @media only screen and (min-width: 1920px) {
   .pageContainer {
     width: 1920px;
-    padding: 0 71px;
+    padding: 70px 71px 0 71px;
   }
 
   .titleButtonsContainer {
