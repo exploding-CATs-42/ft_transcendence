@@ -8,7 +8,7 @@
 
   width: 375px;
   margin: 0 auto;
-  padding-top: 26px;
+  padding: 26px 0;
 }
 
 .titleButtonsContainer {
@@ -87,6 +87,10 @@
 }
 
 @media only screen and (min-width: 768px) and (max-width: 1439.98px) {
+  .pageContainer {
+    min-height: 930px;
+  }
+
   .catImage {
     position: absolute;
     left: 290px;
