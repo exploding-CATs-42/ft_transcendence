@@ -1,3 +1,4 @@
+import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import clsx from "clsx";
 
@@ -12,12 +13,14 @@ interface Props {
 }
 
 const BurgerMenu = ({ isOpened, toggleMenu }: Props) => {
+  const location = useLocation();
+
   useEffect(() => {
-    if (isOpened) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "auto";
-    }
+    if (isOpened) toggleMenu(false);
+  }, [location.pathname]);
+
+  useEffect(() => {
+    document.body.style.overflow = isOpened ? "hidden" : "auto";
   }, [isOpened]);
 
   return (
