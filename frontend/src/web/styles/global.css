@@ -2,7 +2,17 @@
 @import "./normalization.css";
 
 :root {
-  --transition: all 0.3s ease-in-out 0s;
+  --transition-options: 250ms ease-in-out;
+
+  --exploding-kittens: #b81c27;
+  --exploding-kittens-hover: #90161f;
+  --throw-throw-burrito: #f19826;
+  --zombie-kittens: #acbe5a;
+  --off-white: #fcf8ee;
+  --soft-black: rgba(15, 15, 15, 0.6);
+  --throw-throw-burrito-hover: #b96e18;
+  --zombie-kittens-hover: #748239;
+  --modal-window-background: #5b1015;
 }
 
 input,
@@ -20,7 +30,9 @@ body {
   line-height: 1.29;
   letter-spacing: -0.02em;
 
-  background-image: url("/images/background.png");
+  color: var(--off-white);
+
+  background-image: url("/src/web/assets/images/background/background-mobile.png");
   background-size: cover;
   background-repeat: no-repeat;
   background-position: center;
