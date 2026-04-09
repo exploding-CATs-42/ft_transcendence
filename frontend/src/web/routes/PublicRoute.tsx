@@ -4,9 +4,9 @@ import { ReactNode } from "react";
 import { useAppSelector } from "../hooks";
 import { selectIsLoggedIn } from "../redux";
 
-type Props = {
+interface Props {
   children: ReactNode;
-};
+}
 
 export const PublicRoute = ({ children }: Props) => {
   const isLoggedIn = useAppSelector(selectIsLoggedIn);
