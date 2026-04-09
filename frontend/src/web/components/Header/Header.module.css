@@ -1,0 +1,45 @@
+.header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+
+  padding: 17.5px 20px;
+  background-color: var(--soft-black);
+
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.navigation > ul {
+  display: flex;
+  flex-direction: row;
+  gap: 120px;
+}
+
+@media only screen and (min-width: 1920px) {
+  .header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+
+    padding: 15px 70px;
+    background-color: var(--soft-black);
+
+    font-size: 40px;
+  }
+
+  .navigation > ul {
+    display: flex;
+    flex-direction: row;
+    gap: 120px;
+  }
+
+  .signUp {
+    background-color: var(--exploding-kittens);
+
+    padding: 4px 44px;
+    border-radius: 40px;
+  }
+}
