@@ -32,6 +32,7 @@ body {
 
   color: var(--off-white);
 
+  background-color: var(--throw-throw-burrito);
   background-image: url("/src/web/assets/images/background/background-mobile.png");
   background-size: cover;
   background-repeat: no-repeat;
