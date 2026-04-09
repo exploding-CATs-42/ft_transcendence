@@ -1,0 +1,44 @@
+.burgerMenuContainer {
+  --header-height: 80px;
+
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 144px;
+
+  width: 100vw;
+  height: calc(100vh - var(--header-height));
+  backdrop-filter: blur(10px);
+
+  position: fixed;
+  left: 0;
+  top: var(--header-height);
+
+  opacity: 0;
+  pointer-events: none;
+
+  transition: opacity var(--transition-options);
+}
+
+.openedBurgerMenu {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.burgerMenuButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  background-color: transparent;
+
+  stroke: var(--off-white);
+}
+
+.navContainer {
+  display: flex;
+  flex-direction: column;
+  row-gap: 20px;
+
+  width: 200px;
+}
