@@ -21,6 +21,15 @@ button {
   transition: var(--transition);
 }
 
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Knewave", sans-serif;
+}
+
 body {
   font-family: "Chewy", sans-serif;
   font-weight: 400;
