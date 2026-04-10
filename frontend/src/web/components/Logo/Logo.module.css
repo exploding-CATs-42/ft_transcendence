@@ -1,0 +1,6 @@
+.logo {
+  -webkit-filter: drop-shadow(1px 1px 0 var(--off-white))
+    drop-shadow(-1px -1px 0 var(--off-white));
+  filter: drop-shadow(1px 1px 0 var(--off-white))
+    drop-shadow(-1px -1px 0 var(--off-white));
+}
