@@ -39,7 +39,9 @@
       "pages": ["src/web/pages/index"],
       "pages/*": ["src/web/pages/*"],
       "assets": ["src/web/assets/index"],
-      "assets/*": ["src/web/assets/*"]
+      "assets/*": ["src/web/assets/*"],
+      "hooks": ["src/web/hooks/index"],
+      "hooks/*": ["src/web/hooks/*"]
     }
   },
   "include": ["vite.config.ts"]
