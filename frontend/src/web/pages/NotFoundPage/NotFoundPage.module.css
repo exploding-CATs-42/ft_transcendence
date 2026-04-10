@@ -1,3 +1,8 @@
+.background {
+  background-color: var(--exploding-kittens);
+  background-image: none;
+}
+
 .container {
   display: flex;
   flex-direction: column;
@@ -5,18 +10,94 @@
   align-items: center;
 
   flex: 1;
+
+  padding: 40px;
+}
+
+.notFoundContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+
+  margin: 0 auto 80px;
+
+  font-size: 64px;
+}
+
+.leftFour {
+  position: relative;
+  right: -20px;
+}
+
+.catomicBomb {
+  width: 247px;
+}
+
+.rightFour {
+  position: relative;
+  left: -30px;
+}
+
+.jokingMessage {
+  background-color: var(--black);
+  max-width: 400px;
+  padding: 18px 10px;
+  border-radius: 20px;
+  text-align: center;
+
+  font-size: 16px;
+
+  margin-bottom: 66px;
 }
 
 .linkButton {
-  width: 335px;
-  color: white;
-  text-align: center;
+  min-width: 212px;
+  background-color: var(--black);
+  font-size: 24px;
   padding: 14px 0;
-  border-radius: 8px;
+}
 
-  background: rgb(22, 22, 22);
+@media only screen and (min-width: 768px) {
+  .linkButton {
+    min-width: 260px;
+    font-size: 34px;
+  }
 
-  @media only screen and (min-width: 768px) {
-    width: 344px;
+  .catomicBomb {
+    width: 352px;
+  }
+
+  .notFoundContainer {
+    font-size: 150px;
+  }
+
+  .jokingMessage {
+    max-width: 573px;
+    font-size: 24px;
+
+    padding: 30px 34px;
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .linkButton {
+    min-width: 300px;
+    font-size: 40px;
+  }
+
+  .notFoundContainer {
+    font-size: 200px;
+  }
+
+  .catomicBomb {
+    width: 404px;
+  }
+
+  .jokingMessage {
+    padding: 22px 38px;
+    margin-bottom: 90px;
+
+    max-width: 926px;
   }
 }
