@@ -57,9 +57,23 @@ test-backend:
 test-orm:
 	$(COMPOSE) exec backend pnpm test:orm
 
+
+deps-frontend:
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm install"
+
+deps-backend:
+	$(COMPOSE) exec backend sh -c "CI=true pnpm install"
+
+deps:
+	$(COMPOSE) exec backend sh -c "CI=true pnpm install"
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm install"
+
 clean:
 	$(COMPOSE) down --remove-orphans
 	docker image prune -f
 	docker builder prune -f
 
-.PHONY: all up build down logs ps re backend-shell frontend-shell db-shell prisma-format prisma-validate prisma-generate prisma-migrate prisma-deploy prisma-reset seed test-backend test-orm clean
+.PHONY: all up build down logs ps re backend-shell frontend-shell db-shell \
+prisma-format prisma-validate prisma-generate prisma-migrate prisma-deploy \
+prisma-reset seed test-backend test-orm clean \
+deps deps-frontend deps-backend
