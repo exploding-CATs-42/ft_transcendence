@@ -18,7 +18,7 @@
 input,
 textarea,
 button {
-  transition: var(--transition);
+  transition: all var(--transition-options);
 }
 
 h1,
