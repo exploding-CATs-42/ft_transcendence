@@ -18,6 +18,8 @@
   pointer-events: none;
 
   transition: opacity var(--transition-options);
+
+  z-index: 1000;
 }
 
 .openedBurgerMenu {
