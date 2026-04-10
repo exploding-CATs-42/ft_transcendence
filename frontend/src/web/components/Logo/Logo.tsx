@@ -1,6 +1,9 @@
+import s from "./Logo.module.css";
+
 const Logo = () => {
   return (
     <img
+      className={s.logo}
       src="/src/web/assets/images/logo/logo-mobile.png"
       srcSet="
     /src/web/assets/images/logo/logo-mobile.png 51w,
