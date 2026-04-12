@@ -1,2 +1,2 @@
 export * from "./images";
-export * from "./icons";
+export { default as Icons } from "./icons/icons.svg";
