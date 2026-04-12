@@ -9,3 +9,4 @@ export { default as Navigation } from "./Navigation/Navigation";
 export { default as Modal } from "./Modal/Modal";
 export { default as Icon } from "./Icon/Icon";
 export { default as Input } from "./Input/Input";
+export { default as PasswordInput } from "./PasswordInput/PasswordInput";
