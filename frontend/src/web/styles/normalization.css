@@ -50,6 +50,7 @@ a {
 input,
 textarea {
   background-color: transparent;
+  color: inherit;
 }
 
 html,
