@@ -1,0 +1,13 @@
+.icon {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+}
+
+.leftIcon {
+  left: 14px;
+}
+
+.rightIcon {
+  right: 14px;
+}
