@@ -1,0 +1,59 @@
+.inputContainer {
+  position: relative;
+
+  svg {
+    fill: none;
+  }
+}
+
+.input {
+  border-radius: 12px;
+  border-width: 1px;
+  border-style: solid;
+  border-color: inherit;
+
+  line-height: 1.5;
+
+  width: 100%;
+  padding: 14px;
+}
+
+.pdLeft {
+  padding-left: 48px;
+}
+
+.pdRight {
+  padding-right: 48px;
+}
+
+.normal {
+  border-color: var(--off-white);
+
+  svg {
+    stroke: var(--off-white);
+  }
+}
+
+.success {
+  border-color: var(--zombie-kittens);
+
+  & > svg {
+    stroke: var(--zombie-kittens);
+  }
+}
+
+.error {
+  border-color: var(--exploding-kittens);
+
+  & > svg {
+    stroke: var(--exploding-kittens);
+  }
+}
+
+.warning {
+  border-color: var(--throw-throw-burrito);
+
+  & > svg {
+    stroke: var(--throw-throw-burrito);
+  }
+}
