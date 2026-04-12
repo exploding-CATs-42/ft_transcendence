@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
 
-import { CrossIcon } from "assets";
+import { Icon } from "components";
 
 import s from "./Modal.module.css";
 
@@ -55,7 +55,7 @@ const Modal = ({
           type="button"
           onClick={() => toggleModal()}
         >
-          <CrossIcon id={"close"} width={12} />
+          <Icon name="cross" id={"close"} width={12} />
         </button>
         {children}
       </div>
