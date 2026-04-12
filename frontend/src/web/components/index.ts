@@ -13,3 +13,4 @@ export { default as NameInput } from "./NameInput/NameInput";
 export { default as Avatar } from "./Avatar/Avatar";
 export { default as Navigation } from "./Navigation/Navigation";
 export { default as PasswordInput } from "./PasswordInput/PasswordInput";
+export { default as EmailInput } from "./EmailInput/EmailInput";
