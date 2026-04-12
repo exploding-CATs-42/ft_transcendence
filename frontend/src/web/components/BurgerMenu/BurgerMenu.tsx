@@ -2,8 +2,7 @@ import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import clsx from "clsx";
 
-import { BurgerMenuIcon, CrossIcon } from "assets";
-import { Navigation } from "components";
+import { Navigation, Icon } from "components";
 
 import s from "./BurgerMenu.module.css";
 
@@ -31,8 +30,8 @@ const BurgerMenu = ({ isOpened, toggleMenu }: Props) => {
           toggleMenu(!isOpened);
         }}
       >
-        {(isOpened && <CrossIcon width={32} height={32} />) || (
-          <BurgerMenuIcon width={48} height={26} />
+        {(isOpened && <Icon name="cross" width={32} height={32} />) || (
+          <Icon name="burger-menu" width={48} height={26} />
         )}
       </button>
       <div
