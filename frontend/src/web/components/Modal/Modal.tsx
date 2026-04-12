@@ -55,7 +55,7 @@ const Modal = ({
           type="button"
           onClick={() => toggleModal()}
         >
-          <CrossIcon id={"close"} width={12} />
+          <CrossIcon id={"close"} width={12} height={12} />
         </button>
         {children}
       </div>
