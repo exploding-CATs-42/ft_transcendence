@@ -6,15 +6,22 @@ type Variant = "profile" | "settings" | "badge";
 const variantClass: Record<Variant, string> = {
   profile: s.avatarProfile,
   settings: s.avatarSettings,
-  badge: s.avatarBadge,
+  badge: s.avatarBadge
 };
 
 interface Props {
   className?: string;
   variant?: Variant;
+  src?: string;
+  alt?: string;
 }
 
-const ProfileIcon = ({ className, variant = "profile" }: Props) => {
+const Avatar = ({
+  className,
+  variant = "profile",
+  src = "/src/web/assets/images/avatar/avatar-193w.png",
+  alt = "Fierce cat mascot logo in red and gold"
+}: Props) => {
   return (
     <img
       className={clsx(s.avatar, variantClass[variant], className)}
@@ -28,10 +35,10 @@ const ProfileIcon = ({ className, variant = "profile" }: Props) => {
       (min-width: 375px) 116px,
       45px
     "
-      src="/src/web/assets/images/avatar/avatar-193w.png"
-      alt="Fierce cat mascot logo in red and gold"
+      src={src}
+      alt={alt}
     />
   );
 };
 
-export default ProfileIcon;
+export default Avatar;
