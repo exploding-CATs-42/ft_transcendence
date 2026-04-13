@@ -5,6 +5,7 @@ import cors, { CorsOptions } from "cors";
 import { HttpError } from "http-errors";
 import "dotenv/config";
 import { docsRouter } from "./routes/docsRouter/docsRouter";
+import { usersRouter } from "./routes/usersRouter/usersRouter";
 
 const { FRONTEND_URL = "*" } = process.env;
 
@@ -24,6 +25,7 @@ app.get("/", (_, res) => {
 });
 
 app.use("/docs", docsRouter);
+app.use("/api/users", usersRouter);
 
 app.use((_, res) => {
   res.status(404).json({ message: "Route not found" });
