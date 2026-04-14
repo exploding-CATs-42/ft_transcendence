@@ -1,31 +1,22 @@
-import jwt from "jsonwebtoken";
+import jwt, { type JwtPayload, type SignOptions } from "jsonwebtoken";
 import type {
   AccessTokenPayload,
   RefreshTokenPayload,
 } from "../types/auth";
 
-const {
-  JWT_ACCESS_SECRET,
-  JWT_REFRESH_SECRET,
-  JWT_ACCESS_EXPIRES_IN,
-  JWT_REFRESH_EXPIRES_IN,
-} = process.env;
+function getEnv(name: string): string {
+  const value = process.env[name];
 
-if (!JWT_ACCESS_SECRET) {
-  throw new Error("JWT_ACCESS_SECRET is not set");
+  if (!value) {
+    throw new Error(`${name} is not set`);
+  }
+  return value;
 }
 
-if (!JWT_REFRESH_SECRET) {
-  throw new Error("JWT_REFRESH_SECRET is not set");
-}
-
-if (!JWT_ACCESS_EXPIRES_IN) {
-  throw new Error("JWT_ACCESS_EXPIRES_IN is not set");
-}
-
-if (!JWT_REFRESH_EXPIRES_IN) {
-  throw new Error("JWT_REFRESH_EXPIRES_IN is not set");
-}
+const jwtAccessSecret = getEnv("JWT_ACCESS_SECRET");
+const jwtRefreshSecret = getEnv("JWT_REFRESH_SECRET");
+const jwtAccessExpiresIn = getEnv("JWT_ACCESS_EXPIRES_IN");
+const jwtRefreshExpiresIn = getEnv("JWT_REFRESH_EXPIRES_IN");
 
 export function signAccessToken(payload: {
   sub: string;
@@ -39,8 +30,8 @@ export function signAccessToken(payload: {
       username: payload.username,
       type: "access",
     },
-    JWT_ACCESS_SECRET,
-    { expiresIn: JWT_ACCESS_EXPIRES_IN } as jwt.SignOptions
+    jwtAccessSecret,
+    { expiresIn: jwtAccessExpiresIn } as SignOptions
   );
 }
 
@@ -54,27 +45,50 @@ export function signRefreshToken(payload: {
       sessionId: payload.sessionId,
       type: "refresh",
     },
-    JWT_REFRESH_SECRET,
-    { expiresIn: JWT_REFRESH_EXPIRES_IN } as jwt.SignOptions
+    jwtRefreshSecret,
+    { expiresIn: jwtRefreshExpiresIn } as SignOptions
+  );
+}
+
+function isAccessTokenPayload(
+  decoded: string | JwtPayload
+): decoded is AccessTokenPayload {
+  return (
+    typeof decoded !== "string" &&
+    typeof decoded.sub === "string" &&
+    typeof decoded["email"] === "string" &&
+    typeof decoded["username"] === "string" &&
+    decoded["type"] === "access"
+  );
+}
+
+function isRefreshTokenPayload(
+  decoded: string | JwtPayload
+): decoded is RefreshTokenPayload {
+  return (
+    typeof decoded !== "string" &&
+    typeof decoded.sub === "string" &&
+    typeof decoded["sessionId"] === "string" &&
+    decoded["type"] === "refresh"
   );
 }
 
 export function verifyAccessToken(token: string): AccessTokenPayload {
-  const payload = jwt.verify(token, JWT_ACCESS_SECRET) as AccessTokenPayload;
+  const decoded = jwt.verify(token, jwtAccessSecret);
 
-  if (payload.type !== "access") {
-    throw new Error("Invalid access token type");
+  if (!isAccessTokenPayload(decoded)) {
+    throw new Error("Invalid access token payload");
   }
 
-  return payload;
+  return decoded;
 }
 
 export function verifyRefreshToken(token: string): RefreshTokenPayload {
-  const payload = jwt.verify(token, JWT_REFRESH_SECRET) as RefreshTokenPayload;
+  const decoded = jwt.verify(token, jwtRefreshSecret);
 
-  if (payload.type !== "refresh") {
-    throw new Error("Invalid refresh token type");
+  if (!isRefreshTokenPayload(decoded)) {
+    throw new Error("Invalid refresh token payload");
   }
 
-  return payload;
+  return decoded;
 }
