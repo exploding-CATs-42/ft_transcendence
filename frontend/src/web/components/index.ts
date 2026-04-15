@@ -12,3 +12,4 @@ export { default as Input } from "./Input/Input";
 export { default as PasswordInput } from "./PasswordInput/PasswordInput";
 export { default as EmailInput } from "./EmailInput/EmailInput";
 export { default as NameInput } from "./NameInput/NameInput";
+export { default as ConfirmPopup } from "./ConfirmPopup/ConfirmPopup";
