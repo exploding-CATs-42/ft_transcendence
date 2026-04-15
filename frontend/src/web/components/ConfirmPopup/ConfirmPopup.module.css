@@ -1,0 +1,50 @@
+.modal {
+  background-color: white;
+  color: black;
+  border-radius: 20px;
+  padding: 40px;
+
+  /* display: flex;
+  justify-content: center;
+  align-items: center; */
+
+  padding: 40px 57px;
+}
+
+.question {
+  margin-bottom: 32px;
+  text-align: center;
+}
+
+.buttonsContainer {
+  display: flex;
+  flex-direction: row;
+  column-gap: 16px;
+}
+
+.button {
+  min-width: 100px;
+  padding: 12px;
+
+  border: 1px solid transparent;
+
+  &:hover,
+  &:focus {
+    border-color: var(--black);
+    color: var(--off-white);
+  }
+}
+
+.button:nth-child(1) {
+  background-color: var(--zombie-kittens);
+}
+
+.button:nth-child(2) {
+  background-color: var(--exploding-kittens);
+}
+
+@media only screen and (min-width: 768px) {
+  .button {
+    min-width: 125px;
+  }
+}
