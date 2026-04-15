@@ -1,0 +1,134 @@
+paths:
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: Register a new user
+      description: Creates a new user account and returns access and refresh tokens.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./swagger.root.yaml#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+        "409":
+          description: Email or username already in use
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary: Login user
+      description: Authenticates a user, creates a new session, and returns access and refresh tokens.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./swagger.root.yaml#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+
+  /users/logout:
+    post:
+      tags:
+        - Users
+      summary: Logout user
+      description: Invalidates the current refresh session by deleting it from the database.
+      operationId: logoutUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./swagger.root.yaml#/components/schemas/LogoutRequest"
+      responses:
+        "204":
+          description: User logged out successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid refresh token or session not found
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+
+  /users/refresh:
+    post:
+      tags:
+        - Users
+      summary: Refresh tokens
+      description: Verifies the refresh token, rotates it, updates the session, and returns a new token pair.
+      operationId: refreshSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./swagger.root.yaml#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/RefreshResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or expired refresh token
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
