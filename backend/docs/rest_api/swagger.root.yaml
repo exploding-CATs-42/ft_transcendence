@@ -1,0 +1,198 @@
+openapi: 3.0.3
+
+info:
+  title: Hello World API
+  description: A simple Hello World API example using OpenAPI 3.0
+  version: 1.0.0
+
+servers:
+  - url: https://api.example.com/v1
+    description: Production server
+
+paths:
+  /hello:
+    $ref: "./hello.yaml#/paths/~1hello"
+
+  /hello/{name}:
+    $ref: "./hello.yaml#/paths/~1hello~1{name}"
+
+  /users/register:
+    $ref: "./users.yaml#/paths/~1users~1register"
+
+  /users/login:
+    $ref: "./users.yaml#/paths/~1users~1login"
+
+  /users/logout:
+    $ref: "./users.yaml#/paths/~1users~1logout"
+
+  /users/refresh:
+    $ref: "./users.yaml#/paths/~1users~1refresh"
+
+components:
+  schemas:
+    HelloResponse:
+      type: object
+      required:
+        - message
+        - timestamp
+      properties:
+        message:
+          type: string
+          description: The greeting message
+          example: Hello, World!
+        timestamp:
+          type: string
+          format: date-time
+          description: The time the greeting was generated
+          example: 2026-04-04T12:00:00Z
+
+    ErrorResponse:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Error code
+          example: BAD_REQUEST
+        message:
+          type: string
+          description: Human-readable error description
+          example: Invalid parameter provided
+
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - username
+        - avatarUrl
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        username:
+          type: string
+          example: alexfox
+        avatarUrl:
+          type: string
+          nullable: true
+          example: null
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: alexfox
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          example: Password123!
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          example: Password123!
+
+    LogoutRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: jwt-refresh-token
+
+    RefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: jwt-refresh-token
+
+    AuthResponse:
+      type: object
+      required:
+        - user
+        - accessToken
+        - refreshToken
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        accessToken:
+          type: string
+          example: jwt-access-token
+        refreshToken:
+          type: string
+          example: jwt-refresh-token
+
+    RefreshResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          example: new-jwt-access-token
+        refreshToken:
+          type: string
+          example: new-jwt-refresh-token
+
+    ApiErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Invalid refresh token
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - message
+        - errors
+      properties:
+        message:
+          type: string
+          example: Validation error
+        errors:
+          type: object
+          additionalProperties: true
+          example:
+            formErrors: []
+            fieldErrors:
+              email:
+                - Invalid email address

@@ -2,6 +2,7 @@ import express from "express";
 import path from "node:path";
 import fs from "node:fs";
 import swaggerUi from "swagger-ui-express";
+import SwaggerParser from "@apidevtools/swagger-parser";
 
 export const docsRouter = express.Router();
 
@@ -12,15 +13,26 @@ docsRouter.get("/", (_, res) => {
 });
 
 // ----------------- Swagger ----------------- //
-const swaggerDocument = JSON.parse(
-  fs.readFileSync(
-    path.resolve(__dirname, "../../../docs/rest_api/swagger.json"),
-    "utf-8"
-  )
-);
+
 
 docsRouter.use("/rest-api", swaggerUi.serve);
-docsRouter.get("/rest-api", swaggerUi.setup(swaggerDocument));
+
+docsRouter.get("/rest-api", async (_req, res, next) => {
+  try {
+    const rootPath = path.resolve(
+      __dirname,
+      "../../../docs/rest_api/swagger.root.yaml"
+    );
+
+    const swaggerDocument = await SwaggerParser.dereference(rootPath);
+
+    const html = swaggerUi.generateHTML(swaggerDocument);
+    res.send(html);
+  } catch (error) {
+    next(error);
+  }
+});
+
 
 // ----------------- AsyncAPI ----------------- //
 docsRouter.use("/sockets", (_, res) => {
