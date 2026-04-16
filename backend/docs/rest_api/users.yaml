@@ -11,20 +11,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./schemas/users.schemas.yaml#/components/schemas/RegisterRequest"
+              $ref: "./users.schemas.yaml#/components/schemas/RegisterRequest"
       responses:
         "201":
           description: User registered successfully
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/AuthResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/AuthResponse"
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
               example:
                 message: Validation error
                 errors:
@@ -37,7 +37,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Email or username already in use
         "500":
@@ -45,7 +45,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Internal server error
 
@@ -61,20 +61,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./schemas/users.schemas.yaml#/components/schemas/LoginRequest"
+              $ref: "./users.schemas.yaml#/components/schemas/LoginRequest"
       responses:
         "200":
           description: User logged in successfully
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/AuthResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/AuthResponse"
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
               example:
                 message: Validation error
                 errors:
@@ -87,7 +87,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Invalid email or password
         "500":
@@ -95,7 +95,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Internal server error
 
@@ -111,7 +111,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./schemas/users.schemas.yaml#/components/schemas/LogoutRequest"
+              $ref: "./users.schemas.yaml#/components/schemas/LogoutRequest"
       responses:
         "204":
           description: User logged out successfully
@@ -120,7 +120,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
               example:
                 message: Validation error
                 errors:
@@ -133,7 +133,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Invalid refresh token or session not found
         "500":
@@ -141,7 +141,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Internal server error
 
@@ -157,20 +157,20 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./schemas/users.schemas.yaml#/components/schemas/RefreshRequest"
+              $ref: "./users.schemas.yaml#/components/schemas/RefreshRequest"
       responses:
         "200":
           description: Tokens refreshed successfully
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/RefreshResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/RefreshResponse"
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
               example:
                 message: Validation error
                 errors:
@@ -183,7 +183,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Invalid or expired refresh token
         "404":
@@ -191,7 +191,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: User not found
         "500":
@@ -199,6 +199,6 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Internal server error
