@@ -1,4 +1,3 @@
-export { default as Avatar } from "./Avatar/Avatar";
 export { default as BurgerMenu } from "./BurgerMenu/BurgerMenu";
 export { default as Button } from "./Button/Button";
 export { default as CatImage } from "./CatImage/CatImage";
