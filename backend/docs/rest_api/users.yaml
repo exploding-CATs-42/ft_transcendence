@@ -4,7 +4,7 @@ paths:
       tags:
         - Users
       summary: Register a new user
-      description: Creates a new user account and returns access and refresh tokens.
+      description: Creates a new user account, creates the first session, and returns access and refresh tokens.
       operationId: registerUser
       requestBody:
         required: true
@@ -38,8 +38,15 @@ paths:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Email or username already in use
+              examples:
+                emailAlreadyInUse:
+                  summary: Email already in use
+                  value:
+                    message: Email already in use
+                usernameAlreadyInUse:
+                  summary: Username already in use
+                  value:
+                    message: Username already in use
         "500":
           description: Internal server error
           content:
@@ -103,8 +110,8 @@ paths:
     post:
       tags:
         - Users
-      summary: Logout user
-      description: Logs the user out by invalidating the current refresh session associated with the provided refresh token.
+      summary: Logout current session
+      description: Invalidates the current session associated with the provided refresh token.
       operationId: logoutUser
       requestBody:
         required: true
@@ -114,7 +121,7 @@ paths:
               $ref: "./users.schemas.yaml#/components/schemas/LogoutRequest"
       responses:
         "204":
-          description: User logged out successfully
+          description: Session logged out successfully
         "400":
           description: Validation error
           content:
@@ -129,13 +136,20 @@ paths:
                     refreshToken:
                       - Required
         "401":
-          description: Invalid refresh token or session not found
+          description: Refresh token is invalid or the session does not exist
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Invalid refresh token or session not found
+              examples:
+                invalidRefreshToken:
+                  summary: Invalid refresh token
+                  value:
+                    message: Invalid refresh token
+                sessionNotFound:
+                  summary: Session not found
+                  value:
+                    message: Session not found
         "500":
           description: Internal server error
           content:
@@ -149,8 +163,8 @@ paths:
     post:
       tags:
         - Users
-      summary: Refresh tokens
-      description: Verifies the refresh token, rotates it, updates the session, and returns a new token pair.
+      summary: Refresh current session tokens
+      description: Verifies the refresh token, validates the current session, rotates the refresh token, and returns a new token pair.
       operationId: refreshSession
       requestBody:
         required: true
@@ -179,13 +193,24 @@ paths:
                     refreshToken:
                       - Required
         "401":
-          description: Invalid or expired refresh token
+          description: Refresh token validation failed
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Invalid or expired refresh token
+              examples:
+                invalidRefreshToken:
+                  summary: Invalid refresh token
+                  value:
+                    message: Invalid refresh token
+                sessionNotFound:
+                  summary: Session not found
+                  value:
+                    message: Session not found
+                refreshTokenExpired:
+                  summary: Refresh token expired
+                  value:
+                    message: Refresh token expired
         "404":
           description: User not found
           content:
