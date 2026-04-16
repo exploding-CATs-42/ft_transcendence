@@ -11,26 +11,43 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./swagger.root.yaml#/components/schemas/RegisterRequest"
+              $ref: "./schemas/users.schemas.yaml#/components/schemas/RegisterRequest"
       responses:
         "201":
           description: User registered successfully
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/AuthResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/AuthResponse"
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    email:
+                      - Invalid email address
         "409":
           description: Email or username already in use
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Email or username already in use
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
 
   /users/login:
     post:
@@ -44,40 +61,57 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./swagger.root.yaml#/components/schemas/LoginRequest"
+              $ref: "./schemas/users.schemas.yaml#/components/schemas/LoginRequest"
       responses:
         "200":
           description: User logged in successfully
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/AuthResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/AuthResponse"
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    email:
+                      - Invalid email address
         "401":
           description: Invalid email or password
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid email or password
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
 
   /users/logout:
     post:
       tags:
         - Users
       summary: Logout user
-      description: Invalidates the current refresh session by deleting it from the database.
+      description: Logs the user out by invalidating the current refresh session associated with the provided refresh token.
       operationId: logoutUser
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: "./swagger.root.yaml#/components/schemas/LogoutRequest"
+              $ref: "./schemas/users.schemas.yaml#/components/schemas/LogoutRequest"
       responses:
         "204":
           description: User logged out successfully
@@ -86,13 +120,30 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    refreshToken:
+                      - Required
         "401":
           description: Invalid refresh token or session not found
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid refresh token or session not found
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
 
   /users/refresh:
     post:
@@ -106,29 +157,48 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./swagger.root.yaml#/components/schemas/RefreshRequest"
+              $ref: "./schemas/users.schemas.yaml#/components/schemas/RefreshRequest"
       responses:
         "200":
           description: Tokens refreshed successfully
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/RefreshResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/RefreshResponse"
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    refreshToken:
+                      - Required
         "401":
           description: Invalid or expired refresh token
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid or expired refresh token
         "404":
           description: User not found
           content:
             application/json:
               schema:
-                $ref: "./swagger.root.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./schemas/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error

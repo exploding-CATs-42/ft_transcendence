@@ -1,0 +1,151 @@
+components:
+  schemas:
+    User:
+      type: object
+      required:
+        - id
+        - email
+        - username
+        - avatarUrl
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        username:
+          type: string
+          example: alexfox
+        avatarUrl:
+          type: string
+          nullable: true
+          example: null
+
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: alexfox
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          example: Password123!
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          example: Password123!
+
+    LogoutRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: jwt-refresh-token
+
+    RefreshRequest:
+      type: object
+      required:
+        - refreshToken
+      properties:
+        refreshToken:
+          type: string
+          example: jwt-refresh-token
+
+    AuthResponse:
+      type: object
+      required:
+        - user
+        - accessToken
+        - refreshToken
+      properties:
+        user:
+          $ref: "#/components/schemas/User"
+        accessToken:
+          type: string
+          example: jwt-access-token
+        refreshToken:
+          type: string
+          example: jwt-refresh-token
+
+    RefreshResponse:
+      type: object
+      required:
+        - accessToken
+        - refreshToken
+      properties:
+        accessToken:
+          type: string
+          example: new-jwt-access-token
+        refreshToken:
+          type: string
+          example: new-jwt-refresh-token
+
+    ApiErrorResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Request failed
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - message
+        - errors
+      properties:
+        message:
+          type: string
+          example: Validation error
+        errors:
+          type: object
+          required:
+            - formErrors
+            - fieldErrors
+          properties:
+            formErrors:
+              type: array
+              items:
+                type: string
+              example: []
+            fieldErrors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+              example:
+                email:
+                  - Invalid email address
+                password:
+                  - Password must be at least 8 characters
