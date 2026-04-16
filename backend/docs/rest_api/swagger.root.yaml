@@ -8,7 +8,7 @@ info:
 servers:
   - url: http://localhost:8080/api
     description: Docker + Nginx local development
-  - url: http://localhost:3000
+  - url: http://localhost:3000/api
     description: Backend-only local development
 
 tags:
@@ -18,12 +18,30 @@ tags:
 paths:
   /users/register:
     $ref: "./users.yaml#/paths/~1users~1register"
-
   /users/login:
     $ref: "./users.yaml#/paths/~1users~1login"
-
   /users/logout:
     $ref: "./users.yaml#/paths/~1users~1logout"
-
   /users/refresh:
     $ref: "./users.yaml#/paths/~1users~1refresh"
+
+components:
+  schemas:
+    User:
+      $ref: "./users.schemas.yaml#/components/schemas/User"
+    RegisterRequest:
+      $ref: "./users.schemas.yaml#/components/schemas/RegisterRequest"
+    LoginRequest:
+      $ref: "./users.schemas.yaml#/components/schemas/LoginRequest"
+    LogoutRequest:
+      $ref: "./users.schemas.yaml#/components/schemas/LogoutRequest"
+    RefreshRequest:
+      $ref: "./users.schemas.yaml#/components/schemas/RefreshRequest"
+    AuthResponse:
+      $ref: "./users.schemas.yaml#/components/schemas/AuthResponse"
+    RefreshResponse:
+      $ref: "./users.schemas.yaml#/components/schemas/RefreshResponse"
+    ApiErrorResponse:
+      $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+    ValidationErrorResponse:
+      $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
