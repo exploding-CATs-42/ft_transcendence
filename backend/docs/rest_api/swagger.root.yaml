@@ -14,34 +14,36 @@ servers:
 tags:
   - name: Users
     description: User authentication and session management
+   
 
 paths:
   /users/register:
-    $ref: "./users.yaml#/paths/~1users~1register"
+    $ref: "users/users.yaml#/paths/~1users~1register"
   /users/login:
-    $ref: "./users.yaml#/paths/~1users~1login"
+    $ref: "users/users.yaml#/paths/~1users~1login"
   /users/logout:
-    $ref: "./users.yaml#/paths/~1users~1logout"
+    $ref: "users/users.yaml#/paths/~1users~1logout"
   /users/refresh:
-    $ref: "./users.yaml#/paths/~1users~1refresh"
+    $ref: "users/users.yaml#/paths/~1users~1refresh"
+  
 
 components:
   schemas:
     User:
-      $ref: "./users.schemas.yaml#/components/schemas/User"
+      $ref: "users/users.schemas.yaml#/components/schemas/User"
     RegisterRequest:
-      $ref: "./users.schemas.yaml#/components/schemas/RegisterRequest"
+      $ref: "users/users.schemas.yaml#/components/schemas/RegisterRequest"
     LoginRequest:
-      $ref: "./users.schemas.yaml#/components/schemas/LoginRequest"
+      $ref: "users/users.schemas.yaml#/components/schemas/LoginRequest"
     LogoutRequest:
-      $ref: "./users.schemas.yaml#/components/schemas/LogoutRequest"
+      $ref: "users/users.schemas.yaml#/components/schemas/LogoutRequest"
     RefreshRequest:
-      $ref: "./users.schemas.yaml#/components/schemas/RefreshRequest"
+      $ref: "users/users.schemas.yaml#/components/schemas/RefreshRequest"
     AuthResponse:
-      $ref: "./users.schemas.yaml#/components/schemas/AuthResponse"
+      $ref: "users/users.schemas.yaml#/components/schemas/AuthResponse"
     RefreshResponse:
-      $ref: "./users.schemas.yaml#/components/schemas/RefreshResponse"
+      $ref: "users/users.schemas.yaml#/components/schemas/RefreshResponse"
     ApiErrorResponse:
-      $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+      $ref: "users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
     ValidationErrorResponse:
-      $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+      $ref: "users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
