@@ -21,7 +21,7 @@ docsRouter.get("/rest-api", async (_req, res, next) => {
   try {
     const rootPath = path.resolve(
       __dirname,
-      "../../../docs/rest_api/swagger.root.yaml"
+      "../../../docs/rest_api/swagger.yaml"
     );
 
     const swaggerDocument = await SwaggerParser.dereference(rootPath);
