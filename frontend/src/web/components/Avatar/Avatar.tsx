@@ -1,12 +1,14 @@
 import clsx from "clsx";
 import s from "./Avatar.module.css";
 
-type Variant = "profile" | "settings" | "badge";
+type Variant = "profile" | "settings" | "badge" | "friend" | "match";
 
 const variantClass: Record<Variant, string> = {
   profile: s.avatarProfile,
   settings: s.avatarSettings,
-  badge: s.avatarBadge
+  badge: s.avatarBadge,
+  friend: s.avatarFriend,
+  match: s.avatarMatch,
 };
 
 interface Props {

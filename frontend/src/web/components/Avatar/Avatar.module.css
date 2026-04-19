@@ -1,37 +1,74 @@
 .avatar {
-	border-radius: 50%;
+  border-radius: 50%;
 }
 
 .avatarProfile {
-	width: 45px;
+  width: 45px;
+  height: 45px;
 }
 
 .avatarSettings {
-	width: 100px;
+  width: 100px;
+  height: 100px;
 }
 
 .avatarBadge {
-	width: 30px;
+  width: 30px;
+  height: 30px;
+}
+
+.avatarFriend {
+  width: 45px;
+  height: 45px;
+}
+
+.avatarMatch {
+  width: 40px;
+  height: 40px;
 }
 
 @media only screen and (min-width: 768px) {
-	.avatarProfile {
-		width: 116px;
-	}
+  .avatarProfile {
+    width: 116px;
+    height: 116px;
+  }
 
-	.avatarBadge {
-		width: 44px;
-	}
+  .avatarBadge {
+    width: 44px;
+    height: 44px;
+  }
+
+  .avatarFriend {
+    width: 50px;
+    height: 50px;
+  }
 }
 
 @media only screen and (min-width: 1440px) {
-	.avatarProfile {
-		width: 137px;
-	}
+  .avatarProfile {
+    width: 137px;
+    height: 137px;
+  }
+
+  .avatarFriend {
+    width: 70px;
+    height: 70px;
+  }
+
+  .avatarMatch {
+    width: 60px;
+    height: 60px;
+  }
 }
 
 @media only screen and (min-width: 1920px) {
-	.avatarProfile {
-		width: 193px;
-	}
+  .avatarProfile {
+    width: 193px;
+    height: 193px;
+  }
+
+  .avatarFriend {
+    width: 80px;
+    height: 80px;
+  }
 }
