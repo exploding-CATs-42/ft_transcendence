@@ -10,7 +10,7 @@ const HomePage = lazy(() => import("./pages/HomePage/HomePage.jsx"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage.jsx"));
 const GamePage = lazy(() => import("./pages/GamePage/GamePage.jsx"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage/NotFoundPage.js"));
-const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage.js"));
+const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage"));
 
 function App() {
   return (

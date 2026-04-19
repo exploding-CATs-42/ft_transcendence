@@ -4,11 +4,11 @@ import s from "./AuthForm.module.css";
 import type { ReactNode } from "react";
 
 interface Props {
-  title?: string;
-  children?: ReactNode;
-  redirectMessage?: string;
-  redirectTitle?: string;
-  redirectLink?: string;
+  title: string;
+  children: ReactNode;
+  redirectMessage: string;
+  redirectTitle: string;
+  redirectLink: string;
 }
 
 const AuthForm = ({
@@ -24,7 +24,7 @@ const AuthForm = ({
         <span>{title}</span>
         <Icon name="paw" width={50} height={50} fill={"#fcf8ee"}></Icon>
       </div>
-      <form className={s.formInputContainer}>{children}</form>
+      <form className={s.formInputContainer} onSubmit={(event) => event.preventDefault()}>{children}</form>
       <Button className={s.signIn} onClick={() => {}}>
         {title}
       </Button>

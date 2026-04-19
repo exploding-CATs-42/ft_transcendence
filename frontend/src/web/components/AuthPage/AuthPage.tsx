@@ -17,11 +17,11 @@ const AuthPage = ({ children }: Props) => {
 
   return (
     <div className={s.pageContainer}>
-      <div className={s.title}>
+      <h1 className={s.title}>
         <span>
           Exploding <span className={s.kittensSpan}>kittens</span>
         </span>
-      </div>
+      </h1>
       <div className={s.formBackground}>{children}</div>
     </div>
   );
