@@ -16,7 +16,7 @@ interface Props {
     | "eye"
     | "eye-off"
     | "lock"
-    | "logout"
+    | "log-out"
     | "mail"
     | "paw"
     | "pencil"
