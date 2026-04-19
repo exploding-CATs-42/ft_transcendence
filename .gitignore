@@ -1,6 +1,7 @@
 dist/
 build/
 .DS_Store
+.vscode
 
 # Logs
 logs
