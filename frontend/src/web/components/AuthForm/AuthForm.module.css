@@ -1,0 +1,36 @@
+.formTitleContainer {
+  display: flex;
+  justify-content: center;
+
+  font-size: 40px;
+
+  gap: 16px;
+  width: 100%;
+  padding-bottom: 20px;
+}
+
+.formInputContainer {
+  display: flex;
+  flex-direction: column;
+
+  padding-bottom: 25px;
+  gap: 15px;
+}
+
+.signIn {
+  padding: 7px 85px;
+  max-width: 100%;
+  background-color: var(--zombie-kittens);
+  margin-bottom: 15px;
+}
+
+.signUp {
+  font-size: 16px;
+  color: rgba(252, 248, 238, 0.4);
+}
+
+.signUpLink {
+  font-weight: 700;
+  text-decoration: underline;
+  color: var(--off-white);
+}
