@@ -22,6 +22,10 @@ button {
   transition: all var(--transition-options);
 }
 
+input:focus-visible {
+	outline: none;
+}
+
 h1,
 h2,
 h3,
