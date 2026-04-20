@@ -1,0 +1,27 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  overflow-y: auto;
+}
+
+.empty {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+  font-size: 30px;
+}
+
+@media only screen and (min-width: 768px) {
+  .empty {
+    font-size: 40px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .empty {
+    font-size: 50px;
+  }
+}
