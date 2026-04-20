@@ -13,6 +13,7 @@ export { default as LinkButton } from "./LinkButton/LinkButton";
 export { default as List } from "./List/List";
 export { default as ListItem } from "./ListItem/ListItem";
 export { default as Logo } from "./Logo/Logo";
+export { default as MatchListItem } from "./MatchListItem/MatchListItem";
 export { default as Modal } from "./Modal/Modal";
 export { default as NameInput } from "./NameInput/NameInput";
 export { default as Navigation } from "./Navigation/Navigation";
