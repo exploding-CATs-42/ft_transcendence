@@ -9,15 +9,15 @@ export const docsRouter = express.Router();
 // ----------------- Redirects ----------------- //
 // Redirect /docs to /docs/rest-api
 docsRouter.get("/", (_, res) => {
-  res.redirect("/docs/rest-api");
+  res.redirect("rest-api/");
 });
 
 // ----------------- Swagger ----------------- //
 
 
-docsRouter.use("/rest-api", swaggerUi.serve);
+docsRouter.use("/rest-api/", swaggerUi.serve);
 
-docsRouter.get("/rest-api", async (_req, res, next) => {
+docsRouter.get("/rest-api/", async (_req, res, next) => {
   try {
     const rootPath = path.resolve(
       __dirname,
@@ -48,7 +48,7 @@ docsRouter.use("/sockets", (_, res) => {
         <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
         <script>
           AsyncApiStandalone.render({
-            schema: { url: '/docs/asyncapi.yaml' },
+            schema: { url: '/api/docs/asyncapi.yaml' },
             config: { show: { sidebar: true } },
           }, document.getElementById('asyncapi'));
         </script>
