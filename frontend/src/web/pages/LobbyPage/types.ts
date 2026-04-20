@@ -8,3 +8,7 @@ export type LobbyMatch = {
   title: string;
   players: LobbyPlayer[];
 };
+
+export type LobbyPage = {
+  matches: LobbyMatch[];
+};
