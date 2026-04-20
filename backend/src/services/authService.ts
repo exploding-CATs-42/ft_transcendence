@@ -6,11 +6,11 @@ import {
   signRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt";
-import type {
-  LoginResponse,
-  RefreshResponse,
-  RegisterResponse,
-} from "../types/auth";
+import type { AuthResponse, RefreshResponse } from "../types/auth";
+import type { RegisterRequestBody } from "../schemas/users/registerSchema";
+import type { LoginRequestBody } from "../schemas/users/loginSchema";
+import type { LogoutRequestBody } from "../schemas/users/logoutSchema";
+import type { RefreshRequestBody } from "../schemas/users/refreshSchema";
 
 export class AuthServiceError extends Error {
   public statusCode: number;
@@ -35,11 +35,9 @@ function toPublicUser(user: {
   };
 }
 
-export async function registerUser(input: {
-  email: string;
-  username: string;
-  password: string;
-}): Promise<RegisterResponse> {
+export async function registerUser(
+  input: RegisterRequestBody
+): Promise<AuthResponse> {
   const existingByEmail = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -96,10 +94,9 @@ export async function registerUser(input: {
   };
 }
 
-export async function loginUser(input: {
-  email: string;
-  password: string;
-}): Promise<LoginResponse> {
+export async function loginUser(
+  input: LoginRequestBody
+): Promise<AuthResponse> {
   const user = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -147,9 +144,9 @@ export async function loginUser(input: {
   };
 }
 
-export async function logoutUser(input: {
-  refreshToken: string;
-}): Promise<void> {
+export async function logoutUser(
+  input: LogoutRequestBody
+): Promise<void> {
   let payload;
 
   try {
@@ -177,9 +174,9 @@ export async function logoutUser(input: {
   });
 }
 
-export async function refreshSession(input: {
-  refreshToken: string;
-}): Promise<RefreshResponse> {
+export async function refreshSession(
+  input: RefreshRequestBody
+): Promise<RefreshResponse> {
   let payload;
 
   try {
