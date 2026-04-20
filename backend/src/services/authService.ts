@@ -35,6 +35,12 @@ function toPublicUser(user: {
   };
 }
 
+const REFRESH_TOKEN_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+
+function getRefreshTokenExpiresAt(): Date {
+  return new Date(Date.now() + REFRESH_TOKEN_LIFETIME_MS);
+}
+
 export async function registerUser(
   input: RegisterRequestBody
 ): Promise<AuthResponse> {
@@ -77,7 +83,7 @@ export async function registerUser(
       id: sessionId,
       userId: user.id,
       refreshTokenHash,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: getRefreshTokenExpiresAt(),
     },
   });
 
@@ -127,7 +133,7 @@ export async function loginUser(
       id: sessionId,
       userId: user.id,
       refreshTokenHash,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: getRefreshTokenExpiresAt(),
     },
   });
 
@@ -234,7 +240,7 @@ export async function refreshSession(
     where: { id: session.id },
     data: {
       refreshTokenHash: newRefreshTokenHash,
-      expiresAt: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
+      expiresAt: getRefreshTokenExpiresAt(),
     },
   });
 
