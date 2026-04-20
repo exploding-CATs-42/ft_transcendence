@@ -1,17 +1,11 @@
 export interface PublicUser {
-    id: string;
-    email: string;
-    username: string;
-    avatarUrl: string | null;
+  id: string;
+  email: string;
+  username: string;
+  avatarUrl: string | null;
 }
 
-export interface RegisterResponse {
-    user: PublicUser;
-    accessToken: string;
-    refreshToken: string;
-}
-
-export interface LoginResponse {
+export interface AuthResponse {
   user: PublicUser;
   accessToken: string;
   refreshToken: string;
@@ -20,6 +14,18 @@ export interface LoginResponse {
 export interface RefreshResponse {
   accessToken: string;
   refreshToken: string;
+}
+
+export interface ApiErrorResponse {
+  message: string;
+}
+
+export interface ValidationErrorResponse {
+  message: string;
+  errors: {
+    formErrors: string[];
+    fieldErrors: Record<string, string[]>;
+  };
 }
 
 export interface AccessTokenPayload {
@@ -43,23 +49,4 @@ export interface AuthenticatedUser {
   id: string;
   email: string;
   username: string;
-}
-
-export interface RegisterRequestBody {
-  email: string;
-  username: string;
-  password: string;
-}
-
-export interface LoginRequestBody {
-  email: string;
-  password: string;
-}
-
-export interface LogoutRequestBody {
-  refreshToken: string;
-}
-
-export interface RefreshRequestBody {
-  refreshToken: string;
 }
