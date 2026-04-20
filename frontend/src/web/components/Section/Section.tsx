@@ -3,18 +3,11 @@ import s from "./Section.module.css";
 
 interface Props {
   className?: string;
-	children?: React.ReactNode;
+  children?: React.ReactNode;
 }
 
-const Section = ({
-  className,
-	children
-}: Props) => {
-  return (
-    <div className={clsx(s.section, className)}>
-			{children}
-    </div>
-  );
+const Section = ({ className, children }: Props) => {
+  return <div className={clsx(s.section, className)}>{children}</div>;
 };
 
 export default Section;
