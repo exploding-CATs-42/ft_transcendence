@@ -102,11 +102,15 @@ async function main() {
       update: {
         username: "alice",
         passwordHash,
+        isOnline: true,
+        lastSeenAt: new Date(),
       },
       create: {
         email: "alice@example.com",
         username: "alice",
         passwordHash,
+        isOnline: true,
+        lastSeenAt: new Date(),
       },
     }),
     prisma.user.upsert({
@@ -114,11 +118,15 @@ async function main() {
       update: {
         username: "bob",
         passwordHash,
+        isOnline: false,
+        lastSeenAt: new Date(Date.now() - 1000 * 60 * 15),
       },
       create: {
         email: "bob@example.com",
         username: "bob",
         passwordHash,
+        isOnline: false,
+        lastSeenAt: new Date(Date.now() - 1000 * 60 * 15),
       },
     }),
     prisma.user.upsert({
@@ -126,11 +134,15 @@ async function main() {
       update: {
         username: "carol",
         passwordHash,
+        isOnline: false,
+        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60),
       },
       create: {
         email: "carol@example.com",
         username: "carol",
         passwordHash,
+        isOnline: false,
+        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60),
       },
     }),
     prisma.user.upsert({
@@ -138,11 +150,15 @@ async function main() {
       update: {
         username: "dave",
         passwordHash,
+        isOnline: false,
+        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
       },
       create: {
         email: "dave@example.com",
         username: "dave",
         passwordHash,
+        isOnline: false,
+        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
       },
     }),
   ]);
@@ -161,6 +177,12 @@ async function main() {
       high: carol.id < dave.id ? dave.id : carol.id,
       requestedById: carol.id,
       status: FriendshipStatus.PENDING,
+    },
+    {
+      low: alice.id < dave.id ? alice.id : dave.id,
+      high: alice.id < dave.id ? dave.id : alice.id,
+      requestedById: dave.id,
+      status: FriendshipStatus.REJECTED,
     },
   ];
 

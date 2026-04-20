@@ -20,7 +20,7 @@ describe("Prisma ORM smoke tests", () => {
     await prisma.$disconnect();
   });
 
-  it("creates a user", async () => {
+  it("creates a user with presence fields", async () => {
     const suffix = randomUUID();
 
     const user = await prisma.user.create({
@@ -28,11 +28,15 @@ describe("Prisma ORM smoke tests", () => {
         email: `orm-user-${suffix}@example.com`,
         username: `orm_user_${suffix.replace(/-/g, "").slice(0, 12)}`,
         passwordHash: "hashed-password",
+        isOnline: true,
+        lastSeenAt: new Date(),
       },
     });
 
     expect(user.id).toBeDefined();
     expect(user.email).toContain("@example.com");
+    expect(user.isOnline).toBe(true);
+    expect(user.lastSeenAt).not.toBeNull();
   });
 
   it("rejects duplicate email", async () => {
@@ -91,6 +95,41 @@ describe("Prisma ORM smoke tests", () => {
 
     expect(friendship.userLowId).toBe(low);
     expect(friendship.userHighId).toBe(high);
+    expect(friendship.status).toBe(FriendshipStatus.PENDING);
+  });
+
+  it("creates friendship with rejected status", async () => {
+    const suffix = randomUUID().replace(/-/g, "");
+
+    const userA = await prisma.user.create({
+      data: {
+        email: `reject-a-${suffix}@example.com`,
+        username: `reject_a_${suffix.slice(0, 10)}`,
+        passwordHash: "hashed-password",
+      },
+    });
+
+    const userB = await prisma.user.create({
+      data: {
+        email: `reject-b-${suffix}@example.com`,
+        username: `reject_b_${suffix.slice(0, 10)}`,
+        passwordHash: "hashed-password",
+      },
+    });
+
+    const low = userA.id < userB.id ? userA.id : userB.id;
+    const high = userA.id < userB.id ? userB.id : userA.id;
+
+    const friendship = await prisma.friendship.create({
+      data: {
+        userLowId: low,
+        userHighId: high,
+        requestedById: userA.id,
+        status: FriendshipStatus.REJECTED,
+      },
+    });
+
+    expect(friendship.status).toBe(FriendshipStatus.REJECTED);
   });
 
   it("creates a game with membership", async () => {
