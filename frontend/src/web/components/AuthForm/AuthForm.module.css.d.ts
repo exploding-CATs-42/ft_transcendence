@@ -4,5 +4,7 @@ declare const styles: {
   readonly "signIn": string;
   readonly "signUp": string;
   readonly "signUpLink": string;
+  readonly "title": string;
 };
 export = styles;
+

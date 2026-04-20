@@ -1,5 +1,6 @@
 declare const styles: {
-  readonly "background": string;
+  readonly "backgroundContainer": string;
+  readonly "blur": string;
   readonly "formBackground": string;
   readonly "kittensSpan": string;
   readonly "pageContainer": string;

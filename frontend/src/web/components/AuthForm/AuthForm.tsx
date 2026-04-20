@@ -1,7 +1,9 @@
-import { Button, Icon, LinkButton } from "components";
+import type { ReactNode } from "react";
+import { Link } from "react-router-dom";
+
+import { Button, Icon } from "components";
 
 import s from "./AuthForm.module.css";
-import type { ReactNode } from "react";
 
 interface Props {
   title: string;
@@ -21,18 +23,23 @@ const AuthForm = ({
   return (
     <>
       <div className={s.formTitleContainer}>
-        <span>{title}</span>
-        <Icon name="paw" width={50} height={50} fill={"#fcf8ee"}></Icon>
+        <span className={s.title}>{title}</span>
+        <Icon name="paw" width={50} height={50} fill={"#fcf8ee"} />
       </div>
-      <form className={s.formInputContainer} onSubmit={(event) => event.preventDefault()}>{children}</form>
+      <form
+        className={s.formInputContainer}
+        onSubmit={(event) => event.preventDefault()}
+      >
+        {children}
+      </form>
       <Button className={s.signIn} onClick={() => {}}>
         {title}
       </Button>
       <span className={s.signUp}>
         {redirectMessage}{" "}
-        <LinkButton className={s.signUpLink} to={redirectLink || "/"}>
+        <Link className={s.signUpLink} to={redirectLink || "/"}>
           {redirectTitle}
-        </LinkButton>
+        </Link>
       </span>
     </>
   );

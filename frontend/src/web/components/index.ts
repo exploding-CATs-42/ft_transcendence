@@ -16,4 +16,3 @@ export { default as Navigation } from "./Navigation/Navigation";
 export { default as PasswordInput } from "./PasswordInput/PasswordInput";
 export { default as Section } from "./Section/Section";
 export { default as AuthForm } from "./AuthForm/AuthForm";
-export { default as AuthPage } from "./AuthPage/AuthPage";
