@@ -163,6 +163,10 @@ export async function logoutUser(
     throw new AuthServiceError("Session not found", 401);
   }
 
+  if (session.userId !== payload.sub) {
+    throw new AuthServiceError("Invalid refresh token", 401);
+  }
+
   const incomingHash = hashRefreshToken(input.refreshToken);
 
   if (session.refreshTokenHash !== incomingHash) {
@@ -191,6 +195,10 @@ export async function refreshSession(
 
   if (!session) {
     throw new AuthServiceError("Session not found", 401);
+  }
+
+  if (session.userId !== payload.sub) {
+    throw new AuthServiceError("Invalid refresh token", 401);
   }
 
   const incomingHash = hashRefreshToken(input.refreshToken);
