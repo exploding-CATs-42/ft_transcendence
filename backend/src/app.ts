@@ -24,7 +24,7 @@ app.get("/", (_, res) => {
   return res.json({ message: "Hello world!" });
 });
 
-app.use("/docs", docsRouter);
+app.use("/api/docs", docsRouter);
 app.use("/api/users", usersRouter);
 
 app.use((_, res) => {
