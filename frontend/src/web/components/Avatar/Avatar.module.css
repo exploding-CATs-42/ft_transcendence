@@ -1,0 +1,37 @@
+.avatar {
+	border-radius: 50%;
+}
+
+.avatarProfile {
+	width: 45px;
+}
+
+.avatarSettings {
+	width: 100px;
+}
+
+.avatarBadge {
+	width: 30px;
+}
+
+@media only screen and (min-width: 768px) {
+	.avatarProfile {
+		width: 116px;
+	}
+
+	.avatarBadge {
+		width: 44px;
+	}
+}
+
+@media only screen and (min-width: 1440px) {
+	.avatarProfile {
+		width: 137px;
+	}
+}
+
+@media only screen and (min-width: 1920px) {
+	.avatarProfile {
+		width: 193px;
+	}
+}

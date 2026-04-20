@@ -1,0 +1,229 @@
+paths:
+  /users/register:
+    post:
+      tags:
+        - Users
+      summary: Register a new user
+      description: Creates a new user account, creates the first session, and returns access and refresh tokens.
+      operationId: registerUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./users.schemas.yaml#/components/schemas/RegisterRequest"
+      responses:
+        "201":
+          description: User registered successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    email:
+                      - Invalid email address
+        "409":
+          description: Email or username already in use
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                emailAlreadyInUse:
+                  summary: Email already in use
+                  value:
+                    message: Email already in use
+                usernameAlreadyInUse:
+                  summary: Username already in use
+                  value:
+                    message: Username already in use
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
+  /users/login:
+    post:
+      tags:
+        - Users
+      summary: Login user
+      description: Authenticates a user, creates a new session, and returns access and refresh tokens.
+      operationId: loginUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./users.schemas.yaml#/components/schemas/LoginRequest"
+      responses:
+        "200":
+          description: User logged in successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/AuthResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    email:
+                      - Invalid email address
+        "401":
+          description: Invalid email or password
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid email or password
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
+  /users/logout:
+    post:
+      tags:
+        - Users
+      summary: Logout current session
+      description: Invalidates the current session associated with the provided refresh token.
+      operationId: logoutUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./users.schemas.yaml#/components/schemas/LogoutRequest"
+      responses:
+        "204":
+          description: Session logged out successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    refreshToken:
+                      - Required
+        "401":
+          description: Refresh token is invalid or the session does not exist
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                invalidRefreshToken:
+                  summary: Invalid refresh token
+                  value:
+                    message: Invalid refresh token
+                sessionNotFound:
+                  summary: Session not found
+                  value:
+                    message: Session not found
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
+  /users/refresh:
+    post:
+      tags:
+        - Users
+      summary: Refresh current session tokens
+      description: Verifies the refresh token, validates the current session, rotates the refresh token, and returns a new token pair.
+      operationId: refreshSession
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./users.schemas.yaml#/components/schemas/RefreshRequest"
+      responses:
+        "200":
+          description: Tokens refreshed successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/RefreshResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    refreshToken:
+                      - Required
+        "401":
+          description: Refresh token validation failed
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                invalidRefreshToken:
+                  summary: Invalid refresh token
+                  value:
+                    message: Invalid refresh token
+                sessionNotFound:
+                  summary: Session not found
+                  value:
+                    message: Session not found
+                refreshTokenExpired:
+                  summary: Refresh token expired
+                  value:
+                    message: Refresh token expired
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "500":
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error

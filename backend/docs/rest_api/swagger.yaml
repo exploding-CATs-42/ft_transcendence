@@ -1,0 +1,49 @@
+openapi: 3.0.3
+
+info:
+  title: Transcendence REST API
+  version: 1.0.0
+  description: REST API documentation for the ft_transcendence backend.
+
+servers:
+  - url: http://localhost:8080/api
+    description: Docker + Nginx local development
+  - url: http://localhost:3000/api
+    description: Backend-only local development
+
+tags:
+  - name: Users
+    description: User authentication and session management
+   
+
+paths:
+  /users/register:
+    $ref: "users/users.yaml#/paths/~1users~1register"
+  /users/login:
+    $ref: "users/users.yaml#/paths/~1users~1login"
+  /users/logout:
+    $ref: "users/users.yaml#/paths/~1users~1logout"
+  /users/refresh:
+    $ref: "users/users.yaml#/paths/~1users~1refresh"
+  
+
+components:
+  schemas:
+    User:
+      $ref: "users/users.schemas.yaml#/components/schemas/User"
+    RegisterRequest:
+      $ref: "users/users.schemas.yaml#/components/schemas/RegisterRequest"
+    LoginRequest:
+      $ref: "users/users.schemas.yaml#/components/schemas/LoginRequest"
+    LogoutRequest:
+      $ref: "users/users.schemas.yaml#/components/schemas/LogoutRequest"
+    RefreshRequest:
+      $ref: "users/users.schemas.yaml#/components/schemas/RefreshRequest"
+    AuthResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/AuthResponse"
+    RefreshResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/RefreshResponse"
+    ApiErrorResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+    ValidationErrorResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
