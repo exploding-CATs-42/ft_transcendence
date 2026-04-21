@@ -1,0 +1,82 @@
+paths:
+  /me:
+    patch:
+      tags:
+        - Me
+      summary: Update current user profile
+      description: Updates the authenticated user's profile fields. At least one field must be provided.
+      operationId: updateMe
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./me.schemas.yaml#/components/schemas/UpdateMeRequest"
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./me.schemas.yaml#/components/schemas/UpdateMeResponse"
+              example:
+                user:
+                  id: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+                  email: alex@example.com
+                  username: alex_new
+                  avatarUrl: null
+                  isOnline: true
+                  lastSeenAt: "2026-04-20T10:00:00.000Z"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors:
+                    - At least one field must be provided
+                  fieldErrors: {}
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "409":
+          description: Email or username already in use
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                emailAlreadyInUse:
+                  summary: Email already in use
+                  value:
+                    message: Email already in use
+                usernameAlreadyInUse:
+                  summary: Username already in use
+                  value:
+                    message: Username already in use
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
