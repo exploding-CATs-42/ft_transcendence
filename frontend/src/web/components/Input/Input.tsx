@@ -10,7 +10,7 @@ interface Props {
   pdRight?: boolean;
   status?: InputStatus;
   placeholder?: string;
-	className?: string;
+  className?: string;
   children?: React.ReactNode;
 }
 
