@@ -10,7 +10,7 @@
   border-radius: 12px;
   border-width: 1px;
   border-style: solid;
-  border-color: inherit;
+  border: 1px solid rgba(252, 248, 238, 0.3);
 
   line-height: 1.5;
 
