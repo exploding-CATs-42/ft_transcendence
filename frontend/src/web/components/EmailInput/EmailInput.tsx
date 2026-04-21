@@ -3,10 +3,16 @@ import clsx from "clsx";
 import { Icon, Input } from "components";
 
 import s from "./EmailInput.module.css";
+import type { InputStatus } from "components/Input/InputStatus";
 
-const EmailInput = () => {
+interface Props {
+  placeholder?: string;
+  status?: InputStatus;
+}
+
+const EmailInput = ({ placeholder = "Email", status = "normal" }: Props) => {
   return (
-    <Input type="email" pdLeft={true}>
+    <Input type="email" pdLeft={true} placeholder={placeholder} status={status}>
       <Icon
         className={clsx(s.icon, s.leftIcon)}
         name="mail"
