@@ -227,3 +227,230 @@ paths:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Server error
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Search users by username
+      description: Returns users whose username exactly matches the provided value, using case-insensitive comparison.
+      operationId: searchUsers
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: Exact username to search for.
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 30
+            example: alex
+      responses:
+        "200":
+          description: Users returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/UserSearchResponse"
+              example:
+                users:
+                  - id: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+                    username: alex
+                    avatarUrl: null
+                    isOnline: false
+                    lastSeenAt: "2026-04-20T09:45:00.000Z"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    username:
+                      - String must contain at least 3 character(s)
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get public user profile
+      description: Returns public profile information for a user.
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/UserResponse"
+              example:
+                user:
+                  id: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+                  username: alex
+                  avatarUrl: null
+                  isOnline: false
+                  lastSeenAt: "2026-04-20T09:45:00.000Z"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+              example:
+                message: Validation error
+                errors:
+                  formErrors: []
+                  fieldErrors:
+                    userId:
+                      - Invalid UUID
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+  /users/{userId}/stats:
+    get:
+      tags:
+        - Users
+      summary: Get user stats
+      description: Returns basic game statistics for a user.
+      operationId: getUserStats
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User stats returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/UserStatsResponse"
+              example:
+                stats:
+                  totalGames: 10
+                  wins: 6
+                  losses: 4
+                  winRate: 60
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+  /users/{userId}/games:
+    get:
+      tags:
+        - Users
+      summary: Get user game history
+      description: Returns game history for a user.
+      operationId: getUserGames
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User game history returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/UserGamesResponse"
+              example:
+                games:
+                  - gameId: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
+                    createdAt: "2026-04-20T10:00:00.000Z"
+                    startedAt: "2026-04-20T10:01:00.000Z"
+                    endedAt: "2026-04-20T10:10:00.000Z"
+                    winnerUserId: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+                    isWinner: true
+                    players:
+                      - id: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+                        username: alex
+                        avatarUrl: null
+                        isOnline: false
+                        lastSeenAt: "2026-04-20T09:45:00.000Z"
+                      - id: 183d8fae-06b2-49f6-b5f9-3b31ea511902
+                        username: bob
+                        avatarUrl: null
+                        isOnline: true
+                        lastSeenAt: "2026-04-20T10:00:00.000Z"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error

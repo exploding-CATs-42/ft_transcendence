@@ -24,6 +24,47 @@ components:
           nullable: true
           example: null
 
+    PublicProfileUser:
+      type: object
+      required:
+        - id
+        - username
+        - avatarUrl
+        - isOnline
+        - lastSeenAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        username:
+          type: string
+          example: alex
+        avatarUrl:
+          type: string
+          nullable: true
+          example: null
+        isOnline:
+          type: boolean
+          example: false
+        lastSeenAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-20T09:45:00.000Z"
+
+    SelfProfileUser:
+      allOf:
+        - $ref: "#/components/schemas/PublicProfileUser"
+        - type: object
+          required:
+            - email
+          properties:
+            email:
+              type: string
+              format: email
+              example: alex@example.com
+
     RegisterRequest:
       type: object
       required:
@@ -108,6 +149,105 @@ components:
         refreshToken:
           type: string
           example: new-jwt-refresh-token
+
+    UserResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: "#/components/schemas/PublicProfileUser"
+
+    UserSearchResponse:
+      type: object
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicProfileUser"
+
+    UserStats:
+      type: object
+      required:
+        - totalGames
+        - wins
+        - losses
+        - winRate
+      properties:
+        totalGames:
+          type: integer
+          example: 10
+        wins:
+          type: integer
+          example: 6
+        losses:
+          type: integer
+          example: 4
+        winRate:
+          type: integer
+          example: 60
+
+    UserStatsResponse:
+      type: object
+      required:
+        - stats
+      properties:
+        stats:
+          $ref: "#/components/schemas/UserStats"
+
+    UserGameHistoryItem:
+      type: object
+      required:
+        - gameId
+        - createdAt
+        - startedAt
+        - endedAt
+        - winnerUserId
+        - isWinner
+        - players
+      properties:
+        gameId:
+          type: string
+          format: uuid
+          example: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
+        createdAt:
+          type: string
+          format: date-time
+          example: "2026-04-20T10:00:00.000Z"
+        startedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-20T10:01:00.000Z"
+        endedAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-20T10:10:00.000Z"
+        winnerUserId:
+          type: string
+          format: uuid
+          nullable: true
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        isWinner:
+          type: boolean
+          example: true
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicProfileUser"
+
+    UserGamesResponse:
+      type: object
+      required:
+        - games
+      properties:
+        games:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserGameHistoryItem"
 
     ApiErrorResponse:
       type: object

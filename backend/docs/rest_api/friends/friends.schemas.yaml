@@ -1,0 +1,80 @@
+components:
+  schemas:
+    FriendStatus:
+      type: string
+      enum:
+        - PENDING
+        - ACCEPTED
+        - REJECTED
+
+    FriendDirection:
+      type: string
+      enum:
+        - incoming
+        - outgoing
+        - accepted
+
+    FriendListItem:
+      type: object
+      required:
+        - user
+        - status
+        - direction
+      properties:
+        user:
+          $ref: "../users/users.schemas.yaml#/components/schemas/PublicProfileUser"
+        status:
+          $ref: "#/components/schemas/FriendStatus"
+        direction:
+          $ref: "#/components/schemas/FriendDirection"
+
+    FriendsListResponse:
+      type: object
+      required:
+        - friends
+      properties:
+        friends:
+          type: array
+          items:
+            $ref: "#/components/schemas/FriendListItem"
+
+    CreateFriendRequest:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: 183d8fae-06b2-49f6-b5f9-3b31ea511902
+
+    UpdateFriendshipRequest:
+      type: object
+      required:
+        - action
+      properties:
+        action:
+          type: string
+          enum:
+            - accept
+            - reject
+          example: accept
+
+    DeleteFriendshipRequest:
+      type: object
+      required:
+        - userId
+      properties:
+        userId:
+          type: string
+          format: uuid
+          example: 183d8fae-06b2-49f6-b5f9-3b31ea511902
+
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Operation completed
