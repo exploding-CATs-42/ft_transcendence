@@ -12,7 +12,7 @@ interface Props {
 
 const NameInput = ({ placeholder = "Name", status = "normal" }: Props) => {
   return (
-    <Input type="email" pdLeft={true} placeholder={placeholder} status={status}>
+    <Input type="text" pdLeft={true} placeholder={placeholder} status={status}>
       <Icon
         className={clsx(s.icon, s.leftIcon)}
         name="user"
