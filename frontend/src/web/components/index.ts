@@ -17,4 +17,5 @@ export { default as Modal } from "./Modal/Modal";
 export { default as NameInput } from "./NameInput/NameInput";
 export { default as Navigation } from "./Navigation/Navigation";
 export { default as PasswordInput } from "./PasswordInput/PasswordInput";
+export { default as SearchInput } from "./SearchInput/SearchInput";
 export { default as Section } from "./Section/Section";
