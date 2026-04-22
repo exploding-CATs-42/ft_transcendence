@@ -27,7 +27,7 @@ const AuthForm = ({
         <Icon name="paw" width={50} height={50} fill={"#fcf8ee"} />
       </div>
       <form
-        className={s.formInputContainer}
+        className={s.form}
         onSubmit={(event) => event.preventDefault()}
       >
         <div className={s.inputsContainer}>{children}</div>
