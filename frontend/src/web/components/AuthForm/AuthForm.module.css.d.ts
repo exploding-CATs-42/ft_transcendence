@@ -1,6 +1,7 @@
 declare const styles: {
-  readonly "formInputContainer": string;
+  readonly "form": string;
   readonly "formTitleContainer": string;
+  readonly "inputsContainer": string;
   readonly "signIn": string;
   readonly "signUp": string;
   readonly "signUpLink": string;
