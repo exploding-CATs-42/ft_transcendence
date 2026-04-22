@@ -16,6 +16,15 @@
   gap: 15px;
 }
 
+.inputsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+
+  width: 100%;
+  margin-bottom: 25px;
+}
+
 .signIn {
   width: 222px;
   height: 40px;
