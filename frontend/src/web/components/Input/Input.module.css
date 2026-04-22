@@ -1,5 +1,6 @@
 .inputContainer {
   position: relative;
+  width: 100%;
 
   svg {
     fill: none;
@@ -15,7 +16,7 @@
   line-height: 1.5;
 
   width: 100%;
-  padding: 14px;
+  padding: 13px 14px;
 }
 
 .input::placeholder {
