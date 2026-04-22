@@ -36,8 +36,8 @@ const PasswordInput = ({
         <Icon
           className={s.rightIcon}
           name={type == "password" ? "eye-off" : "eye"}
-          width={22}
-          height={22}
+          width={24}
+          height={24}
         />
       </button>
     </Input>
