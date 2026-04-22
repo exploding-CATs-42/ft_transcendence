@@ -4,11 +4,11 @@ import s from "./Button.module.css";
 
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
 
-const Button = ({ className, children, onClick }: Props) => {
+const Button = ({ className, children, onClick, type }: Props) => {
   return (
     <button
       className={clsx(s.button, className)}
-      type="button"
+      type={type ?? "button"}
       onClick={onClick}
     >
       {children}
