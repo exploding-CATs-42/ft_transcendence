@@ -40,7 +40,7 @@
 
 .signUp {
   font-size: 16px;
-  color: rgba(252, 248, 238, 0.4);
+  color: rgba(var(--off-white-rgb), 0.5);
 
   font-family: "Shantell Sans", sans-serif;
 }
