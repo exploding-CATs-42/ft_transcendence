@@ -30,7 +30,7 @@ const AuthForm = ({
         className={s.formInputContainer}
         onSubmit={(event) => event.preventDefault()}
       >
-        {children}
+        <div className={s.inputsContainer}>{children}</div>
       </form>
       <Button className={s.signIn} onClick={() => {}}>
         {title}
