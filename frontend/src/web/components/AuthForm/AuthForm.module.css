@@ -6,6 +6,7 @@
 
 .title {
   font-size: 40px;
+  font-family: "Shantell Sans", sans-serif;
 }
 
 .form {
@@ -25,6 +26,8 @@
 
   width: 100%;
   margin-bottom: 25px;
+
+  font-family: "Playpen Sans", sans-serif;
 }
 
 .signIn {
@@ -38,6 +41,8 @@
 .signUp {
   font-size: 16px;
   color: rgba(252, 248, 238, 0.4);
+
+  font-family: "Shantell Sans", sans-serif;
 }
 
 .signUpLink {
