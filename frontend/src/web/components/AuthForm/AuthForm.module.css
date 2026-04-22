@@ -8,7 +8,7 @@
   font-size: 40px;
 }
 
-.formInputContainer {
+.form {
   display: flex;
   flex-direction: column;
 
