@@ -18,6 +18,10 @@
   padding: 14px;
 }
 
+.input::placeholder {
+  color: rgba(var(--off-white-rgb), 0.6);
+}
+
 .pdLeft {
   padding-left: 48px;
 }
@@ -27,10 +31,10 @@
 }
 
 .normal {
-  border-color: var(--off-white-transparent);
+  border-color: rgba(var(--off-white-rgb), 0.3);
 
-  svg {
-    stroke: var(--off-white-transparent);
+  & > svg {
+    stroke: rgba(var(--off-white-rgb), 0.8);
   }
 }
 
