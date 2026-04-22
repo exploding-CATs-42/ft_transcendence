@@ -11,9 +11,11 @@
 .form {
   display: flex;
   flex-direction: column;
+  align-items: center;
 
-  margin-bottom: 25px;
-  gap: 15px;
+  margin-bottom: 15px;
+
+  width: 100%;
 }
 
 .inputsContainer {
