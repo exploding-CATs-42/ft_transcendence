@@ -5,7 +5,8 @@
   padding-inline: var(--container-inline-padding);
   padding-block: var(--container-block-padding);
 
-  flex: 1;
+  height: calc(100vh - 80px);
+
   display: flex;
   flex-direction: column;
 }
