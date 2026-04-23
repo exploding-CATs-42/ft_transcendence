@@ -4,6 +4,7 @@ import type { LobbyMatch } from "components/MatchListItem/types";
 import { matchesMock } from "./mocks";
 
 import s from "./LobbyPage.module.css";
+import clsx from 'clsx';
 
 const LobbyPage = () => {
   const matches: LobbyMatch[] = matchesMock;
@@ -19,7 +20,7 @@ const LobbyPage = () => {
         />
         <div className={s.buttons}>
           <Button className={s.button}>Create table</Button>
-          <Button className={s.button}>Join table</Button>
+          <Button className={clsx(s.button, s.color)}>Join table</Button>
         </div>
       </Section>
     </div>
