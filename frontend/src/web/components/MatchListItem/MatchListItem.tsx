@@ -1,7 +1,7 @@
-import type { LobbyMatch } from "pages/LobbyPage/types";
-import s from "./MatchListItem.module.css";
-
 import { Avatar, ListItem } from "components";
+
+import type { LobbyMatch } from "./types";
+import s from "./MatchListItem.module.css";
 
 interface Props {
   match: LobbyMatch;
