@@ -11,7 +11,7 @@ const { FRONTEND_URL = "*" } = process.env;
 
 const corsOptions: CorsOptions = {
   origin: FRONTEND_URL,
-  optionsSuccessStatus: 200
+  optionsSuccessStatus: 200,
 };
 
 const app = express();
@@ -20,20 +20,21 @@ app.use(pino(prettyFormat()));
 app.use(cors(corsOptions));
 app.use(express.json());
 
-app.get("/", (_, res) => {
+app.get("/", (_req, res) => {
   return res.json({ message: "Hello world!" });
 });
 
 app.use("/api/docs", docsRouter);
 app.use("/api/users", usersRouter);
 
-app.use((_, res) => {
+app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
 });
 
-app.use((error: unknown, _: Request, res: Response, __: NextFunction) => {
-  if (error instanceof HttpError)
+app.use((error: unknown, _req: Request, res: Response, _next: NextFunction) => {
+  if (error instanceof HttpError) {
     return res.status(error.status).json({ message: error.message });
+  }
 
   return res.status(500).json({ message: "Server error" });
 });
