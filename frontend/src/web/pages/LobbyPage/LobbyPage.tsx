@@ -17,17 +17,11 @@ const LobbyPage = () => {
           renderItem={(match) => <MatchListItem match={match} />}
           className={s.list}
         />
-        <Footer />
+        <div className={s.buttons}>
+          <Button className={s.button}>Create table</Button>
+          <Button className={s.button}>Join table</Button>
+        </div>
       </Section>
-    </div>
-  );
-};
-
-const Footer = () => {
-  return (
-    <div className={s.footer}>
-      <Button className={s.button}>Create table</Button>
-      <Button className={s.button}>Join table</Button>
     </div>
   );
 };
