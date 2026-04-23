@@ -1,6 +1,8 @@
 import { Avatar, ListItem } from "components";
 
-import type { LobbyMatch } from "./types";
+import { createMatchSlots, isPlaceholderSlot } from "./slots";
+import type { LobbyMatch, MatchSlot } from "./types";
+
 import s from "./MatchListItem.module.css";
 
 interface Props {
@@ -8,16 +10,26 @@ interface Props {
 }
 
 const MatchListItem = ({ match }: Props) => {
-  const players = match.players;
+  const slots: MatchSlot[] = createMatchSlots(match.players);
 
   return (
     <ListItem>
       <div className={s.container}>
         <span className={s.title}>{match.title}</span>
         <ul className={s.items}>
-          {players.map((player) => (
-            <li key={player.id}>
-              <Avatar variant="match" src={player.avatarUrl} />
+          {slots.map((slot, index) => (
+            <li
+              key={`${match.id}_${index}`}
+              data-placeholder={isPlaceholderSlot(slot)}
+              className={s.item}
+            >
+              {!isPlaceholderSlot(slot) && (
+                <Avatar
+                  className={s.avatar}
+                  variant="match"
+                  src={slot.player.avatarUrl}
+                />
+              )}
             </li>
           ))}
         </ul>

@@ -1,6 +1,7 @@
 .container {
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
 
   gap: 6px;
 
@@ -14,6 +15,13 @@
   justify-content: space-around;
 }
 
+.item[data-placeholder="true"] {
+  width: 40px;
+  height: 40px;
+  border-radius: 40px;
+  background-color: var(--exploding-kittens-transparent);
+}
+
 .title {
   font-size: 20px;
   line-height: 26px;
@@ -21,13 +29,22 @@
   color: var(--black);
 }
 
-@media only screen and (min-width: 768px) {
+.avatar {
+  border: 2px solid var(--zombie-kittens);
+}
+
+@media only screen and (min-width: 420px) {
   .container {
     flex-direction: row;
-
     align-items: center;
-    justify-content: space-between;
+  }
+  .items {
+    gap: 5px;
+  }
+}
 
+@media only screen and (min-width: 768px) {
+  .container {
     padding-block: 10px;
   }
 
@@ -40,6 +57,11 @@
   .title {
     font-size: 30px;
     line-height: 39px;
+  }
+
+  .item[data-placeholder="true"] {
+    width: 60px;
+    height: 60px;
   }
 }
 
