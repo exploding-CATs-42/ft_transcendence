@@ -8,3 +8,8 @@ export type LobbyMatch = {
   title: string;
   players: LobbyPlayer[];
 };
+
+export type MatchSlot = { id: number } & (
+  | { kind: "real"; player: LobbyPlayer }
+  | { kind: "placeholder" }
+);
