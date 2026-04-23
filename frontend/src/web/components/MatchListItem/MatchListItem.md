@@ -1,31 +1,40 @@
 # MatchListItem
 
-`MatchListItem` renders one lobby match row, including match title and player avatars.
+`MatchListItem` renders one lobby table row with a title and a fixed number of player slots.
 
 ## Component API
 
 | Prop | Type | Required | Description |
 | --- | --- | --- | --- |
-| `match` | `LobbyMatch` | Yes | Match data used to render title and player avatars. |
+| `match` | `LobbyMatch` | Yes | Match data used to render the table title and occupied player slots. |
 
 `LobbyMatch` shape:
 
 ```ts
+type LobbyPlayer = {
+  id: string;
+  avatarUrl: string;
+};
+
 type LobbyMatch = {
   id: string;
   title: string;
-  players: {
-    id: string;
-    avatarUrl: string;
-  }[];
+  players: LobbyPlayer[];
 };
 ```
+
+## Render behavior
+
+- The component always renders a fixed number of slots via `createMatchSlots` from `slots.ts`.
+- Current max slot count is `5` (`MAX_PLAYERS` constant in `slots.ts`).
+- Real players render an `Avatar` with `variant="match"`.
+- Empty slots render a placeholder circle (`data-placeholder="true"`).
 
 ## Basic usage
 
 ```tsx
 import { MatchListItem } from "components";
-import type { LobbyMatch } from "pages/LobbyPage/types";
+import type { LobbyMatch } from "components/MatchListItem/types";
 
 const match: LobbyMatch = {
   id: "table-1",
@@ -47,7 +56,7 @@ export default MatchRow;
 
 ```tsx
 import { List, MatchListItem } from "components";
-import type { LobbyMatch } from "pages/LobbyPage/types";
+import type { LobbyMatch } from "components/MatchListItem/types";
 
 type Props = {
   matches: LobbyMatch[];
@@ -70,4 +79,5 @@ export default MatchesList;
 ## Notes
 
 - This component already wraps content in `ListItem`, so it is intended to be rendered inside `List` via `renderItem`.
-- Avatar rendering uses `Avatar` with `variant="match"`.
+- Slot metadata types are defined in `types.ts` (`MatchSlot`, `LobbyMatch`, `LobbyPlayer`).
+- Placeholder styling is controlled by `MatchListItem.module.css` using the `data-placeholder` attribute.
