@@ -1,21 +1,15 @@
 import express from "express";
 import path from "node:path";
-import fs from "node:fs";
 import swaggerUi from "swagger-ui-express";
 import SwaggerParser from "@apidevtools/swagger-parser";
 
 export const docsRouter = express.Router();
 
-// ----------------- Redirects ----------------- //
-// Redirect /docs to /docs/rest-api
-docsRouter.get("/", (_, res) => {
-  res.redirect("rest-api/");
+docsRouter.get("/", (req, res) => {
+  res.redirect(`${req.baseUrl}/rest-api/`);
 });
 
-// ----------------- Swagger ----------------- //
-
-
-docsRouter.use("/rest-api/", swaggerUi.serve);
+docsRouter.use("/rest-api", swaggerUi.serve);
 
 docsRouter.get("/rest-api/", async (_req, res, next) => {
   try {
@@ -26,16 +20,14 @@ docsRouter.get("/rest-api/", async (_req, res, next) => {
 
     const swaggerDocument = await SwaggerParser.dereference(rootPath);
 
-    const html = swaggerUi.generateHTML(swaggerDocument);
-    res.send(html);
+    res.send(swaggerUi.generateHTML(swaggerDocument));
   } catch (error) {
+    console.error("Swagger load error:", error);
     next(error);
   }
 });
 
-
-// ----------------- AsyncAPI ----------------- //
-docsRouter.use("/sockets", (_, res) => {
+docsRouter.get("/sockets", (_req, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -57,7 +49,6 @@ docsRouter.use("/sockets", (_, res) => {
   `);
 });
 
-// Also expose the raw spec file
 docsRouter.use(
   "/asyncapi.yaml",
   express.static(path.join(__dirname, "../../../docs/sockets/asyncapi.yaml"))
