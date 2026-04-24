@@ -48,13 +48,13 @@ paths:
                   value:
                     message: Username already in use
         "500":
-          description: Internal server error
+          description: Server error
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Internal server error
+                message: Server error
 
   /users/login:
     post:
@@ -98,13 +98,13 @@ paths:
               example:
                 message: Invalid email or password
         "500":
-          description: Internal server error
+          description: Server error
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Internal server error
+                message: Server error
 
   /users/logout:
     post:
@@ -151,13 +151,13 @@ paths:
                   value:
                     message: Session not found
         "500":
-          description: Internal server error
+          description: Server error
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Internal server error
+                message: Server error
 
   /users/refresh:
     post:
@@ -220,10 +220,10 @@ paths:
               example:
                 message: User not found
         "500":
-          description: Internal server error
+          description: Server error
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Internal server error
+                message: Server error
