@@ -12,6 +12,7 @@ const LobbyPage = lazy(() => import("./pages/LobbyPage/LobbyPage"));
 const GamePage = lazy(() => import("./pages/GamePage/GamePage.jsx"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage/NotFoundPage.js"));
 const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/RegisterPage/RegisterPage"));
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
         <Route path="lobby" element={<LobbyPage />}></Route>
         <Route path="game" element={<GamePage />}></Route>
         <Route path="login" element={<LoginPage />}></Route>
+        <Route path="register" element={<RegisterPage />}></Route>
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

@@ -1,6 +1,7 @@
 import { Button, LinkButton } from "components";
 
 import s from "./Navigation.module.css";
+import { Link } from "react-router-dom";
 
 const Navigation = () => {
   const navLinks = [
@@ -23,7 +24,9 @@ const Navigation = () => {
         </ul>
       </nav>
 
-      <Button className={s.signUp}>Sign up</Button>
+      <Link to="/register">
+        <Button className={s.signUp}>Sign up</Button>
+      </Link>
     </>
   );
 };
