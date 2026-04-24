@@ -27,17 +27,14 @@
 
   background-color: var(--modal-window-background);
 
+  width: 100%;
   max-width: 409px;
   padding: 50px 40px;
 
-  box-shadow:
-    0 4px 8px 0 rgba(0, 0, 0, 0.25),
-    0 6px 20px 0 rgba(0, 0, 0, 0.25);
+  box-shadow: 2px 4px 4px 2px var(--shadow);
 
   border: 1px solid rgba(252, 248, 238, 0.4);
   border-radius: 10%;
-
-  font-family: "Shantell Sans";
 }
 
 .blur {
@@ -64,7 +61,6 @@
 @media only screen and (min-width: 768px) {
   .formBackground {
     padding: 40px 60px;
-    min-height: 409px;
   }
 
   .pageContainer {

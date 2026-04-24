@@ -4,14 +4,11 @@ import type { InputType } from "./InputType";
 import type { InputStatus } from "./InputStatus";
 import s from "./Input.module.css";
 
-interface Props {
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   type: InputType;
   pdLeft?: boolean;
   pdRight?: boolean;
   status?: InputStatus;
-  placeholder?: string;
-  className?: string;
-  children?: React.ReactNode;
 }
 
 const defaultState: Props = {

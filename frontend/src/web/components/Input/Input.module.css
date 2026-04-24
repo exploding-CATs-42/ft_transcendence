@@ -1,5 +1,6 @@
 .inputContainer {
   position: relative;
+  width: 100%;
 
   svg {
     fill: none;
@@ -15,7 +16,11 @@
   line-height: 1.5;
 
   width: 100%;
-  padding: 14px;
+  padding: 13px 14px;
+}
+
+.input::placeholder {
+  color: rgba(var(--off-white-rgb), 0.6);
 }
 
 .pdLeft {
@@ -27,10 +32,10 @@
 }
 
 .normal {
-  border-color: var(--off-white-transparent);
+  border-color: rgba(var(--off-white-rgb), 0.3);
 
-  svg {
-    stroke: var(--off-white-transparent);
+  & > svg {
+    stroke: rgba(var(--off-white-rgb), 0.8);
   }
 }
 
