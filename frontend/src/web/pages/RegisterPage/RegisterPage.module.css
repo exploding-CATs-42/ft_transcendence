@@ -34,6 +34,7 @@
   box-shadow: 2px 4px 4px 2px var(--shadow);
 
   border: 1px solid rgba(var(--off-white-rgb), 0.4);
+
   border-radius: 10%;
 }
 
@@ -41,16 +42,14 @@
   position: absolute;
 
   width: 100%;
-  min-height: 100%;
+  height: 100%;
 
   mask: linear-gradient(
     to left,
-    black 45%,
-    rgba(0, 0, 0, 0.5) 60%,
-    rgba(0, 0, 0, 0.2) 80%,
-    transparent 40%
+    black 20%,
+    var(--shadow) 70%,
+    transparent 100%
   );
-
   backdrop-filter: blur(10px);
   right: 0;
   top: 0;
@@ -79,9 +78,9 @@
     max-width: 718px;
 
     color: var(--exploding-kittens);
-    -webkit-text-stroke: 1px var(--black-rgb);
+    -webkit-text-stroke: 1px var(--black);
     text-transform: uppercase;
-    text-shadow: 8px 8px 4px rgba(var(--black-rgb), 0.3);
+    text-shadow: 10px 10px 4px var(--shadow);
   }
 
   .kittensSpan {
