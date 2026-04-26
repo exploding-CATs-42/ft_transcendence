@@ -11,17 +11,17 @@ import FriendListItem from "../FriendListItem/FriendListItem";
 
 import s from "./ListSection.module.css";
 
+interface Props {
+  matches: LobbyMatch[];
+  friends: FriendItem[];
+}
+
 export type ActiveTab = "matches" | "friends";
 
 const tabs: TabOption[] = [
   { key: "matches", label: "Last matches" },
   { key: "friends", label: "Friends" }
 ];
-
-interface Props {
-  matches: LobbyMatch[];
-  friends: FriendItem[];
-}
 
 const ListSection = ({ matches, friends }: Props) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("matches");
