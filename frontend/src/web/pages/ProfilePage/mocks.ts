@@ -1,6 +1,6 @@
 import type { LobbyMatch } from 'components/MatchListItem/types';
-import type { ProfileStat, ProfileUser } from 'types/profile';
 import type { FriendItem } from './components/FriendListItem/FriendListItem';
+import type { ProfileStat, ProfileUser } from 'types';
 
 export const profileUserMock: ProfileUser = {
   id: "uid1",
