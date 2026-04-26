@@ -1,4 +1,3 @@
-import clsx from "clsx";
 import { Icon, Input } from "components";
 import type { InputStatus } from "components/Input/InputStatus";
 import s from "./SearchInput.module.css";
@@ -21,7 +20,7 @@ const SearchInput = ({
       className={s.input}
     >
       <Icon
-        className={clsx(s.icon, s.leftIcon)}
+        className={s.icon}
         name="user"
         width={24}
         height={24}
