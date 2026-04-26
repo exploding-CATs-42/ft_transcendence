@@ -35,6 +35,8 @@
     --container-inline-padding: 60px;
     --container-block-padding: 100px;
 
+    height: calc(100vh - 100px);
+
     flex-direction: row;
     gap: 60px;
   }
