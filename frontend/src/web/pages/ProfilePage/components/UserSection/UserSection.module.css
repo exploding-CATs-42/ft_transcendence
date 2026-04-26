@@ -1,0 +1,152 @@
+.section {
+  min-height: min-content;
+  display: grid;
+  grid-template-columns: max-content max-content max-content auto;
+  grid-template-areas: "avatar name editButton logoutButton";
+  align-items: center;
+  padding-block: 5px;
+  padding-inline: 25px;
+}
+
+.avatar {
+  grid-area: avatar;
+}
+
+.name {
+  font-size: 20px;
+  margin-left: 8px;
+  grid-area: name;
+  text-align: center;
+}
+
+.editButton {
+  margin-left: 8px;
+  grid-area: editButton;
+}
+
+.editIcon {
+  fill: var(--off-white);
+}
+
+.logoutButton {
+  border: 1px solid #fffdfdd4;
+  margin-left: auto;
+  grid-area: logoutButton;
+  padding-inline: 10px;
+  padding-block: 4px;
+  display: flex;
+  align-items: center;
+}
+
+.logoutIcon {
+  fill: transparent;
+  stroke: var(--off-white);
+}
+
+.logoutText {
+  display: none;
+}
+
+@media only screen and (min-width: 768px) {
+  .section {
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "avatar logoutButton"
+      "name editButton";
+
+    padding-block: 20.5px;
+    padding-inline: 26px;
+    column-gap: 10px;
+  }
+
+  .avatar {
+    justify-self: center;
+  }
+
+  .logoutButton {
+    padding-inline: 13px;
+    padding-block: 7px;
+    align-self: flex-start;
+  }
+
+  .logoutIcon {
+    width: 20px;
+    height: 20px;
+  }
+
+  .name {
+    font-size: 25px;
+    line-height: 33px;
+    margin-left: 0;
+  }
+
+  .editIcon {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .section {
+    --top-padding: 83px;
+
+    grid-template-columns: auto auto;
+    grid-template-areas:
+      "avatar avatar"
+      "name editButton"
+      "logoutButton logoutButton";
+    justify-items: center;
+    column-gap: 0;
+    padding-top: var(--top-padding);
+    padding-bottom: 33px;
+  }
+
+  .avatar {
+    position: absolute;
+    top: calc((var(--top-padding) + 137px / 2) * -1);
+  }
+
+  .name {
+    font-size: 30px;
+    line-height: 39px;
+    justify-self: flex-end;
+    margin-left: 30px;
+  }
+
+  .editButton {
+    justify-self: flex-start;
+  }
+
+  .logoutButton {
+    margin-left: 0;
+    margin-top: 35px;
+    padding-inline: 17.5px;
+    padding-block: 7px;
+    gap: 10px;
+  }
+
+  .logoutIcon {
+    width: 33px;
+    height: 33px;
+  }
+
+  .logoutText {
+    display: block;
+    font-size: 25px;
+    line-height: 33px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .section {
+    --top-padding: 100px;
+  }
+
+  .avatar {
+    top: calc((var(--top-padding) + 193px / 2) * -1);
+  }
+
+  .logoutButton {
+    margin-top: 25px;
+  }
+}

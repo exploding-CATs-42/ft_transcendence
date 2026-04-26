@@ -1,0 +1,59 @@
+.pageContainer {
+  --container-inline-padding: 20px;
+  --container-block-padding: 40px;
+
+  padding-inline: var(--container-inline-padding);
+  padding-block: var(--container-block-padding);
+
+  height: calc(100vh - 80px);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 33px;
+}
+
+.flexContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+
+@media only screen and (min-width: 768px) {
+  .pageContainer {
+    --container-inline-padding: 40px;
+    --container-block-padding: 50px;
+  }
+
+  .flexContainer {
+    flex-direction: row;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .pageContainer {
+    --container-inline-padding: 60px;
+    --container-block-padding: 100px;
+
+    height: calc(100vh - 100px);
+
+    flex-direction: row;
+    gap: 60px;
+  }
+
+  .flexContainer {
+    flex-direction: column;
+    gap: 22px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .pageContainer {
+    --container-inline-padding: 100px;
+    --container-block-padding: 120px;
+  }
+
+  .flexContainer {
+    gap: 27px;
+  }
+}
