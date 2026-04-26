@@ -1,18 +1,13 @@
 import { useState } from "react";
 
-import {
-  Button,
-  FriendListItem,
-  List,
-  MatchListItem,
-  SearchInput,
-  Section
-} from "components";
+import { Button, List, MatchListItem, SearchInput, Section } from "components";
 
-import type { FriendItem } from "components/FriendListItem/FriendListItem";
 import type { LobbyMatch } from "components/MatchListItem/types";
 
 import Tabs, { type TabOption } from "../Tabs/Tabs";
+
+import type { FriendItem } from "../FriendListItem/FriendListItem";
+import FriendListItem from "../FriendListItem/FriendListItem";
 
 import s from "./ListSection.module.css";
 
