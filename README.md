@@ -66,7 +66,7 @@ After that, the app is available at:
 
 - `http://localhost:8080` (or your `NGINX_PORT` from `infra/env/.env`)
 
-## 4) Quick Daily Workflow
+## 4) Daily Workflow
 
 If the project is already initialized:
 
@@ -98,6 +98,10 @@ make seed
 - `make re` - restart containers
 - `make ps` - list containers
 - `make logs` - follow logs
+- `make logs-backend` - follow backend logs only
+- `make logs-frontend` - follow frontend logs only
+- `make logs-nginx` - follow nginx logs only
+- `make logs-postgres` - follow postgres logs only
 
 ### Shell Access
 
