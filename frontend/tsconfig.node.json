@@ -41,7 +41,9 @@
       "assets": ["src/web/assets/index"],
       "assets/*": ["src/web/assets/*"],
       "hooks": ["src/web/hooks/index"],
-      "hooks/*": ["src/web/hooks/*"]
+      "hooks/*": ["src/web/hooks/*"],
+      "game": ["src/game/index"],
+      "game/*": ["src/game/*"]
     }
   },
   "include": ["vite.config.ts"]
