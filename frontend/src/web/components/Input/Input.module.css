@@ -17,6 +17,16 @@
 
   width: 100%;
   padding: 13px 14px;
+
+  &:hover,
+  &:focus {
+    border-color: var(--throw-throw-burrito);
+  }
+
+  &:hover + svg,
+  &:focus + svg {
+    stroke: var(--throw-throw-burrito);
+  }
 }
 
 .input::placeholder {
