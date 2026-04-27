@@ -1,5 +1,6 @@
-import { CatImage, LinkButton } from "components";
+import { LinkButton } from "components";
 
+import { CatImage } from "./components";
 import s from "./HomePage.module.css";
 
 const HomePage = () => {
