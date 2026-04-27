@@ -14,6 +14,18 @@ down:
 logs:
 	$(COMPOSE) logs -f
 
+logs-backend:
+	$(COMPOSE) logs -f backend
+
+logs-frontend:
+	$(COMPOSE) logs -f frontend
+
+logs-nginx:
+	$(COMPOSE) logs -f nginx
+
+logs-postgres:
+	$(COMPOSE) logs -f postgres
+
 ps:
 	$(COMPOSE) ps
 
@@ -76,4 +88,4 @@ clean:
 .PHONY: all up build down logs ps re backend-shell frontend-shell db-shell \
 prisma-format prisma-validate prisma-generate prisma-migrate prisma-deploy \
 prisma-reset seed test-backend test-orm clean \
-deps deps-frontend deps-backend
+deps deps-frontend deps-backend logs-backend logs-frontend logs-nginx logs-postgres
