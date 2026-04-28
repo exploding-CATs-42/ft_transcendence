@@ -209,26 +209,30 @@ async function main() {
 
   await prisma.game.create({
     data: {
-      createdAt: new Date(),
-      startedAt: new Date(),
-      memberships: {
-        create: [
-          { userId: alice.id },
-          { userId: bob.id },
-          { userId: carol.id },
-        ],
-      },
-    },
-  });
-
-  await prisma.game.create({
-    data: {
+      gameName: "Friday Night Table",
       winnerUserId: alice.id,
       createdAt: new Date(Date.now() - 1000 * 60 * 60),
       startedAt: new Date(Date.now() - 1000 * 60 * 55),
       endedAt: new Date(Date.now() - 1000 * 60 * 40),
       memberships: {
         create: [{ userId: alice.id }, { userId: dave.id }],
+      },
+    },
+  });
+
+  await prisma.game.create({
+    data: {
+      gameName: "Lunch Break Match",
+      winnerUserId: bob.id,
+      createdAt: new Date(Date.now() - 1000 * 60 * 180),
+      startedAt: new Date(Date.now() - 1000 * 60 * 175),
+      endedAt: new Date(Date.now() - 1000 * 60 * 160),
+      memberships: {
+        create: [
+          { userId: alice.id },
+          { userId: bob.id },
+          { userId: carol.id },
+        ],
       },
     },
   });
