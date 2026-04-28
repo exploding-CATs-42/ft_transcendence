@@ -58,7 +58,7 @@ describe("Prisma ORM smoke tests", () => {
           username: `dup_b_${suffix.replace(/-/g, "").slice(0, 10)}`,
           passwordHash: "hashed-password",
         },
-      }),
+      })
     ).rejects.toThrow();
   });
 
@@ -132,22 +132,32 @@ describe("Prisma ORM smoke tests", () => {
     expect(friendship.status).toBe(FriendshipStatus.REJECTED);
   });
 
-  it("creates a game with membership", async () => {
+  it("creates a finished game with a game name and memberships", async () => {
     const suffix = randomUUID().replace(/-/g, "");
 
-    const actor = await prisma.user.create({
+    const playerA = await prisma.user.create({
       data: {
-        email: `actor-${suffix}@example.com`,
-        username: `actor_${suffix.slice(0, 10)}`,
+        email: `player-a-${suffix}@example.com`,
+        username: `player_a_${suffix.slice(0, 10)}`,
+        passwordHash: "hashed-password",
+      },
+    });
+
+    const playerB = await prisma.user.create({
+      data: {
+        email: `player-b-${suffix}@example.com`,
+        username: `player_b_${suffix.slice(0, 10)}`,
         passwordHash: "hashed-password",
       },
     });
 
     const game = await prisma.game.create({
       data: {
-        createdAt: new Date(),
+        gameName: `Test Lobby ${suffix.slice(0, 6)}`,
+        winnerUserId: playerA.id,
+        endedAt: new Date(),
         memberships: {
-          create: [{ userId: actor.id }],
+          create: [{ userId: playerA.id }, { userId: playerB.id }],
         },
       },
       include: {
@@ -156,8 +166,8 @@ describe("Prisma ORM smoke tests", () => {
     });
 
     expect(game.id).toBeDefined();
-    expect(game.memberships).toHaveLength(1);
-    expect(game.memberships[0]?.userId).toBe(actor.id);
+    expect(game.gameName).toContain("Test Lobby");
+    expect(game.memberships).toHaveLength(2);
   });
 
   it("creates a standalone card", async () => {
