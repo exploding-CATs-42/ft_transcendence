@@ -7,6 +7,8 @@ import { HttpError } from "http-errors";
 import "dotenv/config";
 import { docsRouter } from "./routes/docsRouter/docsRouter";
 import { usersRouter } from "./routes/usersRouter/usersRouter";
+import { meRouter } from "./routes/meRouter/meRouter";
+import { friendsRouter } from "./routes/friendsRouter/friendsRouter";
 
 const { FRONTEND_URL = "*" } = process.env;
 
@@ -29,6 +31,8 @@ app.get("/", (_req, res) => {
 
 app.use("/docs", docsRouter);
 app.use("/users", usersRouter);
+app.use("/me", meRouter);
+app.use("/me/friends", friendsRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
