@@ -1,0 +1,66 @@
+paths:
+  /me:
+    patch:
+      tags:
+        - Me
+      summary: Update current user profile
+      description: Updates the authenticated user's profile fields. At least one field must be provided.
+      operationId: updateMe
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./me.schemas.yaml#/components/schemas/UpdateMeRequest"
+      responses:
+        "200":
+          description: Profile updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./me.schemas.yaml#/components/schemas/UpdateMeResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "409":
+          description: Email or username already in use
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                emailAlreadyInUse:
+                  value:
+                    message: Email already in use
+                usernameAlreadyInUse:
+                  value:
+                    message: Username already in use
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error

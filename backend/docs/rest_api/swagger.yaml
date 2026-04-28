@@ -13,8 +13,11 @@ servers:
 
 tags:
   - name: Users
-    description: User authentication and session management
-   
+    description: User authentication and public user data
+  - name: Me
+    description: Current authenticated user profile
+  - name: Friends
+    description: Friendship management for the current authenticated user
 
 paths:
   /users/register:
@@ -25,7 +28,18 @@ paths:
     $ref: "users/users.yaml#/paths/~1users~1logout"
   /users/refresh:
     $ref: "users/users.yaml#/paths/~1users~1refresh"
-  
+  /users:
+    $ref: "users/users.yaml#/paths/~1users"
+  /users/{userId}:
+    $ref: "users/users.yaml#/paths/~1users~1{userId}"
+  /users/{userId}/games:
+    $ref: "users/users.yaml#/paths/~1users~1{userId}~1games"
+  /me:
+    $ref: "me/me.yaml#/paths/~1me"
+  /me/friends:
+    $ref: "friends/friends.yaml#/paths/~1me~1friends"
+  /me/friends/{userId}:
+    $ref: "friends/friends.yaml#/paths/~1me~1friends~1{userId}"
 
 components:
   securitySchemes:
@@ -40,6 +54,12 @@ components:
   schemas:
     User:
       $ref: "users/users.schemas.yaml#/components/schemas/User"
+    PublicProfileUser:
+      $ref: "users/users.schemas.yaml#/components/schemas/PublicProfileUser"
+    FriendUser:
+      $ref: "users/users.schemas.yaml#/components/schemas/FriendUser"
+    SelfProfileUser:
+      $ref: "users/users.schemas.yaml#/components/schemas/SelfProfileUser"
     RegisterRequest:
       $ref: "users/users.schemas.yaml#/components/schemas/RegisterRequest"
     LoginRequest:
@@ -48,6 +68,30 @@ components:
       $ref: "users/users.schemas.yaml#/components/schemas/AuthResponse"
     RefreshResponse:
       $ref: "users/users.schemas.yaml#/components/schemas/RefreshResponse"
+    UserResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/UserResponse"
+    UserSearchResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/UserSearchResponse"
+    UserGameHistoryItem:
+      $ref: "users/users.schemas.yaml#/components/schemas/UserGameHistoryItem"
+    UserGamesResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/UserGamesResponse"
+    UpdateMeRequest:
+      $ref: "me/me.schemas.yaml#/components/schemas/UpdateMeRequest"
+    UpdateMeResponse:
+      $ref: "me/me.schemas.yaml#/components/schemas/UpdateMeResponse"
+    FriendListItem:
+      $ref: "friends/friends.schemas.yaml#/components/schemas/FriendListItem"
+    FriendsListResponse:
+      $ref: "friends/friends.schemas.yaml#/components/schemas/FriendsListResponse"
+    CreateFriendRequest:
+      $ref: "friends/friends.schemas.yaml#/components/schemas/CreateFriendRequest"
+    UpdateFriendshipRequest:
+      $ref: "friends/friends.schemas.yaml#/components/schemas/UpdateFriendshipRequest"
+    DeleteFriendshipRequest:
+      $ref: "friends/friends.schemas.yaml#/components/schemas/DeleteFriendshipRequest"
+    MessageResponse:
+      $ref: "friends/friends.schemas.yaml#/components/schemas/MessageResponse"
     ApiErrorResponse:
       $ref: "users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
     ValidationErrorResponse:
