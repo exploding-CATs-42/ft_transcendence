@@ -5,6 +5,49 @@ export interface PublicUser {
   avatarUrl: string | null;
 }
 
+export interface PublicProfileUser {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+  totalMatches: number;
+  wins: number;
+}
+
+export interface FriendUser {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+}
+
+export interface SelfProfileUser {
+  id: string;
+  email: string;
+  username: string;
+  avatarUrl: string | null;
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+}
+
+export type FriendDirection = "incoming" | "outgoing" | "accepted";
+
+export interface FriendListItem {
+  user: FriendUser;
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
+  direction: FriendDirection;
+}
+
+export interface UserGameHistoryItem {
+  gameId: string;
+  gameName: string;
+  endedAt: Date;
+  isWinner: boolean;
+  players: FriendUser[];
+}
+
 export interface AuthResponse {
   user: PublicUser;
   accessToken: string;
