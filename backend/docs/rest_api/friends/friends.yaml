@@ -1,0 +1,248 @@
+paths:
+  /me/friends:
+    get:
+      tags:
+        - Friends
+      summary: List friendship relations
+      description: Returns all friendship relations for the authenticated user. If status=incoming is provided, only incoming pending friend requests are returned.
+      operationId: listFriends
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: status
+          in: query
+          required: false
+          description: Optional filter. Only "incoming" is supported.
+          schema:
+            type: string
+            enum:
+              - incoming
+      responses:
+        "200":
+          description: Friendship relations returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./friends.schemas.yaml#/components/schemas/FriendsListResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+    post:
+      tags:
+        - Friends
+      summary: Send friend request
+      description: Sends a friend request to another user.
+      operationId: createFriendRequest
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./friends.schemas.yaml#/components/schemas/CreateFriendRequest"
+      responses:
+        "201":
+          description: Friend request sent successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./friends.schemas.yaml#/components/schemas/MessageResponse"
+              example:
+                message: Friend request sent
+        "400":
+          description: Validation error or invalid target
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "409":
+          description: Friend request already sent
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Friend request already sent
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+    delete:
+      tags:
+        - Friends
+      summary: Delete friendship relation
+      description: Deletes an outgoing pending friend request or an accepted friendship relation.
+      operationId: deleteFriendship
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./friends.schemas.yaml#/components/schemas/DeleteFriendshipRequest"
+      responses:
+        "200":
+          description: Friendship deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./friends.schemas.yaml#/components/schemas/MessageResponse"
+              example:
+                message: Friendship deleted
+        "400":
+          description: Validation error or invalid target
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "404":
+          description: Friendship not found
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Friendship not found
+        "409":
+          description: Friendship cannot be deleted
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Friendship cannot be deleted
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+  /me/friends/{userId}:
+    patch:
+      tags:
+        - Friends
+      summary: Update friendship relation
+      description: Accepts or rejects an incoming pending friend request.
+      operationId: updateFriendship
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id of the other side of the friendship relation.
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "./friends.schemas.yaml#/components/schemas/UpdateFriendshipRequest"
+      responses:
+        "200":
+          description: Friendship updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./friends.schemas.yaml#/components/schemas/MessageResponse"
+              example:
+                message: Friendship updated
+        "400":
+          description: Validation error or invalid target
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "404":
+          description: Friendship not found
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Friendship not found
+        "409":
+          description: Friendship cannot be updated
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                onlyPending:
+                  value:
+                    message: Only pending friendships can be updated
+                outgoingRequest:
+                  value:
+                    message: You cannot update your own outgoing request
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
