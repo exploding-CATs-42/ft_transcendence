@@ -30,13 +30,6 @@ paths:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
-              example:
-                message: Validation error
-                errors:
-                  formErrors: []
-                  fieldErrors:
-                    email:
-                      - Invalid email address
         "409":
           description: Email or username already in use
           content:
@@ -45,11 +38,9 @@ paths:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               examples:
                 emailAlreadyInUse:
-                  summary: Email already in use
                   value:
                     message: Email already in use
                 usernameAlreadyInUse:
-                  summary: Username already in use
                   value:
                     message: Username already in use
         "500":
@@ -92,13 +83,6 @@ paths:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
-              example:
-                message: Validation error
-                errors:
-                  formErrors: []
-                  fieldErrors:
-                    email:
-                      - Invalid email address
         "401":
           description: Invalid email or password
           content:
@@ -128,6 +112,12 @@ paths:
       responses:
         "204":
           description: Session logged out successfully
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
         "401":
           description: Refresh token is missing or invalid, or the session does not exist
           content:
@@ -140,11 +130,9 @@ paths:
                   value:
                     message: Refresh token required
                 invalidRefreshToken:
-                  summary: Invalid refresh token
                   value:
                     message: Invalid refresh token
                 sessionNotFound:
-                  summary: Session not found
                   value:
                     message: Session not found
         "500":
@@ -177,6 +165,12 @@ paths:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/RefreshResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
         "401":
           description: Refresh token validation failed
           content:
@@ -189,17 +183,143 @@ paths:
                   value:
                     message: Refresh token required
                 invalidRefreshToken:
-                  summary: Invalid refresh token
                   value:
                     message: Invalid refresh token
                 sessionNotFound:
-                  summary: Session not found
                   value:
                     message: Session not found
                 refreshTokenExpired:
-                  summary: Refresh token expired
                   value:
                     message: Refresh token expired
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+  /users:
+    get:
+      tags:
+        - Users
+      summary: Search users by username
+      description: Returns users whose username exactly matches the provided value, using case-insensitive comparison.
+      operationId: searchUsers
+      parameters:
+        - name: username
+          in: query
+          required: true
+          description: Exact username to search for.
+          schema:
+            type: string
+            minLength: 3
+            maxLength: 30
+            example: alex
+      responses:
+        "200":
+          description: Users returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/UserSearchResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+  /users/{userId}:
+    get:
+      tags:
+        - Users
+      summary: Get public user profile
+      description: Returns public profile information for a user together with basic finished-match statistics.
+      operationId: getUserById
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/UserResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Server error
+
+  /users/{userId}/games:
+    get:
+      tags:
+        - Users
+      summary: Get user game history
+      description: Returns finished matches for a user.
+      operationId: getUserGames
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: User game history returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/UserGamesResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
         "404":
           description: User not found
           content:

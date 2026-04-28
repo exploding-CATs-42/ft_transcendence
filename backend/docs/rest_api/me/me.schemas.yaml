@@ -1,0 +1,33 @@
+components:
+  schemas:
+    UpdateMeRequest:
+      type: object
+      minProperties: 1
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: alex_new
+        email:
+          type: string
+          format: email
+          example: alex_new@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          example: NewPassword123!
+        avatarUrl:
+          type: string
+          format: uri
+          nullable: true
+          example: https://example.com/avatar.png
+
+    UpdateMeResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: "../users/users.schemas.yaml#/components/schemas/SelfProfileUser"
