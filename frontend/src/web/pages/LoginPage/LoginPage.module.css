@@ -46,10 +46,10 @@
 
   mask: linear-gradient(
     to left,
-    var(--shadow) 0%,
-    var(--shadow) 70%,
-    var(--shadow) 90%,
-    var(--shadow) 100%,
+    rgb(var(--black-rgb)) 0%,
+    rgba(var(--black-rgb), 0.5) 70%,
+    rgba(var(--black-rgb), 0.2) 90%,
+    rgba(var(--black-rgb), 0.2) 100%,
     transparent 40%
   );
   backdrop-filter: blur(10px);
