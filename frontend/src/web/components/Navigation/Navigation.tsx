@@ -23,7 +23,9 @@ const Navigation = () => {
         </ul>
       </nav>
 
-      <Button className={s.signUp}>Sign up</Button>
+      <LinkButton to="/register" className={s.signUp}>
+        Sign up
+      </LinkButton>
     </>
   );
 };
