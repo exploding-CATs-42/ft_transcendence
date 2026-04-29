@@ -1,4 +1,4 @@
-import { Button, LinkButton } from "components";
+import { Avatar, Button, LinkButton } from "components";
 
 import s from "./Navigation.module.css";
 
@@ -8,6 +8,8 @@ const Navigation = () => {
     { path: "/rules", label: "Rules" },
     { path: "/about", label: "About" }
   ];
+
+  const isLoggedIn = false;
 
   return (
     <>
@@ -23,7 +25,14 @@ const Navigation = () => {
         </ul>
       </nav>
 
-      <Button className={s.signUp}>Sign up</Button>
+      {isLoggedIn ? (
+        <LinkButton to="/profile" className={s.profile}>
+          <span className={s.username}>BadCat</span>
+          <Avatar variant="badge" />
+        </LinkButton>
+      ) : (
+        <Button className={s.signUp}>Sign up</Button>
+      )}
     </>
   );
 };
