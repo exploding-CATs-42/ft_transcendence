@@ -2,6 +2,10 @@
   padding-block: 7px;
 }
 
+.input::placeholder {
+  color: var(--white-transparent);
+}
+
 .icon {
   position: absolute;
   top: 50%;
