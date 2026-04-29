@@ -78,11 +78,17 @@
     font-size: 120px;
     line-height: 0.8;
     max-width: 718px;
+    line-height: 1.1;
+    letter-spacing: 10px;
 
     color: var(--exploding-kittens);
-    -webkit-text-stroke: 1px black;
     text-transform: uppercase;
-    text-shadow: 8px 8px 4px rgba(0, 0, 0, 0.3);
+    text-shadow:
+      2px 0 0 var(--soft-black),
+      -2px 0 0 var(--soft-black),
+      0 2px 0 var(--soft-black),
+      0 -2px 0 var(--soft-black),
+      8px 8px var(--shadow);
   }
 
   .kittensSpan {
