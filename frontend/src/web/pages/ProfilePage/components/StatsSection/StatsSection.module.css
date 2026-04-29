@@ -110,7 +110,8 @@
 
 @media only screen and (min-width: 1440px) and (max-height: 800px) {
   .list {
-    overflow: scroll;
+    overflow-y: scroll;
+    padding-right: 10px;
   }
 }
 
@@ -153,7 +154,8 @@
 @media only screen and (min-width: 1920px) and (max-height: 884px) {
   .list {
     grid-template-columns: 1fr;
-    overflow: scroll;
+    overflow-y: scroll;
+    padding-right: 10px;
   }
 }
 
