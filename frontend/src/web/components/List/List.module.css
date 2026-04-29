@@ -14,9 +14,47 @@
   font-size: 30px;
 }
 
+ul {
+  --sb-track-color: var(--black);
+  --sb-thumb-color: var(--off-white);
+  --sb-size: 10px;
+}
+
+ul::-webkit-scrollbar {
+  width: var(--sb-size);
+  margin-right: 10px;
+}
+
+ul::-webkit-scrollbar-track {
+  background: var(--sb-track-color);
+  border-radius: 40px;
+}
+
+ul::-webkit-scrollbar-thumb {
+  background: var(--sb-thumb-color);
+  border-radius: 40px;
+  border: 1px solid var(--black);
+}
+
+@supports not selector(::-webkit-scrollbar) {
+  ul {
+    scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
+  }
+}
+
 @media only screen and (min-width: 768px) {
   .empty {
     font-size: 40px;
+  }
+
+  ul {
+    --sb-size: 15px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  ul {
+    --sb-size: 24px;
   }
 }
 
