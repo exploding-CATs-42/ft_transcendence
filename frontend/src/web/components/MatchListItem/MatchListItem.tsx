@@ -1,4 +1,4 @@
-import { Avatar, ListItem } from "components";
+import { Avatar, LinkButton, ListItem } from "components";
 
 import { createMatchSlots, isPlaceholderSlot } from "./slots";
 import type { LobbyMatch, MatchSlot } from "./types";
@@ -17,24 +17,32 @@ const MatchListItem = ({ match }: Props) => {
       <div className={s.container}>
         <span className={s.title}>{match.title}</span>
         <ul className={s.items}>
-          {slots.map((slot, index) => (
-            <li
-              key={`${match.id}_${index}`}
-              data-placeholder={isPlaceholderSlot(slot)}
-              className={s.item}
-            >
-              {!isPlaceholderSlot(slot) && (
-                <Avatar
-                  className={s.avatar}
-                  variant="match"
-                  src={slot.player.avatarUrl}
-                />
-              )}
-            </li>
-          ))}
+          {slots.map((slot, index) => renderSlot(slot, `${match.id}_${index}`))}
         </ul>
       </div>
     </ListItem>
+  );
+};
+
+const renderSlot = (slot: MatchSlot, key: string) => {
+  const isPlaceholder = isPlaceholderSlot(slot);
+
+  const item = (
+    <li key={key} data-placeholder={isPlaceholder} className={s.item}>
+      {!isPlaceholder && (
+        <Avatar
+          className={s.avatar}
+          variant="match"
+          src={slot.player.avatarUrl}
+        />
+      )}
+    </li>
+  );
+
+  return isPlaceholder ? (
+    item
+  ) : (
+    <LinkButton to={`/users/${slot.player.id}`}>{item}</LinkButton>
   );
 };
 
