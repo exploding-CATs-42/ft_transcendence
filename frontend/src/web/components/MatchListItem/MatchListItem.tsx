@@ -42,7 +42,9 @@ const renderSlot = (slot: MatchSlot, key: string) => {
   return isPlaceholder ? (
     item
   ) : (
-    <LinkButton to={`/users/${slot.player.id}`}>{item}</LinkButton>
+    <LinkButton key={key} to={`/users/${slot.player.id}`}>
+      {item}
+    </LinkButton>
   );
 };
 
