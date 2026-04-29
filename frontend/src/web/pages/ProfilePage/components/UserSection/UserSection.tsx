@@ -1,6 +1,6 @@
 import { Avatar, Button, Icon, Section } from "components";
 
-import type { ProfileUser } from 'types';
+import type { ProfileUser } from "types";
 
 import s from "./UserSection.module.css";
 
