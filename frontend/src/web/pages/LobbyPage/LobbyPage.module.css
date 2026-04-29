@@ -57,7 +57,7 @@
 }
 
 .color {
-	background-color: var(--zombie-kittens);
+  background-color: var(--zombie-kittens);
 }
 
 @media only screen and (min-width: 768px) {
@@ -80,6 +80,7 @@
   .pageContainer {
     --container-inline-padding: 60px;
     --container-block-padding: 100px;
+    height: calc(100vh - 100px);
   }
 
   .listSection {
