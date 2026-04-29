@@ -33,7 +33,8 @@
 
   box-shadow: 2px 4px 4px 2px var(--shadow);
 
-  border: 1px solid rgba(252, 248, 238, 0.4);
+  border: 1px solid rgba(var(--off-white-rgb), 0.4);
+
   border-radius: 10%;
 }
 
@@ -45,10 +46,10 @@
 
   mask: linear-gradient(
     to left,
-    black 0%,
-    rgba(0, 0, 0, 0.5) 70%,
-    rgba(0, 0, 0, 0.2) 90%,
-    rgba(0, 0, 0, 0.2) 100%,
+    var(--shadow) 0%,
+    var(--shadow) 70%,
+    var(--shadow) 90%,
+    var(--shadow) 100%,
     transparent 40%
   );
   backdrop-filter: blur(10px);
