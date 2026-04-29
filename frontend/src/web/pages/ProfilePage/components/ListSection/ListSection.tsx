@@ -6,8 +6,9 @@ import type { LobbyMatch } from "components/MatchListItem/types";
 
 import Tabs, { type TabOption } from "../Tabs/Tabs";
 
-import type { FriendItem } from "../FriendListItem/FriendListItem";
-import FriendListItem from "../FriendListItem/FriendListItem";
+import FriendListItem, {
+  type FriendItem
+} from "../FriendListItem/FriendListItem";
 
 import s from "./ListSection.module.css";
 
