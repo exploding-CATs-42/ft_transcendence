@@ -1,8 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { registerSchema } from "../schemas/users/registerSchema";
 import { loginSchema } from "../schemas/users/loginSchema";
-import { logoutSchema } from "../schemas/users/logoutSchema";
-import { refreshSchema } from "../schemas/users/refreshSchema";
 import {
   AuthServiceError,
   loginUser,
@@ -10,6 +8,19 @@ import {
   refreshSession,
   registerUser,
 } from "../services/authService";
+
+const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
+const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+
+function getRefreshTokenCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env["NODE_ENV"] === "production",
+    sameSite: "lax" as const,
+    path: "/api/users",
+    maxAge: REFRESH_TOKEN_COOKIE_MAX_AGE_MS,
+  };
+}
 
 export async function registerController(
   req: Request,
@@ -27,7 +38,16 @@ export async function registerController(
 
   try {
     const result = await registerUser(parsed.data);
-    return res.status(201).json(result);
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      result.refreshToken,
+      getRefreshTokenCookieOptions()
+    );
+
+    return res.status(201).json({
+      user: result.user,
+      accessToken: result.accessToken,
+    });
   } catch (error) {
     if (error instanceof AuthServiceError) {
       return res.status(error.statusCode).json({ message: error.message });
@@ -53,7 +73,16 @@ export async function loginController(
 
   try {
     const result = await loginUser(parsed.data);
-    return res.status(200).json(result);
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      result.refreshToken,
+      getRefreshTokenCookieOptions()
+    );
+
+    return res.status(200).json({
+      user: result.user,
+      accessToken: result.accessToken,
+    });
   } catch (error) {
     if (error instanceof AuthServiceError) {
       return res.status(error.statusCode).json({ message: error.message });
@@ -68,17 +97,18 @@ export async function logoutController(
   res: Response,
   next: NextFunction
 ) {
-  const parsed = logoutSchema.safeParse(req.body);
+  const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten(),
-    });
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token required" });
   }
 
   try {
-    await logoutUser(parsed.data);
+    await logoutUser(refreshToken);
+    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+      path: "/api/users",
+    });
+
     return res.status(204).send();
   } catch (error) {
     if (error instanceof AuthServiceError) {
@@ -94,18 +124,23 @@ export async function refreshController(
   res: Response,
   next: NextFunction
 ) {
-  const parsed = refreshSchema.safeParse(req.body);
+  const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten(),
-    });
+  if (!refreshToken) {
+    return res.status(401).json({ message: "Refresh token required" });
   }
 
   try {
-    const result = await refreshSession(parsed.data);
-    return res.status(200).json(result);
+    const result = await refreshSession(refreshToken);
+    res.cookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      result.refreshToken,
+      getRefreshTokenCookieOptions()
+    );
+
+    return res.status(200).json({
+      accessToken: result.accessToken,
+    });
   } catch (error) {
     if (error instanceof AuthServiceError) {
       return res.status(error.statusCode).json({ message: error.message });
