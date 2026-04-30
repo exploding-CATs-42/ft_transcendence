@@ -104,8 +104,8 @@ body {
 /* Scroll bar styles */
 
 body {
-  --sb-track-color: #b81c27;
-  --sb-thumb-color: #ffffff;
+  --sb-track-color: var(--exploding-kittens);
+  --sb-thumb-color: var(--off-white);
   --sb-size: 8px;
 }
 
