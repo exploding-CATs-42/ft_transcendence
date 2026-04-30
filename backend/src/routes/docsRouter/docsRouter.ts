@@ -14,7 +14,7 @@ docsRouter.get("/", (req, res) => {
 
 docsRouter.use("/rest-api", swaggerUi.serve);
 
-docsRouter.get("/rest-api/", async (_req, res, next) => {
+docsRouter.get("/rest-api/", async (_, res, next) => {
   try {
     const rootPath = path.resolve(
       __dirname,
@@ -30,7 +30,7 @@ docsRouter.get("/rest-api/", async (_req, res, next) => {
   }
 });
 
-docsRouter.get("/sockets", (_req, res) => {
+docsRouter.get("/sockets", (_, res) => {
   res.send(`
     <!DOCTYPE html>
     <html>
@@ -52,7 +52,7 @@ docsRouter.get("/sockets", (_req, res) => {
   `);
 });
 
-docsRouter.use(
+docsRouter.get(
   "/asyncapi.yaml",
   express.static(path.join(__dirname, "../../../docs/sockets/asyncapi.yaml"))
 );
