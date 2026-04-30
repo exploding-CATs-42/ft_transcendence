@@ -62,52 +62,26 @@ components:
           maxLength: 100
           example: Password123!
 
-    LogoutRequest:
-      type: object
-      required:
-        - refreshToken
-      properties:
-        refreshToken:
-          type: string
-          example: jwt-refresh-token
-
-    RefreshRequest:
-      type: object
-      required:
-        - refreshToken
-      properties:
-        refreshToken:
-          type: string
-          example: jwt-refresh-token
-
     AuthResponse:
       type: object
       required:
         - user
         - accessToken
-        - refreshToken
       properties:
         user:
           $ref: "#/components/schemas/User"
         accessToken:
           type: string
           example: jwt-access-token
-        refreshToken:
-          type: string
-          example: jwt-refresh-token
 
     RefreshResponse:
       type: object
       required:
         - accessToken
-        - refreshToken
       properties:
         accessToken:
           type: string
           example: new-jwt-access-token
-        refreshToken:
-          type: string
-          example: new-jwt-refresh-token
 
     ApiErrorResponse:
       type: object
