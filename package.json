@@ -2,7 +2,7 @@
   "name": "exploding-cats-mono",
   "private": true,
   "scripts": {
-    "format": "pnpm -r run format",
+    "format": "pnpm -r run format:check",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm -r run typecheck"
   }
