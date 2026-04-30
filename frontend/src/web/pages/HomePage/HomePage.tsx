@@ -1,9 +1,24 @@
+import { useEffect } from "react";
 import { LinkButton } from "components";
 
 import { CatImage } from "./components";
 import s from "./HomePage.module.css";
 
 const HomePage = () => {
+  useEffect(() => {
+    const main = document.querySelector("main");
+
+    if (main) {
+      main.classList.add(s.main);
+    }
+
+    return () => {
+      if (main) {
+        main.classList.remove(s.main);
+      }
+    };
+  }, []);
+
   return (
     <div className={s.pageContainer}>
       <div className={s.titleButtonsContainer}>
