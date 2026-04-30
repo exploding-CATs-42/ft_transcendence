@@ -4,7 +4,7 @@ paths:
       tags:
         - Users
       summary: Register a new user
-      description: Creates a new user account, creates the first session, and returns access and refresh tokens.
+      description: Creates a new user account, creates the first session, sets the refresh token HttpOnly cookie, and returns the access token.
       operationId: registerUser
       requestBody:
         required: true
@@ -15,6 +15,11 @@ paths:
       responses:
         "201":
           description: User registered successfully
+          headers:
+            Set-Cookie:
+              description: HttpOnly refresh token cookie.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -61,7 +66,7 @@ paths:
       tags:
         - Users
       summary: Login user
-      description: Authenticates a user, creates a new session, and returns access and refresh tokens.
+      description: Authenticates a user, creates a new session, sets the refresh token HttpOnly cookie, and returns the access token.
       operationId: loginUser
       requestBody:
         required: true
@@ -72,6 +77,11 @@ paths:
       responses:
         "200":
           description: User logged in successfully
+          headers:
+            Set-Cookie:
+              description: HttpOnly refresh token cookie.
+              schema:
+                type: string
           content:
             application/json:
               schema:
@@ -111,37 +121,24 @@ paths:
       tags:
         - Users
       summary: Logout current session
-      description: Invalidates the current session associated with the provided refresh token.
+      description: Invalidates the current session associated with the refresh token cookie.
       operationId: logoutUser
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "./users.schemas.yaml#/components/schemas/LogoutRequest"
+      security:
+        - refreshTokenCookie: []
       responses:
         "204":
           description: Session logged out successfully
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
-              example:
-                message: Validation error
-                errors:
-                  formErrors: []
-                  fieldErrors:
-                    refreshToken:
-                      - Required
         "401":
-          description: Refresh token is invalid or the session does not exist
+          description: Refresh token is missing or invalid, or the session does not exist
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               examples:
+                missingRefreshToken:
+                  summary: Missing refresh token
+                  value:
+                    message: Refresh token required
                 invalidRefreshToken:
                   summary: Invalid refresh token
                   value:
@@ -164,34 +161,22 @@ paths:
       tags:
         - Users
       summary: Refresh current session tokens
-      description: Verifies the refresh token, validates the current session, rotates the refresh token, and returns a new token pair.
+      description: Verifies the refresh token cookie, validates the current session, rotates the refresh token cookie, and returns a new access token.
       operationId: refreshSession
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "./users.schemas.yaml#/components/schemas/RefreshRequest"
+      security:
+        - refreshTokenCookie: []
       responses:
         "200":
           description: Tokens refreshed successfully
+          headers:
+            Set-Cookie:
+              description: Rotated HttpOnly refresh token cookie.
+              schema:
+                type: string
           content:
             application/json:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/RefreshResponse"
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
-              example:
-                message: Validation error
-                errors:
-                  formErrors: []
-                  fieldErrors:
-                    refreshToken:
-                      - Required
         "401":
           description: Refresh token validation failed
           content:
@@ -199,6 +184,10 @@ paths:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               examples:
+                missingRefreshToken:
+                  summary: Missing refresh token
+                  value:
+                    message: Refresh token required
                 invalidRefreshToken:
                   summary: Invalid refresh token
                   value:
