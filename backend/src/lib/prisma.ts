@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+// @ts-expect-error: Prisma client types are generated at build time
 import { PrismaClient } from "../generated/prisma/client";
 
 const connectionString = process.env["DATABASE_URL"];
@@ -16,7 +17,7 @@ declare global {
 export const prisma =
   globalThis.__prisma ??
   new PrismaClient({
-    adapter,
+    adapter
   });
 
 if (process.env["NODE_ENV"] !== "production") {
