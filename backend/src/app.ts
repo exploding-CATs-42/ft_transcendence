@@ -27,8 +27,8 @@ app.get("/", (_req, res) => {
   return res.json({ message: "Hello world!" });
 });
 
-app.use("/api/docs", docsRouter);
-app.use("/api/users", usersRouter);
+app.use("/docs", docsRouter);
+app.use("/users", usersRouter);
 
 app.use((_req, res) => {
   res.status(404).json({ message: "Route not found" });
