@@ -22,6 +22,30 @@
   --exploding-kittens-transparent: #acbe5a4d;
 }
 
+html,
+body {
+  min-height: 100vh;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+}
+
+main {
+  display: flex;
+  flex-direction: column;
+
+  flex: 1;
+}
+
 input,
 textarea,
 button {
