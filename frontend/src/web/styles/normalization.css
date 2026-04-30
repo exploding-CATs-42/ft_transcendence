@@ -51,27 +51,3 @@ textarea {
   background-color: transparent;
   color: inherit;
 }
-
-html,
-body {
-  min-height: 100vh;
-}
-
-body {
-  display: flex;
-  flex-direction: column;
-}
-
-#root {
-  display: flex;
-  flex-direction: column;
-
-  flex: 1;
-}
-
-main {
-  display: flex;
-  flex-direction: column;
-
-  flex: 1;
-}
