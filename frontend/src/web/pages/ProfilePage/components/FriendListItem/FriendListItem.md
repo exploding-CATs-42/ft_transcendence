@@ -1,12 +1,13 @@
 # FriendListItem
 
-`FriendListItem` renders one friend row with avatar, username, online status text, and two action buttons.
+`FriendListItem` renders one friend row with avatar, username, online status
+text, and two action buttons.
 
 ## Component API
 
-| Prop | Type | Required | Description |
-| --- | --- | --- | --- |
-| `friend` | `FriendItem` | Yes | Friend data used to render avatar, name, and online/offline status. |
+| Prop     | Type         | Required | Description                                                         |
+| -------- | ------------ | -------- | ------------------------------------------------------------------- |
+| `friend` | `FriendItem` | Yes      | Friend data used to render avatar, name, and online/offline status. |
 
 `FriendItem` shape:
 
@@ -72,5 +73,7 @@ export default FriendsList;
 
 ## Notes
 
-- `FriendListItem` is currently presentational; button clicks are not handled via props.
-- To add actions, extend `Props` with callback handlers and pass them from the parent list container.
+- `FriendListItem` is currently presentational; button clicks are not handled
+  via props.
+- To add actions, extend `Props` with callback handlers and pass them from the
+  parent list container.

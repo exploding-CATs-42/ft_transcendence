@@ -19,12 +19,7 @@ const SearchInput = ({
       placeholder={placeholder}
       className={s.input}
     >
-      <Icon
-        className={s.icon}
-        name="user"
-        width={24}
-        height={24}
-      />
+      <Icon className={s.icon} name="user" width={24} height={24} />
     </Input>
   );
 };

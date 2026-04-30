@@ -1,13 +1,14 @@
 # ListItem
 
-`ListItem` is a presentational wrapper around an `<li>` element used to keep list row styling consistent.
+`ListItem` is a presentational wrapper around an `<li>` element used to keep
+list row styling consistent.
 
 ## Component API
 
-| Prop | Type | Required | Description |
-| --- | --- | --- | --- |
-| `className` | `string` | No | Adds custom classes on top of default item styles. |
-| `children` | `React.ReactNode` | No | Content rendered inside the list item. |
+| Prop        | Type              | Required | Description                                        |
+| ----------- | ----------------- | -------- | -------------------------------------------------- |
+| `className` | `string`          | No       | Adds custom classes on top of default item styles. |
+| `children`  | `React.ReactNode` | No       | Content rendered inside the list item.             |
 
 ## Basic usage
 

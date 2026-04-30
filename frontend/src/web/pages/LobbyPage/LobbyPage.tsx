@@ -4,7 +4,7 @@ import type { LobbyMatch } from "components/MatchListItem/types";
 import { matchesMock } from "./mocks";
 
 import s from "./LobbyPage.module.css";
-import clsx from 'clsx';
+import clsx from "clsx";
 
 const LobbyPage = () => {
   const matches: LobbyMatch[] = matchesMock;
