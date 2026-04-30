@@ -6,11 +6,12 @@ import {
   signRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt";
-import type { AuthResponse, RefreshResponse } from "../types/auth";
+import type {
+  AuthSessionResponse,
+  RefreshSessionResponse,
+} from "../types/auth";
 import type { RegisterRequestBody } from "../schemas/users/registerSchema";
 import type { LoginRequestBody } from "../schemas/users/loginSchema";
-import type { LogoutRequestBody } from "../schemas/users/logoutSchema";
-import type { RefreshRequestBody } from "../schemas/users/refreshSchema";
 
 export class AuthServiceError extends Error {
   public statusCode: number;
@@ -43,7 +44,7 @@ function getRefreshTokenExpiresAt(): Date {
 
 export async function registerUser(
   input: RegisterRequestBody
-): Promise<AuthResponse> {
+): Promise<AuthSessionResponse> {
   const existingByEmail = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -102,7 +103,7 @@ export async function registerUser(
 
 export async function loginUser(
   input: LoginRequestBody
-): Promise<AuthResponse> {
+): Promise<AuthSessionResponse> {
   const user = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -151,12 +152,12 @@ export async function loginUser(
 }
 
 export async function logoutUser(
-  input: LogoutRequestBody
+  refreshToken: string
 ): Promise<void> {
   let payload;
 
   try {
-    payload = verifyRefreshToken(input.refreshToken);
+    payload = verifyRefreshToken(refreshToken);
   } catch {
     throw new AuthServiceError("Invalid refresh token", 401);
   }
@@ -173,7 +174,7 @@ export async function logoutUser(
     throw new AuthServiceError("Invalid refresh token", 401);
   }
 
-  const incomingHash = hashRefreshToken(input.refreshToken);
+  const incomingHash = hashRefreshToken(refreshToken);
 
   if (session.refreshTokenHash !== incomingHash) {
     throw new AuthServiceError("Invalid refresh token", 401);
@@ -185,12 +186,12 @@ export async function logoutUser(
 }
 
 export async function refreshSession(
-  input: RefreshRequestBody
-): Promise<RefreshResponse> {
+  refreshToken: string
+): Promise<RefreshSessionResponse> {
   let payload;
 
   try {
-    payload = verifyRefreshToken(input.refreshToken);
+    payload = verifyRefreshToken(refreshToken);
   } catch {
     throw new AuthServiceError("Invalid refresh token", 401);
   }
@@ -207,7 +208,7 @@ export async function refreshSession(
     throw new AuthServiceError("Invalid refresh token", 401);
   }
 
-  const incomingHash = hashRefreshToken(input.refreshToken);
+  const incomingHash = hashRefreshToken(refreshToken);
 
   if (session.refreshTokenHash !== incomingHash) {
     throw new AuthServiceError("Invalid refresh token", 401);
