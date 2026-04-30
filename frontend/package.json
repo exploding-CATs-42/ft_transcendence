@@ -5,6 +5,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "test": "vitest",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint --fix ./src",
     "format": "prettier --write ./src",
     "clean": "rimraf dist"
