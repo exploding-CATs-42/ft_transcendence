@@ -28,6 +28,15 @@ paths:
   
 
 components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    refreshTokenCookie:
+      type: apiKey
+      in: cookie
+      name: refreshToken
   schemas:
     User:
       $ref: "users/users.schemas.yaml#/components/schemas/User"
@@ -35,10 +44,6 @@ components:
       $ref: "users/users.schemas.yaml#/components/schemas/RegisterRequest"
     LoginRequest:
       $ref: "users/users.schemas.yaml#/components/schemas/LoginRequest"
-    LogoutRequest:
-      $ref: "users/users.schemas.yaml#/components/schemas/LogoutRequest"
-    RefreshRequest:
-      $ref: "users/users.schemas.yaml#/components/schemas/RefreshRequest"
     AuthResponse:
       $ref: "users/users.schemas.yaml#/components/schemas/AuthResponse"
     RefreshResponse:
