@@ -6,7 +6,8 @@
     "format:fix": "pnpm -r run format",
     "lint": "pnpm -r run lint:check",
     "lint:fix": "pnpm -r run lint",
-    "typecheck": "pnpm -r run typecheck"
+    "typecheck": "pnpm -r run typecheck",
+    "check": "pnpm run format && pnpm run lint && pnpm run typecheck"
   },
   "packageManager": "pnpm@10.33.0"
 }
