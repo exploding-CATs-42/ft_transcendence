@@ -8,10 +8,19 @@ export interface PublicUser {
 export interface AuthResponse {
   user: PublicUser;
   accessToken: string;
-  refreshToken: string;
 }
 
 export interface RefreshResponse {
+  accessToken: string;
+}
+
+export interface AuthSessionResponse {
+  user: PublicUser;
+  accessToken: string;
+  refreshToken: string;
+}
+
+export interface RefreshSessionResponse {
   accessToken: string;
   refreshToken: string;
 }
