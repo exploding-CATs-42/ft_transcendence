@@ -107,6 +107,7 @@ body {
   --sb-track-color: var(--exploding-kittens);
   --sb-thumb-color: var(--off-white);
   --sb-size: 8px;
+  --sb-border-radius: 6px;
 }
 
 body::-webkit-scrollbar {
@@ -115,12 +116,12 @@ body::-webkit-scrollbar {
 
 body::-webkit-scrollbar-track {
   background: var(--sb-track-color);
-  border-radius: 6px;
+  border-radius: var(--sb-border-radius);
 }
 
 body::-webkit-scrollbar-thumb {
   background: var(--sb-thumb-color);
-  border-radius: 6px;
+  border-radius: var(--sb-border-radius);
 }
 
 @supports not selector(::-webkit-scrollbar) {
