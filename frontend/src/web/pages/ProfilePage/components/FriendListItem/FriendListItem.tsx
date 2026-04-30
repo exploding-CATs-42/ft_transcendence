@@ -7,7 +7,7 @@ export type FriendItem = {
   username: string;
   avatarUrl: string;
   isOnline: boolean;
-}
+};
 
 interface Props {
   friend: FriendItem;

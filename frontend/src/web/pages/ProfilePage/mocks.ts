@@ -1,12 +1,11 @@
-import type { LobbyMatch } from 'components/MatchListItem/types';
-import type { FriendItem } from './components/FriendListItem/FriendListItem';
-import type { ProfileStat, ProfileUser } from 'types';
+import type { LobbyMatch } from "components/MatchListItem/types";
+import type { FriendItem } from "./components/FriendListItem/FriendListItem";
+import type { ProfileStat, ProfileUser } from "types";
 
 export const profileUserMock: ProfileUser = {
   id: "uid1",
   username: "Lera",
-  avatarUrl:
-    "/src/web/assets/images/avatar/avatar-193w.png",
+  avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
   isOnline: false,
   lastSeenAt: new Date()
 };

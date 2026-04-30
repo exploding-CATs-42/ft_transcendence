@@ -1,12 +1,13 @@
 # MatchListItem
 
-`MatchListItem` renders one lobby table row with a title and a fixed number of player slots.
+`MatchListItem` renders one lobby table row with a title and a fixed number of
+player slots.
 
 ## Component API
 
-| Prop | Type | Required | Description |
-| --- | --- | --- | --- |
-| `match` | `LobbyMatch` | Yes | Match data used to render the table title and occupied player slots. |
+| Prop    | Type         | Required | Description                                                          |
+| ------- | ------------ | -------- | -------------------------------------------------------------------- |
+| `match` | `LobbyMatch` | Yes      | Match data used to render the table title and occupied player slots. |
 
 `LobbyMatch` shape:
 
@@ -25,7 +26,8 @@ type LobbyMatch = {
 
 ## Render behavior
 
-- The component always renders a fixed number of slots via `createMatchSlots` from `slots.ts`.
+- The component always renders a fixed number of slots via `createMatchSlots`
+  from `slots.ts`.
 - Current max slot count is `5` (`MAX_PLAYERS` constant in `slots.ts`).
 - Real players render an `Avatar` with `variant="match"`.
 - Empty slots render a placeholder circle (`data-placeholder="true"`).
@@ -78,6 +80,9 @@ export default MatchesList;
 
 ## Notes
 
-- This component already wraps content in `ListItem`, so it is intended to be rendered inside `List` via `renderItem`.
-- Slot metadata types are defined in `types.ts` (`MatchSlot`, `LobbyMatch`, `LobbyPlayer`).
-- Placeholder styling is controlled by `MatchListItem.module.css` using the `data-placeholder` attribute.
+- This component already wraps content in `ListItem`, so it is intended to be
+  rendered inside `List` via `renderItem`.
+- Slot metadata types are defined in `types.ts` (`MatchSlot`, `LobbyMatch`,
+  `LobbyPlayer`).
+- Placeholder styling is controlled by `MatchListItem.module.css` using the
+  `data-placeholder` attribute.
