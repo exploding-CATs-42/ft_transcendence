@@ -4,7 +4,7 @@ import s from "./Tabs.module.css";
 export type TabOption = {
   key: string;
   label: string;
-}
+};
 
 interface Props {
   tabs: TabOption[];

@@ -8,7 +8,7 @@ const variantClass: Record<Variant, string> = {
   settings: s.avatarSettings,
   badge: s.avatarBadge,
   friend: s.avatarFriend,
-  match: s.avatarMatch,
+  match: s.avatarMatch
 };
 
 interface Props {

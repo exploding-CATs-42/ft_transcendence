@@ -1,16 +1,17 @@
 # List
 
-`List` is a generic component for rendering collections with a consistent scrollable list layout and an empty-state fallback.
+`List` is a generic component for rendering collections with a consistent
+scrollable list layout and an empty-state fallback.
 
 ## Component API
 
-| Prop | Type | Required | Description |
-| --- | --- | --- | --- |
-| `items` | `T[]` | Yes | Array of items to render. |
-| `renderItem` | `(item: T) => React.ReactNode` | Yes | Function that renders each item. |
-| `getKey` | `(item: T) => React.Key` | Yes | Function that returns a stable key for each item. |
-| `className` | `string` | No | Adds custom classes on top of default list styles. |
-| `empty` | `string` | No | Text displayed when `items` is empty. Default: `"No items"`. |
+| Prop         | Type                           | Required | Description                                                  |
+| ------------ | ------------------------------ | -------- | ------------------------------------------------------------ |
+| `items`      | `T[]`                          | Yes      | Array of items to render.                                    |
+| `renderItem` | `(item: T) => React.ReactNode` | Yes      | Function that renders each item.                             |
+| `getKey`     | `(item: T) => React.Key`       | Yes      | Function that returns a stable key for each item.            |
+| `className`  | `string`                       | No       | Adds custom classes on top of default list styles.           |
+| `empty`      | `string`                       | No       | Text displayed when `items` is empty. Default: `"No items"`. |
 
 ## Basic usage
 
@@ -79,5 +80,6 @@ export default UsersPage;
 
 ## Notes
 
-- `renderItem` should return list elements (for example `ListItem`) to keep valid HTML structure inside the `<ul>`.
+- `renderItem` should return list elements (for example `ListItem`) to keep
+  valid HTML structure inside the `<ul>`.
 - Keep `getKey` stable and unique to avoid unnecessary re-renders.

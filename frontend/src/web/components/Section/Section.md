@@ -1,13 +1,14 @@
 # Section
 
-`Section` is a layout wrapper component used to group content blocks with a shared container style.
+`Section` is a layout wrapper component used to group content blocks with a
+shared container style.
 
 ## Component API
 
-| Prop | Type | Required | Description |
-| --- | --- | --- | --- |
-| `className` | `string` | No | Adds custom classes on top of the default section styles. |
-| `children` | `React.ReactNode` | No | Content rendered inside the section container. |
+| Prop        | Type              | Required | Description                                               |
+| ----------- | ----------------- | -------- | --------------------------------------------------------- |
+| `className` | `string`          | No       | Adds custom classes on top of the default section styles. |
+| `children`  | `React.ReactNode` | No       | Content rendered inside the section container.            |
 
 ## Basic usage
 

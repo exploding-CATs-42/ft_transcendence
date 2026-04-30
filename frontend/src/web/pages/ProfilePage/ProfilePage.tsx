@@ -1,8 +1,4 @@
-import {
-	ListSection,
-	StatsSection,
-	UserSection
-} from "./components";
+import { ListSection, StatsSection, UserSection } from "./components";
 
 import { friendsMock, matchesMock, profileUserMock, statsMock } from "./mocks";
 
