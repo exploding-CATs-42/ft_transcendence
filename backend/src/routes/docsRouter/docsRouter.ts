@@ -6,7 +6,10 @@ import SwaggerParser from "@apidevtools/swagger-parser";
 export const docsRouter = express.Router();
 
 docsRouter.get("/", (req, res) => {
-  res.redirect(`${req.baseUrl}/rest-api/`);
+  const forwardedPrefix = req.get("x-forwarded-prefix") ?? "";
+  const publicBaseUrl = `${forwardedPrefix}${req.baseUrl}`;
+
+  res.redirect(`${publicBaseUrl}/rest-api/`);
 });
 
 docsRouter.use("/rest-api", swaggerUi.serve);
@@ -40,7 +43,7 @@ docsRouter.get("/sockets", (_req, res) => {
         <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
         <script>
           AsyncApiStandalone.render({
-            schema: { url: '/api/docs/asyncapi.yaml' },
+            schema: { url: './asyncapi.yaml' },
             config: { show: { sidebar: true } },
           }, document.getElementById('asyncapi'));
         </script>
