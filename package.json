@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "format": "pnpm -r run format:check",
+    "format:fix": "pnpm -r run format",
     "lint": "pnpm -r run lint",
     "typecheck": "pnpm -r run typecheck"
   },
