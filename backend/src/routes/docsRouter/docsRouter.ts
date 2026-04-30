@@ -1,6 +1,5 @@
 import express from "express";
 import path from "node:path";
-import fs from "node:fs";
 import swaggerUi from "swagger-ui-express";
 import SwaggerParser from "@apidevtools/swagger-parser";
 
@@ -13,7 +12,6 @@ docsRouter.get("/", (_, res) => {
 });
 
 // ----------------- Swagger ----------------- //
-
 
 docsRouter.use("/rest-api", swaggerUi.serve);
 
@@ -32,7 +30,6 @@ docsRouter.get("/rest-api", async (_req, res, next) => {
     next(error);
   }
 });
-
 
 // ----------------- AsyncAPI ----------------- //
 docsRouter.use("/sockets", (_, res) => {

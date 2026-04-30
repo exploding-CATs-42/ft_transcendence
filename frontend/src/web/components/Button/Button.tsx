@@ -2,7 +2,7 @@ import clsx from "clsx";
 
 import s from "./Button.module.css";
 
-interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {}
+type Props = React.ButtonHTMLAttributes<HTMLButtonElement>;
 
 const Button = ({ className, children, onClick, type }: Props) => {
   return (
