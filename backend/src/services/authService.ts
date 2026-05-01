@@ -10,6 +10,7 @@ import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 import type {
   AuthSessionResponse,
   RefreshSessionResponse,
+  PublicUser,
 } from "../types/auth";
 import type { RegisterRequestBody } from "../schemas/users/registerSchema";
 import type { LoginRequestBody } from "../schemas/users/loginSchema";
@@ -23,12 +24,8 @@ export class AuthServiceError extends Error {
   }
 }
 
-function toPublicUser(user: {
-  id: string;
-  email: string;
-  username: string;
-  avatarUrl: string | null;
-}) {
+
+function toPublicUser(user: PublicUser): PublicUser {
   return {
     id: user.id,
     email: user.email,
