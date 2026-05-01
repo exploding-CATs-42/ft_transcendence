@@ -5,7 +5,7 @@ import prettyFormat from "pino-pretty";
 import cors from "cors";
 import "dotenv/config";
 import { corsOptions } from "./config/cors";
-import { setupRouting } from "./routes/routing";
+import { setupRouting } from "./routes";
 
 const app = express();
 
