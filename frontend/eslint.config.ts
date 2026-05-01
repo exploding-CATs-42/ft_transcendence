@@ -14,8 +14,15 @@ export default defineConfig([
       reactHooks.configs.flat.recommended,
       reactRefresh.configs.vite
     ],
-    languageOptions: {
-      globals: globals.browser
+    languageOptions: { globals: globals.browser },
+    rules: {
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_"
+        }
+      ]
     }
   }
 ]);
