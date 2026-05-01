@@ -39,11 +39,7 @@ export interface ValidationErrorResponse {
 
 export interface AccessTokenPayload {
   sub: string;
-  email: string;
-  username: string;
   type: "access";
-  iat?: number;
-  exp?: number;
 }
 
 export interface RefreshTokenPayload {

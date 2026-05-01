@@ -91,8 +91,6 @@ export async function registerUser(
 
   const accessToken = signAccessToken({
     sub: user.id,
-    email: user.email,
-    username: user.username,
   });
 
   return {
@@ -141,8 +139,6 @@ export async function loginUser(
 
   const accessToken = signAccessToken({
     sub: user.id,
-    email: user.email,
-    username: user.username,
   });
 
   return {
@@ -248,8 +244,6 @@ export async function refreshSession(
 
   const newAccessToken = signAccessToken({
     sub: user.id,
-    email: user.email,
-    username: user.username,
   });
 
   return {
