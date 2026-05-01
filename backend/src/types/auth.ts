@@ -46,8 +46,6 @@ export interface RefreshTokenPayload {
   sub: string;
   sessionId: string;
   type: "refresh";
-  iat?: number;
-  exp?: number;
 }
 
 export interface AuthenticatedUser {
