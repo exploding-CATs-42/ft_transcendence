@@ -1,5 +1,6 @@
 import { PrismaPg } from "@prisma/adapter-pg";
-// @ts-expect-error: Prisma client types are generated at build time
+// eslint-disable-next-line @typescript-eslint/ban-ts-comment
+// @ts-ignore
 import { PrismaClient } from "../generated/prisma/client";
 
 const connectionString = process.env["DATABASE_URL"];
