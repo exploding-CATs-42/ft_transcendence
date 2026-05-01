@@ -5,7 +5,7 @@ import prettyFormat from "pino-pretty";
 import cors, { CorsOptions } from "cors";
 import { HttpError } from "http-errors";
 import "dotenv/config";
-import { docsRouter } from "./routes/docsRouter/docsRouter";
+import { docsRouter } from "./routes/docs/docsRouter";
 import { usersRouter } from "./routes/usersRouter/usersRouter";
 
 const { FRONTEND_URL = "*" } = process.env;
