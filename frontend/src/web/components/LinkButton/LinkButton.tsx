@@ -8,7 +8,6 @@ interface Props {
   className?: string;
   children?: ReactNode;
   to: string;
-  onClick?: React.MouseEventHandler<HTMLElement>;
 }
 
 const LinkButton = ({ to, className = "", children }: Props) => {
