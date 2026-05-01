@@ -4,7 +4,7 @@ import pino from "pino-http";
 import prettyFormat from "pino-pretty";
 import cors from "cors";
 import "dotenv/config";
-import { corsOptions } from "./config/cors";
+import { corsOptions } from "./config";
 import { setupRouting } from "./routes";
 
 const app = express();
