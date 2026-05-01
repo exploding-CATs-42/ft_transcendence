@@ -1,0 +1,1 @@
+export { friendsRouter } from "./friendsRouter";
