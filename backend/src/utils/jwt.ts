@@ -20,14 +20,11 @@ const jwtRefreshExpiresIn = getEnv("JWT_REFRESH_EXPIRES_IN");
 
 export function signAccessToken(payload: {
   sub: string;
-  email: string;
-  username: string;
+
 }): string {
   return jwt.sign(
     {
       sub: payload.sub,
-      email: payload.email,
-      username: payload.username,
       type: "access",
     },
     jwtAccessSecret,
@@ -50,14 +47,16 @@ export function signRefreshToken(payload: {
   );
 }
 
+function isJwtObject(decoded: string | JwtPayload): decoded is JwtPayload {
+  return typeof decoded === "object" && decoded !== null;
+}
+
 function isAccessTokenPayload(
   decoded: string | JwtPayload
 ): decoded is AccessTokenPayload {
   return (
-    typeof decoded !== "string" &&
+    isJwtObject(decoded) &&
     typeof decoded.sub === "string" &&
-    typeof decoded["email"] === "string" &&
-    typeof decoded["username"] === "string" &&
     decoded["type"] === "access"
   );
 }
@@ -66,7 +65,7 @@ function isRefreshTokenPayload(
   decoded: string | JwtPayload
 ): decoded is RefreshTokenPayload {
   return (
-    typeof decoded !== "string" &&
+    isJwtObject(decoded) &&
     typeof decoded.sub === "string" &&
     typeof decoded["sessionId"] === "string" &&
     decoded["type"] === "refresh"
