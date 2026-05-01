@@ -6,6 +6,7 @@ import {
   signRefreshToken,
   verifyRefreshToken,
 } from "../utils/jwt";
+import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 import type {
   AuthSessionResponse,
   RefreshSessionResponse,
@@ -36,7 +37,7 @@ function toPublicUser(user: {
   };
 }
 
-const REFRESH_TOKEN_LIFETIME_MS = 7 * 24 * 60 * 60 * 1000;
+const REFRESH_TOKEN_LIFETIME_MS = getRefreshTokenLifetimeMs();
 
 function getRefreshTokenExpiresAt(): Date {
   return new Date(Date.now() + REFRESH_TOKEN_LIFETIME_MS);

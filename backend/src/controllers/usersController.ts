@@ -8,9 +8,10 @@ import {
   refreshSession,
   registerUser,
 } from "../services/authService";
+import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 
 const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
-const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = 7 * 24 * 60 * 60 * 1000;
+const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = getRefreshTokenLifetimeMs();
 
 function getRefreshTokenCookieOptions() {
   return {
@@ -106,6 +107,7 @@ export async function logoutController(
   try {
     await logoutUser(refreshToken);
     res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
+      
       path: "/api/users",
     });
 
