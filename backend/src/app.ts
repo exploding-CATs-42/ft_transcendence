@@ -2,17 +2,10 @@ import express from "express";
 import cookieParser from "cookie-parser";
 import pino from "pino-http";
 import prettyFormat from "pino-pretty";
-import cors, { CorsOptions } from "cors";
+import cors from "cors";
 import "dotenv/config";
+import { corsOptions } from "./config/cors";
 import { setupRouting } from "./routes/routing";
-
-const { FRONTEND_URL = "*" } = process.env;
-
-const corsOptions: CorsOptions = {
-  origin: FRONTEND_URL === "*" ? true : FRONTEND_URL,
-  credentials: true,
-  optionsSuccessStatus: 200
-};
 
 const app = express();
 
