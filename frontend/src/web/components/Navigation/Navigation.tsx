@@ -1,4 +1,4 @@
-import { Avatar, Button, LinkButton } from "components";
+import { Avatar, LinkButton } from "components";
 
 import s from "./Navigation.module.css";
 
