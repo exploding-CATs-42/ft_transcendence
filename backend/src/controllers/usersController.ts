@@ -6,7 +6,7 @@ import {
   loginUser,
   logoutUser,
   refreshSession,
-  registerUser,
+  registerUser
 } from "../services/authService";
 import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 
@@ -19,7 +19,7 @@ function getRefreshTokenCookieOptions() {
     secure: process.env["NODE_ENV"] === "production",
     sameSite: "lax" as const,
     path: "/api/users",
-    maxAge: REFRESH_TOKEN_COOKIE_MAX_AGE_MS,
+    maxAge: REFRESH_TOKEN_COOKIE_MAX_AGE_MS
   };
 }
 
@@ -33,7 +33,7 @@ export async function registerController(
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten(),
+      errors: parsed.error.flatten()
     });
   }
 
@@ -47,7 +47,7 @@ export async function registerController(
 
     return res.status(201).json({
       user: result.user,
-      accessToken: result.accessToken,
+      accessToken: result.accessToken
     });
   } catch (error) {
     if (error instanceof AuthServiceError) {
@@ -68,7 +68,7 @@ export async function loginController(
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten(),
+      errors: parsed.error.flatten()
     });
   }
 
@@ -82,7 +82,7 @@ export async function loginController(
 
     return res.status(200).json({
       user: result.user,
-      accessToken: result.accessToken,
+      accessToken: result.accessToken
     });
   } catch (error) {
     if (error instanceof AuthServiceError) {
@@ -110,7 +110,7 @@ export async function logoutController(
       httpOnly: true,
       secure: process.env["NODE_ENV"] === "production",
       sameSite: "lax",
-      path: "/api/users",
+      path: "/api/users"
     });
 
     return res.status(204).send();
@@ -143,7 +143,7 @@ export async function refreshController(
     );
 
     return res.status(200).json({
-      accessToken: result.accessToken,
+      accessToken: result.accessToken
     });
   } catch (error) {
     if (error instanceof AuthServiceError) {
