@@ -6,8 +6,11 @@ env:
   PNPM_VERSION: 10.33.0
 
 jobs:
-  format:
+  quality:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        script: [ format, lint, typecheck ]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
@@ -22,40 +25,4 @@ jobs:
             backend/pnpm-lock.yaml
             frontend/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - run: pnpm run format
-
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            backend/pnpm-lock.yaml
-            frontend/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run lint
-
-  typecheck:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v6
-      - uses: pnpm/action-setup@v6
-        with:
-          version: ${{ env.PNPM_VERSION }}
-      - uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: |
-            pnpm-lock.yaml
-            backend/pnpm-lock.yaml
-            frontend/pnpm-lock.yaml
-      - run: pnpm install --frozen-lockfile
-      - run: pnpm run typecheck
+      - run: pnpm run ${{ matrix.script }}
