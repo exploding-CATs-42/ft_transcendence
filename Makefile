@@ -80,6 +80,32 @@ deps:
 	$(COMPOSE) exec backend sh -c "CI=true pnpm install"
 	$(COMPOSE) exec frontend sh -c "CI=true pnpm install"
 
+format-frontend:
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm run format"
+
+format-backend:
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run format"
+
+format: format-frontend format-backend
+
+lint-frontend:
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm run lint"
+
+lint-backend:
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run lint"
+
+lint: lint-frontend lint-backend
+
+typecheck-frontend:
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm run typecheck"
+
+typecheck-backend:
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run typecheck"
+
+typecheck: typecheck-frontend typecheck-backend
+
+code-quality-check: format lint typecheck
+
 clean:
 	$(COMPOSE) down --remove-orphans
 	docker image prune -f
