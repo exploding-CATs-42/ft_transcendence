@@ -13,7 +13,7 @@ const { FRONTEND_URL = "*" } = process.env;
 const corsOptions: CorsOptions = {
   origin: FRONTEND_URL === "*" ? true : FRONTEND_URL,
   credentials: true,
-  optionsSuccessStatus: 200,
+  optionsSuccessStatus: 200
 };
 
 const app = express();

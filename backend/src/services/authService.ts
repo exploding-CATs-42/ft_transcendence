@@ -4,13 +4,13 @@ import { hashPassword, comparePassword, hashRefreshToken } from "../utils/hash";
 import {
   signAccessToken,
   signRefreshToken,
-  verifyRefreshToken,
+  verifyRefreshToken
 } from "../utils/jwt";
 import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 import type {
   AuthSessionResponse,
   RefreshSessionResponse,
-  PublicUser,
+  PublicUser
 } from "../types/auth";
 import type { RegisterRequestBody } from "../schemas/users/registerSchema";
 import type { LoginRequestBody } from "../schemas/users/loginSchema";
@@ -24,13 +24,12 @@ export class AuthServiceError extends Error {
   }
 }
 
-
 function toPublicUser(user: PublicUser): PublicUser {
   return {
     id: user.id,
     email: user.email,
     username: user.username,
-    avatarUrl: user.avatarUrl,
+    avatarUrl: user.avatarUrl
   };
 }
 
@@ -44,7 +43,7 @@ export async function registerUser(
   input: RegisterRequestBody
 ): Promise<AuthSessionResponse> {
   const existingByEmail = await prisma.user.findUnique({
-    where: { email: input.email },
+    where: { email: input.email }
   });
 
   if (existingByEmail) {
@@ -52,7 +51,7 @@ export async function registerUser(
   }
 
   const existingByUsername = await prisma.user.findUnique({
-    where: { username: input.username },
+    where: { username: input.username }
   });
 
   if (existingByUsername) {
@@ -65,14 +64,14 @@ export async function registerUser(
     data: {
       email: input.email,
       username: input.username,
-      passwordHash,
-    },
+      passwordHash
+    }
   });
 
   const sessionId = randomUUID();
   const refreshToken = signRefreshToken({
     sub: user.id,
-    sessionId,
+    sessionId
   });
 
   const refreshTokenHash = hashRefreshToken(refreshToken);
@@ -82,18 +81,18 @@ export async function registerUser(
       id: sessionId,
       userId: user.id,
       refreshTokenHash,
-      expiresAt: getRefreshTokenExpiresAt(),
-    },
+      expiresAt: getRefreshTokenExpiresAt()
+    }
   });
 
   const accessToken = signAccessToken({
-    sub: user.id,
+    sub: user.id
   });
 
   return {
     user: toPublicUser(user),
     accessToken,
-    refreshToken,
+    refreshToken
   };
 }
 
@@ -101,7 +100,7 @@ export async function loginUser(
   input: LoginRequestBody
 ): Promise<AuthSessionResponse> {
   const user = await prisma.user.findUnique({
-    where: { email: input.email },
+    where: { email: input.email }
   });
 
   if (!user) {
@@ -120,7 +119,7 @@ export async function loginUser(
   const sessionId = randomUUID();
   const refreshToken = signRefreshToken({
     sub: user.id,
-    sessionId,
+    sessionId
   });
 
   const refreshTokenHash = hashRefreshToken(refreshToken);
@@ -130,24 +129,22 @@ export async function loginUser(
       id: sessionId,
       userId: user.id,
       refreshTokenHash,
-      expiresAt: getRefreshTokenExpiresAt(),
-    },
+      expiresAt: getRefreshTokenExpiresAt()
+    }
   });
 
   const accessToken = signAccessToken({
-    sub: user.id,
+    sub: user.id
   });
 
   return {
     user: toPublicUser(user),
     accessToken,
-    refreshToken,
+    refreshToken
   };
 }
 
-export async function logoutUser(
-  refreshToken: string
-): Promise<void> {
+export async function logoutUser(refreshToken: string): Promise<void> {
   let payload;
 
   try {
@@ -157,7 +154,7 @@ export async function logoutUser(
   }
 
   const session = await prisma.userSession.findUnique({
-    where: { id: payload.sessionId },
+    where: { id: payload.sessionId }
   });
 
   if (!session) {
@@ -175,7 +172,7 @@ export async function logoutUser(
   }
 
   await prisma.userSession.delete({
-    where: { id: session.id },
+    where: { id: session.id }
   });
 }
 
@@ -191,7 +188,7 @@ export async function refreshSession(
   }
 
   const session = await prisma.userSession.findUnique({
-    where: { id: payload.sessionId },
+    where: { id: payload.sessionId }
   });
 
   if (!session) {
@@ -210,14 +207,14 @@ export async function refreshSession(
 
   if (session.expiresAt.getTime() < Date.now()) {
     await prisma.userSession.delete({
-      where: { id: session.id },
+      where: { id: session.id }
     });
 
     throw new AuthServiceError("Refresh token expired", 401);
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: session.userId },
+    where: { id: session.userId }
   });
 
   if (!user) {
@@ -226,7 +223,7 @@ export async function refreshSession(
 
   const newRefreshToken = signRefreshToken({
     sub: user.id,
-    sessionId: session.id,
+    sessionId: session.id
   });
 
   const newRefreshTokenHash = hashRefreshToken(newRefreshToken);
@@ -235,16 +232,16 @@ export async function refreshSession(
     where: { id: session.id },
     data: {
       refreshTokenHash: newRefreshTokenHash,
-      expiresAt: getRefreshTokenExpiresAt(),
-    },
+      expiresAt: getRefreshTokenExpiresAt()
+    }
   });
 
   const newAccessToken = signAccessToken({
-    sub: user.id,
+    sub: user.id
   });
 
   return {
     accessToken: newAccessToken,
-    refreshToken: newRefreshToken,
+    refreshToken: newRefreshToken
   };
 }

@@ -1,8 +1,5 @@
 import jwt, { type JwtPayload, type SignOptions } from "jsonwebtoken";
-import type {
-  AccessTokenPayload,
-  RefreshTokenPayload,
-} from "../types/auth";
+import type { AccessTokenPayload, RefreshTokenPayload } from "../types/auth";
 
 function getEnv(name: string): string {
   const value = process.env[name];
@@ -18,14 +15,11 @@ const jwtRefreshSecret = getEnv("JWT_REFRESH_SECRET");
 const jwtAccessExpiresIn = getEnv("JWT_ACCESS_EXPIRES_IN");
 const jwtRefreshExpiresIn = getEnv("JWT_REFRESH_EXPIRES_IN");
 
-export function signAccessToken(payload: {
-  sub: string;
-
-}): string {
+export function signAccessToken(payload: { sub: string }): string {
   return jwt.sign(
     {
       sub: payload.sub,
-      type: "access",
+      type: "access"
     },
     jwtAccessSecret,
     { expiresIn: jwtAccessExpiresIn } as SignOptions
@@ -40,7 +34,7 @@ export function signRefreshToken(payload: {
     {
       sub: payload.sub,
       sessionId: payload.sessionId,
-      type: "refresh",
+      type: "refresh"
     },
     jwtRefreshSecret,
     { expiresIn: jwtRefreshExpiresIn } as SignOptions
