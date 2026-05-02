@@ -17,6 +17,10 @@ jobs:
         with:
           node-version: "24"
           cache: "pnpm"
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            backend/pnpm-lock.yaml
+            frontend/pnpm-lock.yaml
       - run: pnpm install
       - run: pnpm run format
 
@@ -31,6 +35,10 @@ jobs:
         with:
           node-version: "24"
           cache: "pnpm"
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            backend/pnpm-lock.yaml
+            frontend/pnpm-lock.yaml
       - run: pnpm install
       - run: pnpm run lint
 
@@ -45,5 +53,9 @@ jobs:
         with:
           node-version: "24"
           cache: "pnpm"
+          cache-dependency-path: |
+            pnpm-lock.yaml
+            backend/pnpm-lock.yaml
+            frontend/pnpm-lock.yaml
       - run: pnpm install
       - run: pnpm run typecheck
