@@ -1,9 +1,6 @@
 name: Code Quality
 
-on:
-  pull_request:
-    types: [ opened, synchronize, reopened ]
-  workflow_dispatch:
+on: [ pull_request, workflow_dispatch ]
 
 env:
   PNPM_VERSION: 10.33.0
