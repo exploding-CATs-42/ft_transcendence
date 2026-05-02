@@ -169,7 +169,17 @@ code-quality-check: format-check lint-check typecheck ## Run format check, lint 
 
 code-quality-fix: format-fix lint-fix ## Run format fix and lint fix
 
-
+volumes: ## Show project Docker volumes with mountpoint and size
+	@echo ""
+	@echo "Project Docker volumes:"
+	@echo ""
+	@docker volume ls --format '{{.Name}}' | grep 'ft_transcendence' | while read volume; do \
+		echo "Name: $$volume"; \
+		echo "Driver: $$(docker volume inspect $$volume --format '{{.Driver}}')"; \
+		echo "Mountpoint: $$(docker volume inspect $$volume --format '{{.Mountpoint}}')"; \
+		echo "Size: $$(docker run --rm -v $$volume:/volume alpine:latest sh -c 'du -sh /volume 2>/dev/null | cut -f1')"; \
+		echo ""; \
+	done
 
 ## -------------------------
 ## Help
@@ -207,4 +217,4 @@ test-backend test-orm \
 format-check format-fix format-check-frontend format-fix-frontend format-check-backend format-fix-backend \
 lint-check lint-fix lint-check-frontend lint-fix-frontend lint-check-backend lint-fix-backend \
 typecheck typecheck-frontend typecheck-backend \
-code-quality-check code-quality-fix
+code-quality-check code-quality-fix volumes
