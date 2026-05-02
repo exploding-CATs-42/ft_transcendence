@@ -44,3 +44,11 @@ export interface GameState {
   startedAt: number | null;
   finishedAt: number | null;
 }
+
+export interface GameLobby {
+  gameId: string;
+  name: string;
+  status: GameStatus;
+  players: Player[];
+  createdAt: number;
+}
