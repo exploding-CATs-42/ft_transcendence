@@ -21,7 +21,7 @@ jobs:
             pnpm-lock.yaml
             backend/pnpm-lock.yaml
             frontend/pnpm-lock.yaml
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run format
 
   lint:
@@ -39,7 +39,7 @@ jobs:
             pnpm-lock.yaml
             backend/pnpm-lock.yaml
             frontend/pnpm-lock.yaml
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run lint
 
   typecheck:
@@ -57,5 +57,5 @@ jobs:
             pnpm-lock.yaml
             backend/pnpm-lock.yaml
             frontend/pnpm-lock.yaml
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm run typecheck
