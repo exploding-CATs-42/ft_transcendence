@@ -80,21 +80,35 @@ deps:
 	$(COMPOSE) exec backend sh -c "CI=true pnpm install"
 	$(COMPOSE) exec frontend sh -c "CI=true pnpm install"
 
-format-frontend:
+format-check-frontend:
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm run format:check"
+
+format-fix-frontend:
 	$(COMPOSE) exec frontend sh -c "CI=true pnpm run format"
 
-format-backend:
+format-check-backend:
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run format:check"
+
+format-fix-backend:
 	$(COMPOSE) exec backend sh -c "CI=true pnpm run format"
 
-format: format-frontend format-backend
+format-check: format-check-frontend format-check-backend
+format-fix: format-fix-frontend format-fix-backend
 
-lint-frontend:
+lint-check-frontend:
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm run lint:check"
+
+lint-fix-frontend:
 	$(COMPOSE) exec frontend sh -c "CI=true pnpm run lint"
 
-lint-backend:
+lint-check-backend:
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run lint:check"
+
+lint-fix-backend:
 	$(COMPOSE) exec backend sh -c "CI=true pnpm run lint"
 
-lint: lint-frontend lint-backend
+lint-check: lint-check-frontend lint-check-backend
+lint-fix: lint-fix-frontend lint-fix-backend
 
 typecheck-frontend:
 	$(COMPOSE) exec frontend sh -c "CI=true pnpm run typecheck"
@@ -104,7 +118,8 @@ typecheck-backend:
 
 typecheck: typecheck-frontend typecheck-backend
 
-code-quality-check: format lint typecheck
+code-quality-check: format-check lint-check typecheck
+code-quality-fix: format-fix lint-fix
 
 clean:
 	$(COMPOSE) down --remove-orphans
