@@ -27,22 +27,7 @@
     "noImplicitOverride": true,
     "noImplicitReturns": true,
     "noUncheckedIndexedAccess": true,
-    "noPropertyAccessFromIndexSignature": true,
-
-    // Aliases
-    "baseUrl": ".",
-    "paths": {
-      "types": ["src/web/@types/index"],
-      "types/*": ["src/web/@types/*"],
-      "components": ["src/web/components/index"],
-      "components/*": ["src/web/components/*"],
-      "pages": ["src/web/pages/index"],
-      "pages/*": ["src/web/pages/*"],
-      "assets": ["src/web/assets/index"],
-      "assets/*": ["src/web/assets/*"],
-      "hooks": ["src/web/hooks/index"],
-      "hooks/*": ["src/web/hooks/*"]
-    }
+    "noPropertyAccessFromIndexSignature": true
   },
   "include": ["vite.config.ts"]
 }
