@@ -12,7 +12,7 @@ export async function updateMeController(
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten(),
+      errors: parsed.error.flatten()
     });
   }
 
@@ -25,15 +25,13 @@ export async function updateMeController(
       ...(parsed.data.username !== undefined
         ? { username: parsed.data.username }
         : {}),
-      ...(parsed.data.email !== undefined
-        ? { email: parsed.data.email }
-        : {}),
+      ...(parsed.data.email !== undefined ? { email: parsed.data.email } : {}),
       ...(parsed.data.password !== undefined
         ? { password: parsed.data.password }
         : {}),
       ...(parsed.data.avatarUrl !== undefined
         ? { avatarUrl: parsed.data.avatarUrl }
-        : {}),
+        : {})
     });
 
     return res.status(200).json(result);

@@ -4,7 +4,7 @@ import {
   createFriendRequestController,
   deleteFriendshipController,
   listFriendsController,
-  updateFriendshipController,
+  updateFriendshipController
 } from "../../controllers/friendsController";
 
 export const friendsRouter = express.Router();

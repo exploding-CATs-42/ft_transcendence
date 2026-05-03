@@ -4,7 +4,7 @@ import type {
   FriendUser,
   PublicProfileUser,
   SelfProfileUser,
-  UserGameHistoryItem,
+  UserGameHistoryItem
 } from "../types/auth";
 
 export class UsersServiceError extends Error {
@@ -21,7 +21,7 @@ export const publicProfileSelect = {
   username: true,
   avatarUrl: true,
   isOnline: true,
-  lastSeenAt: true,
+  lastSeenAt: true
 } satisfies Prisma.UserSelect;
 
 export const selfProfileSelect = {
@@ -30,7 +30,7 @@ export const selfProfileSelect = {
   username: true,
   avatarUrl: true,
   isOnline: true,
-  lastSeenAt: true,
+  lastSeenAt: true
 } satisfies Prisma.UserSelect;
 
 export function toFriendUser(user: {
@@ -45,7 +45,7 @@ export function toFriendUser(user: {
     username: user.username,
     avatarUrl: user.avatarUrl,
     isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
+    lastSeenAt: user.lastSeenAt
   };
 }
 
@@ -63,14 +63,14 @@ export function toSelfProfileUser(user: {
     username: user.username,
     avatarUrl: user.avatarUrl,
     isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
+    lastSeenAt: user.lastSeenAt
   };
 }
 
 async function ensureUserExists(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true },
+    select: { id: true }
   });
 
   if (!user) {
@@ -88,24 +88,24 @@ async function getFinishedGamesStats(userId: string): Promise<{
         userId,
         game: {
           endedAt: {
-            not: null,
-          },
-        },
-      },
+            not: null
+          }
+        }
+      }
     }),
     prisma.game.count({
       where: {
         winnerUserId: userId,
         endedAt: {
-          not: null,
-        },
-      },
-    }),
+          not: null
+        }
+      }
+    })
   ]);
 
   return {
     totalMatches,
-    wins,
+    wins
   };
 }
 
@@ -125,7 +125,7 @@ async function toPublicProfileUser(user: {
     isOnline: user.isOnline,
     lastSeenAt: user.lastSeenAt,
     totalMatches: stats.totalMatches,
-    wins: stats.wins,
+    wins: stats.wins
   };
 }
 
@@ -134,7 +134,7 @@ export async function getPublicUserById(
 ): Promise<PublicProfileUser> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: publicProfileSelect,
+    select: publicProfileSelect
   });
 
   if (!user) {
@@ -151,13 +151,13 @@ export async function searchUsersByUsername(
     where: {
       username: {
         equals: username,
-        mode: "insensitive",
-      },
+        mode: "insensitive"
+      }
     },
     select: publicProfileSelect,
     orderBy: {
-      username: "asc",
-    },
+      username: "asc"
+    }
   });
 
   return Promise.all(users.map(toPublicProfileUser));
@@ -173,9 +173,9 @@ export async function getUserGames(
       userId,
       game: {
         endedAt: {
-          not: null,
-        },
-      },
+          not: null
+        }
+      }
     },
     include: {
       game: {
@@ -187,13 +187,13 @@ export async function getUserGames(
           memberships: {
             include: {
               user: {
-                select: publicProfileSelect,
-              },
-            },
-          },
-        },
-      },
-    },
+                select: publicProfileSelect
+              }
+            }
+          }
+        }
+      }
+    }
   });
 
   return memberships
@@ -204,7 +204,7 @@ export async function getUserGames(
       isWinner: membership.game.winnerUserId === userId,
       players: membership.game.memberships.map((gameMembership) =>
         toFriendUser(gameMembership.user)
-      ),
+      )
     }))
     .sort((left, right) => {
       return right.endedAt.getTime() - left.endedAt.getTime();

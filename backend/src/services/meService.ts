@@ -25,7 +25,7 @@ export async function updateMe(
 ): Promise<{ user: SelfProfileUser }> {
   const currentUser = await prisma.user.findUnique({
     where: { id: currentUserId },
-    select: { id: true },
+    select: { id: true }
   });
 
   if (!currentUser) {
@@ -35,7 +35,7 @@ export async function updateMe(
   if (input.email !== undefined) {
     const existingByEmail = await prisma.user.findUnique({
       where: { email: input.email },
-      select: { id: true },
+      select: { id: true }
     });
 
     if (existingByEmail && existingByEmail.id !== currentUserId) {
@@ -46,7 +46,7 @@ export async function updateMe(
   if (input.username !== undefined) {
     const existingByUsername = await prisma.user.findUnique({
       where: { username: input.username },
-      select: { id: true },
+      select: { id: true }
     });
 
     if (existingByUsername && existingByUsername.id !== currentUserId) {
@@ -84,10 +84,10 @@ export async function updateMe(
   const updatedUser = await prisma.user.update({
     where: { id: currentUserId },
     data,
-    select: selfProfileSelect,
+    select: selfProfileSelect
   });
 
   return {
-    user: toSelfProfileUser(updatedUser),
+    user: toSelfProfileUser(updatedUser)
   };
 }
