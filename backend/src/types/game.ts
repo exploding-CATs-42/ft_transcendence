@@ -49,6 +49,6 @@ export interface GameLobby {
   gameId: string;
   name: string;
   status: GameStatus;
-  players: Player[];
+  players: string[];
   createdAt: number;
 }
