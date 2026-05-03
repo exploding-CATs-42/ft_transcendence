@@ -1,5 +1,5 @@
 {
-  "name": "exploding-cats",
+  "name": "frontend",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -12,7 +12,6 @@
     "format:check": "prettier --check ./src",
     "clean": "rimraf dist"
   },
-  "packageManager": "pnpm@10.33.0",
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
     "@reduxjs/toolkit": "^2.11.2",
