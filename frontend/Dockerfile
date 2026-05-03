@@ -1,13 +1,24 @@
-FROM node:22-alpine
-
+FROM node:24-alpine AS base
 RUN corepack enable
-
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY frontend/package.json ./frontend/
+
 RUN pnpm install --frozen-lockfile
 
-COPY . .
+################## DEV ################################################
+FROM base AS dev
+WORKDIR /app
+CMD ["pnpm", "--filter", "frontend", "dev"]
 
+################## BUILD ##############################################
+FROM base AS build
+COPY frontend/ ./frontend/
+RUN pnpm --filter frontend build
 
-CMD ["pnpm", "dev", "--host", "0.0.0.0", "--port", "5173"]
+################## PRODUCTION #########################################
+FROM nginx:alpine AS runner
+COPY --from=build /app/frontend/dist /usr/share/nginx/html
+EXPOSE 80
+CMD ["nginx", "-g", "daemon off;"]

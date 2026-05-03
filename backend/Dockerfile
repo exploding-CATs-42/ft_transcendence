@@ -1,13 +1,34 @@
-FROM node:22-alpine
-
+FROM node:24-alpine AS base
 RUN corepack enable
-
 WORKDIR /app
 
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY backend/package.json ./backend/
+
 RUN pnpm install --frozen-lockfile
 
-COPY . .
+################## DEV ################################################
+FROM base AS dev
+WORKDIR /app
+CMD ["sh", "-c", "pnpm --filter backend prisma:generate && pnpm --filter backend dev"]
 
+################## BUILD ##############################################
+FROM base AS build
+COPY backend/ ./backend/
+RUN pnpm --filter backend build
 
-CMD ["pnpm", "dev"]
+################## PRODUCTION #########################################
+FROM node:22-alpine AS runner
+RUN corepack enable
+WORKDIR /app
+
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml ./
+COPY backend/package.json ./backend/
+
+RUN pnpm install --frozen-lockfile --filter backend
+
+COPY --from=build /app/backend/dist ./backend/dist
+COPY --from=build /app/backend/prisma ./backend/prisma
+
+WORKDIR /app/backend
+CMD ["sh", "-c", "pnpm prisma:deploy && node dist/main.js"]
