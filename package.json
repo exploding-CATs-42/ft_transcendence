@@ -1,5 +1,5 @@
 {
-  "name": "exploding-cats-mono",
+  "name": "exploding-cats",
   "private": true,
   "scripts": {
     "format": "pnpm -r run format:check",
