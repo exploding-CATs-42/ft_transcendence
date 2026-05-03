@@ -24,6 +24,106 @@ components:
           nullable: true
           example: null
 
+    PublicProfileUser:
+      type: object
+      required:
+        - id
+        - username
+        - avatarUrl
+        - isOnline
+        - lastSeenAt
+        - totalMatches
+        - wins
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        username:
+          type: string
+          example: alex
+        avatarUrl:
+          type: string
+          nullable: true
+          example: null
+        isOnline:
+          type: boolean
+          example: false
+        lastSeenAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-28T10:00:00.000Z"
+        totalMatches:
+          type: integer
+          example: 10
+        wins:
+          type: integer
+          example: 6
+
+    FriendUser:
+      type: object
+      required:
+        - id
+        - username
+        - avatarUrl
+        - isOnline
+        - lastSeenAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        username:
+          type: string
+          example: alex
+        avatarUrl:
+          type: string
+          nullable: true
+          example: null
+        isOnline:
+          type: boolean
+          example: false
+        lastSeenAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-28T10:00:00.000Z"
+
+    SelfProfileUser:
+      type: object
+      required:
+        - id
+        - email
+        - username
+        - avatarUrl
+        - isOnline
+        - lastSeenAt
+      properties:
+        id:
+          type: string
+          format: uuid
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        username:
+          type: string
+          example: alexfox
+        avatarUrl:
+          type: string
+          nullable: true
+          example: null
+        isOnline:
+          type: boolean
+          example: true
+        lastSeenAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-28T10:00:00.000Z"
+
     RegisterRequest:
       type: object
       required:
@@ -82,6 +182,62 @@ components:
         accessToken:
           type: string
           example: new-jwt-access-token
+
+    UserResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: "#/components/schemas/PublicProfileUser"
+
+    UserSearchResponse:
+      type: object
+      required:
+        - users
+      properties:
+        users:
+          type: array
+          items:
+            $ref: "#/components/schemas/PublicProfileUser"
+
+    UserGameHistoryItem:
+      type: object
+      required:
+        - gameId
+        - gameName
+        - endedAt
+        - isWinner
+        - players
+      properties:
+        gameId:
+          type: string
+          format: uuid
+          example: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
+        gameName:
+          type: string
+          example: Friday Night Table
+        endedAt:
+          type: string
+          format: date-time
+          example: "2026-04-28T09:52:56.910Z"
+        isWinner:
+          type: boolean
+          example: true
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/FriendUser"
+
+    UserGamesResponse:
+      type: object
+      required:
+        - games
+      properties:
+        games:
+          type: array
+          items:
+            $ref: "#/components/schemas/UserGameHistoryItem"
 
     ApiErrorResponse:
       type: object
