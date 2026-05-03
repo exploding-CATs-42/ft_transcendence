@@ -1,0 +1,17 @@
+merge_protections_settings:
+  reporting_method: check-runs
+
+merge_protections:
+  - name: Block rebasing stacked branches to non-main
+    if:
+      - base != main
+    success_conditions:
+      - base = main
+
+pull_request_rules:
+  - name: Comment on stacked branch PRs
+    conditions:
+      - base != main
+    actions:
+      comment:
+        message: "Cannot rebase — this is a stacked branch. Rebase the bottom branch to main first."
