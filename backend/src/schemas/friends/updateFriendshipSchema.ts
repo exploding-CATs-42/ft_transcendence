@@ -1,11 +1,11 @@
 import { z } from "zod";
 
 export const updateFriendshipParamsSchema = z.object({
-  userId: z.string().uuid(),
+  userId: z.string().uuid()
 });
 
 export const updateFriendshipBodySchema = z.object({
-  action: z.enum(["accept", "reject"]),
+  action: z.enum(["accept", "reject"])
 });
 
 export type UpdateFriendshipParams = z.infer<
