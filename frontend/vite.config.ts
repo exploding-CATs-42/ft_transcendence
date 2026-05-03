@@ -1,10 +1,21 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react-swc";
 import svgr from "vite-plugin-svgr";
+import { resolve } from "path";
 
 export default defineConfig({
   plugins: [react(), svgr()],
   resolve: {
-    tsconfigPaths: true
+    alias: {
+      types: resolve(__dirname, "src/web/@types"),
+      components: resolve(__dirname, "src/web/components"),
+      pages: resolve(__dirname, "src/web/pages"),
+      assets: resolve(__dirname, "src/web/assets"),
+      hooks: resolve(__dirname, "src/web/hooks")
+    }
+  },
+  server: {
+    host: "0.0.0.0",
+    port: 5173
   }
 });
