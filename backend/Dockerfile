@@ -18,7 +18,7 @@ COPY backend/ ./backend/
 RUN pnpm --filter backend build
 
 ################## PRODUCTION #########################################
-FROM node:22-alpine AS runner
+FROM node:24-alpine AS runner
 RUN corepack enable
 WORKDIR /app
 
