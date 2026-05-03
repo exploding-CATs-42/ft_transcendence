@@ -1,0 +1,33 @@
+# Git
+.git
+.gitignore
+
+# Env files (secrets)
+**/.env
+**/.env.local
+**/.env.*.local
+
+# Node dependencies
+**/node_modules
+
+# Build outputs
+**/dist
+**/build
+
+# pnpm store
+.pnpm-store
+
+# Logs
+*.log
+tmp
+pnpm-debug.log
+
+# Test coverage
+coverage
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Optional files
+README.md
