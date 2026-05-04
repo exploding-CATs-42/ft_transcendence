@@ -1,5 +1,7 @@
 COMPOSE = docker compose --env-file infra/env/.env -f infra/docker/compose.dev.yml
 
+BACKEND_WD = -w /app/backend
+
 
 ## -------------------------
 ## Docker lifecycle
@@ -78,36 +80,36 @@ deps-frontend: ## Install frontend dependencies
 ## -------------------------
 
 prisma-format: ## Format Prisma schema
-	$(COMPOSE) exec backend pnpm prisma format
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma format
 
 prisma-validate: ## Validate Prisma schema
-	$(COMPOSE) exec backend pnpm prisma validate
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma validate
 
 prisma-generate: ## Generate Prisma client
-	$(COMPOSE) exec backend pnpm prisma generate
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma generate
 
 prisma-migrate: ## Create and apply a new Prisma migration. Usage: make prisma-migrate name=init
 	@if [ -z "$(name)" ]; then echo "Usage: make prisma-migrate name=init"; exit 1; fi
-	$(COMPOSE) exec backend pnpm prisma migrate dev --name $(name)
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma migrate dev --name $(name)
 
 prisma-deploy: ## Apply pending Prisma migrations
-	$(COMPOSE) exec backend pnpm prisma migrate deploy
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma migrate deploy
 
 prisma-reset: ## Reset database and apply migrations from scratch
-	$(COMPOSE) exec backend pnpm prisma migrate reset --force
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma migrate reset --force
 
 seed: ## Seed the database
-	$(COMPOSE) exec backend pnpm run seed
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm run seed
 
 ## -------------------------
 ## Tests
 ## -------------------------
 
 test-backend: ## Run backend tests
-	$(COMPOSE) exec backend pnpm test
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm test
 
 test-orm: ## Run backend ORM tests
-	$(COMPOSE) exec backend pnpm test:orm
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm test:orm
 
 ## -------------------------
 ## Formatting
