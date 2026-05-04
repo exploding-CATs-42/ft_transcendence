@@ -93,6 +93,4 @@ export interface RefreshTokenPayload {
 
 export interface AuthenticatedUser {
   id: string;
-  email: string;
-  username: string;
 }

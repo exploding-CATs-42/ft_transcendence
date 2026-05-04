@@ -22,9 +22,7 @@ export function authMiddleware(
     const payload = verifyAccessToken(token);
 
     req.user = {
-      id: payload.sub,
-      email: payload.email,
-      username: payload.username
+      id: payload.sub
     };
 
     return next();
