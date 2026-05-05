@@ -6,9 +6,19 @@ services:
     container_name: ft-nginx
     ports:
       - "${NGINX_PORT}:80"
+    environment:
+      PARANOIA: 1
+      ANOMALY_INBOUND: 5
+      ANOMALY_OUTBOUND: 4
+      MODSEC_RULE_ENGINE: On
     depends_on:
       - backend
       - frontend
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://localhost/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
     networks:
       - transcendence_net
 

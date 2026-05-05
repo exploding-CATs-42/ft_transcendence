@@ -1,5 +1,5 @@
-FROM nginx:alpine
+FROM owasp/modsecurity-crs:nginx
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf /etc/nginx/templates/nginx.conf.template
 
 EXPOSE 80
