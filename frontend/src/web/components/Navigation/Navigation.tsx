@@ -2,7 +2,11 @@ import { Avatar, LinkButton } from "components";
 
 import s from "./Navigation.module.css";
 
-const Navigation = () => {
+interface Props {
+  onLinkClick?: () => void;
+}
+
+const Navigation = ({ onLinkClick }: Props) => {
   const navLinks = [
     { path: "/lobby", label: "Play" },
     { path: "/rules", label: "Rules" },
