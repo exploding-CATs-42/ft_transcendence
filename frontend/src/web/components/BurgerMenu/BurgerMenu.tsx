@@ -15,8 +15,8 @@ const BurgerMenu = ({ isOpened, toggleMenu }: Props) => {
   const location = useLocation();
 
   useEffect(() => {
-    if (isOpened) toggleMenu(false);
-  }, [location.pathname, isOpened, toggleMenu]);
+    toggleMenu(false);
+  }, [location.pathname]);
 
   useEffect(() => {
     document.body.style.overflow = isOpened ? "hidden" : "auto";
