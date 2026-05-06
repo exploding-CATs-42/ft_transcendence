@@ -1,4 +1,3 @@
-import { useLocation } from "react-router-dom";
 import { useEffect } from "react";
 import clsx from "clsx";
 
@@ -12,11 +11,9 @@ interface Props {
 }
 
 const BurgerMenu = ({ isOpened, toggleMenu }: Props) => {
-  const location = useLocation();
-
-  useEffect(() => {
+  const handleLinkClick = () => {
     toggleMenu(false);
-  }, [location.pathname]);
+  };
 
   useEffect(() => {
     document.body.style.overflow = isOpened ? "hidden" : "auto";
@@ -40,7 +37,7 @@ const BurgerMenu = ({ isOpened, toggleMenu }: Props) => {
         })}
       >
         <div className={s.navContainer}>
-          <Navigation />
+          <Navigation onLinkClick={handleLinkClick} />
         </div>
       </div>
     </>
