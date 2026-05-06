@@ -3,8 +3,7 @@ import { Icon, Input } from "components";
 import s from "./EmailInput.module.css";
 import type { InputStatus } from "components/Input/InputStatus";
 
-interface Props {
-  placeholder?: string;
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;
 }
 

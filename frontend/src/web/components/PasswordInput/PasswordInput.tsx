@@ -7,8 +7,7 @@ import type { InputStatus } from "components/Input/InputStatus";
 
 import s from "./PasswordInput.module.css";
 
-interface Props {
-  placeholder?: string;
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;
 }
 
