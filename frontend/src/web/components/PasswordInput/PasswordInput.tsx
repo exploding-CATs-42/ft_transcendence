@@ -11,10 +11,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;
 }
 
-const PasswordInput = ({
-  placeholder = "Password",
-  status = "normal"
-}: Props) => {
+const PasswordInput = ({ placeholder = "Password", status }: Props) => {
   const [type, setType] = useState<InputType>("password");
 
   const toggleType = () => {

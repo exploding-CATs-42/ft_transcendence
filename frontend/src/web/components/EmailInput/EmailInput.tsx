@@ -7,7 +7,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;
 }
 
-const EmailInput = ({ placeholder = "Email", status = "normal" }: Props) => {
+const EmailInput = ({ placeholder = "Email", status }: Props) => {
   return (
     <Input type="email" pdLeft={true} placeholder={placeholder} status={status}>
       <Icon className={s.icon} name="mail" width={24} height={24} />
