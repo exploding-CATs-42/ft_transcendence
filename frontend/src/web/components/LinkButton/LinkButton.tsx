@@ -1,18 +1,13 @@
-import type { ReactNode } from "react";
-import { Link } from "react-router-dom";
+import { Link, type LinkProps } from "react-router-dom";
 import clsx from "clsx";
 
 import s from "./LinkButton.module.css";
 
-interface Props {
-  className?: string;
-  children?: ReactNode;
-  to: string;
-}
+type Props = LinkProps;
 
-const LinkButton = ({ to, className = "", children }: Props) => {
+const LinkButton = ({ className = "", children, ...rest }: Props) => {
   return (
-    <Link className={clsx(s.button, className)} to={to}>
+    <Link {...rest} className={clsx(s.button, className)}>
       {children}
     </Link>
   );
