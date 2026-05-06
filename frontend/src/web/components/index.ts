@@ -20,3 +20,4 @@ export { default as PasswordInput } from "./PasswordInput/PasswordInput";
 export { default as SearchInput } from "./SearchInput/SearchInput";
 export { default as Section } from "./Section/Section";
 export { default as PhaserGame } from "./PhaserGame/PhaserGame";
+export { default as FormField } from "./FormField/FormField";
