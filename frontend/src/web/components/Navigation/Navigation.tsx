@@ -21,7 +21,11 @@ const Navigation = ({ onLinkClick }: Props) => {
         <ul className={s.navList}>
           {navLinks.map((link) => (
             <li key={link.path} className={s.navLinkItem}>
-              <LinkButton to={link.path} className={s.link}>
+              <LinkButton
+                to={link.path}
+                className={s.link}
+                onClick={() => onLinkClick?.()}
+              >
                 {link.label}
               </LinkButton>
             </li>
@@ -30,12 +34,20 @@ const Navigation = ({ onLinkClick }: Props) => {
       </nav>
 
       {isLoggedIn ? (
-        <LinkButton to="/profile" className={s.profile}>
+        <LinkButton
+          to="/profile"
+          className={s.profile}
+          onClick={() => onLinkClick?.()}
+        >
           <span className={s.username}>BadCat</span>
           <Avatar variant="badge" />
         </LinkButton>
       ) : (
-        <LinkButton to="/register" className={s.signUp}>
+        <LinkButton
+          to="/register"
+          className={s.signUp}
+          onClick={() => onLinkClick?.()}
+        >
           Sign up
         </LinkButton>
       )}
