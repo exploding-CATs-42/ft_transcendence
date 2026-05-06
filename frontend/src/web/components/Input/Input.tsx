@@ -19,7 +19,16 @@ const defaultState: Props = {
 };
 
 const Input = (props: Props) => {
-  const { type, pdLeft, pdRight, status, placeholder, className, children } = {
+  const {
+    type,
+    pdLeft,
+    pdRight,
+    status,
+    placeholder,
+    className,
+    children,
+    ...rest
+  } = {
     ...defaultState,
     ...props
   };
@@ -27,6 +36,7 @@ const Input = (props: Props) => {
   return (
     <div className={clsx(s.inputContainer, s[status!])}>
       <input
+        {...rest}
         className={clsx(s.input, className, {
           [s.pdLeft]: pdLeft,
           [s.pdRight]: pdRight
