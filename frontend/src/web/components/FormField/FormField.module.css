@@ -1,0 +1,19 @@
+.container {
+  position: relative;
+}
+
+.errorMessage {
+  position: absolute;
+  left: 14px;
+  font-size: 12px;
+  color: var(--off-white);
+  background-color: var(--modal-window-background);
+
+  transform: translateY(-50%);
+}
+
+@media only screen and (min-width: 480px) {
+  .errorMessage {
+    font-size: 14px;
+  }
+}
