@@ -11,27 +11,17 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus | undefined;
 }
 
-const defaultState: Props = {
-  type: "text",
-  pdLeft: false,
-  pdRight: false,
-  status: "normal"
-};
-
 const Input = (props: Props) => {
   const {
-    type,
-    pdLeft,
-    pdRight,
-    status,
+    type = "text",
+    pdLeft = false,
+    pdRight = false,
+    status = "normal",
     placeholder,
     className,
     children,
     ...rest
-  } = {
-    ...defaultState,
-    ...props
-  };
+  } = props;
 
   return (
     <div className={clsx(s.inputContainer, s[status!])}>
