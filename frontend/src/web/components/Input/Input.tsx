@@ -33,7 +33,7 @@ const Input = (props: Props) => {
         })}
         type={type}
         placeholder={placeholder}
-        autoComplete={(type === "email" && "email") || undefined}
+        autoComplete={type === "email" ? "email" : undefined}
       />
       {children}
     </div>
