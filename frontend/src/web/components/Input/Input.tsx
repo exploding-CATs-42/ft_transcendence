@@ -8,7 +8,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   type: InputType;
   pdLeft?: boolean;
   pdRight?: boolean;
-  status?: InputStatus;
+  status?: InputStatus | undefined;
 }
 
 const defaultState: Props = {
