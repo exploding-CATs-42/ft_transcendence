@@ -19,8 +19,7 @@ const PasswordInput = ({
   const [type, setType] = useState<InputType>("password");
 
   const toggleType = () => {
-    if (type == "password") setType("text");
-    else setType("password");
+    setType((t) => (t === "password" ? "text" : "password"));
   };
 
   return (
