@@ -13,7 +13,8 @@ export default defineConfig({
       assets: resolve(__dirname, "src/web/assets"),
       hooks: resolve(__dirname, "src/web/hooks"),
       game: resolve(__dirname, "src/game"),
-      utils: resolve(__dirname, "src/web/utils")
+      utils: resolve(__dirname, "src/web/utils"),
+      api: resolve(__dirname, "src/web/api")
     }
   },
   server: {
