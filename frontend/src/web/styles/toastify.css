@@ -1,0 +1,16 @@
+@media (max-width: 480px) {
+  .Toastify__toast-container {
+    width: 80% !important;
+    left: 50% !important;
+    transform: translateX(-50%) !important;
+    top: 10px !important;
+  }
+
+  .Toastify__toast {
+    border-radius: 8px !important;
+    font-size: 13px !important;
+    min-height: 48px !important;
+    padding: 10px 14px !important;
+    margin-bottom: 6px !important;
+  }
+}
