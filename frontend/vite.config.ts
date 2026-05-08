@@ -12,7 +12,8 @@ export default defineConfig({
       pages: resolve(__dirname, "src/web/pages"),
       assets: resolve(__dirname, "src/web/assets"),
       hooks: resolve(__dirname, "src/web/hooks"),
-      game: resolve(__dirname, "src/game")
+      game: resolve(__dirname, "src/game"),
+      utils: resolve(__dirname, "src/web/utils")
     }
   },
   server: {
