@@ -45,7 +45,9 @@
       "hooks": ["src/web/hooks/index"],
       "hooks/*": ["src/web/hooks/*"],
       "game": ["src/game/index"],
-      "game/*": ["src/game/*"]
+      "game/*": ["src/game/*"],
+      "utils": ["src/web/utils/index"],
+      "utils/*": ["src/web/utils/*"]
     }
   },
   "include": ["src"]
