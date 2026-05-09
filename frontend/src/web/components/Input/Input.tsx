@@ -1,3 +1,4 @@
+import { forwardRef } from "react";
 import clsx from "clsx";
 
 import type { InputType } from "./InputType";
@@ -11,7 +12,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus | undefined;
 }
 
-const Input = (props: Props) => {
+const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
   const {
     type = "text",
     pdLeft = false,
@@ -27,6 +28,7 @@ const Input = (props: Props) => {
     <div className={clsx(s.inputContainer, s[status!])}>
       <input
         {...rest}
+        ref={ref}
         className={clsx(s.input, className, {
           [s.pdLeft]: pdLeft,
           [s.pdRight]: pdRight
@@ -38,6 +40,6 @@ const Input = (props: Props) => {
       {children}
     </div>
   );
-};
+});
 
 export default Input;
