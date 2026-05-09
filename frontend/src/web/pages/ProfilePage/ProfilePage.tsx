@@ -1,7 +1,5 @@
 import { ListSection, StatsSection, UserSection } from "./components";
-
 import { friendsMock, matchesMock, profileUserMock, statsMock } from "./mocks";
-
 import s from "./ProfilePage.module.css";
 
 const ProfilePage = () => {

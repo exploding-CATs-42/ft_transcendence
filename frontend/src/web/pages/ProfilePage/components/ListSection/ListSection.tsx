@@ -1,8 +1,9 @@
+// Libraries
 import { useState } from "react";
-
+//Project level
 import { Button, List, MatchListItem, SearchInput, Section } from "components";
 import type { LobbyMatch } from "types";
-
+// Local level
 import { FriendListItem, Tabs } from "../../components";
 import type { TabOption, FriendItem } from "../../types";
 import s from "./ListSection.module.css";

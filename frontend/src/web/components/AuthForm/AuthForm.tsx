@@ -1,8 +1,9 @@
+// Libraries
 import type { ReactNode, SubmitEventHandler } from "react";
 import { Link } from "react-router-dom";
-
+// Project level
 import { Button, Icon } from "components";
-
+// Local level
 import s from "./AuthForm.module.css";
 
 interface Props {

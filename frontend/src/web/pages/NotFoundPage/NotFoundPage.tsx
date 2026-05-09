@@ -1,8 +1,9 @@
+// Libraries
 import { useEffect } from "react";
-
+// Project level
 import { LinkButton } from "components";
 import { CatomicBomb } from "assets";
-
+// Local level
 import s from "./NotFoundPage.module.css";
 
 const NotFoundPage = () => {

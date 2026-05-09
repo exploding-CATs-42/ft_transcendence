@@ -1,6 +1,7 @@
+// Project level
 import { Icon, Input } from "components";
 import type { InputStatus } from "types";
-
+// Local level
 import s from "./EmailInput.module.css";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {

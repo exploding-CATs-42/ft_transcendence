@@ -1,6 +1,8 @@
+// Libraries
 import { Fragment } from "react";
-import s from "./List.module.css";
 import clsx from "clsx";
+// Local level
+import s from "./List.module.css";
 
 interface Props<T> {
   items: T[];

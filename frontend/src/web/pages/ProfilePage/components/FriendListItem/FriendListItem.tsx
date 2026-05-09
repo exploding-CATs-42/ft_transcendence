@@ -1,5 +1,6 @@
+// Project level
 import { Avatar, Button, ListItem } from "components";
-
+//Local level
 import s from "./FriendListItem.module.css";
 
 export type FriendItem = {

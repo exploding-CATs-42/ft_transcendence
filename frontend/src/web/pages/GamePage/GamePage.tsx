@@ -1,9 +1,10 @@
+// Libraries
 import { useRef, useState } from "react";
-
+// Project level
 import { PhaserGame } from "components";
 import type { IRefPhaserGame } from "types";
 import { MainMenu } from "game/scenes";
-
+// Local level
 import s from "./GamePage.module.css";
 
 const GamePage = () => {

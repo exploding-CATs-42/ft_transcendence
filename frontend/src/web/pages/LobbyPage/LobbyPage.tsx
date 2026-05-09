@@ -1,10 +1,11 @@
+// Libraries
+import clsx from "clsx";
+// Project level
 import { Section, Button, List, MatchListItem } from "components";
 import type { LobbyMatch } from "types";
-
+// Local level
 import { matchesMock } from "./mocks";
-
 import s from "./LobbyPage.module.css";
-import clsx from "clsx";
 
 const LobbyPage = () => {
   const matches: LobbyMatch[] = matchesMock;

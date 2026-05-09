@@ -1,10 +1,11 @@
+// Libraries
 import { Route, Routes } from "react-router-dom";
 import { lazy } from "react";
-
+// Project level
+// import { PrivateRoute, PublicRoute } from "routes";
+import { Layout } from "components";
+// Local level
 import "./styles/global.css";
-
-// import { PrivateRoute, PublicRoute } from "./routes";
-import { Layout } from "./components";
 
 const HomePage = lazy(() => import("./pages/HomePage/HomePage.jsx"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage.jsx"));

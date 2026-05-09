@@ -1,5 +1,6 @@
+// Libraries
 import clsx from "clsx";
-
+// Local level
 import s from "./Button.module.css";
 
 type Props = React.ButtonHTMLAttributes<HTMLButtonElement>;

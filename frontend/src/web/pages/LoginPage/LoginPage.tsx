@@ -1,5 +1,6 @@
+// Project level
 import { AuthForm, EmailInput, PasswordInput } from "components";
-
+// Local level
 import s from "./LoginPage.module.css";
 
 const LoginPage = () => {

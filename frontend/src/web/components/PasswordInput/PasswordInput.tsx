@@ -1,8 +1,9 @@
+// Libraries
 import { useState } from "react";
-
+// Project level
 import { Icon, Input } from "components";
 import type { InputType, InputStatus } from "types";
-
+// Local level
 import s from "./PasswordInput.module.css";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {

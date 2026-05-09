@@ -1,6 +1,7 @@
+// Libraries
 import { useEffect, useState, type SubmitEventHandler } from "react";
 import { io } from "socket.io-client";
-
+// Local level
 import s from "./ChatPage.module.css";
 
 const socket = io(import.meta.env["VITE_WS_BASE_URL"]);

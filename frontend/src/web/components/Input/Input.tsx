@@ -1,6 +1,7 @@
+// Libraries
 import { forwardRef } from "react";
 import clsx from "clsx";
-
+// Local level
 import type { InputType, InputStatus } from "./types";
 import s from "./Input.module.css";
 

@@ -1,4 +1,6 @@
+// Libraries
 import clsx from "clsx";
+// Local level
 import s from "./Tabs.module.css";
 
 export type TabOption = {

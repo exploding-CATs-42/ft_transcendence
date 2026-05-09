@@ -1,8 +1,8 @@
+// Project level
 import { Avatar, LinkButton, ListItem } from "components";
-
+// Local level
 import { createMatchSlots, isPlaceholderSlot } from "./slots";
 import type { LobbyMatch, MatchSlot } from "./types";
-
 import s from "./MatchListItem.module.css";
 
 interface Props {

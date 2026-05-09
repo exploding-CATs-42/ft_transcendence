@@ -1,6 +1,7 @@
+// Libraries
 import { useEffect } from "react";
 import { LinkButton } from "components";
-
+// Local level
 import { CatImage } from "./components";
 import s from "./HomePage.module.css";
 
