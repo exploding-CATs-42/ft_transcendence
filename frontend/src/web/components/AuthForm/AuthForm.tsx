@@ -12,6 +12,7 @@ interface Props {
   redirectTitle: string;
   redirectLink: string;
   onSubmit: SubmitEventHandler;
+  disabled?: boolean;
 }
 
 const AuthForm = ({
@@ -20,7 +21,8 @@ const AuthForm = ({
   redirectMessage,
   redirectTitle,
   redirectLink,
-  onSubmit
+  onSubmit,
+  disabled
 }: Props) => {
   return (
     <>
@@ -30,7 +32,7 @@ const AuthForm = ({
       </div>
       <form className={s.form} onSubmit={onSubmit}>
         <div className={s.inputsContainer}>{children}</div>
-        <Button className={s.signIn} type="submit">
+        <Button className={s.signIn} type="submit" disabled={disabled}>
           {title}
         </Button>
       </form>
