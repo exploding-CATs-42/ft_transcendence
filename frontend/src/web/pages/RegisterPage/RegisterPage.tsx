@@ -28,6 +28,11 @@ const RegisterPage = () => {
     try {
       await api.users.register(data);
       toast.success("Success");
+
+      await api.users.login({
+        email: data.email,
+        password: data.password
+      });
     } catch (error) {
       toast.error((error as Error).message, { autoClose: 5000 });
     }
