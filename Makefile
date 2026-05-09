@@ -120,16 +120,16 @@ format-check: format-check-frontend format-check-backend ## Check formatting for
 format-fix: format-fix-frontend format-fix-backend ## Fix formatting for frontend and backend
 
 format-check-frontend: ## Check frontend formatting
-	$(COMPOSE) exec frontend sh -c "CI=true pnpm run format:check"
-
-format-fix-frontend: ## Fix frontend formatting
 	$(COMPOSE) exec frontend sh -c "CI=true pnpm run format"
 
+format-fix-frontend: ## Fix frontend formatting
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm run format:fix"
+
 format-check-backend: ## Check backend formatting
-	$(COMPOSE) exec backend sh -c "CI=true pnpm run format:check"
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run format"
 
 format-fix-backend: ## Fix backend formatting
-	$(COMPOSE) exec backend sh -c "CI=true pnpm run format"
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run format:fix"
 
 ## -------------------------
 ## Linting
@@ -140,16 +140,16 @@ lint-check: lint-check-frontend lint-check-backend ## Check linting for frontend
 lint-fix: lint-fix-frontend lint-fix-backend ## Fix linting for frontend and backend
 
 lint-check-frontend: ## Check frontend linting
-	$(COMPOSE) exec frontend sh -c "CI=true pnpm run lint:check"
-
-lint-fix-frontend: ## Fix frontend linting
 	$(COMPOSE) exec frontend sh -c "CI=true pnpm run lint"
 
+lint-fix-frontend: ## Fix frontend linting
+	$(COMPOSE) exec frontend sh -c "CI=true pnpm run lint:fix"
+
 lint-check-backend: ## Check backend linting
-	$(COMPOSE) exec backend sh -c "CI=true pnpm run lint:check"
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run lint"
 
 lint-fix-backend: ## Fix backend linting
-	$(COMPOSE) exec backend sh -c "CI=true pnpm run lint"
+	$(COMPOSE) exec backend sh -c "CI=true pnpm run lint:fix"
 
 ## -------------------------
 ## Type checking
