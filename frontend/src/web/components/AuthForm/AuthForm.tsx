@@ -1,4 +1,4 @@
-import type { ReactNode } from "react";
+import type { ReactNode, SubmitEventHandler } from "react";
 import { Link } from "react-router-dom";
 
 import { Button, Icon } from "components";
@@ -11,6 +11,7 @@ interface Props {
   redirectMessage: string;
   redirectTitle: string;
   redirectLink: string;
+  onSubmit: SubmitEventHandler;
 }
 
 const AuthForm = ({
@@ -18,7 +19,8 @@ const AuthForm = ({
   children,
   redirectMessage,
   redirectTitle,
-  redirectLink
+  redirectLink,
+  onSubmit
 }: Props) => {
   return (
     <>
@@ -26,9 +28,9 @@ const AuthForm = ({
         <span className={s.title}>{title}</span>
         <Icon name="paw" width={50} height={50} fill={"#fcf8ee"} />
       </div>
-      <form className={s.form} onSubmit={(event) => event.preventDefault()}>
+      <form className={s.form} onSubmit={onSubmit}>
         <div className={s.inputsContainer}>{children}</div>
-        <Button className={s.signIn} type="submit" onClick={() => {}}>
+        <Button className={s.signIn} type="submit">
           {title}
         </Button>
       </form>
