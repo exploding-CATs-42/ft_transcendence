@@ -10,6 +10,7 @@ import {
   PasswordInput
 } from "components";
 import { registerSchema, type RegisterSchema } from "schemas";
+import api from "api";
 // Local level
 import s from "./RegisterPage.module.css";
 
@@ -23,7 +24,12 @@ const RegisterPage = () => {
   });
 
   const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
-    console.log(data);
+    try {
+      await api.users.register(data);
+      console.log("Success");
+    } catch (error) {
+      console.error((error as Error).message);
+    }
   };
 
   return (
