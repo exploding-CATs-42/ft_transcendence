@@ -1,4 +1,6 @@
+// Libraries
 import clsx from "clsx";
+// Local level
 import s from "./Avatar.module.css";
 
 type Variant = "profile" | "settings" | "badge" | "friend" | "match";

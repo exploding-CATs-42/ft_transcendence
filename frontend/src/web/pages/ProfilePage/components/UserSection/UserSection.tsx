@@ -1,5 +1,6 @@
+// Project level
 import { Avatar, Button, Icon, Section } from "components";
-
+// Local level
 import type { ProfileUser } from "../../types";
 import s from "./UserSection.module.css";
 

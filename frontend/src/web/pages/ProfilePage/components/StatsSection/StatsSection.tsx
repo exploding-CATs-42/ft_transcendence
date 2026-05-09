@@ -1,5 +1,6 @@
+// Project level
 import { Section } from "components";
-
+// Local level
 import type { ProfileStat } from "../../types";
 import s from "./StatsSection.module.css";
 

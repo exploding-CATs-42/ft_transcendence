@@ -1,6 +1,7 @@
+// Libraries
 import { Outlet } from "react-router-dom";
 import { ToastContainer, type ToastContainerProps } from "react-toastify";
-
+// Project level
 import { Header } from "components";
 import { useToastPosition } from "hooks";
 

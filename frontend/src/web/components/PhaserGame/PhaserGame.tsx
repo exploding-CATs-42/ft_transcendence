@@ -1,7 +1,8 @@
+// Libraries
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
-
+// Project level
 import { EventBus, StartGame } from "game";
-
+// Local level
 import type { IRefPhaserGame } from "./types";
 
 interface IProps {

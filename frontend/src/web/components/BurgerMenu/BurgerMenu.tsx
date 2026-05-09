@@ -1,8 +1,9 @@
+// Libraries
 import { useEffect } from "react";
 import clsx from "clsx";
-
+// Project level
 import { Navigation, Icon } from "components";
-
+// Local level
 import s from "./BurgerMenu.module.css";
 
 interface Props {

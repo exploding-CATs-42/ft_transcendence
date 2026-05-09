@@ -1,6 +1,7 @@
+// Project level
 import { useModal } from "hooks";
 import { Button, Modal } from "components";
-
+// Local level
 import s from "./ConfirmPopup.module.css";
 
 const ConfirmPopup = () => {

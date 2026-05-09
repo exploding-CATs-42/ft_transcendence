@@ -1,9 +1,10 @@
+// Libraries
 import { Link } from "react-router-dom";
-import { Logo } from "components";
-import { Navigation, BurgerMenu } from "components";
-
-import s from "./Header.module.css";
 import { useEffect, useState } from "react";
+// Project level
+import { Logo, Navigation, BurgerMenu } from "components";
+// Local level
+import s from "./Header.module.css";
 
 const Header = () => {
   const [isBurgerMenuOpened, setIsBurgerMenuOpened] = useState(false);

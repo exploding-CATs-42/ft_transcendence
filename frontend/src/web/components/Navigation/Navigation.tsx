@@ -1,5 +1,6 @@
+// Project level
 import { Avatar, LinkButton } from "components";
-
+// Local level
 import s from "./Navigation.module.css";
 
 interface Props {

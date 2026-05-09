@@ -1,9 +1,10 @@
+// Libraries
 import { useEffect } from "react";
 import { createPortal } from "react-dom";
 import clsx from "clsx";
-
+// Project level
 import { Icon } from "components";
-
+// Local level
 import s from "./Modal.module.css";
 
 const modalRoot = document.querySelector("#rootModal")!;
