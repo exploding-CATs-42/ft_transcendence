@@ -20,12 +20,12 @@ function App() {
     <Routes>
       <Route path="/" element={<Layout />}>
         <Route index element={<HomePage />} />
-        <Route path="profile" element={<ProfilePage />}></Route>
-        <Route path="lobby" element={<LobbyPage />}></Route>
-        <Route path="game" element={<GamePage />}></Route>
-        <Route path="login" element={<LoginPage />}></Route>
-        <Route path="register" element={<RegisterPage />}></Route>
-        <Route path="chat" element={<ChatPage />}></Route>
+        <Route path="profile" element={<ProfilePage />} />
+        <Route path="lobby" element={<LobbyPage />} />
+        <Route path="game" element={<GamePage />} />
+        <Route path="login" element={<LoginPage />} />
+        <Route path="register" element={<RegisterPage />} />
+        <Route path="chat" element={<ChatPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
