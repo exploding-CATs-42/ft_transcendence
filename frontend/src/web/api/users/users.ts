@@ -6,8 +6,8 @@ export type RegisterReqBody = {
   password: string;
 };
 
-const register = async (credentials: RegisterReqBody) => {
-  const result = await api.post("/users/register", credentials);
+const register = async (body: RegisterReqBody) => {
+  const result = await api.post("/users/register", body);
   return result.data;
 };
 
@@ -16,8 +16,8 @@ export type UserCredentials = {
   password: string;
 };
 
-const login = async (credentials: UserCredentials) => {
-  const result = await api.post("/users/login", credentials);
+const login = async (body: UserCredentials) => {
+  const result = await api.post("/users/login", body);
   const { token } = result.data;
 
   setAxiosToken(token);
