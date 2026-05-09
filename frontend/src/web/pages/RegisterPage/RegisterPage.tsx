@@ -53,6 +53,7 @@ const RegisterPage = () => {
               <EmailInput
                 {...register("email")}
                 status={errors.email ? "error" : "normal"}
+                autoFocus
               />
             </FormField>
             <FormField error={errors.username?.message}>
