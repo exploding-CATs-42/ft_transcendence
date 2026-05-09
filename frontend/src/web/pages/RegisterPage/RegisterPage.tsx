@@ -18,7 +18,7 @@ const RegisterPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors }
+    formState: { errors, isSubmitting }
   } = useForm<RegisterSchema>({
     resolver: zodResolver(registerSchema)
   });
@@ -46,6 +46,7 @@ const RegisterPage = () => {
             redirectTitle="Sign in"
             redirectLink="/login"
             onSubmit={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
           >
             <FormField error={errors.email?.message}>
               <EmailInput
