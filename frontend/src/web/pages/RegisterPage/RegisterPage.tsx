@@ -2,7 +2,13 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 // Project level
-import { AuthForm, EmailInput, NameInput, PasswordInput } from "components";
+import {
+  AuthForm,
+  EmailInput,
+  FormField,
+  NameInput,
+  PasswordInput
+} from "components";
 import { registerSchema, type RegisterSchema } from "schemas";
 // Local level
 import s from "./RegisterPage.module.css";
@@ -35,24 +41,32 @@ const RegisterPage = () => {
             redirectLink="/login"
             onSubmit={handleSubmit(onSubmit)}
           >
-            <EmailInput
-              {...register("email")}
-              status={errors.email ? "error" : "normal"}
-            />
-            <NameInput
-              {...register("username")}
-              status={errors.username ? "error" : "normal"}
-              placeholder="Username"
-            />
-            <PasswordInput
-              {...register("password")}
-              status={errors.password ? "error" : "normal"}
-            />
-            <PasswordInput
-              {...register("passwordConfirm")}
-              status={errors.passwordConfirm ? "error" : "normal"}
-              placeholder="Password confirmation"
-            />
+            <FormField error={errors.email?.message}>
+              <EmailInput
+                {...register("email")}
+                status={errors.email ? "error" : "normal"}
+              />
+            </FormField>
+            <FormField error={errors.username?.message}>
+              <NameInput
+                {...register("username")}
+                status={errors.username ? "error" : "normal"}
+                placeholder="Username"
+              />
+            </FormField>
+            <FormField error={errors.password?.message}>
+              <PasswordInput
+                {...register("password")}
+                status={errors.password ? "error" : "normal"}
+              />
+            </FormField>
+            <FormField error={errors.passwordConfirm?.message}>
+              <PasswordInput
+                {...register("passwordConfirm")}
+                status={errors.passwordConfirm ? "error" : "normal"}
+                placeholder="Password confirmation"
+              />
+            </FormField>
           </AuthForm>
         </div>
       </div>
