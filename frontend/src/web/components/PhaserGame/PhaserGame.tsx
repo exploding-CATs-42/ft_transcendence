@@ -1,10 +1,8 @@
 import { forwardRef, useEffect, useLayoutEffect, useRef } from "react";
+
 import { EventBus, StartGame } from "game";
 
-export interface IRefPhaserGame {
-  game: Phaser.Game | null;
-  scene: Phaser.Scene | null;
-}
+import type { IRefPhaserGame } from "./types";
 
 interface IProps {
   currentActiveScene?: (scene_instance: Phaser.Scene) => void;

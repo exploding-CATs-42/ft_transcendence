@@ -1,15 +1,10 @@
 import { useState } from "react";
 
 import { Button, List, MatchListItem, SearchInput, Section } from "components";
+import type { LobbyMatch } from "types";
 
-import type { LobbyMatch } from "components/MatchListItem/types";
-
-import Tabs, { type TabOption } from "../Tabs/Tabs";
-
-import FriendListItem, {
-  type FriendItem
-} from "../FriendListItem/FriendListItem";
-
+import { FriendListItem, Tabs } from "../../components";
+import type { TabOption, FriendItem } from "../../types";
 import s from "./ListSection.module.css";
 
 interface Props {

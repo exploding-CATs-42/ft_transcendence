@@ -36,7 +36,7 @@ type LobbyMatch = {
 
 ```tsx
 import { MatchListItem } from "components";
-import type { LobbyMatch } from "components/MatchListItem/types";
+import type { LobbyMatch } from "types";
 
 const match: LobbyMatch = {
   id: "table-1",
@@ -58,7 +58,7 @@ export default MatchRow;
 
 ```tsx
 import { List, MatchListItem } from "components";
-import type { LobbyMatch } from "components/MatchListItem/types";
+import type { LobbyMatch } from "types";
 
 type Props = {
   matches: LobbyMatch[];

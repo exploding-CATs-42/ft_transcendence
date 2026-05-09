@@ -1,6 +1,6 @@
 import { Section } from "components";
-import type { ProfileStat } from "types";
 
+import type { ProfileStat } from "../../types";
 import s from "./StatsSection.module.css";
 
 interface Props {

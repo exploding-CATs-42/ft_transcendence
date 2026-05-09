@@ -1,8 +1,8 @@
 import { useRef, useState } from "react";
 
 import { PhaserGame } from "components";
-import type { IRefPhaserGame } from "components/PhaserGame/PhaserGame";
-import type { MainMenu } from "game/scenes";
+import type { IRefPhaserGame } from "types";
+import { MainMenu } from "game/scenes";
 
 import s from "./GamePage.module.css";
 

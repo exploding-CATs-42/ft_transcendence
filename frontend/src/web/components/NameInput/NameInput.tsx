@@ -1,7 +1,7 @@
 import { Icon, Input } from "components";
+import type { InputStatus } from "types";
 
 import s from "./NameInput.module.css";
-import type { InputStatus } from "components/Input/InputStatus";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;

@@ -1,4 +1,4 @@
-import type { LobbyMatch } from "components/MatchListItem/types";
+import type { LobbyMatch } from "types";
 
 export const matchesMock: LobbyMatch[] = [
   {

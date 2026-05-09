@@ -1,5 +1,6 @@
 import { Icon, Input } from "components";
-import type { InputStatus } from "components/Input/InputStatus";
+import type { InputStatus } from "types";
+
 import s from "./SearchInput.module.css";
 
 interface Props {
