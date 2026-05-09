@@ -18,7 +18,7 @@ const RegisterPage = () => {
             redirectLink="/login"
           >
             <EmailInput></EmailInput>
-            <NameInput placeholder="Nickname"></NameInput>
+            <NameInput placeholder="Username"></NameInput>
             <PasswordInput></PasswordInput>
             <PasswordInput placeholder="Password confirmation"></PasswordInput>
           </AuthForm>
