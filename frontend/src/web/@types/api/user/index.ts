@@ -1,2 +1,1 @@
-export * from "./UserCredentials";
-export * from "./RegisterReqBody";
+export * from "api/users/users";

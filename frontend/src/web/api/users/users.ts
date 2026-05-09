@@ -1,9 +1,19 @@
-import type { RefreshCredentials, UserCredentials } from "types";
 import { api, setAxiosToken } from "../axios";
+
+export type RegisterReqBody = {
+  username: string;
+  email: string;
+  password: string;
+};
 
 const register = async (credentials: UserCredentials) => {
   const result = await api.post("/users/register", credentials);
   return result.data;
+};
+
+export type UserCredentials = {
+  email: string;
+  password: string;
 };
 
 const login = async (credentials: UserCredentials) => {
