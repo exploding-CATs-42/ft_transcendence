@@ -6,7 +6,7 @@ export type RegisterReqBody = {
   password: string;
 };
 
-const register = async (credentials: UserCredentials) => {
+const register = async (credentials: RegisterReqBody) => {
   const result = await api.post("/users/register", credentials);
   return result.data;
 };
