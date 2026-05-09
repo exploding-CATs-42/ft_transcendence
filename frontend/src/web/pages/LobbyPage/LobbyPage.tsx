@@ -1,5 +1,5 @@
 import { Section, Button, List, MatchListItem } from "components";
-import type { LobbyMatch } from "components/MatchListItem/types";
+import type { LobbyMatch } from "types";
 
 import { matchesMock } from "./mocks";
 

@@ -31,7 +31,7 @@ type FriendItem = {
 
 ```tsx
 import { FriendListItem } from "components";
-import type { FriendItem } from "components/FriendListItem/FriendListItem";
+import type { FriendItem } from "types";
 
 const friend: FriendItem = {
   id: "f-1",
@@ -51,7 +51,7 @@ export default FriendRow;
 
 ```tsx
 import { FriendListItem, List } from "components";
-import type { FriendItem } from "components/FriendListItem/FriendListItem";
+import type { FriendItem } from "types";
 
 type Props = {
   friends: FriendItem[];

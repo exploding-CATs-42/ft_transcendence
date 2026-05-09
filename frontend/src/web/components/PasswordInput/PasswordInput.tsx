@@ -1,9 +1,7 @@
 import { useState } from "react";
 
 import { Icon, Input } from "components";
-
-import type { InputType } from "components/Input/InputType";
-import type { InputStatus } from "components/Input/InputStatus";
+import type { InputType, InputStatus } from "types";
 
 import s from "./PasswordInput.module.css";
 

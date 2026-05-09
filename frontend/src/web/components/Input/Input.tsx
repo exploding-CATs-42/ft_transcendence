@@ -1,8 +1,7 @@
 import { forwardRef } from "react";
 import clsx from "clsx";
 
-import type { InputType } from "./InputType";
-import type { InputStatus } from "./InputStatus";
+import type { InputType, InputStatus } from "./types";
 import s from "./Input.module.css";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
