@@ -19,10 +19,8 @@ const logout = async () => {
   setAxiosToken("");
 };
 
-const refresh = async (credentials: RefreshCredentials) => {
-  const result = await api.post("/users/refresh", credentials.data, {
-    signal: credentials.signal
-  });
+const refresh = async () => {
+  const result = await api.post("/users/refresh");
   const { token } = result.data.result;
 
   setAxiosToken(token);
