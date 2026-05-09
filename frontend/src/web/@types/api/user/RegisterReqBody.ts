@@ -1,5 +1,5 @@
 export type RegisterReqBody = {
-  name: string;
+  username: string;
   email: string;
   password: string;
 };
