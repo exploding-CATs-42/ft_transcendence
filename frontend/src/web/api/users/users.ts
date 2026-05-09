@@ -21,10 +21,10 @@ const logout = async () => {
 
 const refresh = async () => {
   const result = await api.post("/users/refresh");
-  const { token } = result.data.result;
+  const { accessToken } = result.data;
 
-  setAxiosToken(token);
-  return result.data.result;
+  setAxiosToken(accessToken);
+  return result.data;
 };
 
 export default {
