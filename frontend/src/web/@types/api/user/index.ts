@@ -1,3 +1,3 @@
 export * from "./UserCredentials";
-export * from "./RegisterUserRequestBody";
+export * from "./RegisterReqBody";
 export * from "./RefreshCredentials";
