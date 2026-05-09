@@ -101,6 +101,10 @@ prisma-reset: ## Reset database and apply migrations from scratch
 seed: ## Seed the database
 	$(COMPOSE) exec $(BACKEND_WD) backend pnpm run seed
 
+postgres:
+	$(COMPOSE) up -d postgres
+
+
 ## -------------------------
 ## Tests
 ## -------------------------
