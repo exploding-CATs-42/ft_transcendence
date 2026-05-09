@@ -49,7 +49,9 @@
       "utils": ["src/web/utils/index"],
       "utils/*": ["src/web/utils/*"],
       "api": ["src/web/api/index"],
-      "api/*": ["src/web/api/*"]
+      "api/*": ["src/web/api/*"],
+      "schemas": ["src/web/schemas/index"],
+      "schemas/*": ["src/web/schemas/*"]
     }
   },
   "include": ["src"]
