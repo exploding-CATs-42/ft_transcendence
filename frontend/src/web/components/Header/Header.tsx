@@ -23,7 +23,12 @@ const Header = () => {
 
   return (
     <header className={s.header}>
-      <Link to={"/"}>
+      <Link
+        to={"/"}
+        onClick={() => {
+          setIsBurgerMenuOpened(false);
+        }}
+      >
         <Logo />
       </Link>
 
