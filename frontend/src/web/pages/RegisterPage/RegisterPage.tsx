@@ -1,6 +1,7 @@
 // Libraries
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "react-toastify";
 // Project level
 import {
   AuthForm,
@@ -26,9 +27,9 @@ const RegisterPage = () => {
   const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
     try {
       await api.users.register(data);
-      console.log("Success");
+      toast.success("Success");
     } catch (error) {
-      console.error((error as Error).message);
+      toast.error((error as Error).message, { autoClose: 5000 });
     }
   };
 
