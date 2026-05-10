@@ -1,22 +1,22 @@
-import { Navigate, useLocation } from "react-router-dom";
-import { ReactNode } from "react";
+// import { Navigate, useLocation } from "react-router-dom";
+// import type{ ReactNode } from "react";
 
-import { useAppSelector } from "../hooks";
-import { selectIsLoggedIn } from "../redux";
+// import { useAppSelector } from "../hooks";
+// import { selectIsLoggedIn } from "../redux";
 
-interface Props {
-  children: ReactNode;
-}
+// interface Props {
+//   children: ReactNode;
+// }
 
-const PrivateRoute = ({ children }: Props) => {
-  const isLoggedIn = useAppSelector(selectIsLoggedIn);
-  const location = useLocation();
+// const PrivateRoute = ({ children }: Props) => {
+//   const isLoggedIn = useAppSelector(selectIsLoggedIn);
+//   const location = useLocation();
 
-  return isLoggedIn ? (
-    children
-  ) : (
-    <Navigate state={{ from: location }} to={"/"} />
-  );
-};
+//   return isLoggedIn ? (
+//     children
+//   ) : (
+//     <Navigate state={{ from: location }} to={"/"} />
+//   );
+// };
 
-export default PrivateRoute;
+// export default PrivateRoute;
