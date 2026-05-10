@@ -16,7 +16,7 @@ export const initSockets = (io: Server) => {
       socket.data.user = user;
 
       next();
-    } catch (error) {
+    } catch (_) {
       next(new Error("Invalid token"));
     }
   });
