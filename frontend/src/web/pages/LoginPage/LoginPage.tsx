@@ -16,6 +16,9 @@ const LoginPage = () => {
             redirectMessage="Don't have an account?"
             redirectTitle="Sign up"
             redirectLink="/register"
+            onSubmit={(e) => {
+              e.preventDefault();
+            }}
           >
             <EmailInput></EmailInput>
             <PasswordInput></PasswordInput>
