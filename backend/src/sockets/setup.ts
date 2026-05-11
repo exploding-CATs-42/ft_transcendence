@@ -11,9 +11,9 @@ export const initSockets = (io: Server) => {
         return next(new Error("Authentication token missing"));
       }
 
-      const user = verifyAccessToken(token);
+      const payload = verifyAccessToken(token);
 
-      socket.data.user = user;
+      socket.data = payload;
 
       next();
     } catch (_) {
