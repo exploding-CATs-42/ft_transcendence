@@ -1,5 +1,5 @@
 // Libraries
-import { useForm } from "react-hook-form";
+import { useForm, type SubmitHandler } from "react-hook-form";
 // Project level
 import { AuthForm, EmailInput, PasswordInput } from "components";
 import type { LoginSchema } from "schemas";
@@ -7,7 +7,11 @@ import type { LoginSchema } from "schemas";
 import s from "./LoginPage.module.css";
 
 const LoginPage = () => {
-  const { register } = useForm<LoginSchema>();
+  const { register, handleSubmit } = useForm<LoginSchema>();
+
+  const onSubmit: SubmitHandler<LoginSchema> = (data) => {
+    console.log(data);
+  };
 
   return (
     <div className={s.backgroundContainer}>
@@ -22,9 +26,7 @@ const LoginPage = () => {
             redirectMessage="Don't have an account?"
             redirectTitle="Sign up"
             redirectLink="/register"
-            onSubmit={(e) => {
-              e.preventDefault();
-            }}
+            onSubmit={handleSubmit(onSubmit)}
           >
             <EmailInput {...register("email")} />
             <PasswordInput {...register("password")} />
