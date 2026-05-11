@@ -3,6 +3,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 // Project level
 import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
 import type { LoginSchema } from "schemas";
+import api from "api";
 // Local level
 import s from "./LoginPage.module.css";
 
@@ -13,8 +14,13 @@ const LoginPage = () => {
     formState: { isSubmitting, errors }
   } = useForm<LoginSchema>();
 
-  const onSubmit: SubmitHandler<LoginSchema> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
+    try {
+      await api.users.login(data);
+      console.log("Success");
+    } catch (error) {
+      console.log((error as Error).message);
+    }
   };
 
   return (
