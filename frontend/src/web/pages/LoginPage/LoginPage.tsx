@@ -7,7 +7,11 @@ import type { LoginSchema } from "schemas";
 import s from "./LoginPage.module.css";
 
 const LoginPage = () => {
-  const { register, handleSubmit } = useForm<LoginSchema>();
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting }
+  } = useForm<LoginSchema>();
 
   const onSubmit: SubmitHandler<LoginSchema> = (data) => {
     console.log(data);
@@ -27,6 +31,7 @@ const LoginPage = () => {
             redirectTitle="Sign up"
             redirectLink="/register"
             onSubmit={handleSubmit(onSubmit)}
+            disabled={isSubmitting}
           >
             <EmailInput {...register("email")} />
             <PasswordInput {...register("password")} />
