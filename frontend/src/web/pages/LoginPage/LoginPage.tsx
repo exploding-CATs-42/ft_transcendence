@@ -21,8 +21,8 @@ const LoginPage = () => {
               e.preventDefault();
             }}
           >
-            <EmailInput></EmailInput>
-            <PasswordInput></PasswordInput>
+            <EmailInput />
+            <PasswordInput />
           </AuthForm>
         </div>
       </div>
