@@ -1,7 +1,7 @@
 // Libraries
 import { useForm, type SubmitHandler } from "react-hook-form";
 // Project level
-import { AuthForm, EmailInput, PasswordInput } from "components";
+import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
 import type { LoginSchema } from "schemas";
 // Local level
 import s from "./LoginPage.module.css";
@@ -10,7 +10,7 @@ const LoginPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting }
+    formState: { isSubmitting, errors }
   } = useForm<LoginSchema>();
 
   const onSubmit: SubmitHandler<LoginSchema> = (data) => {
@@ -33,8 +33,12 @@ const LoginPage = () => {
             onSubmit={handleSubmit(onSubmit)}
             disabled={isSubmitting}
           >
-            <EmailInput {...register("email")} />
-            <PasswordInput {...register("password")} />
+            <FormField error={errors.email?.message}>
+              <EmailInput {...register("email")} />
+            </FormField>
+            <FormField error={errors.password?.message}>
+              <PasswordInput {...register("password")} />
+            </FormField>
           </AuthForm>
         </div>
       </div>
