@@ -1,6 +1,7 @@
 // Libraries
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 // Project level
 import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
 import type { LoginSchema } from "schemas";
@@ -9,6 +10,8 @@ import api from "api";
 import s from "./LoginPage.module.css";
 
 const LoginPage = () => {
+  const navigate = useNavigate();
+
   const {
     register,
     handleSubmit,
@@ -19,6 +22,7 @@ const LoginPage = () => {
     try {
       await api.users.login(data);
       toast.success("Success");
+      navigate("/lobby");
     } catch (error) {
       toast.error((error as Error).message);
     }
