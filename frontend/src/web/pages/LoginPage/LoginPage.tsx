@@ -1,9 +1,14 @@
+// Libraries
+import { useForm } from "react-hook-form";
 // Project level
 import { AuthForm, EmailInput, PasswordInput } from "components";
+import type { LoginSchema } from "schemas";
 // Local level
 import s from "./LoginPage.module.css";
 
 const LoginPage = () => {
+  const { register } = useForm<LoginSchema>();
+
   return (
     <div className={s.backgroundContainer}>
       <div className={s.blur} />
@@ -21,8 +26,8 @@ const LoginPage = () => {
               e.preventDefault();
             }}
           >
-            <EmailInput />
-            <PasswordInput />
+            <EmailInput {...register("email")} />
+            <PasswordInput {...register("password")} />
           </AuthForm>
         </div>
       </div>
