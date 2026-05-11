@@ -1,5 +1,6 @@
 // Libraries
 import { useForm, type SubmitHandler } from "react-hook-form";
+import { toast } from "react-toastify";
 // Project level
 import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
 import type { LoginSchema } from "schemas";
@@ -17,9 +18,9 @@ const LoginPage = () => {
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
       await api.users.login(data);
-      console.log("Success");
+      toast.success("Success");
     } catch (error) {
-      console.log((error as Error).message);
+      toast.error((error as Error).message);
     }
   };
 
