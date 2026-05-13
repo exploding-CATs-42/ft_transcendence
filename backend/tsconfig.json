@@ -31,7 +31,7 @@
     "removeComments": true,
     "noEmitOnError": true
   },
-  "include": ["src"],
+  "include": ["src", "eslint.config.mts", "vitest.config.ts", "prisma.config.ts"],
   "exclude": ["node_modules", "dist", "test"]
 }
 //You can see the full documentation on https://www.typescriptlang.org/tsconfig
