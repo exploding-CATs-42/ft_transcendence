@@ -93,3 +93,6 @@ vite.config.ts.timestamp-*
 .vite/
 
 backend/src/generated
+
+# games persistence file
+games.json
