@@ -1,9 +1,9 @@
 import { Server, Socket } from "socket.io";
 import { registerChatHandlers } from "./chat";
-import { socketAuthMiddleware } from "../middlewares/socketAuthMiddleware";
+import { authMiddleware } from "../middlewares/sockets/authMiddleware";
 
 export const initSockets = (io: Server) => {
-  io.use(socketAuthMiddleware);
+  io.use(authMiddleware);
 
   io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
