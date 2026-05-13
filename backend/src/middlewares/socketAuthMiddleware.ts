@@ -1,7 +1,7 @@
 import { verifyAccessToken } from "../utils/jwt";
 import { ExtendedError, Socket } from "socket.io";
 
-export function socketMiddleware(
+export function socketAuthMiddleware(
   socket: Socket,
   next: (err?: ExtendedError | undefined) => void
 ) {
