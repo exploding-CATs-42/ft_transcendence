@@ -7,7 +7,12 @@ export default defineConfig([
   {
     files: ["**/*.{js,mjs,cjs,ts,mts,cts}"],
     extends: [js.configs.recommended, ts.configs.recommended],
-    languageOptions: { globals: globals.node },
+    languageOptions: {
+      globals: globals.node,
+      parserOptions: {
+        tsconfigRootDir: __dirname
+      }
+    },
     rules: {
       "@typescript-eslint/no-unused-vars": [
         "error",
