@@ -9,6 +9,8 @@ import {
 } from "./turn";
 
 export enum ServerEventType {
+  GAME_STARTING = "GAME_STARTING",
+  DEALING_CARDS = "DEALING_CARDS",
   GAME_STARTED = "GAME_STARTED",
   TURN_CHANGED = "TURN_CHANGED",
   CARD_PLAYED = "CARD_PLAYED",
