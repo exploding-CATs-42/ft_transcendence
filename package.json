@@ -8,7 +8,8 @@
     "lint:fix": "pnpm run -r --parallel lint",
     "typecheck": "pnpm run -r --parallel typecheck",
     "check": "pnpm run format && pnpm run lint && pnpm run typecheck",
-    "fix": "pnpm run format:fix && pnpm run lint:fix"
+    "fix": "pnpm run format:fix && pnpm run lint:fix",
+    "dev": "make postgres && pnpm run -r --parallel dev"
   },
   "packageManager": "pnpm@10.33.0"
 }
