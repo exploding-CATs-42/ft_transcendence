@@ -32,3 +32,8 @@ export const drawTopCard = ({ context }: { context: GameContext }) => {
     players
   };
 };
+
+export const rotateTurn = ({ context }: { context: GameContext }) => ({
+  currentPlayerIndex: (context.currentPlayerIndex + 1) % context.players.length,
+  turnNumber: context.turnNumber + 1
+});
