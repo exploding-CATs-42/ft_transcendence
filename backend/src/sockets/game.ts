@@ -6,6 +6,11 @@ interface StartGameData {
   players: { playerId: string; displayName: string; socketId: string }[];
 }
 
+interface DrawCardData {
+  gameId: string;
+  playerId: string;
+}
+
 const rooms: Record<string, GameRoom> = {};
 
 export const registerGameHandlers = (io: Server, socket: Socket) => {
@@ -18,5 +23,9 @@ export const registerGameHandlers = (io: Server, socket: Socket) => {
       deckSize: 20,
       cardsPerPlayer: 5
     });
+  });
+
+  socket.on("draw_card", (data: DrawCardData) => {
+    rooms[data.gameId]?.drawCard(data.playerId);
   });
 };
