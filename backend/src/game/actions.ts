@@ -17,3 +17,18 @@ export const dealCards = ({ context }: { context: GameContext }) => {
   };
 };
 
+export const drawTopCard = ({ context }: { context: GameContext }) => {
+  const top = context.deck[0];
+  if (top === undefined) return {};
+
+  const players = context.players.map((player, i) =>
+    i === context.currentPlayerIndex
+      ? { ...player, hand: [...player.hand, top] }
+      : player
+  );
+
+  return {
+    deck: context.deck.slice(1),
+    players
+  };
+};
