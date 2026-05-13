@@ -3,6 +3,9 @@ import path from "path";
 import { GameState } from "../types";
 
 const FILE_PATH = path.resolve("./data/games.json");
+const SAVE_INTERVAL_MS = 5000;
+
+let autoSaveInterval: NodeJS.Timeout | null = null;
 
 export function loadGames(games: Map<string, GameState>): void {
   try {
@@ -41,4 +44,41 @@ export function saveGames(games: Map<string, GameState>): void {
   } catch (error) {
     console.error("Failed to save games", error);
   }
+}
+
+export function startAutoSave(games: Map<string, GameState>): void {
+  if (autoSaveInterval) {
+    return;
+  }
+
+  autoSaveInterval = setInterval(() => {
+    saveGames(games);
+  }, SAVE_INTERVAL_MS);
+
+  console.log(`Auto-save started (${SAVE_INTERVAL_MS}ms)`);
+}
+
+export function stopAutoSave(): void {
+  if (!autoSaveInterval) {
+    return;
+  }
+
+  clearInterval(autoSaveInterval);
+  autoSaveInterval = null;
+
+  console.log("Auto-save stopped");
+}
+
+export function setupShutdownHandlers(games: Map<string, GameState>): void {
+  const shutdown = () => {
+    console.log("Shutdown detected");
+
+    saveGames(games);
+    stopAutoSave();
+
+    process.exit(0);
+  };
+
+  process.on("SIGINT", shutdown);
+  process.on("SIGTERM", shutdown);
 }
