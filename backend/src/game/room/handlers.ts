@@ -38,3 +38,25 @@ export const sendInitialState = ({ actor, emitters }: RoomOps) => {
     turnNumber: turnNumber
   });
 };
+
+export const drawCard = ({ actor, emitters }: RoomOps, playerId: string) => {
+  const before = actor.getSnapshot().context;
+  const currentId = before.players[before.currentPlayerIndex]?.playerId;
+  if (currentId !== playerId) return;
+
+  actor.send({ type: "DRAW_CARD", playerId });
+
+  const after = actor.getSnapshot().context;
+  const drawer = after.players.find((p) => p.playerId === playerId);
+
+  if (drawer) {
+    emitters.emitToPlayer(playerId, PrivateEventType.YOUR_HAND, {
+      hand: drawer.hand
+    });
+  }
+  emitters.emitToRoom(ServerEventType.CARD_DRAWN, { playerId });
+  emitters.emitToRoom(ServerEventType.TURN_CHANGED, {
+    currentPlayerId: after.players[after.currentPlayerIndex]?.playerId,
+    turnNumber: after.turnNumber
+  });
+};
