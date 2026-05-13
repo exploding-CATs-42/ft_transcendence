@@ -8,10 +8,13 @@ import { Server } from "socket.io";
 import { corsOptions, ioOptions } from "./config";
 import { setupRouting } from "./routes";
 import { initSockets } from "./sockets";
+import { initGamePersistence } from "./utils/gameStore";
 
 const app = express();
 const server = createServer(app);
 const io = new Server(server, ioOptions);
+
+initGamePersistence();
 
 app.use(pino(prettyFormat()));
 app.use(cors(corsOptions));
