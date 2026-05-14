@@ -1,7 +1,8 @@
 import { GameState } from "../types";
 import {
   loadGames,
-  setupShutdownHandlers,
+  setupSignalHandlers,
+  shutdown,
   startAutoSave
 } from "./gamePersistence";
 
@@ -14,7 +15,9 @@ export function initGamePersistence() {
 
   loadGames(games);
   startAutoSave(games);
-  setupShutdownHandlers(games);
+  setupSignalHandlers(() => {
+    shutdown(games);
+  });
 
   initialized = true;
 }

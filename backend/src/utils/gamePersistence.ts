@@ -69,16 +69,16 @@ export function stopAutoSave(): void {
   console.log("Auto-save stopped");
 }
 
-export function setupShutdownHandlers(games: Map<string, GameState>): void {
-  const shutdown = () => {
-    console.log("Shutdown detected");
+export function setupSignalHandlers(handler: () => void): void {
+  console.log("Shutdown detected");
 
-    saveGames(games);
-    stopAutoSave();
+  process.on("SIGINT", handler);
+  process.on("SIGTERM", handler);
+}
 
-    process.exit(0);
-  };
+export function shutdown(games: Map<GameId, GameState>) {
+  saveGames(games);
+  stopAutoSave();
 
-  process.on("SIGINT", shutdown);
-  process.on("SIGTERM", shutdown);
+  process.exit(0);
 }
