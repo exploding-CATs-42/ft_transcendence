@@ -1,13 +1,13 @@
 import fs from "fs";
 import path from "path";
-import { GameState } from "../types";
+import { GameId, GameState } from "../types";
 
 const FILE_PATH = path.resolve("./data/games.json");
 const SAVE_INTERVAL_MS = 5000;
 
 let autoSaveInterval: NodeJS.Timeout | null = null;
 
-export function loadGames(games: Map<string, GameState>): void {
+export function loadGames(games: Map<GameId, GameState>): void {
   try {
     if (!fs.existsSync(FILE_PATH)) {
       console.log("No persistence file found");
@@ -33,7 +33,7 @@ export function loadGames(games: Map<string, GameState>): void {
   }
 }
 
-export function saveGames(games: Map<string, GameState>): void {
+export function saveGames(games: Map<GameId, GameState>): void {
   try {
     const data = JSON.stringify([...games.values()], null, 2);
 
@@ -46,7 +46,7 @@ export function saveGames(games: Map<string, GameState>): void {
   }
 }
 
-export function startAutoSave(games: Map<string, GameState>): void {
+export function startAutoSave(games: Map<GameId, GameState>): void {
   if (autoSaveInterval) {
     return;
   }
