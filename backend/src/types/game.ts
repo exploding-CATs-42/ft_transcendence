@@ -9,6 +9,8 @@ export const GameStatus = {
 
 export type GameStatus = (typeof GameStatus)[keyof typeof GameStatus];
 
+export type GameId = string;
+
 export interface GameRules {
   dealtCardsPerPlayer: number;
   defusesDealtPerPlayer: number;
@@ -35,7 +37,7 @@ export interface Player {
 }
 
 export interface GameState {
-  gameId: string;
+  gameId: GameId;
   status: GameStatus;
   players: Player[];
   deck: Deck;
