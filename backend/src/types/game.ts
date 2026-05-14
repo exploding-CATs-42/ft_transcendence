@@ -11,6 +11,8 @@ export type GameStatus = (typeof GameStatus)[keyof typeof GameStatus];
 
 export type GameId = string;
 
+export type GameId = string;
+
 export interface GameRules {
   dealtCardsPerPlayer: number;
   defusesDealtPerPlayer: number;
