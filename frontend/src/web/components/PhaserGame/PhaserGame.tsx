@@ -3,10 +3,10 @@ import { useEffect, useLayoutEffect, useRef, type RefObject } from "react";
 // Project level
 import { EventBus, StartGame } from "game";
 // Local level
-import type { IRefPhaserGame } from "./types";
+import type { PhaserGameRef } from "./types";
 
 interface Props {
-  ref: RefObject<IRefPhaserGame | null>;
+  ref: RefObject<PhaserGameRef | null>;
   currentActiveScene?: (sceneInstance: Phaser.Scene) => void;
 }
 
