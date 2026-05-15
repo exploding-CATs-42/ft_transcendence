@@ -70,13 +70,13 @@ export function stopAutoSave(): void {
 }
 
 export function setupSignalHandlers(handler: () => void): void {
-  console.log("Shutdown detected");
-
   process.on("SIGINT", handler);
   process.on("SIGTERM", handler);
 }
 
 export function shutdown(games: Map<GameId, GameState>) {
+  console.log("Shutdown detected");
+
   saveGames(games);
   stopAutoSave();
 
