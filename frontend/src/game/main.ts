@@ -11,12 +11,11 @@ const config: Phaser.Types.Core.GameConfig = {
   type: AUTO,
   width: 1024,
   height: 768,
-  parent: "game-container",
   backgroundColor: "#028af8",
   scene: [Boot, Preloader, MainMenu, MainGame, GameOver],
 };
 
-const StartGame = (parent: string) => {
+const StartGame = (parent: HTMLDivElement) => {
   return new Game({ ...config, parent });
 };
 
