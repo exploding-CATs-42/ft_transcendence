@@ -2,7 +2,7 @@
 import { useRef, useState } from "react";
 // Project level
 import { PhaserGame } from "components";
-import type { IRefPhaserGame } from "types";
+import type { PhaserGameRef } from "types";
 import { MainMenu } from "game/scenes";
 // Local level
 import s from "./GamePage.module.css";
@@ -12,7 +12,7 @@ const GamePage = () => {
   const [canMoveSprite, setCanMoveSprite] = useState(true);
 
   //  References to the PhaserGame component (game and scene are exposed)
-  const phaserRef = useRef<IRefPhaserGame | null>(null);
+  const phaserRef = useRef<PhaserGameRef | null>(null);
   const [spritePosition, setSpritePosition] = useState({ x: 0, y: 0 });
 
   const changeScene = () => {

@@ -1,1 +1,1 @@
-export type { IRefPhaserGame } from "./IRefPhaserGame";
+export type { PhaserGameRef } from "./PhaserGameRef";
