@@ -1,4 +1,4 @@
-import { GameState } from "../types";
+import { GameId, GameState } from "../types";
 import {
   loadGames,
   setupSignalHandlers,
@@ -6,7 +6,7 @@ import {
   startAutoSave
 } from "./gamePersistence";
 
-const games = new Map<string, GameState>();
+const games = new Map<GameId, GameState>();
 
 let initialized = false;
 
@@ -30,7 +30,7 @@ function assertInitialized() {
   }
 }
 
-export function getGame(gameId: string): GameState | undefined {
+export function getGame(gameId: GameId): GameState | undefined {
   assertInitialized();
   return games.get(gameId);
 }
