@@ -4,10 +4,14 @@ import { prisma } from "./lib/prisma";
 
 const { PORT = 3000 } = process.env;
 
+async function ensureDatabaseConnection() {
+  await prisma.$connect();
+  await prisma.$queryRaw`SELECT 1`;
+}
+
 async function startServer() {
   try {
-    await prisma.$connect();
-    await prisma.$queryRaw`SELECT 1`;
+    await ensureDatabaseConnection();
 
     console.log("Database connection established");
 
