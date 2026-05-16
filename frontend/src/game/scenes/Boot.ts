@@ -1,10 +1,12 @@
+// Libraries
 import { Scene } from "phaser";
+// Project level
 import { background } from "game/assets";
-import { Textures } from "game/constants";
+import { Scenes, Textures } from "game/constants";
 
 export class Boot extends Scene {
   constructor() {
-    super("Boot");
+    super(Scenes.Boot);
   }
 
   preload() {
@@ -14,6 +16,6 @@ export class Boot extends Scene {
   }
 
   create() {
-    this.scene.start("Preloader");
+    this.scene.start(Scenes.Preloader);
   }
 }
