@@ -77,8 +77,8 @@ export function setupSignalHandlers(handler: () => void): void {
 export function shutdown(games: Map<GameId, GameState>) {
   console.log("Shutdown detected");
 
-  saveGames(games);
   stopAutoSave();
+  saveGames(games);
 
   process.exit(0);
 }
