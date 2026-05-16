@@ -84,6 +84,9 @@ infra/env/.env
 # pnpm
 .pnpm-store
 
+# Turbo cache
+.turbo
+
 # Vite files
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
