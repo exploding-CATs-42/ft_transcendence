@@ -1,11 +1,13 @@
 import { TurnState } from "./turn";
 import { CardInstance } from "./card";
 
-export enum GameStatus {
-  LOBBY = "LOBBY",
-  PLAYING = "PLAYING",
-  FINISHED = "FINISHED"
-}
+export const GameStatus = {
+  LOBBY: "LOBBY",
+  PLAYING: "PLAYING",
+  FINISHED: "FINISHED"
+} as const;
+
+export type GameStatus = (typeof GameStatus)[keyof typeof GameStatus];
 
 export interface GameRules {
   dealtCardsPerPlayer: number;

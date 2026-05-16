@@ -8,23 +8,26 @@ import {
   FavorState
 } from "./turn";
 
-export enum ServerEventType {
-  GAME_STARTED = "GAME_STARTED",
-  TURN_CHANGED = "TURN_CHANGED",
-  CARD_PLAYED = "CARD_PLAYED",
-  COMBO_PLAYED = "COMBO_PLAYED",
-  NOPE_PLAYED = "NOPE_PLAYED",
-  NOPE_WINDOW_RESOLVED = "NOPE_WINDOW_RESOLVED",
-  CARD_DRAWN = "CARD_DRAWN",
-  EXPLODING_KITTEN_DRAWN = "EXPLODING_KITTEN_DRAWN",
-  PLAYER_DEFUSED = "PLAYER_DEFUSED",
-  PLAYER_ELIMINATED = "PLAYER_ELIMINATED",
-  KITTEN_INSERTED = "KITTEN_INSERTED",
-  FAVOR_REQUESTED = "FAVOR_REQUESTED",
-  FAVOR_RESOLVED = "FAVOR_RESOLVED",
-  DECK_SHUFFLED = "DECK_SHUFFLED",
-  GAME_OVER = "GAME_OVER"
-}
+export const ServerEventType = {
+  GAME_STARTED: "GAME_STARTED",
+  TURN_CHANGED: "TURN_CHANGED",
+  CARD_PLAYED: "CARD_PLAYED",
+  COMBO_PLAYED: "COMBO_PLAYED",
+  NOPE_PLAYED: "NOPE_PLAYED",
+  NOPE_WINDOW_RESOLVED: "NOPE_WINDOW_RESOLVED",
+  CARD_DRAWN: "CARD_DRAWN",
+  EXPLODING_KITTEN_DRAWN: "EXPLODING_KITTEN_DRAWN",
+  PLAYER_DEFUSED: "PLAYER_DEFUSED",
+  PLAYER_ELIMINATED: "PLAYER_ELIMINATED",
+  KITTEN_INSERTED: "KITTEN_INSERTED",
+  FAVOR_REQUESTED: "FAVOR_REQUESTED",
+  FAVOR_RESOLVED: "FAVOR_RESOLVED",
+  DECK_SHUFFLED: "DECK_SHUFFLED",
+  GAME_OVER: "GAME_OVER"
+} as const;
+
+export type ServerEventType =
+  (typeof ServerEventType)[keyof typeof ServerEventType];
 
 export interface PublicGameView {
   gameId: string;
@@ -83,22 +86,28 @@ export interface NopeWindowResolvedPayload {
   executed: boolean;
 }
 
-export enum PrivateEventType {
-  YOUR_HAND = "YOUR_HAND",
-  CARD_RECEIVED = "CARD_RECEIVED",
-  CARD_REMOVED = "CARD_REMOVED",
-  SEE_THE_FUTURE_PEEK = "SEE_THE_FUTURE_PEEK",
-  DEFUSE_PROMPT = "DEFUSE_PROMPT",
-  INSERT_KITTEN_PROMPT = "INSERT_KITTEN_PROMPT",
-  FAVOR_MUST_GIVE = "FAVOR_MUST_GIVE"
-}
+export const PrivateEventType = {
+  YOUR_HAND: "YOUR_HAND",
+  CARD_RECEIVED: "CARD_RECEIVED",
+  CARD_REMOVED: "CARD_REMOVED",
+  SEE_THE_FUTURE_PEEK: "SEE_THE_FUTURE_PEEK",
+  DEFUSE_PROMPT: "DEFUSE_PROMPT",
+  INSERT_KITTEN_PROMPT: "INSERT_KITTEN_PROMPT",
+  FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE"
+} as const;
 
-export enum CardRemovalReason {
-  PLAYED = "PLAYED",
-  STOLEN = "STOLEN",
-  GIVEN_AWAY = "GIVEN_AWAY",
-  EXPLODED = "EXPLODED"
-}
+export type PrivateEventType =
+  (typeof PrivateEventType)[keyof typeof PrivateEventType];
+
+export const CardRemovalReason = {
+  PLAYED: "PLAYED",
+  STOLEN: "STOLEN",
+  GIVEN_AWAY: "GIVEN_AWAY",
+  EXPLODED: "EXPLODED"
+} as const;
+
+export type CardRemovalReason =
+  (typeof CardRemovalReason)[keyof typeof CardRemovalReason];
 
 export interface YourHandPayload {
   hand: CardInstance[];
