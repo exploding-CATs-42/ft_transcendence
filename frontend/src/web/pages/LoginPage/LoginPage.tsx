@@ -2,10 +2,12 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 import { useNavigate } from "react-router-dom";
+import { AxiosError } from "axios";
 // Project level
 import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
 import type { LoginSchema } from "schemas";
 import api from "api";
+import type { BadRequestErrorResponse } from "types";
 // Local level
 import s from "./LoginPage.module.css";
 
@@ -15,7 +17,8 @@ const LoginPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors }
+    formState: { isSubmitting, errors },
+    setError
   } = useForm<LoginSchema>();
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
@@ -24,7 +27,24 @@ const LoginPage = () => {
       toast.success("Success");
       navigate("/lobby");
     } catch (error) {
-      toast.error((error as Error).message);
+      const err = error as AxiosError<
+        BadRequestErrorResponse<keyof LoginSchema>
+      >;
+
+      if (err.response?.status !== 400) {
+        toast.error(err.message);
+        return;
+      }
+
+      const fieldErrors = err.response.data.errors.fieldErrors;
+
+      Object.entries(fieldErrors).forEach(([field, messages]) => {
+        const message = messages[0];
+
+        if (!message) return;
+
+        setError(field as keyof LoginSchema, { message });
+      });
     }
   };
 
@@ -45,10 +65,16 @@ const LoginPage = () => {
             disabled={isSubmitting}
           >
             <FormField error={errors.email?.message}>
-              <EmailInput {...register("email")} />
+              <EmailInput
+                {...register("email")}
+                status={errors.email ? "error" : "normal"}
+              />
             </FormField>
             <FormField error={errors.password?.message}>
-              <PasswordInput {...register("password")} />
+              <PasswordInput
+                {...register("password")}
+                status={errors.password ? "error" : "normal"}
+              />
             </FormField>
           </AuthForm>
         </div>
