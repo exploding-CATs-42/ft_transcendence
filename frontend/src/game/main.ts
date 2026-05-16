@@ -8,13 +8,6 @@ const config: Phaser.Types.Core.GameConfig = {
   width: 800,
   height: 600,
   scene: [WaitingRoom],
-  physics: {
-    default: "arcade",
-    arcade: {
-      gravity: { y: 300, x: 0 },
-      debug: false,
-    },
-  },
 };
 
 const StartGame = (parent: HTMLDivElement) => {
