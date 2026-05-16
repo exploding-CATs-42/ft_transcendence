@@ -1,22 +1,27 @@
 import { CardInstance, CardType } from "./card";
 
-export enum TurnPhase {
-  ACTION = "ACTION",
-  NOPE_WINDOW = "NOPE_WINDOW",
-  DEFUSE_PROMPT = "DEFUSE_PROMPT",
-  INSERT_KITTEN = "INSERT_KITTEN",
-  FAVOR_SELECT = "FAVOR_SELECT"
-}
+export const TurnPhase = {
+  ACTION: "ACTION",
+  NOPE_WINDOW: "NOPE_WINDOW",
+  DEFUSE_PROMPT: "DEFUSE_PROMPT",
+  INSERT_KITTEN: "INSERT_KITTEN",
+  FAVOR_SELECT: "FAVOR_SELECT"
+} as const;
 
-export enum PendingActionType {
-  ATTACK = "ATTACK",
-  SKIP = "SKIP",
-  FAVOR = "FAVOR",
-  SHUFFLE = "SHUFFLE",
-  SEE_THE_FUTURE = "SEE_THE_FUTURE",
-  CAT_PAIR = "CAT_PAIR",
-  CAT_TRIPLE = "CAT_TRIPLE"
-}
+export type TurnPhase = (typeof TurnPhase)[keyof typeof TurnPhase];
+
+export const PendingActionType = {
+  ATTACK: "ATTACK",
+  SKIP: "SKIP",
+  FAVOR: "FAVOR",
+  SHUFFLE: "SHUFFLE",
+  SEE_THE_FUTURE: "SEE_THE_FUTURE",
+  CAT_PAIR: "CAT_PAIR",
+  CAT_TRIPLE: "CAT_TRIPLE"
+} as const;
+
+export type PendingActionType =
+  (typeof PendingActionType)[keyof typeof PendingActionType];
 
 export interface TurnState {
   currentPlayerId: string;
