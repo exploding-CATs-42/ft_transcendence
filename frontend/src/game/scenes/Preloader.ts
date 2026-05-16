@@ -2,6 +2,7 @@
 import { Scene } from "phaser";
 // Project level
 import { Textures, Scenes } from "game/constants";
+import { avatar } from "game/assets";
 
 export class Preloader extends Scene {
   constructor() {
@@ -29,8 +30,7 @@ export class Preloader extends Scene {
     //  Load the assets for the game - Replace with your own assets
     this.load.setPath("src/game/assets/images");
 
-    this.load.image("logo", "logo.png");
-    this.load.image("star", "star.png");
+    this.load.image(Textures.avatar, avatar);
   }
 
   create() {
