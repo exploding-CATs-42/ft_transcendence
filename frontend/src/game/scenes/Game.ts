@@ -1,4 +1,4 @@
-import { EventBus } from "../EventBus";
+import { EventBus } from "game/utils";
 import { Scene } from "phaser";
 
 export class Game extends Scene {
