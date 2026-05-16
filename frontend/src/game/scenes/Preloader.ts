@@ -1,9 +1,11 @@
-import { Textures } from "game/constants";
+// Libraries
 import { Scene } from "phaser";
+// Project level
+import { Textures, Scenes } from "game/constants";
 
 export class Preloader extends Scene {
   constructor() {
-    super("Preloader");
+    super(Scenes.Preloader);
   }
 
   init() {
@@ -36,6 +38,6 @@ export class Preloader extends Scene {
     //  For example, you can define global animations here, so we can use them in other scenes.
 
     //  Move to the Game scene. You could also swap this for a Scene Transition, such as a camera fade.
-    this.scene.start("Game");
+    this.scene.start(Scenes.Game);
   }
 }

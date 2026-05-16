@@ -1,5 +1,8 @@
-import { EventBus } from "game/utils";
+// Libraries
 import { Scene } from "phaser";
+// Project level
+import { Scenes } from "game/constants";
+import { EventBus } from "game/utils";
 
 export class Game extends Scene {
   camera!: Phaser.Cameras.Scene2D.Camera;
@@ -7,7 +10,7 @@ export class Game extends Scene {
   gameText!: Phaser.GameObjects.Text;
 
   constructor() {
-    super("Game");
+    super(Scenes.Game);
   }
 
   create() {
