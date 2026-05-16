@@ -6,7 +6,7 @@ import { EventBus, StartGame } from "game";
 import type { PhaserGameRef } from "./types";
 
 interface Props {
-  ref: RefObject<PhaserGameRef | null>;
+  ref?: RefObject<PhaserGameRef | null>;
   currentActiveScene?: (sceneInstance: Phaser.Scene) => void;
 }
 
@@ -21,10 +21,12 @@ const PhaserGame = ({ currentActiveScene, ref }: Props) => {
 
     gameRef.current = StartGame(containerRef.current);
 
-    ref.current = {
-      game: gameRef.current,
-      scene: null,
-    };
+    if (ref) {
+      ref.current = {
+        game: gameRef.current,
+        scene: null,
+      };
+    }
 
     return () => {
       gameRef.current?.destroy(true);
@@ -35,10 +37,13 @@ const PhaserGame = ({ currentActiveScene, ref }: Props) => {
   useEffect(() => {
     const handler = (sceneInstance: Phaser.Scene) => {
       currentActiveScene?.(sceneInstance);
-      ref.current = {
-        game: gameRef.current,
-        scene: sceneInstance,
-      };
+
+      if (ref) {
+        ref.current = {
+          game: gameRef.current,
+          scene: sceneInstance,
+        };
+      }
     };
 
     EventBus.on("current-scene-ready", handler);
