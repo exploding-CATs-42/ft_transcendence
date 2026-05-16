@@ -13,8 +13,11 @@ api.interceptors.response.use(
   (res) => res,
   (error) => {
     const message = getErrorMessage(error);
-    return Promise.reject(new Error(message));
-  },
+    return Promise.reject({
+      ...error,
+      message
+    });
+  }
 );
 
 export const setAxiosToken = (token: string) => {
