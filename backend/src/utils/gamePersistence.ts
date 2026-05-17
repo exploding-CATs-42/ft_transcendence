@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "path";
 import { GameId, GameState } from "../types";
-import { consumeHasChanges, hasChanges } from "./gameStore";
+import { consumeHasChanges } from "./gameStore";
 
 const persistencePath = process.env["GAME_PERSISTENCE_FILE_PATH"];
 
