@@ -11,10 +11,14 @@ import {
 import { createGameSchema } from "../schemas/games/createGameSchema";
 
 export function getGamesController(
-  _: Request,
+  req: Request,
   res: Response,
   next: NextFunction
 ) {
+  if (!req.user) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
   try {
     const result = getGames();
     return res.status(200).json(result);
@@ -40,6 +44,10 @@ export function getGameByIdController(
     });
   }
 
+  if (!req.user) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
   try {
     const result = getGameById(parsed.data);
     return res.status(200).json(result);
@@ -63,6 +71,10 @@ export async function createGameController(
       message: "Validation error",
       errors: z.treeifyError(parsed.error)
     });
+  }
+
+  if (!req.user) {
+    return res.status(401).json({ message: "Invalid token" });
   }
 
   try {
