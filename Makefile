@@ -88,9 +88,8 @@ prisma-validate: ## Validate Prisma schema
 prisma-generate: ## Generate Prisma client
 	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma generate
 
-prisma-migrate: ## Create and apply a new Prisma migration. Usage: make prisma-migrate name=init
-	@if [ -z "$(name)" ]; then echo "Usage: make prisma-migrate name=init"; exit 1; fi
-	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma migrate dev --name $(name)
+prisma-migrate: ## Create and apply a new Prisma migration.
+	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma migrate dev
 
 prisma-deploy: ## Apply pending Prisma migrations
 	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma migrate deploy
