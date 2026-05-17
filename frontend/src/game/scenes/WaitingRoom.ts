@@ -8,7 +8,22 @@ export class WaitingRoom extends Scene {
     super(Scenes.WaitingRoom);
   }
 
-  init() {}
+  init() {
+    this.input.keyboard?.on("keydown-F", () => {
+      if (this.scale.isFullscreen) {
+        this.scale.stopFullscreen();
+      } else {
+        this.scale.startFullscreen();
+      }
+    });
+
+    // Or via a button click:
+    document.getElementById("fullscreen-btn")?.addEventListener("click", () => {
+      this.scale.toggleFullscreen();
+    });
+
+    this.addFullscreenToggleButton();
+  }
 
   preload() {}
 
@@ -22,4 +37,23 @@ export class WaitingRoom extends Scene {
   }
 
   override update() {}
+
+  private addFullscreenToggleButton() {
+    const button = this.add.dom(
+      0,
+      0,
+      "button",
+      "position: absolute; bottom: 12px; right: 12px; font-size: 32px; color: black;",
+      "CLICK ME",
+    );
+
+    button.addListener("click");
+    button.on("click", () => {
+      if (this.scale.isFullscreen) {
+        this.scale.stopFullscreen();
+      } else {
+        this.scale.startFullscreen();
+      }
+    });
+  }
 }
