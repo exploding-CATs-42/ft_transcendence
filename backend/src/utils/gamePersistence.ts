@@ -1,7 +1,7 @@
 import fs from "node:fs/promises";
 import path from "path";
 import { GameId, GameState } from "../types";
-import { consumeHasChanges } from "./gameStore";
+import * as GameStore from "./gameStore";
 
 const persistencePath = process.env["GAME_PERSISTENCE_FILE_PATH"];
 
@@ -60,7 +60,7 @@ export async function saveGames(games: Map<GameId, GameState>): Promise<void> {
     await fs.writeFile(tempFilePath, data);
     await fs.rename(tempFilePath, FILE_PATH);
 
-    consumeHasChanges();
+    GameStore.consumeHasChanges();
   } catch (error) {
     console.error("Failed to save games", error);
   }
