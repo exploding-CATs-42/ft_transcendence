@@ -12,7 +12,9 @@ export class WaitingRoom extends Scene {
 
   preload() {}
 
-  create() {}
+  create() {
+    this.cameras.main.setBackgroundColor("#e09d52");
+  }
 
   override update() {}
 }
