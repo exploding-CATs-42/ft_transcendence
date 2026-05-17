@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createGameController,
+  deleteGameController,
   getGameByIdController,
   getGamesController
 } from "../../controllers/gamesController";
@@ -13,3 +14,4 @@ lobbyRouter.use(authMiddleware);
 lobbyRouter.get("/", getGamesController);
 lobbyRouter.get("/:gameId", getGameByIdController);
 lobbyRouter.post("/", createGameController);
+lobbyRouter.delete("/:gameId", deleteGameController);

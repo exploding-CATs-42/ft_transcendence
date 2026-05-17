@@ -1,8 +1,14 @@
 import { prisma } from "../lib/prisma";
 import { CreateGameRequestBody } from "../schemas/games/createGameSchema";
+import { DeleteGameParams } from "../schemas/games/deleteGameSchema";
 import { GetGameByIdParams } from "../schemas/games/getGameByIdSchema";
 import { GameState, GameStatus, Player } from "../types/game";
-import { getAllGames, getGame, setGame } from "../utils/gameStore";
+import {
+  deleteGameById,
+  getAllGames,
+  getGame,
+  setGame
+} from "../utils/gameStore";
 
 export class GamesServiceError extends Error {
   public statusCode: number;
@@ -13,7 +19,7 @@ export class GamesServiceError extends Error {
   }
 }
 
-async function ensureUserExists(userId: string) {
+export async function ensureUserExists(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { id: true, username: true }
@@ -22,6 +28,7 @@ async function ensureUserExists(userId: string) {
   if (!user) {
     throw new GamesServiceError("User not found", 404);
   }
+  return user;
 }
 
 export function getGames(): GameState[] {
@@ -60,4 +67,13 @@ export async function createGame(
   };
   setGame(game);
   return game;
+}
+
+export function deleteGame(input: DeleteGameParams) {
+  const game = getGame(input.gameId);
+
+  if (!game) {
+    throw new GamesServiceError("Game not found");
+  }
+  deleteGameById(input.gameId);
 }
