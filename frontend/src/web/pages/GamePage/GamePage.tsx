@@ -1,14 +1,29 @@
+// Libraries
+import { useEffect, useState } from "react";
 // Project level
 import { PhaserGame } from "components";
-// Local level
-import s from "./GamePage.module.css";
 
 const GamePage = () => {
-  return (
-    <div id="app" className={s.app}>
-      <PhaserGame />
-    </div>
-  );
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const main = document.querySelector("main") as HTMLElement;
+
+    if (!main) return;
+
+    const prev = {
+      overflow: main.style.overflow,
+    };
+
+    main.style.overflow = "hidden";
+    setReady(true);
+
+    return () => {
+      main.style.overflow = prev.overflow;
+    };
+  }, []);
+
+  return <>{ready && <PhaserGame />}</>;
 };
 
 export default GamePage;
