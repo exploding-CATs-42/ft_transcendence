@@ -1,4 +1,4 @@
-import fs from "fs";
+import fs from "node:fs/promises";
 import path from "path";
 import { GameId, GameState } from "../types";
 
@@ -13,14 +13,23 @@ const SAVE_INTERVAL_MS = 5000;
 
 let autoSaveInterval: NodeJS.Timeout | null = null;
 
-export function loadGames(games: Map<GameId, GameState>): void {
-  try {
-    if (!fs.existsSync(FILE_PATH)) {
-      console.log("No persistence file found");
-      return;
-    }
+export async function ensurePersistenceFile() {
+  const dir = path.dirname(FILE_PATH);
 
-    const raw = fs.readFileSync(FILE_PATH, "utf8");
+  await fs.mkdir(dir, { recursive: true });
+
+  try {
+    await fs.access(FILE_PATH);
+  } catch {
+    await fs.writeFile(FILE_PATH, "[]");
+  }
+}
+
+export async function loadGames(games: Map<GameId, GameState>): Promise<void> {
+  try {
+    await ensurePersistenceFile();
+
+    const raw = await fs.readFile(FILE_PATH, "utf8");
 
     if (!raw.trim()) {
       console.log("Persistence file is empty");
@@ -39,14 +48,15 @@ export function loadGames(games: Map<GameId, GameState>): void {
   }
 }
 
-export function saveGames(games: Map<GameId, GameState>): void {
+export async function saveGames(games: Map<GameId, GameState>): Promise<void> {
   try {
-    const data = JSON.stringify([...games.values()], null, 2);
+    await ensurePersistenceFile();
 
+    const data = JSON.stringify([...games.values()], null, 2);
     const tempFilePath = `${FILE_PATH}.tmp`;
 
-    fs.writeFileSync(tempFilePath, data);
-    fs.renameSync(tempFilePath, FILE_PATH);
+    await fs.writeFile(tempFilePath, data);
+    await fs.rename(tempFilePath, FILE_PATH);
   } catch (error) {
     console.error("Failed to save games", error);
   }
@@ -57,8 +67,8 @@ export function startAutoSave(games: Map<GameId, GameState>): void {
     return;
   }
 
-  autoSaveInterval = setInterval(() => {
-    saveGames(games);
+  autoSaveInterval = setInterval(async () => {
+    await saveGames(games);
   }, SAVE_INTERVAL_MS);
 
   console.log(`Auto-save started (${SAVE_INTERVAL_MS}ms)`);
@@ -80,11 +90,11 @@ export function setupSignalHandlers(handler: () => void): void {
   process.on("SIGTERM", handler);
 }
 
-export function shutdown(games: Map<GameId, GameState>) {
+export async function shutdown(games: Map<GameId, GameState>) {
   console.log("Shutdown detected");
 
   stopAutoSave();
-  saveGames(games);
+  await saveGames(games);
 
   process.exit(0);
 }
