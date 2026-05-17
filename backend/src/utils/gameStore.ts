@@ -1,9 +1,9 @@
 import { GameId, GameState } from "../types";
 import {
+  createSaveLoop,
   loadGames,
   setupSignalHandlers,
   shutdown,
-  startAutoSave,
 } from "./gamePersistence";
 
 const games = new Map<GameId, GameState>();
@@ -14,9 +14,9 @@ export function initGamePersistence() {
   if (initialized) return;
 
   loadGames(games);
-  startAutoSave(games);
+  const saver = createSaveLoop(games);
   setupSignalHandlers(() => {
-    shutdown(games);
+    shutdown(games, saver.stop);
   });
 
   initialized = true;
