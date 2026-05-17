@@ -13,10 +13,12 @@ import {
 } from "components";
 import { registerSchema, type RegisterSchema } from "schemas";
 import api from "api";
+import { useAuth } from "hooks";
 // Local level
 import s from "./RegisterPage.module.css";
 
 const RegisterPage = () => {
+  const { setAccessToken } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -32,10 +34,11 @@ const RegisterPage = () => {
       await api.users.register(data);
       toast.success("Success");
 
-      await api.users.login({
+      const { accessToken } = await api.users.login({
         email: data.email,
         password: data.password,
       });
+      setAccessToken(accessToken);
       navigate("/lobby");
     } catch (error) {
       toast.error((error as Error).message, { autoClose: 5000 });
