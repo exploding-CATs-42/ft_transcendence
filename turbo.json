@@ -1,5 +1,11 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalDependencies": [
+    ".prettierrc",
+    ".prettierignore",
+    "tsconfig.*",
+    "eslint.config.*"
+  ],
   "tasks": {
     "typecheck": {
       "dependsOn": ["^typecheck"]

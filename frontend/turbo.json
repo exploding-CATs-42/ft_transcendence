@@ -2,7 +2,24 @@
   "extends": ["//"],
   "tasks": {
     "typecheck": {
-      "inputs": ["src/**", "tsconfig.json", "tsconfig.app.json"]
+      "inputs": [
+        "src/**",
+        "tsconfig.json",
+        "tsconfig.app.json",
+        "vite.config.ts"
+      ]
+    },
+    "lint": {
+      "inputs": ["src/**", "eslint.config.ts"]
+    },
+    "lint:check": {
+      "inputs": ["src/**", "eslint.config.ts"]
+    },
+    "format": {
+      "inputs": ["src/**"]
+    },
+    "format:check": {
+      "inputs": ["src/**"]
     }
   }
 }
