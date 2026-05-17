@@ -2,7 +2,13 @@ import fs from "fs";
 import path from "path";
 import { GameId, GameState } from "../types";
 
-const FILE_PATH = path.resolve("./data/games.json");
+const persistencePath = process.env["GAME_PERSISTENCE_FILE_PATH"];
+
+if (!persistencePath) {
+  throw new Error("GAME_PERSISTENCE_FILE_PATH is not defined");
+}
+
+const FILE_PATH = path.resolve(persistencePath);
 const SAVE_INTERVAL_MS = 5000;
 
 let autoSaveInterval: NodeJS.Timeout | null = null;
