@@ -48,6 +48,9 @@ export async function loadGames(games: Map<GameId, GameState>): Promise<void> {
 
 export async function saveGames(games: Map<GameId, GameState>): Promise<void> {
   try {
+    if (!games) {
+      throw new Error("saveGames called with undefined games");
+    }
     await ensurePersistenceDir();
 
     const data = JSON.stringify([...games.values()], null, 2);
