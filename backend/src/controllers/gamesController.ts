@@ -1,119 +1,67 @@
-import type { Request, Response, NextFunction } from "express";
+import type { Response, NextFunction } from "express";
 
-import { getGameByIdParamsSchema } from "../schemas/games/getGameByIdSchema";
 import {
   createGame,
   deleteGame,
-  GamesServiceError,
   getGameById,
   getGames
 } from "../services/gameService";
+
+import { getGameByIdParamsSchema } from "../schemas/games/getGameByIdSchema";
 import { createGameSchema } from "../schemas/games/createGameSchema";
 import { deleteGameParamsSchema } from "../schemas/games/deleteGameSchema";
+import { AuthenticatedRequest } from "../types/auth";
+import { validate } from "../utils/validate";
+
+type AsyncController = (
+  req: AuthenticatedRequest,
+  res: Response
+) => Promise<void>;
+
+export function asyncHandler(controller: AsyncController) {
+  return (
+    req: AuthenticatedRequest,
+    res: Response,
+    next: NextFunction
+  ): void => {
+    controller(req, res).catch(next);
+  };
+}
 
 export async function getGamesController(
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: AuthenticatedRequest,
+  res: Response
 ) {
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-
-  try {
-    const result = await getGames(req.user.id);
-    return res.status(200).json(result);
-  } catch (error) {
-    if (error instanceof GamesServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-    return next(error);
-  }
+  const result = await getGames(req.user.id);
+  res.status(200).json(result);
 }
 
 export async function getGameByIdController(
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: AuthenticatedRequest,
+  res: Response
 ) {
-  const parsed = getGameByIdParamsSchema.safeParse(req.params);
+  const parsed = validate(getGameByIdParamsSchema, req.params);
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten()
-    });
-  }
-
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-
-  try {
-    const result = await getGameById(req.user.id, parsed.data);
-    return res.status(200).json(result);
-  } catch (error) {
-    if (error instanceof GamesServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-    return next(error);
-  }
+  const result = await getGameById(req.user.id, parsed);
+  res.status(200).json(result);
 }
 
 export async function createGameController(
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: AuthenticatedRequest,
+  res: Response
 ) {
-  const parsed = createGameSchema.safeParse(req.body);
+  const parsed = validate(createGameSchema, req.body);
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten()
-    });
-  }
-
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-
-  try {
-    const result = await createGame(req.user.id, parsed.data);
-    return res.status(201).json(result);
-  } catch (error) {
-    if (error instanceof GamesServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-    return next(error);
-  }
+  const result = await createGame(req.user.id, parsed);
+  res.status(201).json(result);
 }
 
 export async function deleteGameController(
-  req: Request,
-  res: Response,
-  next: NextFunction
+  req: AuthenticatedRequest,
+  res: Response
 ) {
-  const parsed = deleteGameParamsSchema.safeParse(req.params);
+  const parsed = validate(deleteGameParamsSchema, req.params);
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten()
-    });
-  }
-
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-
-  try {
-    const result = await deleteGame(req.user.id, parsed.data);
-    return res.status(201).json(result);
-  } catch (error) {
-    if (error instanceof GamesServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-    return next(error);
-  }
+  const result = await deleteGame(req.user.id, parsed);
+  res.status(201).json(result);
 }
