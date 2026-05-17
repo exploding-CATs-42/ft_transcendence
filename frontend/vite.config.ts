@@ -16,7 +16,8 @@ export default defineConfig({
       utils: resolve(__dirname, "src/web/utils"),
       api: resolve(__dirname, "src/web/api"),
       schemas: resolve(__dirname, "src/web/schemas"),
-      constants: resolve(__dirname, "src/web/constants")
+      constants: resolve(__dirname, "src/web/constants"),
+      context: resolve(__dirname, "src/web/context")
     }
   },
   server: {

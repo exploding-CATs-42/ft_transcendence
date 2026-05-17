@@ -37,7 +37,9 @@
       "schemas": ["./src/web/schemas/index"],
       "schemas/*": ["./src/web/schemas/*"],
       "constants": ["./src/web/constants/index"],
-      "constants/*": ["./src/web/constants/*"]
+      "constants/*": ["./src/web/constants/*"],
+      "context": ["./src/web/context/index"],
+      "context/*": ["./src/web/context/*"]
     }
   },
   "include": ["src"]
