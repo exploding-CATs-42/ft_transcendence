@@ -3,7 +3,7 @@ import {
   loadGames,
   setupSignalHandlers,
   shutdown,
-  startAutoSave
+  startAutoSave,
 } from "./gamePersistence";
 
 const games = new Map<GameId, GameState>();
@@ -25,7 +25,7 @@ export function initGamePersistence() {
 function assertInitialized() {
   if (!initialized) {
     throw new Error(
-      "Game store not initialized. Call initGamePersistence() first."
+      "Game store not initialized. Call initGamePersistence() first.",
     );
   }
 }

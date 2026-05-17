@@ -13,7 +13,7 @@ const SAVE_INTERVAL_MS = 5000;
 
 let autoSaveInterval: NodeJS.Timeout | null = null;
 
-export async function ensurePersistenceFile() {
+export async function ensurePersistenceDir() {
   const dir = path.dirname(FILE_PATH);
 
   await fs.mkdir(dir, { recursive: true });
@@ -27,7 +27,7 @@ export async function ensurePersistenceFile() {
 
 export async function loadGames(games: Map<GameId, GameState>): Promise<void> {
   try {
-    await ensurePersistenceFile();
+    await ensurePersistenceDir();
 
     const raw = await fs.readFile(FILE_PATH, "utf8");
 
@@ -50,7 +50,7 @@ export async function loadGames(games: Map<GameId, GameState>): Promise<void> {
 
 export async function saveGames(games: Map<GameId, GameState>): Promise<void> {
   try {
-    await ensurePersistenceFile();
+    await ensurePersistenceDir();
 
     const data = JSON.stringify([...games.values()], null, 2);
     const tempFilePath = `${FILE_PATH}.tmp`;
