@@ -4,6 +4,7 @@ import { docsRouter } from "./docs";
 import { usersRouter } from "./users";
 import { meRouter } from "./me";
 import { friendsRouter } from "./friends";
+import { lobbyRouter } from "./lobbyRouter/lobbyRouter";
 
 export const setupRouting = (app: Express) => {
   app.get("/", (_, res) => {
@@ -14,6 +15,7 @@ export const setupRouting = (app: Express) => {
   app.use("/users", usersRouter);
   app.use("/me", meRouter);
   app.use("/me/friends", friendsRouter);
+  app.use("/lobby", lobbyRouter);
 
   app.use((_, res) => {
     res.status(404).json({ message: "Route not found" });
