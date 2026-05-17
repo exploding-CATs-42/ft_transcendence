@@ -9,6 +9,7 @@ import {
 const games = new Map<GameId, GameState>();
 
 let initialized = false;
+let hasPendingChanges = false;
 
 export function initGamePersistence() {
   if (initialized) return;
@@ -30,6 +31,18 @@ function assertInitialized() {
   }
 }
 
+export function hasChanges(): boolean {
+  return hasPendingChanges;
+}
+
+export function consumeHasChanges(): boolean {
+  const changed = hasPendingChanges;
+
+  hasPendingChanges = false;
+
+  return changed;
+}
+
 export function getGame(gameId: GameId): GameState | undefined {
   assertInitialized();
   return games.get(gameId);
@@ -43,6 +56,7 @@ export function getAllGames(): GameState[] {
 export function setGame(game: GameState): void {
   assertInitialized();
   games.set(game.gameId, game);
+  hasPendingChanges = true;
 }
 
 export function deleteGameById(gameId: string): void {
