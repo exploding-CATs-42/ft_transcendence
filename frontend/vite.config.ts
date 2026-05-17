@@ -15,7 +15,8 @@ export default defineConfig({
       game: resolve(__dirname, "src/game"),
       utils: resolve(__dirname, "src/web/utils"),
       api: resolve(__dirname, "src/web/api"),
-      schemas: resolve(__dirname, "src/web/schemas")
+      schemas: resolve(__dirname, "src/web/schemas"),
+      constants: resolve(__dirname, "src/web/constants")
     }
   },
   server: {

@@ -35,7 +35,9 @@
       "api": ["./src/web/api/index"],
       "api/*": ["./src/web/api/*"],
       "schemas": ["./src/web/schemas/index"],
-      "schemas/*": ["./src/web/schemas/*"]
+      "schemas/*": ["./src/web/schemas/*"],
+      "constants": ["./src/web/constants/index"],
+      "constants/*": ["./src/web/constants/*"]
     }
   },
   "include": ["src"]
