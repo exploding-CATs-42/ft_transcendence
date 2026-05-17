@@ -15,6 +15,10 @@ export class WaitingRoom extends Scene {
   create() {
     this.cameras.main.setBackgroundColor("#e09d52");
     this.add.image(0, 0, Textures.avatar).setOrigin(0, 0);
+    this.add.text(20, 200, "Username", {
+      fontSize: 32,
+      color: "black",
+    });
   }
 
   override update() {}
