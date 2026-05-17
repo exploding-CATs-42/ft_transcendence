@@ -31,11 +31,18 @@ export async function ensureUserExists(userId: string) {
   return user;
 }
 
-export function getGames(): GameState[] {
+export async function getGames(currentUserId: string): Promise<GameState[]> {
+  await ensureUserExists(currentUserId);
+
   return getAllGames();
 }
 
-export function getGameById(input: GetGameByIdParams): GameState {
+export async function getGameById(
+  currentUserId: string,
+  input: GetGameByIdParams
+): Promise<GameState> {
+  await ensureUserExists(currentUserId);
+
   const game = getGame(input.gameId);
 
   if (!game) {
@@ -46,15 +53,16 @@ export function getGameById(input: GetGameByIdParams): GameState {
 }
 
 export async function createGame(
+  currentUserId: string,
   input: CreateGameRequestBody
 ): Promise<GameState> {
-  await ensureUserExists(input.playerId);
+  const user = await ensureUserExists(currentUserId);
 
   const gameId = crypto.randomUUID();
 
   const createdBy: Player = {
-    playerId: input.playerId,
-    displayName: input.playerName
+    playerId: user.id,
+    displayName: user.username
   };
 
   const game: GameState = {
@@ -69,7 +77,11 @@ export async function createGame(
   return game;
 }
 
-export function deleteGame(input: DeleteGameParams) {
+export async function deleteGame(
+  currentUserId: string,
+  input: DeleteGameParams
+) {
+  await ensureUserExists(currentUserId);
   const game = getGame(input.gameId);
 
   if (!game) {
