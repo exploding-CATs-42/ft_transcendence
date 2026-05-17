@@ -1,3 +1,6 @@
+// Project level
+import type { AccessToken } from "types";
+// Local level
 import { api, setAxiosToken } from "../axios";
 
 export type RegisterReqBody = {
@@ -6,7 +9,17 @@ export type RegisterReqBody = {
   password: string;
 };
 
-const register = async (body: RegisterReqBody) => {
+export type RegisterResponse = {
+  user: {
+    id: string;
+    email: string;
+    username: string;
+    avatarUrl: string | null;
+  };
+  accessToken: AccessToken;
+};
+
+const register = async (body: RegisterReqBody): Promise<RegisterResponse> => {
   const result = await api.post("/users/register", body);
   return result.data;
 };
@@ -16,7 +29,9 @@ export type UserCredentials = {
   password: string;
 };
 
-const login = async (body: UserCredentials) => {
+export type LoginResponse = RegisterResponse;
+
+const login = async (body: UserCredentials): Promise<LoginResponse> => {
   const result = await api.post("/users/login", body);
   const { token } = result.data;
 
