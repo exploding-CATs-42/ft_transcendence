@@ -2,8 +2,7 @@ import { prisma } from "../lib/prisma";
 import { CreateGameRequestBody } from "../schemas/games/createGameSchema";
 import { GetGameByIdParams } from "../schemas/games/getGameByIdSchema";
 import { GameState, GameStatus, Player } from "../types/game";
-
-const games = new Map<string, GameState>();
+import { getAllGames, getGame, setGame } from "../utils/gameStore";
 
 export class GamesServiceError extends Error {
   public statusCode: number;
@@ -26,11 +25,11 @@ async function ensureUserExists(userId: string) {
 }
 
 export function getGames(): GameState[] {
-  return Array.from(games.values());
+  return getAllGames();
 }
 
 export function getGameById(input: GetGameByIdParams): GameState {
-  const game = games.get(input.gameId);
+  const game = getGame(input.gameId);
 
   if (!game) {
     throw new GamesServiceError("Game not found");
@@ -59,6 +58,6 @@ export async function createGame(
     max_players: input.playersAmount,
     createdAt: Date.now()
   };
-  games.set(gameId, game);
+  setGame(game);
   return game;
 }
