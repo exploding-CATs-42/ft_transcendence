@@ -4,7 +4,7 @@ import { docsRouter } from "./docs";
 import { usersRouter } from "./users";
 import { meRouter } from "./me";
 import { friendsRouter } from "./friends";
-import { gamesRouter } from "./games/gamesRouter";
+import { gamesRouter } from "./games";
 
 export const setupRouting = (app: Express) => {
   app.get("/", (_, res) => {
