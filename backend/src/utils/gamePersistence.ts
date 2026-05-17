@@ -11,8 +11,6 @@ if (!persistencePath) {
 const FILE_PATH = path.resolve(persistencePath);
 const SAVE_INTERVAL_MS = 5000;
 
-let autoSaveInterval: NodeJS.Timeout | null = null;
-
 export async function ensurePersistenceDir() {
   const dir = path.dirname(FILE_PATH);
 
@@ -62,27 +60,27 @@ export async function saveGames(games: Map<GameId, GameState>): Promise<void> {
   }
 }
 
-export function startAutoSave(games: Map<GameId, GameState>): void {
-  if (autoSaveInterval) {
-    return;
-  }
+export function createSaveLoop(games: Map<GameId, GameState>) {
+  let timeout: ReturnType<typeof setTimeout>;
+  let stopped = false;
 
-  autoSaveInterval = setInterval(async () => {
+  async function loop() {
+    if (stopped) return;
+
     await saveGames(games);
-  }, SAVE_INTERVAL_MS);
 
-  console.log(`Auto-save started (${SAVE_INTERVAL_MS}ms)`);
-}
+    if (stopped) return;
 
-export function stopAutoSave(): void {
-  if (!autoSaveInterval) {
-    return;
+    timeout = setTimeout(loop, SAVE_INTERVAL_MS);
   }
 
-  clearInterval(autoSaveInterval);
-  autoSaveInterval = null;
-
-  console.log("Auto-save stopped");
+  loop();
+  return {
+    stop(): void {
+      clearTimeout(timeout);
+      stopped = true;
+    },
+  };
 }
 
 export function setupSignalHandlers(handler: () => void): void {
@@ -90,10 +88,13 @@ export function setupSignalHandlers(handler: () => void): void {
   process.on("SIGTERM", handler);
 }
 
-export async function shutdown(games: Map<GameId, GameState>) {
+export async function shutdown(
+  games: Map<GameId, GameState>,
+  stop: () => void,
+) {
   console.log("Shutdown detected");
 
-  stopAutoSave();
+  stop();
   await saveGames(games);
 
   process.exit(0);
