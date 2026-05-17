@@ -6,7 +6,7 @@ import {
 } from "../../controllers/gamesController";
 import { errorMiddleware } from "../../middlewares/lobby/ErrorRequestMiddleware";
 import { asyncHandler } from "../../utils/asyncHandler";
-import { createAuthenticatedRouter } from "./createAuthenticatedRouter";
+import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
 
 export const gamesRouter = createAuthenticatedRouter();
 
