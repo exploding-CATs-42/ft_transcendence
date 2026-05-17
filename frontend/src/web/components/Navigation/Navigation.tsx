@@ -1,5 +1,7 @@
 // Project level
+// Project level
 import { Avatar, LinkButton } from "components";
+import { useAuth } from "hooks";
 // Local level
 import s from "./Navigation.module.css";
 
@@ -8,13 +10,13 @@ interface Props {
 }
 
 const Navigation = ({ onLinkClick }: Props) => {
+  const { accessToken: isLoggedIn } = useAuth();
+
   const navLinks = [
     { path: "/lobby", label: "Play" },
     { path: "/rules", label: "Rules" },
     { path: "/about", label: "About" },
   ];
-
-  const isLoggedIn = false;
 
   return (
     <>
