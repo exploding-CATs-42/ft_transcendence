@@ -62,7 +62,7 @@ export async function createGame(
     name: input.gameName,
     status: GameStatus.LOBBY,
     players: [createdBy],
-    max_players: input.playersAmount,
+    maxPlayers: input.maxPlayers,
     createdAt: Date.now()
   };
   setGame(game);
