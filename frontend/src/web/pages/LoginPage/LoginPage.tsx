@@ -70,7 +70,7 @@ const LoginPage = () => {
                 status={errors.email ? "error" : "normal"}
               />
             </FormField>
-            <FormField error={errors.password?.message}>
+            <FormField error={errors.password?.message && "Invalid password"}>
               <PasswordInput
                 {...register("password")}
                 status={errors.password ? "error" : "normal"}
