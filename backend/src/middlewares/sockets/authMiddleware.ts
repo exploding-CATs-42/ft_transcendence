@@ -3,7 +3,7 @@ import { ExtendedError, Socket } from "socket.io";
 
 export function authMiddleware(
   socket: Socket,
-  next: (err?: ExtendedError | undefined) => void
+  next: (err?: ExtendedError | undefined) => void,
 ) {
   try {
     const token = socket.handshake.auth["token"];

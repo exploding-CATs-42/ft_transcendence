@@ -43,8 +43,8 @@ const match: LobbyMatch = {
   title: "Cat Clash #1",
   players: [
     { id: "p1", avatarUrl: "/avatars/p1.png" },
-    { id: "p2", avatarUrl: "/avatars/p2.png" }
-  ]
+    { id: "p2", avatarUrl: "/avatars/p2.png" },
+  ],
 };
 
 const MatchRow = () => {

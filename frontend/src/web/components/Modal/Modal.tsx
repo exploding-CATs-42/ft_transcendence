@@ -22,7 +22,7 @@ const Modal = ({
   isOpen,
   toggleModal,
   previosModal = false,
-  className
+  className,
 }: Props) => {
   useEffect(() => {
     if (previosModal) return;
@@ -61,7 +61,7 @@ const Modal = ({
         {children}
       </div>
     </div>,
-    modalRoot
+    modalRoot,
   );
 };
 

@@ -58,7 +58,7 @@ const GamePage = () => {
           duration: 500 + Math.random() * 1000,
           alpha: 0,
           yoyo: true,
-          repeat: -1
+          repeat: -1,
         });
       }
     }

@@ -5,14 +5,14 @@ import { MeServiceError, updateMe } from "../services/meService";
 export async function updateMeController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const parsed = updateMeSchema.safeParse(req.body);
 
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten()
+      errors: parsed.error.flatten(),
     });
   }
 
@@ -31,7 +31,7 @@ export async function updateMeController(
         : {}),
       ...(parsed.data.avatarUrl !== undefined
         ? { avatarUrl: parsed.data.avatarUrl }
-        : {})
+        : {}),
     });
 
     return res.status(200).json(result);

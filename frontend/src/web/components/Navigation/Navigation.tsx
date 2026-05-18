@@ -11,7 +11,7 @@ const Navigation = ({ onLinkClick }: Props) => {
   const navLinks = [
     { path: "/lobby", label: "Play" },
     { path: "/rules", label: "Rules" },
-    { path: "/about", label: "About" }
+    { path: "/about", label: "About" },
   ];
 
   const isLoggedIn = false;

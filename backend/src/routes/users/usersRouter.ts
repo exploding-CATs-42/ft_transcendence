@@ -6,7 +6,7 @@ import {
   logoutController,
   refreshController,
   registerController,
-  searchUsersController
+  searchUsersController,
 } from "../../controllers/usersController";
 
 export const usersRouter = express.Router();

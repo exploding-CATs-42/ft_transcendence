@@ -12,7 +12,7 @@ const Layout = () => {
     theme: "light",
     autoClose: 2000,
     style: { zIndex: 99999 },
-    position: toastPosition
+    position: toastPosition,
   };
 
   return (

@@ -7,7 +7,7 @@ export const ClientActionType = {
   DRAW_CARD: "DRAW_CARD",
   PLAY_DEFUSE: "PLAY_DEFUSE",
   INSERT_KITTEN: "INSERT_KITTEN",
-  FAVOR_GIVE: "FAVOR_GIVE"
+  FAVOR_GIVE: "FAVOR_GIVE",
 } as const;
 
 export type ClientActionType =

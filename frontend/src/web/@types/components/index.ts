@@ -3,5 +3,5 @@ export type { IRefPhaserGame } from "components/PhaserGame/types";
 export type {
   LobbyMatch,
   LobbyPlayer,
-  MatchSlot
+  MatchSlot,
 } from "components/MatchListItem/types";

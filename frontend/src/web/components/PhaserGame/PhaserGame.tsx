@@ -11,7 +11,7 @@ interface IProps {
 
 const PhaserGame = forwardRef<IRefPhaserGame, IProps>(function PhaserGame(
   { currentActiveScene },
-  ref
+  ref,
 ) {
   const game = useRef<Phaser.Game | null>(null!);
 

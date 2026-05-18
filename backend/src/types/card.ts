@@ -11,7 +11,7 @@ export const CardType = {
   HAIRY_POTATO_CAT: "HAIRY_POTATO_CAT",
   BEARD_CAT: "BEARD_CAT",
   CATTERMELON: "CATTERMELON",
-  RAINBOW_RALPHING_CAT: "RAINBOW_RALPHING_CAT"
+  RAINBOW_RALPHING_CAT: "RAINBOW_RALPHING_CAT",
 } as const;
 
 export type CardType = (typeof CardType)[keyof typeof CardType];

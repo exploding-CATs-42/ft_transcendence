@@ -41,5 +41,5 @@ export default {
   register,
   login,
   logout,
-  refresh
+  refresh,
 };

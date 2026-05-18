@@ -34,7 +34,7 @@ const BurgerMenu = ({ isOpened, toggleMenu }: Props) => {
       </button>
       <div
         className={clsx(s.burgerMenuContainer, {
-          [s.openedBurgerMenu]: isOpened
+          [s.openedBurgerMenu]: isOpened,
         })}
       >
         <div className={s.navContainer}>

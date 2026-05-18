@@ -40,25 +40,25 @@ export async function listFriends(params: {
     where: {
       OR: [
         { userLowId: params.currentUserId },
-        { userHighId: params.currentUserId }
+        { userHighId: params.currentUserId },
       ],
       ...(params.status === "incoming"
         ? {
             status: FriendshipStatus.PENDING,
             requestedById: {
-              not: params.currentUserId
-            }
+              not: params.currentUserId,
+            },
           }
-        : {})
+        : {}),
     },
     include: {
       userLow: {
-        select: publicProfileSelect
+        select: publicProfileSelect,
       },
       userHigh: {
-        select: publicProfileSelect
-      }
-    }
+        select: publicProfileSelect,
+      },
+    },
   });
 
   return friendships.map((friendship) => {
@@ -73,8 +73,8 @@ export async function listFriends(params: {
       direction: getDirection({
         currentUserId: params.currentUserId,
         requestedById: friendship.requestedById,
-        status: friendship.status
-      })
+        status: friendship.status,
+      }),
     };
   });
 }
@@ -86,13 +86,13 @@ export async function sendFriendRequest(params: {
   if (params.currentUserId === params.targetUserId) {
     throw new FriendsServiceError(
       "You cannot send a friend request to yourself",
-      400
+      400,
     );
   }
 
   const targetUser = await prisma.user.findUnique({
     where: { id: params.targetUserId },
-    select: { id: true }
+    select: { id: true },
   });
 
   if (!targetUser) {
@@ -103,8 +103,8 @@ export async function sendFriendRequest(params: {
 
   const existingFriendship = await prisma.friendship.findUnique({
     where: {
-      userLowId_userHighId: pair
-    }
+      userLowId_userHighId: pair,
+    },
   });
 
   if (existingFriendship) {
@@ -116,8 +116,8 @@ export async function sendFriendRequest(params: {
       userLowId: pair.userLowId,
       userHighId: pair.userHighId,
       requestedById: params.currentUserId,
-      status: FriendshipStatus.PENDING
-    }
+      status: FriendshipStatus.PENDING,
+    },
   });
 }
 
@@ -134,8 +134,8 @@ export async function updateFriendship(params: {
 
   const friendship = await prisma.friendship.findUnique({
     where: {
-      userLowId_userHighId: pair
-    }
+      userLowId_userHighId: pair,
+    },
   });
 
   if (!friendship) {
@@ -145,27 +145,27 @@ export async function updateFriendship(params: {
   if (friendship.status !== FriendshipStatus.PENDING) {
     throw new FriendsServiceError(
       "Only pending friendships can be updated",
-      409
+      409,
     );
   }
 
   if (friendship.requestedById === params.currentUserId) {
     throw new FriendsServiceError(
       "You cannot update your own outgoing request",
-      409
+      409,
     );
   }
 
   await prisma.friendship.update({
     where: {
-      userLowId_userHighId: pair
+      userLowId_userHighId: pair,
     },
     data: {
       status:
         params.action === "accept"
           ? FriendshipStatus.ACCEPTED
-          : FriendshipStatus.REJECTED
-    }
+          : FriendshipStatus.REJECTED,
+    },
   });
 }
 
@@ -181,8 +181,8 @@ export async function deleteFriendship(params: {
 
   const friendship = await prisma.friendship.findUnique({
     where: {
-      userLowId_userHighId: pair
-    }
+      userLowId_userHighId: pair,
+    },
   });
 
   if (!friendship) {
@@ -201,7 +201,7 @@ export async function deleteFriendship(params: {
 
   await prisma.friendship.delete({
     where: {
-      userLowId_userHighId: pair
-    }
+      userLowId_userHighId: pair,
+    },
   });
 }

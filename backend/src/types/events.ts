@@ -5,7 +5,7 @@ import {
   PendingAction,
   PendingActionType,
   NopeChain,
-  FavorState
+  FavorState,
 } from "./turn";
 
 export const ServerEventType = {
@@ -23,7 +23,7 @@ export const ServerEventType = {
   FAVOR_REQUESTED: "FAVOR_REQUESTED",
   FAVOR_RESOLVED: "FAVOR_RESOLVED",
   DECK_SHUFFLED: "DECK_SHUFFLED",
-  GAME_OVER: "GAME_OVER"
+  GAME_OVER: "GAME_OVER",
 } as const;
 
 export type ServerEventType =
@@ -93,7 +93,7 @@ export const PrivateEventType = {
   SEE_THE_FUTURE_PEEK: "SEE_THE_FUTURE_PEEK",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   INSERT_KITTEN_PROMPT: "INSERT_KITTEN_PROMPT",
-  FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE"
+  FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE",
 } as const;
 
 export type PrivateEventType =
@@ -103,7 +103,7 @@ export const CardRemovalReason = {
   PLAYED: "PLAYED",
   STOLEN: "STOLEN",
   GIVEN_AWAY: "GIVEN_AWAY",
-  EXPLODED: "EXPLODED"
+  EXPLODED: "EXPLODED",
 } as const;
 
 export type CardRemovalReason =

@@ -17,7 +17,7 @@ export type ActiveTab = "matches" | "friends";
 
 const tabs: TabOption[] = [
   { key: "matches", label: "Last matches" },
-  { key: "friends", label: "Friends" }
+  { key: "friends", label: "Friends" },
 ];
 
 const ListSection = ({ matches, friends }: Props) => {

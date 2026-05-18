@@ -19,10 +19,10 @@ export function signAccessToken(payload: { sub: string }): string {
   return jwt.sign(
     {
       sub: payload.sub,
-      type: "access"
+      type: "access",
     },
     jwtAccessSecret,
-    { expiresIn: jwtAccessExpiresIn } as SignOptions
+    { expiresIn: jwtAccessExpiresIn } as SignOptions,
   );
 }
 
@@ -34,10 +34,10 @@ export function signRefreshToken(payload: {
     {
       sub: payload.sub,
       sessionId: payload.sessionId,
-      type: "refresh"
+      type: "refresh",
     },
     jwtRefreshSecret,
-    { expiresIn: jwtRefreshExpiresIn } as SignOptions
+    { expiresIn: jwtRefreshExpiresIn } as SignOptions,
   );
 }
 
@@ -46,7 +46,7 @@ function isJwtObject(decoded: string | JwtPayload): decoded is JwtPayload {
 }
 
 function isAccessTokenPayload(
-  decoded: string | JwtPayload
+  decoded: string | JwtPayload,
 ): decoded is AccessTokenPayload {
   return (
     isJwtObject(decoded) &&
@@ -56,7 +56,7 @@ function isAccessTokenPayload(
 }
 
 function isRefreshTokenPayload(
-  decoded: string | JwtPayload
+  decoded: string | JwtPayload,
 ): decoded is RefreshTokenPayload {
   return (
     isJwtObject(decoded) &&
