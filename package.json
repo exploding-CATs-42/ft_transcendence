@@ -2,17 +2,14 @@
   "name": "exploding-cats",
   "private": true,
   "scripts": {
-    "format:check": "turbo run format:check",
-    "format:fix": "turbo run format:fix",
-    "lint:check": "turbo run lint:check",
-    "lint:fix": "turbo run lint:fix",
-    "typecheck": "turbo run typecheck",
-    "check": "turbo run format:check lint:check typecheck",
-    "fix": "turbo run format:fix lint:fix",
-    "dev": "make postgres && turbo run dev"
-  },
-  "devDependencies": {
-    "turbo": "^2.9.14"
+    "format:check": "pnpm run -r --parallel format:check",
+    "format:fix": "pnpm run -r --parallel format:fix",
+    "lint:check": "pnpm run -r lint:check",
+    "lint:fix": "pnpm run -r lint:fix",
+    "typecheck": "pnpm run -r typecheck",
+    "check": "pnpm run format:check && pnpm run lint:check && pnpm run typecheck",
+    "fix": "pnpm run -r format:fix lint:fix",
+    "dev": "make postgres && pnpm run -r dev"
   },
   "packageManager": "pnpm@10.33.0"
 }
