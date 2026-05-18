@@ -43,8 +43,6 @@ export class WaitingRoom extends Scene {
     this.addWaitingLabel();
   }
 
-  override update() {}
-
   private addFullscreenToggleButton() {
     const button = this.add.dom(
       0,
