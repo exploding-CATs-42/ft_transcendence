@@ -10,14 +10,9 @@ export class WaitingRoom extends Scene {
 
   init() {
     this.input.keyboard?.on("keydown-F", () => {
-      if (this.scale.isFullscreen) {
-        this.scale.stopFullscreen();
-      } else {
-        this.scale.startFullscreen();
-      }
+      this.scale.toggleFullscreen();
     });
 
-    // Or via a button click:
     document.getElementById("fullscreen-btn")?.addEventListener("click", () => {
       this.scale.toggleFullscreen();
     });
