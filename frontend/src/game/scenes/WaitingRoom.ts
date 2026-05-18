@@ -2,6 +2,7 @@
 import { Scene } from "phaser";
 // Project level
 import { Scenes, Textures } from "game/constants";
+import { addBackgroundImage } from "game/utils";
 
 export class WaitingRoom extends Scene {
   constructor() {
@@ -24,6 +25,7 @@ export class WaitingRoom extends Scene {
 
   create() {
     this.cameras.main.setBackgroundColor("#e09d52");
+    addBackgroundImage(this, Textures.waitingRoomBg);
     this.addPlayers();
   }
 
