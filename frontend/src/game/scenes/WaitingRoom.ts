@@ -40,6 +40,7 @@ export class WaitingRoom extends Scene {
     this.addFullscreenToggleButton();
 
     this.addPlayers(data.players);
+    this.addWaitingLabel();
   }
 
   override update() {}
@@ -86,5 +87,16 @@ export class WaitingRoom extends Scene {
         })
         .setOrigin(0.5, 0.5);
     });
+  }
+
+  private addWaitingLabel() {
+    this.add
+      .text(
+        this.scale.width / 2,
+        this.scale.height / 2,
+        "Waiting for other players to join...",
+        { fontSize: 80, color: "black", fontFamily: "Chewy" },
+      )
+      .setOrigin(0.5, 0);
   }
 }
