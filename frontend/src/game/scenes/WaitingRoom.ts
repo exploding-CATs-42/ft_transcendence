@@ -24,11 +24,7 @@ export class WaitingRoom extends Scene {
 
   create() {
     this.cameras.main.setBackgroundColor("#e09d52");
-    this.add.image(0, 0, Textures.avatar).setOrigin(0, 0);
-    this.add.text(20, 200, "Username", {
-      fontSize: 32,
-      color: "black",
-    });
+    this.addPlayers();
   }
 
   override update() {}
@@ -49,6 +45,41 @@ export class WaitingRoom extends Scene {
       } else {
         this.scale.startFullscreen();
       }
+    });
+  }
+
+  private addPlayers() {
+    type Point = { x: number; y: number };
+    type Player = { position: Point; name: string };
+
+    const players: Player[] = [
+      { position: { x: 44, y: 700 }, name: "You" },
+      { position: { x: 120, y: 200 }, name: "Player 1" },
+      { position: { x: 602, y: 90 }, name: "Player 2" },
+      { position: { x: 1098, y: 90 }, name: "Player 3" },
+      { position: { x: 1600, y: 180 }, name: "Player 4" },
+    ];
+
+    players.forEach(({ position: { x, y }, name }) => {
+      const avatar = this.add.image(x, y, Textures.avatar).setOrigin(0, 0);
+
+      const radius = Math.min(avatar.displayWidth, avatar.displayHeight) / 2;
+      const cx = x + radius;
+      const cy = y + radius;
+
+      avatar.setPosition(cx, cy).setOrigin(0.5, 0.5);
+
+      const mask = this.add.graphics();
+      mask.fillCircle(cx, cy, radius);
+      avatar.setMask(mask.createGeometryMask());
+
+      this.add
+        .text(cx, cy - radius - 30, name, {
+          fontSize: 32,
+          color: "black",
+          fontFamily: "Chewy",
+        })
+        .setOrigin(0.5, 0.5);
     });
   }
 }
