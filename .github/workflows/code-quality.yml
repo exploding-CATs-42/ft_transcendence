@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        script: [ format, lint, typecheck ]
+        script: [ format:check, lint:check, typecheck ]
     steps:
       - uses: actions/checkout@v6
       - uses: pnpm/action-setup@v6
