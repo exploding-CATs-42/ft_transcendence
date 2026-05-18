@@ -6,6 +6,17 @@ import { addBackgroundImage } from "game/utils";
 import type { Player } from "game/entities";
 import { SEATS } from "game/constants";
 
+// It's just a placeholder and has to be removed later
+const data: { players: Player[] } = {
+  players: [
+    { username: "You", imageUrl: null },
+    { username: "Player 2", imageUrl: null },
+    { username: "Player 3", imageUrl: null },
+    { username: "Player 4", imageUrl: null },
+    { username: "Player 5", imageUrl: null },
+  ],
+};
+
 export class WaitingRoom extends Scene {
   constructor() {
     super(Scenes.WaitingRoom);
@@ -28,15 +39,6 @@ export class WaitingRoom extends Scene {
     addBackgroundImage(this, Textures.waitingRoomBg);
     this.addFullscreenToggleButton();
 
-    const data: { players: Player[] } = {
-      players: [
-        { username: "You", imageUrl: null },
-        { username: "Player 2", imageUrl: null },
-        { username: "Player 3", imageUrl: null },
-        { username: "Player 4", imageUrl: null },
-        { username: "Player 5", imageUrl: null },
-      ],
-    };
     this.addPlayers(data.players);
   }
 
