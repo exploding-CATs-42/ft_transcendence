@@ -34,7 +34,7 @@ export class Preloader extends Scene {
     //  A simple progress bar
     const progressBarWidth = 468;
     const progressBarHeight = 32;
-    const marginBottom = 100;
+    const marginBottom = 170;
 
     // Center horizontally
     const x = this.scale.width / 2;
