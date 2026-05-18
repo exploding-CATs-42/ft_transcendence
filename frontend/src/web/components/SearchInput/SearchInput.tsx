@@ -11,7 +11,7 @@ interface Props {
 
 const SearchInput = ({
   placeholder = "Player ID",
-  status = "normal"
+  status = "normal",
 }: Props) => {
   return (
     <Input

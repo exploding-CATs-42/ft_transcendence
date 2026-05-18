@@ -7,25 +7,25 @@ export const matchesMock: LobbyMatch[] = [
     players: [
       {
         id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-3",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-4",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-5",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
-      }
-    ]
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      },
+    ],
   },
   {
     id: "g-101",
@@ -33,21 +33,21 @@ export const matchesMock: LobbyMatch[] = [
     players: [
       {
         id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-3",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-4",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
-      }
-    ]
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      },
+    ],
   },
   {
     id: "g-102",
@@ -55,17 +55,17 @@ export const matchesMock: LobbyMatch[] = [
     players: [
       {
         id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-3",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
-      }
-    ]
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      },
+    ],
   },
   {
     id: "g-103",
@@ -73,12 +73,12 @@ export const matchesMock: LobbyMatch[] = [
     players: [
       {
         id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
       },
       {
         id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png"
-      }
-    ]
-  }
+        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      },
+    ],
+  },
 ];

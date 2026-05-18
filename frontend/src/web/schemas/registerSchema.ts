@@ -18,11 +18,11 @@ export const registerSchema = z
       .regex(/[0-9]/, "It needs at least one number")
       .regex(/[^A-Za-z0-9]/, "It needs at least one special character"),
 
-    passwordConfirm: z.string().min(1, "Please confirm your password")
+    passwordConfirm: z.string().min(1, "Please confirm your password"),
   })
   .refine((data) => data.password === data.passwordConfirm, {
     path: ["passwordConfirm"],
-    message: "Passwords do not match"
+    message: "Passwords do not match",
   });
 
 export type RegisterSchema = z.infer<typeof registerSchema>;

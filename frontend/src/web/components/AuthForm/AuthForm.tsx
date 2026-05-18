@@ -23,7 +23,7 @@ const AuthForm = ({
   redirectTitle,
   redirectLink,
   onSubmit,
-  disabled
+  disabled,
 }: Props) => {
   return (
     <>

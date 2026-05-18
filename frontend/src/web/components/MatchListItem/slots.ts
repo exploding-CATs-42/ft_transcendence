@@ -6,7 +6,7 @@ export const createMatchSlots = (players: LobbyPlayer[]): MatchSlot[] => {
   return Array.from({ length: MAX_PLAYERS }, (_, id) =>
     players[id]
       ? { id, kind: "real", player: players[id] }
-      : { id, kind: "placeholder" }
+      : { id, kind: "placeholder" },
   );
 };
 

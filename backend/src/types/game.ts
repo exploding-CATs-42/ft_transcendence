@@ -4,7 +4,7 @@ import { CardInstance } from "./card";
 export const GameStatus = {
   LOBBY: "LOBBY",
   PLAYING: "PLAYING",
-  FINISHED: "FINISHED"
+  FINISHED: "FINISHED",
 } as const;
 
 export type GameStatus = (typeof GameStatus)[keyof typeof GameStatus];

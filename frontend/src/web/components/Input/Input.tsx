@@ -31,7 +31,7 @@ const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
         ref={ref}
         className={clsx(s.input, className, {
           [s.pdLeft]: pdLeft,
-          [s.pdRight]: pdRight
+          [s.pdRight]: pdRight,
         })}
         type={type}
         placeholder={placeholder}

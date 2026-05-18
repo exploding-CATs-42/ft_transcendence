@@ -10,7 +10,7 @@ const variantClass: Record<Variant, string> = {
   settings: s.avatarSettings,
   badge: s.avatarBadge,
   friend: s.avatarFriend,
-  match: s.avatarMatch
+  match: s.avatarMatch,
 };
 
 interface Props {
@@ -24,7 +24,7 @@ const Avatar = ({
   className,
   variant = "profile",
   src = "/src/web/assets/images/avatar/avatar-193w.png",
-  alt = "Fierce cat mascot logo in red and gold"
+  alt = "Fierce cat mascot logo in red and gold",
 }: Props) => {
   return (
     <img

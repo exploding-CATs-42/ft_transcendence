@@ -25,7 +25,7 @@ type User = {
 
 const users: User[] = [
   { id: 1, name: "Alice" },
-  { id: 2, name: "Bob" }
+  { id: 2, name: "Bob" },
 ];
 
 const UsersList = () => {

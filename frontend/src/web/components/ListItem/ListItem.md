@@ -29,7 +29,7 @@ import { List, ListItem } from "components";
 
 const users = [
   { id: 1, nickname: "cat_master" },
-  { id: 2, nickname: "burrito_thrower" }
+  { id: 2, nickname: "burrito_thrower" },
 ];
 
 const UsersList = () => {

@@ -21,7 +21,7 @@ const List = <T,>({
   renderItem,
   getKey,
   className,
-  empty
+  empty,
 }: Props<T>) => {
   return (
     <ul className={clsx(s.list, className)}>

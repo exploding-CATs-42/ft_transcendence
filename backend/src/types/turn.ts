@@ -5,7 +5,7 @@ export const TurnPhase = {
   NOPE_WINDOW: "NOPE_WINDOW",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   INSERT_KITTEN: "INSERT_KITTEN",
-  FAVOR_SELECT: "FAVOR_SELECT"
+  FAVOR_SELECT: "FAVOR_SELECT",
 } as const;
 
 export type TurnPhase = (typeof TurnPhase)[keyof typeof TurnPhase];
@@ -17,7 +17,7 @@ export const PendingActionType = {
   SHUFFLE: "SHUFFLE",
   SEE_THE_FUTURE: "SEE_THE_FUTURE",
   CAT_PAIR: "CAT_PAIR",
-  CAT_TRIPLE: "CAT_TRIPLE"
+  CAT_TRIPLE: "CAT_TRIPLE",
 } as const;
 
 export type PendingActionType =

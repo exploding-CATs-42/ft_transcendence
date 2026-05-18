@@ -9,13 +9,13 @@ import {
   loginUser,
   logoutUser,
   refreshSession,
-  registerUser
+  registerUser,
 } from "../services/authService";
 import {
   getPublicUserById,
   getUserGames,
   searchUsersByUsername,
-  UsersServiceError
+  UsersServiceError,
 } from "../services/usersService";
 import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 
@@ -28,21 +28,21 @@ function getRefreshTokenCookieOptions() {
     secure: process.env["NODE_ENV"] === "production",
     sameSite: "lax" as const,
     path: "/api/users",
-    maxAge: REFRESH_TOKEN_COOKIE_MAX_AGE_MS
+    maxAge: REFRESH_TOKEN_COOKIE_MAX_AGE_MS,
   };
 }
 
 export async function registerController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const parsed = registerSchema.safeParse(req.body);
 
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten()
+      errors: parsed.error.flatten(),
     });
   }
 
@@ -51,12 +51,12 @@ export async function registerController(
     res.cookie(
       REFRESH_TOKEN_COOKIE_NAME,
       result.refreshToken,
-      getRefreshTokenCookieOptions()
+      getRefreshTokenCookieOptions(),
     );
 
     return res.status(201).json({
       user: result.user,
-      accessToken: result.accessToken
+      accessToken: result.accessToken,
     });
   } catch (error) {
     if (error instanceof AuthServiceError) {
@@ -70,14 +70,14 @@ export async function registerController(
 export async function loginController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const parsed = loginSchema.safeParse(req.body);
 
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten()
+      errors: parsed.error.flatten(),
     });
   }
 
@@ -86,12 +86,12 @@ export async function loginController(
     res.cookie(
       REFRESH_TOKEN_COOKIE_NAME,
       result.refreshToken,
-      getRefreshTokenCookieOptions()
+      getRefreshTokenCookieOptions(),
     );
 
     return res.status(200).json({
       user: result.user,
-      accessToken: result.accessToken
+      accessToken: result.accessToken,
     });
   } catch (error) {
     if (error instanceof AuthServiceError) {
@@ -105,7 +105,7 @@ export async function loginController(
 export async function logoutController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
 
@@ -119,7 +119,7 @@ export async function logoutController(
       httpOnly: true,
       secure: process.env["NODE_ENV"] === "production",
       sameSite: "lax",
-      path: "/api/users"
+      path: "/api/users",
     });
 
     return res.status(204).send();
@@ -135,7 +135,7 @@ export async function logoutController(
 export async function refreshController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const refreshToken = req.cookies?.[REFRESH_TOKEN_COOKIE_NAME];
 
@@ -148,11 +148,11 @@ export async function refreshController(
     res.cookie(
       REFRESH_TOKEN_COOKIE_NAME,
       result.refreshToken,
-      getRefreshTokenCookieOptions()
+      getRefreshTokenCookieOptions(),
     );
 
     return res.status(200).json({
-      accessToken: result.accessToken
+      accessToken: result.accessToken,
     });
   } catch (error) {
     if (error instanceof UsersServiceError) {
@@ -166,14 +166,14 @@ export async function refreshController(
 export async function searchUsersController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const parsed = searchUsersQuerySchema.safeParse(req.query);
 
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten()
+      errors: parsed.error.flatten(),
     });
   }
 
@@ -192,14 +192,14 @@ export async function searchUsersController(
 export async function getUserByIdController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const parsed = getUserByIdParamsSchema.safeParse(req.params);
 
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten()
+      errors: parsed.error.flatten(),
     });
   }
 
@@ -218,14 +218,14 @@ export async function getUserByIdController(
 export async function getUserGamesController(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const parsed = getUserGamesParamsSchema.safeParse(req.params);
 
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: parsed.error.flatten()
+      errors: parsed.error.flatten(),
     });
   }
 

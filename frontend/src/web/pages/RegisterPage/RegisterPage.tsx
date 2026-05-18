@@ -9,7 +9,7 @@ import {
   EmailInput,
   FormField,
   NameInput,
-  PasswordInput
+  PasswordInput,
 } from "components";
 import { registerSchema, type RegisterSchema } from "schemas";
 import api from "api";
@@ -22,9 +22,9 @@ const RegisterPage = () => {
   const {
     register,
     handleSubmit,
-    formState: { errors, isSubmitting }
+    formState: { errors, isSubmitting },
   } = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema)
+    resolver: zodResolver(registerSchema),
   });
 
   const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
@@ -34,7 +34,7 @@ const RegisterPage = () => {
 
       await api.users.login({
         email: data.email,
-        password: data.password
+        password: data.password,
       });
       navigate("/lobby");
     } catch (error) {

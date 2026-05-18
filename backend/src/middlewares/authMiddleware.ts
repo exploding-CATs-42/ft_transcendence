@@ -4,7 +4,7 @@ import { verifyAccessToken } from "../utils/jwt";
 export function authMiddleware(
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) {
   const authorizationHeader = req.header("Authorization");
 
@@ -22,7 +22,7 @@ export function authMiddleware(
     const payload = verifyAccessToken(token);
 
     req.user = {
-      id: payload.sub
+      id: payload.sub,
     };
 
     return next();

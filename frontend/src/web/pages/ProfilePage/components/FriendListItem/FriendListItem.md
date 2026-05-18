@@ -37,7 +37,7 @@ const friend: FriendItem = {
   id: "f-1",
   username: "Sasha",
   avatarUrl: "/avatars/sasha.png",
-  isOnline: true
+  isOnline: true,
 };
 
 const FriendRow = () => {

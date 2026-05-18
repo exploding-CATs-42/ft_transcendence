@@ -24,7 +24,7 @@ export class Game extends Scene {
         color: "#ffffff",
         stroke: "#000000",
         strokeThickness: 8,
-        align: "center"
+        align: "center",
       })
       .setOrigin(0.5)
       .setDepth(100);

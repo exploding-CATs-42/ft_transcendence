@@ -24,7 +24,7 @@ export class MainMenu extends Scene {
         color: "#ffffff",
         stroke: "#000000",
         strokeThickness: 8,
-        align: "center"
+        align: "center",
       })
       .setOrigin(0.5)
       .setDepth(100);
@@ -59,10 +59,10 @@ export class MainMenu extends Scene {
           if (vueCallback) {
             vueCallback({
               x: Math.floor(this.logo.x),
-              y: Math.floor(this.logo.y)
+              y: Math.floor(this.logo.y),
             });
           }
-        }
+        },
       });
     }
   }
