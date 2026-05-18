@@ -18,7 +18,7 @@ const LoginPage = () => {
     register,
     handleSubmit,
     formState: { isSubmitting, errors },
-    setError
+    setError,
   } = useForm<LoginSchema>();
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
