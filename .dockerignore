@@ -31,3 +31,28 @@ Thumbs.db
 
 # Optional files
 README.md
+
+# Turbo cache
+.turbo
+**/.turbo
+
+# Generated Prisma client (regenerated at build/runtime anyway)
+backend/src/generated
+
+# Docs (not needed in any image)
+docs
+
+# Test files
+**/tests
+**/*.test.ts
+**/*.spec.ts
+**/vitest.config.ts
+**/coverage
+
+# TypeScript build info
+**/*.tsbuildinfo
+
+# Editor/IDE
+.vscode
+.idea
+**/*.swp
