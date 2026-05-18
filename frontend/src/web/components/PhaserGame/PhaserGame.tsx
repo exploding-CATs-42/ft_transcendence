@@ -32,7 +32,7 @@ const PhaserGame = ({ currentActiveScene, ref }: Props) => {
       gameRef.current?.destroy(true);
       gameRef.current = null;
     };
-  }, []);
+  }, [ref]);
 
   useEffect(() => {
     const handler = (sceneInstance: Phaser.Scene) => {
@@ -51,7 +51,7 @@ const PhaserGame = ({ currentActiveScene, ref }: Props) => {
     return () => {
       EventBus.removeListener("current-scene-ready", handler);
     };
-  }, [currentActiveScene]);
+  }, [currentActiveScene, ref]);
 
   return <div ref={containerRef} style={{ width: "100%", height: "100%" }} />;
 };

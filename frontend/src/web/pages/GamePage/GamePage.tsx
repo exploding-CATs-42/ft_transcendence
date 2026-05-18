@@ -16,6 +16,10 @@ const GamePage = () => {
     };
 
     main.style.overflow = "hidden";
+    // This error is disabled because in this specific case
+    // the "unnecessary" rerender is actually "necessary"
+    // and gives me the desired effect.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setReady(true);
 
     return () => {
