@@ -19,8 +19,6 @@ export class WaitingRoom extends Scene {
     document.getElementById("fullscreen-btn")?.addEventListener("click", () => {
       this.scale.toggleFullscreen();
     });
-
-    this.addFullscreenToggleButton();
   }
 
   preload() {}
@@ -28,6 +26,7 @@ export class WaitingRoom extends Scene {
   create() {
     this.cameras.main.setBackgroundColor("#e09d52");
     addBackgroundImage(this, Textures.waitingRoomBg);
+    this.addFullscreenToggleButton();
 
     const data: { players: Player[] } = {
       players: [
