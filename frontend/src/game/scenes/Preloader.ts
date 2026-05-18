@@ -3,6 +3,7 @@ import { Scene } from "phaser";
 // Project level
 import { Textures, Scenes } from "game/constants";
 import { avatar } from "game/assets";
+import { addBackgroundImage } from "game/utils";
 
 export class Preloader extends Scene {
   constructor() {
@@ -11,7 +12,7 @@ export class Preloader extends Scene {
 
   init() {
     //  We loaded this image in our Boot Scene, so we can display it here
-    this.addBackgroundImage(Textures.background);
+    addBackgroundImage(this, Textures.background);
     this.addProgressBar();
   }
 
@@ -26,23 +27,6 @@ export class Preloader extends Scene {
 
     //  Move to the Game scene. You could also swap this for a Scene Transition, such as a camera fade.
     this.scene.start(Scenes.WaitingRoom);
-  }
-
-  private addBackgroundImage(texture: string) {
-    const bg = this.add.image(
-      this.scale.width / 2,
-      this.scale.height / 2,
-      texture,
-    );
-
-    const scaleX = this.scale.width / bg.width;
-    const scaleY = this.scale.height / bg.height;
-    const scale = Math.max(scaleX, scaleY);
-
-    bg.setOrigin(0.5);
-    bg.setScale(scale);
-
-    return bg;
   }
 
   private addProgressBar() {
