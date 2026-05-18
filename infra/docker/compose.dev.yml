@@ -7,8 +7,9 @@ services:
     ports:
       - "${NGINX_PORT}:80"
     depends_on:
-      - backend
-      - frontend
+      backend:
+        condition: service_healthy
+      frontend:
     networks:
       - transcendence_net
 
@@ -31,6 +32,12 @@ services:
       - backend_node_modules:/app/backend/node_modules
     networks:
       - transcendence_net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3000/"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
   frontend:
     build:
