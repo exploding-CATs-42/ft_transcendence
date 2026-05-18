@@ -3,6 +3,8 @@ import { Scene } from "phaser";
 // Project level
 import { Scenes, Textures } from "game/constants";
 import { addBackgroundImage } from "game/utils";
+import type { Player } from "game/entities";
+import { SEATS } from "game/constants";
 
 export class WaitingRoom extends Scene {
   constructor() {
@@ -26,7 +28,17 @@ export class WaitingRoom extends Scene {
   create() {
     this.cameras.main.setBackgroundColor("#e09d52");
     addBackgroundImage(this, Textures.waitingRoomBg);
-    this.addPlayers();
+
+    const data: { players: Player[] } = {
+      players: [
+        { username: "You", imageUrl: null },
+        { username: "Player 2", imageUrl: null },
+        { username: "Player 3", imageUrl: null },
+        { username: "Player 4", imageUrl: null },
+        { username: "Player 5", imageUrl: null },
+      ],
+    };
+    this.addPlayers(data.players);
   }
 
   override update() {}
@@ -50,19 +62,9 @@ export class WaitingRoom extends Scene {
     });
   }
 
-  private addPlayers() {
-    type Point = { x: number; y: number };
-    type Player = { position: Point; name: string };
-
-    const players: Player[] = [
-      { position: { x: 44, y: 700 }, name: "You" },
-      { position: { x: 120, y: 200 }, name: "Player 1" },
-      { position: { x: 602, y: 90 }, name: "Player 2" },
-      { position: { x: 1098, y: 90 }, name: "Player 3" },
-      { position: { x: 1600, y: 180 }, name: "Player 4" },
-    ];
-
-    players.forEach(({ position: { x, y }, name }) => {
+  private addPlayers(players: Player[]) {
+    players.forEach((player, i) => {
+      const { x, y } = SEATS[i]!;
       const avatar = this.add.image(x, y, Textures.avatar).setOrigin(0, 0);
 
       const radius = Math.min(avatar.displayWidth, avatar.displayHeight) / 2;
@@ -76,7 +78,7 @@ export class WaitingRoom extends Scene {
       avatar.setMask(mask.createGeometryMask());
 
       this.add
-        .text(cx, cy - radius - 30, name, {
+        .text(cx, cy - radius - 30, player.username, {
           fontSize: 32,
           color: "black",
           fontFamily: "Chewy",
