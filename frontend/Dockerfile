@@ -2,18 +2,20 @@ FROM node:24-alpine AS base
 RUN corepack enable
 WORKDIR /app
 
+################## DEV ################################################
+FROM base AS dev
+# No COPY, no RUN pnpm install — everything comes via volumes.
+# The entrypoint installs deps at runtime if node_modules is empty,
+# then starts the dev server.
+CMD ["sh", "-c", "pnpm install --frozen-lockfile && pnpm --filter frontend dev"]
+
+################## BUILD ##############################################
+FROM base AS build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY frontend/package.json ./frontend/
 
 RUN pnpm install --frozen-lockfile
 
-################## DEV ################################################
-FROM base AS dev
-WORKDIR /app
-CMD ["pnpm", "--filter", "frontend", "dev"]
-
-################## BUILD ##############################################
-FROM base AS build
 COPY frontend/ ./frontend/
 RUN pnpm --filter frontend build
 
