@@ -1,5 +1,3 @@
-import { prisma } from "../lib/prisma";
-
 import { DEFAULT_GAME_STATE } from "../constants/game";
 import { ApiError } from "../errors/apiError";
 
@@ -12,16 +10,16 @@ import {
 import { GameState, UserId } from "../types";
 import GameStore from "../utils/gameStore";
 
-export async function ensureUserExists(userId: UserId) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, username: true },
-  });
+import { ensureUserExists } from "../utils/users";
 
-  if (!user) {
-    throw new ApiError("User not found", 404);
+function ensureGameExists(gameId: string) {
+  const game = GameStore.getGame(gameId);
+
+  if (!game) {
+    throw new ApiError("Game not found", 404);
   }
-  return user;
+
+  return game;
 }
 
 export async function getGames(userId: UserId): Promise<GameState[]> {
@@ -36,13 +34,7 @@ export async function getGameById(
 ): Promise<GameState> {
   await ensureUserExists(userId);
 
-  const game = GameStore.getGame(input.gameId);
-
-  if (!game) {
-    throw new ApiError("Game not found", 404);
-  }
-
-  return game;
+  return ensureGameExists(input.gameId);
 }
 
 export async function createGame(
@@ -67,10 +59,7 @@ export async function createGame(
 
 export async function deleteGame(userId: UserId, input: DeleteGameParams) {
   await ensureUserExists(userId);
-  const game = GameStore.getGame(input.gameId);
+  ensureGameExists(input.gameId);
 
-  if (!game) {
-    throw new ApiError("Game not found", 404);
-  }
   GameStore.deleteGameById(input.gameId);
 }
