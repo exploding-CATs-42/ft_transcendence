@@ -6,7 +6,7 @@ import { AuthenticatedRequest } from "../types/auth";
 type AuthenticatedHandler = (
   req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => unknown;
 
 type AuthenticatedRouter = Router & {
