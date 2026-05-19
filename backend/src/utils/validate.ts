@@ -1,5 +1,5 @@
 import { ZodSchema } from "zod";
-import { ValidationError } from "../errors/lobby/validationError";
+import { ValidationError } from "../errors/validationError";
 
 export function validate<T>(schema: ZodSchema<T>, data: unknown): T {
   const parsed = schema.safeParse(data);
