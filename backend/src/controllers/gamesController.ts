@@ -12,7 +12,7 @@ import {
 import { createGameSchema } from "../schemas/games/createGameSchema";
 import { deleteGameParamsSchema } from "../schemas/games/deleteGameSchema";
 
-export function getGamesController(
+export async function getGamesController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -22,7 +22,7 @@ export function getGamesController(
   }
 
   try {
-    const result = getGames();
+    const result = await getGames(req.user.id);
     return res.status(200).json(result);
   } catch (error) {
     if (error instanceof GamesServiceError) {
@@ -32,7 +32,7 @@ export function getGamesController(
   }
 }
 
-export function getGameByIdController(
+export async function getGameByIdController(
   req: Request,
   res: Response,
   next: NextFunction
@@ -51,7 +51,7 @@ export function getGameByIdController(
   }
 
   try {
-    const result = getGameById(parsed.data);
+    const result = await getGameById(req.user.id, parsed.data);
     return res.status(200).json(result);
   } catch (error) {
     if (error instanceof GamesServiceError) {
@@ -80,7 +80,7 @@ export async function createGameController(
   }
 
   try {
-    const result = await createGame(parsed.data);
+    const result = await createGame(req.user.id, parsed.data);
     return res.status(201).json(result);
   } catch (error) {
     if (error instanceof GamesServiceError) {
@@ -109,7 +109,7 @@ export async function deleteGameController(
   }
 
   try {
-    const result = deleteGame(parsed.data);
+    const result = await deleteGame(req.user.id, parsed.data);
     return res.status(201).json(result);
   } catch (error) {
     if (error instanceof GamesServiceError) {
