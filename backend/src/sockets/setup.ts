@@ -1,6 +1,7 @@
 import { Server, Socket } from "socket.io";
 import { registerChatHandlers } from "./chat";
 import { authMiddleware } from "../middlewares/sockets/authMiddleware";
+import { lobbyGameHandlers } from "./game";
 
 export const initSockets = (io: Server) => {
   io.use(authMiddleware);
@@ -10,6 +11,7 @@ export const initSockets = (io: Server) => {
 
     // Register feature-specific handlers
     registerChatHandlers(io, socket);
+    lobbyGameHandlers(io, socket);
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
