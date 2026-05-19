@@ -6,6 +6,7 @@ import {
   DeleteGameParams,
   GetGameByIdParams,
   JoinGameParams,
+  LeaveGameParams,
 } from "../schemas/games";
 
 import { GameState, Player, UserId } from "../types";
@@ -93,4 +94,33 @@ export async function joinGame(
 
   game.players.push(playerToJoin);
   return `Player ${user.username} [${user.id}] joined the game ${game.name} [${game.gameId}].`;
+}
+
+export async function leaveGame(
+  input: LeaveGameParams,
+  currentUserId: string,
+): Promise<string> {
+  const user = await ensureUserExists(currentUserId);
+
+  const game = ensureGameExists(input.gameId);
+
+  const indexOf = game.players.findIndex((p) => {
+    return p.playerId === user.id;
+  });
+
+  if (indexOf === -1) {
+    throw new ApiError("Player is not in the game", 409);
+  }
+
+  game.players.splice(indexOf, 1);
+
+  if (game.players.length == 0) {
+    GameStore.deleteGameById(input.gameId);
+    return (
+      `Player ${user.username} [${user.id}] left the game ${game.name} [${game.gameId}].\n` +
+      `Game is empty, removing.`
+    );
+  }
+
+  return `Player ${user.username}[${user.id}] left the game ${game.name} [${game.gameId}].`;
 }
