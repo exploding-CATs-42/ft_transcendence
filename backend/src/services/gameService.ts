@@ -3,12 +3,7 @@ import { prisma } from "../lib/prisma";
 import { CreateGameRequestBody } from "../schemas/games/createGameSchema";
 import { DeleteGameParams } from "../schemas/games/deleteGameSchema";
 import { GetGameByIdParams } from "../schemas/games/getGameByIdSchema";
-import {
-  DEFAULT_GAME_STATE,
-  DEFAULT_PLAYER,
-  GameState,
-  Player
-} from "../types/game";
+import { DEFAULT_GAME_STATE, GameState } from "../types/game";
 import {
   deleteGameById,
   getAllGames,
@@ -53,20 +48,14 @@ export async function createGame(
   userId: string,
   input: CreateGameRequestBody
 ): Promise<GameState> {
-  const user = await ensureUserExists(userId);
-
-  const createdBy: Player = {
-    ...DEFAULT_PLAYER,
-    playerId: user.id,
-    displayName: user.username
-  };
+  await ensureUserExists(userId);
 
   const gameId = crypto.randomUUID();
 
   const game: GameState = {
     ...DEFAULT_GAME_STATE,
     gameId: gameId,
-    players: [createdBy],
+    players: [],
     name: input.gameName,
     maxPlayers: input.maxPlayers
   };
