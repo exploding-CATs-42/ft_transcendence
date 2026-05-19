@@ -15,7 +15,7 @@ export const setupRouting = (app: Express) => {
   app.use("/users", usersRouter);
   app.use("/me", meRouter);
   app.use("/me/friends", friendsRouter);
-  app.use("/lobby", gamesRouter);
+  app.use("/games", gamesRouter);
 
   app.use((_, res) => {
     res.status(404).json({ message: "Route not found" });

@@ -10,8 +10,6 @@ export const errorMiddleware: ErrorRequestHandler = (error, _, res, __) => {
     return;
   }
 
-  console.error(error);
-
   res.status(500).json({
     message: "Internal server error"
   });
