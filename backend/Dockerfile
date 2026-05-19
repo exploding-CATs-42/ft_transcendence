@@ -7,7 +7,7 @@ FROM base AS dev
 # Code + node_modules come via volumes.
 # On first run: installs deps, generates prisma client, then starts dev server.
 # On subsequent runs: pnpm install is near-instant, prisma generate is fast.
-CMD ["sh", "-c", "pnpm install --frozen-lockfile && pnpm --filter backend prisma:generate && pnpm --filter backend prisma migrate deploy && pnpm --filter backend dev"]
+CMD ["sh", "-c", "pnpm install --frozen-lockfile && pnpm --filter backend prisma:generate && pnpm --filter backend prisma:migrate && pnpm --filter backend dev"]
 
 ################## BUILD ##############################################
 FROM base AS build
@@ -17,7 +17,7 @@ COPY backend/package.json ./backend/
 RUN pnpm install --frozen-lockfile
 
 COPY backend/ ./backend/
-RUN pnpm --filter backend prisma:generate && pnpm --filter backend build
+RUN pnpm --filter backend prisma:generate && pnpm --filter backend prisma:deploy && pnpm --filter backend build
 
 ################## PRODUCTION #########################################
 FROM node:24-alpine AS runner
