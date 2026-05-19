@@ -4,11 +4,13 @@ import z from "zod";
 import { getGameByIdParamsSchema } from "../schemas/games/getGameByIdSchema";
 import {
   createGame,
+  deleteGame,
   GamesServiceError,
   getGameById,
   getGames
 } from "../services/gameService";
 import { createGameSchema } from "../schemas/games/createGameSchema";
+import { deleteGameParamsSchema } from "../schemas/games/deleteGameSchema";
 
 export function getGamesController(
   req: Request,
@@ -79,6 +81,35 @@ export async function createGameController(
 
   try {
     const result = await createGame(parsed.data);
+    return res.status(201).json(result);
+  } catch (error) {
+    if (error instanceof GamesServiceError) {
+      return res.status(error.statusCode).json({ message: error.message });
+    }
+    return next(error);
+  }
+}
+
+export async function deleteGameController(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  const parsed = deleteGameParamsSchema.safeParse(req.params);
+
+  if (!parsed.success) {
+    return res.status(400).json({
+      message: "Validation error",
+      errors: z.treeifyError(parsed.error)
+    });
+  }
+
+  if (!req.user) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
+  try {
+    const result = deleteGame(parsed.data);
     return res.status(201).json(result);
   } catch (error) {
     if (error instanceof GamesServiceError) {

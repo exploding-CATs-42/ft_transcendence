@@ -46,5 +46,6 @@ export function setGame(game: GameState): void {
 }
 
 export function deleteGameById(gameId: string): void {
+  assertInitialized();
   games.delete(gameId);
 }
