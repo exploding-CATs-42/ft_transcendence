@@ -1,4 +1,4 @@
-import { ApiError } from "../errors/lobby/apiError";
+import { ApiError } from "../errors/apiError";
 import { prisma } from "../lib/prisma";
 import { CreateGameRequestBody } from "../schemas/games/createGameSchema";
 import { DeleteGameParams } from "../schemas/games/deleteGameSchema";
