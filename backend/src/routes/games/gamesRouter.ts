@@ -2,7 +2,7 @@ import {
   createGameController,
   deleteGameController,
   getGameByIdController,
-  getGamesController
+  getGamesController,
 } from "../../controllers/gamesController";
 import { errorMiddleware } from "../../middlewares/games/ErrorRequestMiddleware";
 import { asyncHandler } from "../../utils/asyncHandler";

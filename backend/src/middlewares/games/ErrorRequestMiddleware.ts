@@ -5,12 +5,12 @@ export const errorMiddleware: ErrorRequestHandler = (error, _, res, __) => {
   if (error instanceof ApiError) {
     res.status(error.statusCode).json({
       message: error.message,
-      details: error.details
+      details: error.details,
     });
     return;
   }
 
   res.status(500).json({
-    message: "Internal server error"
+    message: "Internal server error",
   });
 };

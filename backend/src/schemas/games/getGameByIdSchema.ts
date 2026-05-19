@@ -3,7 +3,7 @@ import { gameId } from "./ids.schema";
 
 export const getGameByIdParamsSchema = z
   .object({
-    gameId
+    gameId,
   })
   .strict();
 

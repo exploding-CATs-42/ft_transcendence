@@ -8,13 +8,13 @@ import {
   deleteGameById,
   getAllGames,
   getGame,
-  setGame
+  setGame,
 } from "../utils/gameStore";
 
 export async function ensureUserExists(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, username: true }
+    select: { id: true, username: true },
   });
 
   if (!user) {
@@ -31,7 +31,7 @@ export async function getGames(userId: string): Promise<GameState[]> {
 
 export async function getGameById(
   userId: string,
-  input: GetGameByIdParams
+  input: GetGameByIdParams,
 ): Promise<GameState> {
   await ensureUserExists(userId);
 
@@ -46,7 +46,7 @@ export async function getGameById(
 
 export async function createGame(
   userId: string,
-  input: CreateGameRequestBody
+  input: CreateGameRequestBody,
 ): Promise<GameState> {
   await ensureUserExists(userId);
 
@@ -57,7 +57,7 @@ export async function createGame(
     gameId: gameId,
     players: [],
     name: input.gameName,
-    maxPlayers: input.maxPlayers
+    maxPlayers: input.maxPlayers,
   };
 
   setGame(game);

@@ -4,7 +4,7 @@ import {
   createGame,
   deleteGame,
   getGameById,
-  getGames
+  getGames,
 } from "../services/gameService";
 
 import { getGameByIdParamsSchema } from "../schemas/games/getGameByIdSchema";
@@ -15,14 +15,14 @@ import { validate } from "../utils/validate";
 
 type AsyncController = (
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) => Promise<void>;
 
 export function asyncHandler(controller: AsyncController) {
   return (
     req: AuthenticatedRequest,
     res: Response,
-    next: NextFunction
+    next: NextFunction,
   ): void => {
     controller(req, res).catch(next);
   };
@@ -30,7 +30,7 @@ export function asyncHandler(controller: AsyncController) {
 
 export async function getGamesController(
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) {
   const result = await getGames(req.user.id);
   res.status(200).json(result);
@@ -38,7 +38,7 @@ export async function getGamesController(
 
 export async function getGameByIdController(
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) {
   const parsed = validate(getGameByIdParamsSchema, req.params);
 
@@ -48,7 +48,7 @@ export async function getGameByIdController(
 
 export async function createGameController(
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) {
   const parsed = validate(createGameSchema, req.body);
 
@@ -58,7 +58,7 @@ export async function createGameController(
 
 export async function deleteGameController(
   req: AuthenticatedRequest,
-  res: Response
+  res: Response,
 ) {
   const parsed = validate(deleteGameParamsSchema, req.params);
 

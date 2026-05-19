@@ -60,12 +60,12 @@ export const DEFAULT_GAME_RULES: GameRules = {
   minPlayers: 2,
   maxPlayers: 5,
   fasterVariantRemoveFraction: 0.3,
-  nopeWindowMs: 5000
+  nopeWindowMs: 5000,
 };
 
 export const DEFAULT_DECK: Deck = {
   drawPile: [],
-  discardPile: []
+  discardPile: [],
 };
 
 export const DEFAULT_PLAYER: Player = {
@@ -73,7 +73,7 @@ export const DEFAULT_PLAYER: Player = {
   displayName: "",
   hand: [],
   isAlive: true,
-  turnOrder: 0
+  turnOrder: 0,
 };
 
 export const DEFAULT_GAME_STATE: GameState = {
@@ -88,5 +88,5 @@ export const DEFAULT_GAME_STATE: GameState = {
   rules: DEFAULT_GAME_RULES,
   createdAt: Date.now(),
   startedAt: null,
-  finishedAt: null
+  finishedAt: null,
 };
