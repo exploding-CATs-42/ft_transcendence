@@ -1,5 +1,4 @@
 import type { Request, Response, NextFunction } from "express";
-import z from "zod";
 
 import { getGameByIdParamsSchema } from "../schemas/games/getGameByIdSchema";
 import {
@@ -42,7 +41,7 @@ export async function getGameByIdController(
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: z.treeifyError(parsed.error)
+      errors: parsed.error.flatten()
     });
   }
 
@@ -71,7 +70,7 @@ export async function createGameController(
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: z.treeifyError(parsed.error)
+      errors: parsed.error.flatten()
     });
   }
 
@@ -100,7 +99,7 @@ export async function deleteGameController(
   if (!parsed.success) {
     return res.status(400).json({
       message: "Validation error",
-      errors: z.treeifyError(parsed.error)
+      errors: parsed.error.flatten()
     });
   }
 
