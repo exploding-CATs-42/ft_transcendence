@@ -31,20 +31,22 @@ export interface Deck {
 export interface Player {
   playerId: string;
   displayName: string;
-  hand: CardInstance[];
-  isAlive: boolean;
-  turnOrder: number;
+  hand?: CardInstance[];
+  isAlive?: boolean;
+  turnOrder?: number;
 }
 
 export interface GameState {
   gameId: GameId;
   status: GameStatus;
+  name: string;
+  max_players: number;
   players: Player[];
-  deck: Deck;
-  turn: TurnState;
-  winnerId: string | null;
-  rules: GameRules;
+  deck?: Deck;
+  turn?: TurnState;
+  winnerId?: string | null;
+  rules?: GameRules;
   createdAt: number;
-  startedAt: number | null;
-  finishedAt: number | null;
+  startedAt?: number | null;
+  finishedAt?: number | null;
 }
