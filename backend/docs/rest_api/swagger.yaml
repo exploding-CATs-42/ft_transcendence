@@ -18,6 +18,8 @@ tags:
     description: Current authenticated user profile
   - name: Friends
     description: Friendship management for the current authenticated user
+  - name: Games
+    description: Games in lobby management
 
 paths:
   /users/register:
@@ -40,6 +42,10 @@ paths:
     $ref: "friends/friends.yaml#/paths/~1me~1friends"
   /me/friends/{userId}:
     $ref: "friends/friends.yaml#/paths/~1me~1friends~1{userId}"
+  /games:
+    $ref: "games/games.yaml#/paths/~1games"
+  /games/{gameId}:
+    $ref: "games/games.yaml#/paths/~1games~1{gameId}"
 
 components:
   securitySchemes:
@@ -90,6 +96,20 @@ components:
       $ref: "friends/friends.schemas.yaml#/components/schemas/UpdateFriendshipRequest"
     DeleteFriendshipRequest:
       $ref: "friends/friends.schemas.yaml#/components/schemas/DeleteFriendshipRequest"
+    Player:
+      $ref: "games/games.schemas.yaml#/components/schemas/Player"
+    GameStatus:
+      $ref: "games/games.schemas.yaml#/components/schemas/GameStatus"
+    Game:
+      $ref: "games/games.schemas.yaml#/components/schemas/Game"
+    CreateGameRequest:
+      $ref: "games/games.schemas.yaml#/components/schemas/CreateGameRequest"
+    GameResponse:
+      $ref: "games/games.schemas.yaml#/components/schemas/GameResponse"
+    GamesResponse:
+      $ref: "games/games.schemas.yaml#/components/schemas/GamesResponse"
+    DeleteGameResponse:
+      $ref: "games/games.schemas.yaml#/components/schemas/DeleteGameResponse"
     MessageResponse:
       $ref: "friends/friends.schemas.yaml#/components/schemas/MessageResponse"
     ApiErrorResponse:

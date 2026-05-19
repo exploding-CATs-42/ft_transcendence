@@ -1,0 +1,100 @@
+components:
+  schemas:
+    Player:
+      type: object
+      required:
+        - playerId
+        - displayName
+      properties:
+        playerId:
+          type: string
+          format: uuid
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+        displayName:
+          type: string
+          example: alexfox
+
+    GameStatus:
+      type: string
+      enum:
+        - LOBBY
+        - PLAYING
+        - FINISHED
+      example: LOBBY
+
+    Game:
+      type: object
+      required:
+        - gameId
+        - name
+        - status
+        - players
+        - max_players
+        - createdAt
+      properties:
+        gameId:
+          type: string
+          format: uuid
+          example: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
+        name:
+          type: string
+          example: Friday Night Table
+        status:
+          $ref: "#/components/schemas/GameStatus"
+        players:
+          type: array
+          items:
+            $ref: "#/components/schemas/Player"
+        max_players:
+          type: integer
+          minimum: 2
+          maximum: 5
+          example: 4
+        createdAt:
+          type: integer
+          format: int64
+          example: 1777363200000
+
+    CreateGameRequest:
+      type: object
+      required:
+        - gameName
+        - playersAmount
+      properties:
+        gameName:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: Friday Night Table
+        playersAmount:
+          type: integer
+          minimum: 2
+          maximum: 5
+          example: 4
+
+    GameResponse:
+      type: object
+      required:
+        - game
+      properties:
+        game:
+          $ref: "#/components/schemas/Game"
+
+    GamesResponse:
+      type: object
+      required:
+        - games
+      properties:
+        games:
+          type: array
+          items:
+            $ref: "#/components/schemas/Game"
+
+    DeleteGameResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Game deleted successfully
