@@ -1,5 +1,6 @@
 import { DEFAULT_GAME_STATE, DEFAULT_PLAYER } from "../constants/game";
 import { ApiError } from "../errors/apiError";
+import { SocketError } from "../errors/socketError";
 
 import {
   CreateGameRequestBody,
@@ -81,7 +82,7 @@ export async function joinGame(
   const game = ensureGameExists(input.gameId);
 
   if (game.players.length >= game.maxPlayers) {
-    throw new ApiError("Game is full", 409);
+    throw new SocketError("Game is full");
   }
 
   const alreadyJoined = game.players.some((p) => {
@@ -89,7 +90,7 @@ export async function joinGame(
   });
 
   if (alreadyJoined) {
-    throw new ApiError("Player is already in game", 409);
+    throw new SocketError("Player is already in game");
   }
 
   game.players.push(playerToJoin);
@@ -109,7 +110,7 @@ export async function leaveGame(
   });
 
   if (indexOf === -1) {
-    throw new ApiError("Player is not in the game", 409);
+    throw new SocketError("Player is not in the game");
   }
 
   game.players.splice(indexOf, 1);
