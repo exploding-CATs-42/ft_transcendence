@@ -16,12 +16,7 @@ type AuthenticatedRouter = Router & {
   delete(path: string, handler: AuthenticatedHandler): void;
 };
 
-export function createAuthenticatedRouter(): AuthenticatedRouter & {
-  get(path: string, handler: AuthenticatedHandler): void;
-  post(path: string, handler: AuthenticatedHandler): void;
-  patch(path: string, handler: AuthenticatedHandler): void;
-  delete(path: string, handler: AuthenticatedHandler): void;
-} {
+export function createAuthenticatedRouter(): AuthenticatedRouter {
   const router = express.Router();
   router.use(authMiddleware);
   return router as AuthenticatedRouter;
