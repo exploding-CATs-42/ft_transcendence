@@ -1,5 +1,4 @@
 import {
-  asyncHandler,
   createGameController,
   deleteGameController,
   getGameByIdController,
@@ -7,6 +6,7 @@ import {
 } from "../../controllers/gamesController";
 import { authMiddleware } from "../../middlewares/authMiddleware";
 import { errorMiddleware } from "../../middlewares/lobby/ErrorRequestMiddleware";
+import { asyncHandler } from "../../utils/asyncHandler";
 import { createAuthenticatedRouter } from "./createAuthenticatedRouter";
 
 export const lobbyRouter = createAuthenticatedRouter();
