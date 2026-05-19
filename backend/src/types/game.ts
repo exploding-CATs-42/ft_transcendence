@@ -40,7 +40,7 @@ export interface GameState {
   gameId: GameId;
   status: GameStatus;
   name: string;
-  max_players: number;
+  maxPlayers: number;
   players: Player[];
   deck?: Deck;
   turn?: TurnState;
