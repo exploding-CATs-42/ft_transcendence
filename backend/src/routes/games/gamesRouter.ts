@@ -8,11 +8,11 @@ import { errorMiddleware } from "../../middlewares/lobby/ErrorRequestMiddleware"
 import { asyncHandler } from "../../utils/asyncHandler";
 import { createAuthenticatedRouter } from "./createAuthenticatedRouter";
 
-export const lobbyRouter = createAuthenticatedRouter();
+export const gamesRouter = createAuthenticatedRouter();
 
-lobbyRouter.get("/", asyncHandler(getGamesController));
-lobbyRouter.get("/:gameId", asyncHandler(getGameByIdController));
-lobbyRouter.post("/", asyncHandler(createGameController));
-lobbyRouter.delete("/:gameId", asyncHandler(deleteGameController));
+gamesRouter.get("/", asyncHandler(getGamesController));
+gamesRouter.get("/:gameId", asyncHandler(getGameByIdController));
+gamesRouter.post("/", asyncHandler(createGameController));
+gamesRouter.delete("/:gameId", asyncHandler(deleteGameController));
 
-lobbyRouter.use(errorMiddleware);
+gamesRouter.use(errorMiddleware);
