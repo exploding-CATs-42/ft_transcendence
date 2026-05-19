@@ -3,7 +3,12 @@ import { prisma } from "../lib/prisma";
 import { CreateGameRequestBody } from "../schemas/games/createGameSchema";
 import { DeleteGameParams } from "../schemas/games/deleteGameSchema";
 import { GetGameByIdParams } from "../schemas/games/getGameByIdSchema";
-import { GameState, GameStatus, Player } from "../types/game";
+import {
+  DEFAULT_GAME_STATE,
+  DEFAULT_PLAYER,
+  GameState,
+  Player
+} from "../types/game";
 import {
   deleteGameById,
   getAllGames,
@@ -23,17 +28,17 @@ export async function ensureUserExists(userId: string) {
   return user;
 }
 
-export async function getGames(currentUserId: string): Promise<GameState[]> {
-  await ensureUserExists(currentUserId);
+export async function getGames(userId: string): Promise<GameState[]> {
+  await ensureUserExists(userId);
 
   return getAllGames();
 }
 
 export async function getGameById(
-  currentUserId: string,
+  userId: string,
   input: GetGameByIdParams
 ): Promise<GameState> {
-  await ensureUserExists(currentUserId);
+  await ensureUserExists(userId);
 
   const game = getGame(input.gameId);
 
@@ -45,35 +50,33 @@ export async function getGameById(
 }
 
 export async function createGame(
-  currentUserId: string,
+  userId: string,
   input: CreateGameRequestBody
 ): Promise<GameState> {
-  const user = await ensureUserExists(currentUserId);
-
-  const gameId = crypto.randomUUID();
+  const user = await ensureUserExists(userId);
 
   const createdBy: Player = {
+    ...DEFAULT_PLAYER,
     playerId: user.id,
     displayName: user.username
   };
 
+  const gameId = crypto.randomUUID();
+
   const game: GameState = {
-    gameId,
-    name: input.gameName,
-    status: GameStatus.LOBBY,
+    ...DEFAULT_GAME_STATE,
+    gameId: gameId,
     players: [createdBy],
-    maxPlayers: input.maxPlayers,
-    createdAt: Date.now()
+    name: input.gameName,
+    maxPlayers: input.maxPlayers
   };
+
   setGame(game);
   return game;
 }
 
-export async function deleteGame(
-  currentUserId: string,
-  input: DeleteGameParams
-) {
-  await ensureUserExists(currentUserId);
+export async function deleteGame(userId: string, input: DeleteGameParams) {
+  await ensureUserExists(userId);
   const game = getGame(input.gameId);
 
   if (!game) {
