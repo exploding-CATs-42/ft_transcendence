@@ -1,7 +1,7 @@
 import type { NextFunction, Response, Router } from "express";
 import express from "express";
-import { authMiddleware } from "../../middlewares/authMiddleware";
-import { AuthenticatedRequest } from "../../types/auth";
+import { authMiddleware } from "../middlewares/authMiddleware";
+import { AuthenticatedRequest } from "../types/auth";
 
 type AuthenticatedHandler = (
   req: AuthenticatedRequest,
