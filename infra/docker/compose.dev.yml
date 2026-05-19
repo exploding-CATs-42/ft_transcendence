@@ -10,6 +10,7 @@ services:
       backend:
         condition: service_healthy
       frontend:
+        condition: service_healthy
     networks:
       - transcendence_net
 
@@ -55,6 +56,12 @@ services:
       - frontend_node_modules:/app/frontend/node_modules
     networks:
       - transcendence_net
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:5173/"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 15s
 
   postgres:
     image: postgres:16-alpine
