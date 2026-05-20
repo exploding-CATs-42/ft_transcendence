@@ -13,7 +13,7 @@ const Logo = () => {
     (max-width: 1439px) 51px,
     (max-width: 1919px) 70px,
     80px"
-      alt="Exploding logo hugs Earth"
+      alt="C.A.T. logo"
     />
   );
 };
