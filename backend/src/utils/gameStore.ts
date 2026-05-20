@@ -49,3 +49,10 @@ export function deleteGameById(gameId: string): void {
   assertInitialized();
   games.delete(gameId);
 }
+
+export default {
+  getGame,
+  getAllGames,
+  setGame,
+  deleteGameById,
+};
