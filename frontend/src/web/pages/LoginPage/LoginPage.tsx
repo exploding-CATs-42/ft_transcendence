@@ -1,7 +1,6 @@
 // Libraries
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
 import { AxiosError } from "axios";
 // Project level
 import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
@@ -14,7 +13,6 @@ import s from "./LoginPage.module.css";
 
 const LoginPage = () => {
   const { setAccessToken } = useAuth();
-  const navigate = useNavigate();
 
   const {
     register,
@@ -28,7 +26,6 @@ const LoginPage = () => {
       const { accessToken } = await api.users.login(data);
       setAccessToken(accessToken);
       toast.success("Success");
-      navigate("/lobby");
     } catch (error) {
       const err = error as AxiosError<
         BadRequestErrorResponse<keyof LoginSchema>
