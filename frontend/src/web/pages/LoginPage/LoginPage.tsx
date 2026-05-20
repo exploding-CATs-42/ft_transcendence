@@ -8,10 +8,12 @@ import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
 import type { LoginSchema } from "schemas";
 import api from "api";
 import type { BadRequestErrorResponse } from "types";
+import { useAuth } from "hooks";
 // Local level
 import s from "./LoginPage.module.css";
 
 const LoginPage = () => {
+  const { setAccessToken } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -23,7 +25,8 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
-      await api.users.login(data);
+      const { accessToken } = await api.users.login(data);
+      setAccessToken(accessToken);
       toast.success("Success");
       navigate("/lobby");
     } catch (error) {
