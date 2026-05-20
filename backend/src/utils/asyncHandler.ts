@@ -1,6 +1,10 @@
 import { NextFunction, Response } from "express";
 import { AuthenticatedRequest } from "../types/auth";
+import { ZodSchema } from "zod";
 import { Socket } from "socket.io";
+import { validate } from "./validate";
+import { SocketError } from "../errors/socketError";
+import { ValidationError } from "../errors/validationError";
 
 export type AsyncController = (
   req: AuthenticatedRequest,
@@ -17,20 +21,41 @@ export function asyncHandler(controller: AsyncController) {
   };
 }
 
-export type SocketHandler = (data: unknown) => Promise<void>;
+export type SocketHandler<T> = (parsed: T) => Promise<void>;
 
-export async function withErrorHandler(
+export function withErrorHandler<T>(
+  schema: ZodSchema<T>,
   socket: Socket,
   errorEvent: string,
-  event: SocketHandler,
+  event: SocketHandler<T>,
 ) {
   return async (data: unknown): Promise<void> => {
     try {
-      await event(data);
+      const parsed: T = validate(schema, data);
+
+      await event(parsed);
     } catch (error) {
+      console.error("Socket error: ", error);
+
+      if (error instanceof SocketError || error instanceof ValidationError) {
+        socket.emit(errorEvent, {
+          message: error.message,
+          details: error.details,
+        });
+
+        return;
+      }
+
+      if (error instanceof Error) {
+        socket.emit(errorEvent, {
+          message: error.message,
+        });
+
+        return;
+      }
+
       socket.emit(errorEvent, {
-        message:
-          error instanceof Error ? error.message : "An unknown error occurred",
+        message: "Unknown socket error",
       });
     }
   };
