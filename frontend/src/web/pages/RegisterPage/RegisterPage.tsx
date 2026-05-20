@@ -49,46 +49,50 @@ const RegisterPage = () => {
     <div className={s.backgroundContainer}>
       <div className={s.blur} />
       <div className={s.pageContainer}>
-        <h1 className={s.title}>
-          Exploding <span className={s.kittensSpan}>kittens</span>
-        </h1>
-        <div className={s.formBackground}>
-          <AuthForm
-            title="Sign up"
-            redirectMessage="Already have an account?"
-            redirectTitle="Sign in"
-            redirectLink="/login"
-            onSubmit={handleSubmit(onSubmit)}
-            disabled={isSubmitting}
-          >
-            <FormField error={errors.email?.message}>
-              <EmailInput
-                {...register("email")}
-                status={errors.email ? "error" : "normal"}
-                autoFocus
-              />
-            </FormField>
-            <FormField error={errors.username?.message}>
-              <NameInput
-                {...register("username")}
-                status={errors.username ? "error" : "normal"}
-                placeholder="Username"
-              />
-            </FormField>
-            <FormField error={errors.password?.message}>
-              <PasswordInput
-                {...register("password")}
-                status={errors.password ? "error" : "normal"}
-              />
-            </FormField>
-            <FormField error={errors.passwordConfirm?.message}>
-              <PasswordInput
-                {...register("passwordConfirm")}
-                status={errors.passwordConfirm ? "error" : "normal"}
-                placeholder="Password confirmation"
-              />
-            </FormField>
-          </AuthForm>
+        <div className={s.rightSection}>
+          <h1 className={s.title}>
+            Exploding <span className={s.kittensSpan}>kittens</span>
+          </h1>
+        </div>
+        <div className={s.leftSection}>
+          <div className={s.formBackground}>
+            <AuthForm
+              title="Sign up"
+              redirectMessage="Already have an account?"
+              redirectTitle="Sign in"
+              redirectLink="/login"
+              onSubmit={handleSubmit(onSubmit)}
+              disabled={isSubmitting}
+            >
+              <FormField error={errors.email?.message}>
+                <EmailInput
+                  {...register("email")}
+                  status={errors.email ? "error" : "normal"}
+                  autoFocus
+                />
+              </FormField>
+              <FormField error={errors.username?.message}>
+                <NameInput
+                  {...register("username")}
+                  status={errors.username ? "error" : "normal"}
+                  placeholder="Username"
+                />
+              </FormField>
+              <FormField error={errors.password?.message}>
+                <PasswordInput
+                  {...register("password")}
+                  status={errors.password ? "error" : "normal"}
+                />
+              </FormField>
+              <FormField error={errors.passwordConfirm?.message}>
+                <PasswordInput
+                  {...register("passwordConfirm")}
+                  status={errors.passwordConfirm ? "error" : "normal"}
+                  placeholder="Password confirmation"
+                />
+              </FormField>
+            </AuthForm>
+          </div>
         </div>
       </div>
     </div>
