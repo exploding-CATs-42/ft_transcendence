@@ -1,7 +1,6 @@
 // Libraries
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 // Project level
 import {
@@ -19,7 +18,6 @@ import s from "./RegisterPage.module.css";
 
 const RegisterPage = () => {
   const { setAccessToken } = useAuth();
-  const navigate = useNavigate();
 
   const {
     register,
@@ -39,7 +37,6 @@ const RegisterPage = () => {
         password: data.password,
       });
       setAccessToken(accessToken);
-      navigate("/lobby");
     } catch (error) {
       toast.error((error as Error).message, { autoClose: 5000 });
     }
