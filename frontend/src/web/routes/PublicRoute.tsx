@@ -1,18 +1,18 @@
-// import { Navigate, useLocation } from "react-router-dom";
-// import { ReactNode } from "react";
+// Libraries
+import { Navigate, useLocation } from "react-router-dom";
+import type { ReactNode } from "react";
+// Project level
+import { useAuth } from "hooks";
 
-// import { useAppSelector } from "../hooks";
-// import { selectIsLoggedIn } from "../redux";
+interface Props {
+  children: ReactNode;
+}
 
-// interface Props {
-//   children: ReactNode;
-// }
+export const PublicRoute = ({ children }: Props) => {
+  const { accessToken: isLoggedIn } = useAuth();
+  const location = useLocation();
 
-// export const PublicRoute = ({ children }: Props) => {
-//   const isLoggedIn = useAppSelector(selectIsLoggedIn);
-//   const location = useLocation();
+  return isLoggedIn ? <Navigate to={location.state?.from || "/"} /> : children;
+};
 
-//   return isLoggedIn ? <Navigate to={location.state?.from || "/"} /> : children;
-// };
-
-// export default PublicRoute;
+export default PublicRoute;
