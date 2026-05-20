@@ -20,7 +20,7 @@ const NotFoundPage = () => {
       <h1 className="visually-hidden">Not Found</h1>
       <div className={s.notFoundContainer}>
         <span className={s.leftFour}>4</span>
-        <img className={s.catomicBomb} src={CatomicBomb} alt="Catomic bomb" />
+        <img className={s.catomicBomb} src={CatomicBomb} alt="0" />
         <span className={s.rightFour}>4</span>
       </div>
       <p className={s.jokingMessage}>
