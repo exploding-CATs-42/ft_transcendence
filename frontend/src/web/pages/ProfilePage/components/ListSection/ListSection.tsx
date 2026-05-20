@@ -32,13 +32,19 @@ const ListSection = ({ matches, friends }: Props) => {
       />
 
       {activeTab === "friends" ? (
-        <List
-          items={friends}
-          getKey={(friend) => friend.id}
-          renderItem={(friend) => <FriendListItem friend={friend} />}
-          className={s.list}
-          empty="No friends yet"
-        />
+        <>
+          <List
+            items={friends}
+            getKey={(friend) => friend.id}
+            renderItem={(friend) => <FriendListItem friend={friend} />}
+            className={s.list}
+            empty="No friends yet"
+          />
+          <div className={s.footer}>
+            <SearchInput />
+            <Button className={s.button}>Add</Button>
+          </div>
+        </>
       ) : (
         <List
           items={matches}
@@ -48,11 +54,6 @@ const ListSection = ({ matches, friends }: Props) => {
           empty="No matches yet"
         />
       )}
-
-      <div className={s.footer}>
-        <SearchInput />
-        <Button className={s.button}>Add</Button>
-      </div>
     </Section>
   );
 };
