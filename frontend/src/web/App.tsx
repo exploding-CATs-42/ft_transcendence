@@ -2,7 +2,7 @@
 import { Route, Routes } from "react-router-dom";
 import { lazy } from "react";
 // Project level
-// import { PrivateRoute, PublicRoute } from "routes";
+import { PrivateRoute, AuthRoute } from "routes";
 import { Layout } from "components";
 // Local level
 import "./styles/global.css";
@@ -21,14 +21,25 @@ function App() {
   return (
     <Routes>
       <Route path="/" element={<Layout />}>
+        {/* Public routes */}
         <Route index element={<HomePage />} />
-        <Route path="profile" element={<ProfilePage />} />
-        <Route path="lobby" element={<LobbyPage />} />
-        <Route path="game" element={<GamePage />} />
-        <Route path="login" element={<LoginPage />} />
-        <Route path="register" element={<RegisterPage />} />
-        <Route path="chat" element={<ChatPage />} />
         <Route path="rules" element={<RulesPage />} />
+
+        {/* Login/Register routes */}
+        <Route element={<AuthRoute />}>
+          <Route path="login" element={<LoginPage />} />
+          <Route path="register" element={<RegisterPage />} />
+        </Route>
+
+        {/* Private routes */}
+        <Route element={<PrivateRoute />}>
+          <Route path="profile" element={<ProfilePage />} />
+          <Route path="lobby" element={<LobbyPage />} />
+          <Route path="game" element={<GamePage />} />
+          <Route path="chat" element={<ChatPage />} />
+        </Route>
+
+        {/* Unknown routes */}
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
