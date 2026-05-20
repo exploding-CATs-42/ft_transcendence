@@ -4,10 +4,10 @@ import { prisma } from "../lib/prisma";
 import { CreateGameRequestBody } from "../schemas/games/createGameSchema";
 import { DeleteGameParams } from "../schemas/games/deleteGameSchema";
 import { GetGameByIdParams } from "../schemas/games/getGameByIdSchema";
-import { GameState } from "../types";
+import { GameState, UserId } from "../types";
 import GameStore from "../utils/gameStore";
 
-export async function ensureUserExists(userId: string) {
+export async function ensureUserExists(userId: UserId) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: { id: true, username: true },
@@ -19,14 +19,14 @@ export async function ensureUserExists(userId: string) {
   return user;
 }
 
-export async function getGames(userId: string): Promise<GameState[]> {
+export async function getGames(userId: UserId): Promise<GameState[]> {
   await ensureUserExists(userId);
 
   return GameStore.getAllGames();
 }
 
 export async function getGameById(
-  userId: string,
+  userId: UserId,
   input: GetGameByIdParams,
 ): Promise<GameState> {
   await ensureUserExists(userId);
@@ -41,7 +41,7 @@ export async function getGameById(
 }
 
 export async function createGame(
-  userId: string,
+  userId: UserId,
   input: CreateGameRequestBody,
 ): Promise<GameState> {
   await ensureUserExists(userId);
@@ -60,7 +60,7 @@ export async function createGame(
   return game;
 }
 
-export async function deleteGame(userId: string, input: DeleteGameParams) {
+export async function deleteGame(userId: UserId, input: DeleteGameParams) {
   await ensureUserExists(userId);
   const game = GameStore.getGame(input.gameId);
 
