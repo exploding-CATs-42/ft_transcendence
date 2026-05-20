@@ -39,7 +39,9 @@
       "constants": ["./src/web/constants/index"],
       "constants/*": ["./src/web/constants/*"],
       "context": ["./src/web/context/index"],
-      "context/*": ["./src/web/context/*"]
+      "context/*": ["./src/web/context/*"],
+      "routes": ["./src/web/routes/index"],
+      "routes/*": ["./src/web/routes/*"]
     }
   },
   "include": ["src"]
