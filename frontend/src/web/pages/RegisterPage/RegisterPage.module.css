@@ -3,17 +3,30 @@
   display: flex;
   flex: 1;
 }
-
 .pageContainer {
   display: flex;
 
-  align-items: center;
-  justify-content: space-around;
-
   margin: 0 auto;
-  padding: 20px;
+  padding: 70px;
 
+  justify-content: center;
   z-index: 2;
+}
+
+.leftSection,
+.rightSection {
+  display: none;
+}
+
+.rightSection {
+  display: flex;
+  align-items: center;
+}
+
+.leftSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
 .title {
@@ -69,7 +82,7 @@
 
 @media only screen and (min-width: 1440px) {
   .pageContainer {
-    min-width: 1240px;
+    min-width: 1440px;
     justify-content: space-between;
   }
 
@@ -94,11 +107,27 @@
   .kittensSpan {
     font-size: 100px;
   }
+
+  .leftSection,
+  .rightSection {
+    flex: 1;
+  }
+
+  .rightSection {
+    display: flex;
+    align-items: center;
+  }
+
+  .leftSection {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 @media only screen and (min-width: 1920px) {
   .pageContainer {
-    min-width: 1720px;
+    min-width: 1920px;
     justify-content: space-between;
   }
 
