@@ -1,18 +1,18 @@
 // Libraries
-import { Navigate, useLocation } from "react-router-dom";
-import type { ReactNode } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 // Project level
 import { useAuth } from "hooks";
 
-interface Props {
-  children: ReactNode;
-}
-
-export const PublicRoute = ({ children }: Props) => {
+const PublicRoute = () => {
   const { accessToken: isLoggedIn } = useAuth();
   const location = useLocation();
+  const from = location.state?.from?.pathname;
 
-  return isLoggedIn ? <Navigate to={location.state?.from || "/"} /> : children;
+  if (isLoggedIn) {
+    return <Navigate to={from || "/lobby"} replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default PublicRoute;
