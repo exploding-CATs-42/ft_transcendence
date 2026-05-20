@@ -10,6 +10,7 @@ export const GameStatus = {
 export type GameStatus = (typeof GameStatus)[keyof typeof GameStatus];
 
 export type GameId = string;
+export type UserId = string;
 
 export interface GameRules {
   dealtCardsPerPlayer: number;
@@ -29,7 +30,7 @@ export interface Deck {
 }
 
 export interface Player {
-  playerId: string;
+  playerId: UserId;
   displayName: string;
   hand: CardInstance[];
   isAlive: boolean;
