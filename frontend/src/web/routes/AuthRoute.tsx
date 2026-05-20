@@ -3,7 +3,7 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 // Project level
 import { useAuth } from "hooks";
 
-const PublicRoute = () => {
+const AuthRoute = () => {
   const { accessToken: isLoggedIn } = useAuth();
   const location = useLocation();
   const from = location.state?.from?.pathname;
@@ -15,4 +15,4 @@ const PublicRoute = () => {
   return <Outlet />;
 };
 
-export default PublicRoute;
+export default AuthRoute;
