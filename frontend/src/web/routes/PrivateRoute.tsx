@@ -1,22 +1,17 @@
 // Libraries
-import { Navigate, useLocation } from "react-router-dom";
-import type { ReactNode } from "react";
+import { Navigate, Outlet, useLocation } from "react-router-dom";
 // Project level
 import { useAuth } from "hooks";
 
-interface Props {
-  children: ReactNode;
-}
-
-const PrivateRoute = ({ children }: Props) => {
+const PrivateRoute = () => {
   const { accessToken: isLoggedIn } = useAuth();
   const location = useLocation();
 
-  return isLoggedIn ? (
-    children
-  ) : (
-    <Navigate state={{ from: location }} to={"/"} />
-  );
+  if (!isLoggedIn) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return <Outlet />;
 };
 
 export default PrivateRoute;
