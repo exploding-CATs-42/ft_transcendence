@@ -1,4 +1,4 @@
-import type { Response, NextFunction } from "express";
+import type { Response } from "express";
 
 import {
   createGame,
@@ -12,21 +12,6 @@ import { createGameSchema } from "../schemas/games/createGameSchema";
 import { deleteGameParamsSchema } from "../schemas/games/deleteGameSchema";
 import { AuthenticatedRequest } from "../types/auth";
 import { validate } from "../utils/validate";
-
-type AsyncController = (
-  req: AuthenticatedRequest,
-  res: Response,
-) => Promise<void>;
-
-export function asyncHandler(controller: AsyncController) {
-  return (
-    req: AuthenticatedRequest,
-    res: Response,
-    next: NextFunction,
-  ): void => {
-    controller(req, res).catch(next);
-  };
-}
 
 export async function getGamesController(
   req: AuthenticatedRequest,
