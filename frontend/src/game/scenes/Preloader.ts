@@ -2,7 +2,7 @@
 import { Scene } from "phaser";
 // Project level
 import { Textures, Scenes } from "game/constants";
-import { avatar, waitingRoomBg } from "game/assets";
+import { avatar, gameRoomBg, waitingRoomBg } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 
 export class Preloader extends Scene {
@@ -20,6 +20,7 @@ export class Preloader extends Scene {
     //  Load the assets for the game - Replace with your own assets
     this.load.image(Textures.waitingRoomBg, waitingRoomBg);
     this.load.image(Textures.avatar, avatar);
+    this.load.image(Textures.gameRoomBg, gameRoomBg);
   }
 
   create() {
