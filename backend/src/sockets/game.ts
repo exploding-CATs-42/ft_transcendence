@@ -3,8 +3,12 @@ import { Socket, Server } from "socket.io";
 // Project level
 import { joinGame, leaveGame } from "../services/gameService";
 import { withErrorHandler } from "../utils/asyncHandler";
-import { joinGameSchema } from "../schemas/games/joinGame";
-import { leaveGameSchema } from "../schemas/games/leaveGame";
+import {
+  JoinGameParams,
+  joinGameSchema,
+  LeaveGameParams,
+  leaveGameSchema,
+} from "../schemas/games";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
@@ -13,7 +17,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       joinGameSchema,
       socket,
       "join-table-error",
-      async (parsed: any) => {
+      async (parsed: JoinGameParams) => {
         const res = await joinGame(parsed, socket.data.sub);
         await socket.join(parsed.gameId);
 
@@ -28,7 +32,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       leaveGameSchema,
       socket,
       "leave-table-error",
-      async (parsed: any) => {
+      async (parsed: LeaveGameParams) => {
         const res = await leaveGame(parsed, socket.data.sub);
         await socket.leave(parsed.gameId);
 
