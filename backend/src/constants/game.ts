@@ -26,8 +26,8 @@ export const DEFAULT_DECK: Deck = {
 };
 
 export const DEFAULT_PLAYER: Player = {
-  playerId: "",
-  displayName: "",
+  id: "",
+  name: "",
   hand: [],
   isAlive: true,
   turnOrder: 0,

@@ -51,8 +51,8 @@ export interface PublicTurnView {
 }
 
 export interface PublicPlayerView {
-  playerId: string;
-  displayName: string;
+  id: string;
+  name: string;
   handSize: number;
   isAlive: boolean;
   turnOrder: number;

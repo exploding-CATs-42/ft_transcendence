@@ -30,8 +30,8 @@ export interface Deck {
 }
 
 export interface Player {
-  playerId: UserId;
-  displayName: string;
+  id: UserId;
+  name: string;
   hand: CardInstance[];
   isAlive: boolean;
   turnOrder: number;
