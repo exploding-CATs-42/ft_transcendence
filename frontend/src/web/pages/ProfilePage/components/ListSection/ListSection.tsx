@@ -23,6 +23,20 @@ const tabs: TabOption[] = [
 const ListSection = ({ matches, friends }: Props) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("matches");
 
+  const sortedFriends = [...friends].sort((a, b) => {
+    // accepted first
+    const statusOrder = {
+      ACCEPTED: 0,
+      PENDING: 1,
+      REJECTED: 2,
+    };
+
+    if (statusOrder[a.status] !== statusOrder[b.status]) {
+      return statusOrder[b.status] - statusOrder[a.status];
+    }
+    return a.user.username.localeCompare(b.user.username);
+  });
+
   return (
     <Section className={s.section}>
       <Tabs
@@ -34,8 +48,8 @@ const ListSection = ({ matches, friends }: Props) => {
       {activeTab === "friends" ? (
         <>
           <List
-            items={friends}
-            getKey={(friend) => friend.id}
+            items={sortedFriends}
+            getKey={(friend) => friend.user.id}
             renderItem={(friend) => <FriendListItem friend={friend} />}
             className={s.list}
             empty="No friends yet"
