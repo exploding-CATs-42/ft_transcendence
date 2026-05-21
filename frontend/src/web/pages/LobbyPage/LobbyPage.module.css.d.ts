@@ -7,10 +7,10 @@ declare const styles: {
   readonly "pageContainer": string;
   readonly "joinModal": string;
   readonly "modalTitle": string;
-  readonly "modalLabel": string;
   readonly "modalInput": string;
-  readonly "modalButtons": string;
-  readonly "modalButton": string;
+  readonly "joinButton": string;
+  readonly "createText": string;
+  readonly "createLink": string;
   readonly "matchButton": string;
 };
 export = styles;
