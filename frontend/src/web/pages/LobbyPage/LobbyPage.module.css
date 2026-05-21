@@ -151,6 +151,17 @@
   }
 }
 
+.matchButton {
+  width: 100%;
+  padding: 0;
+
+  background: none;
+  border: none;
+
+  text-align: left;
+  cursor: pointer;
+}
+
 @media only screen and (min-width: 1920px) {
   .pageContainer {
     --container-inline-padding: 100px;
