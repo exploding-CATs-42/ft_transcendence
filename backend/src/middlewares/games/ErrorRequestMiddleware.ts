@@ -1,5 +1,5 @@
 import { ErrorRequestHandler } from "express";
-import { ApiError } from "../../errors/apiError";
+import { ApiError } from "../../errors";
 
 export const errorMiddleware: ErrorRequestHandler = (error, _, res, __) => {
   if (error instanceof ApiError) {
