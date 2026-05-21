@@ -26,16 +26,19 @@ const FriendListItem = ({ friend }: Props) => {
         <div className={s.leftContent}>
           <Avatar
             variant="friend"
-            src={friend.avatarUrl}
-            alt={`${friend.username} avatar`}
+            src={friend.user.avatarUrl}
+            alt={`${friend.user.username} avatar`}
           />
+
           <div className={s.infoContainer}>
-            <span className={s.username}>{friend.username}</span>
+            <span className={s.username}>{friend.user.username}</span>
+
             <span className={s.status}>
-              {friend.isOnline ? "online" : "offline"}
+              {friend.user.isOnline ? "online" : "offline"}
             </span>
           </div>
         </div>
+
         <div className={s.rightContent}>
           <Button className={s.button}>Accept</Button>
           <Button className={s.button}>Ignore</Button>
