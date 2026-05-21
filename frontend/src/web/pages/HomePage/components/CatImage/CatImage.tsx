@@ -17,7 +17,7 @@ const CatImage = ({ className }: Props) => {
     (max-width: 1439px) 465px,
     (max-width: 1919px) 651px,
     708px"
-      alt="Exploding cat hugs Earth"
+      alt="Screaming cat holds on to Earth on fire"
     />
   );
 };
