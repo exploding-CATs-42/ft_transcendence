@@ -1,5 +1,5 @@
 import { assign, setup } from "xstate";
-import { addPlayer } from "./actions";
+import { addPlayer, removePlayer } from "./actions";
 import { Player } from "./types";
 import { GameEvent } from "./events";
 
@@ -14,6 +14,7 @@ export const gameMachine = setup({
   },
   actions: {
     addPlayer: assign(addPlayer),
+    removePlayer: assign(removePlayer),
   },
 }).createMachine({
   id: "game",
@@ -27,6 +28,9 @@ export const gameMachine = setup({
         START_GAME: "playing",
         JOIN_GAME: {
           actions: "addPlayer",
+        },
+        LEAVE_GAME: {
+          actions: "removePlayer",
         },
       },
     },
