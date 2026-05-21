@@ -7,11 +7,14 @@ import {
   getGames,
 } from "../services/gameService";
 
-import { getGameByIdParamsSchema } from "../schemas/games/getGameByIdSchema";
-import { createGameSchema } from "../schemas/games/createGameSchema";
-import { deleteGameParamsSchema } from "../schemas/games/deleteGameSchema";
 import { AuthenticatedRequest } from "../types/auth";
 import { validate } from "../utils/validate";
+
+import {
+  createGameSchema,
+  deleteGameParamsSchema,
+  getGameByIdParamsSchema,
+} from "../schemas/games";
 
 export async function getGamesController(
   req: AuthenticatedRequest,

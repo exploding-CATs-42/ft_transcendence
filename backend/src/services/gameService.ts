@@ -1,9 +1,14 @@
+import { prisma } from "../lib/prisma";
+
 import { DEFAULT_GAME_STATE } from "../constants/game";
 import { ApiError } from "../errors/apiError";
-import { prisma } from "../lib/prisma";
-import { CreateGameRequestBody } from "../schemas/games/createGameSchema";
-import { DeleteGameParams } from "../schemas/games/deleteGameSchema";
-import { GetGameByIdParams } from "../schemas/games/getGameByIdSchema";
+
+import {
+  CreateGameRequestBody,
+  DeleteGameParams,
+  GetGameByIdParams,
+} from "../schemas/games";
+
 import { GameState, UserId } from "../types";
 import GameStore from "../utils/gameStore";
 
