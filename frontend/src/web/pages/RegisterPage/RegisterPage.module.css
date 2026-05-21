@@ -20,11 +20,6 @@
 
 .rightSection {
   display: flex;
-  align-items: center;
-}
-
-.leftSection {
-  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -89,7 +84,6 @@
   .title {
     display: block;
     font-size: 120px;
-    line-height: 0.8;
     max-width: 718px;
     line-height: 1.1;
     letter-spacing: 10px;
@@ -113,14 +107,8 @@
     flex: 1;
   }
 
-  .rightSection {
-    display: flex;
-    align-items: center;
-  }
-
   .leftSection {
     display: flex;
-    justify-content: center;
     align-items: center;
   }
 }
