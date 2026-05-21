@@ -1,23 +1,25 @@
 // Project level
-import { useModal } from "hooks";
 import { Button, Modal } from "components";
 // Local level
 import s from "./ConfirmPopup.module.css";
 
-const ConfirmPopup = () => {
-  const [isOpenModal, toggleModal] = useModal();
+interface Props {
+  msg?: string;
+  toggleModal: () => void;
+  isOpenModal: boolean;
+  onClick: () => void;
+}
 
+const ConfirmPopup = ({ msg, toggleModal, isOpenModal, onClick }: Props) => {
   return (
     <>
-      <button type="button" onClick={() => toggleModal()}>
-        Open modal
-      </button>
-
       <Modal className={s.modal} isOpen={isOpenModal} toggleModal={toggleModal}>
-        <p className={s.question}>Do you really want to leave?</p>
+        <p className={s.question}>{msg}</p>
         <div className={s.buttonsContainer}>
-          <Button className={s.button}>Yes</Button>
-          <Button className={s.button} onClick={() => toggleModal()}>
+          <Button className={s.button} onClick={onClick}>
+            Yes
+          </Button>
+          <Button className={s.button} onClick={toggleModal}>
             No
           </Button>
         </div>
