@@ -1,8 +1,8 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { Scenes } from "game/constants";
-import { EventBus } from "game/utils";
+import { Scenes, Textures } from "game/constants";
+import { EventBus, addBackgroundImage } from "game/utils";
 
 export class GameRoom extends Scene {
   constructor() {
@@ -10,6 +10,7 @@ export class GameRoom extends Scene {
   }
 
   create() {
+    addBackgroundImage(this, Textures.gameRoomBg);
     EventBus.emit("current-scene-ready", this);
   }
 }
