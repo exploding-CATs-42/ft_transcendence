@@ -1,4 +1,5 @@
-import { GameId, GameState } from "../types";
+import { Game } from "../game/types";
+import { GameId } from "../types";
 import {
   createSaveLoop,
   loadGames,
@@ -6,7 +7,7 @@ import {
   shutdown,
 } from "./gamePersistence";
 
-const games = new Map<GameId, GameState>();
+const games = new Map<GameId, Game>();
 
 let initialized = false;
 
@@ -30,19 +31,19 @@ function assertInitialized() {
   }
 }
 
-export function getGame(gameId: GameId): GameState | undefined {
+export function getGame(gameId: GameId): Game | undefined {
   assertInitialized();
   return games.get(gameId);
 }
 
-export function getAllGames(): GameState[] {
+export function getAllGames(): Game[] {
   assertInitialized();
   return Array.from(games.values());
 }
 
-export function setGame(game: GameState): void {
+export function setGame(game: Game): void {
   assertInitialized();
-  games.set(game.gameId, game);
+  games.set(game.info.id, game);
 }
 
 export function deleteGameById(gameId: string): void {
