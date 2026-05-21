@@ -69,31 +69,28 @@ const LobbyPage = () => {
       >
         <h2 className={s.modalTitle}>Join table</h2>
 
-        <label className={s.modalLabel}>
-          Game ID
-          <input
-            className={s.modalInput}
-            value={gameId}
-            onChange={(event) => setGameId(event.target.value)}
-            placeholder="Enter game id"
-          />
-        </label>
+        <input
+          className={s.modalInput}
+          value={gameId}
+          onChange={(event) => setGameId(event.target.value)}
+          placeholder="Table id"
+        />
 
-        <div className={s.modalButtons}>
-          <Button
-            className={s.modalButton}
-            onClick={() => toggleJoinModal(false)}
-          >
-            Cancel
-          </Button>
+        <Button
+          className={s.joinButton}
+          onClick={handleJoinGame}
+        >
+          Join
+        </Button>
 
-          <Button
-            className={clsx(s.modalButton, s.color)}
-            onClick={handleJoinGame}
-          >
-            Join
-          </Button>
-        </div>
+        <p className={s.createText}>Want to create a room?</p>
+
+        <button
+          className={s.createLink}
+          type="button"
+        >
+          Create a new one
+        </button>
       </Modal>
     </div>
   );
