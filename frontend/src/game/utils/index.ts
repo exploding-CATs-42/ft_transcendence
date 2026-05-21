@@ -1,2 +1,2 @@
 export { EventBus } from "./EventBus";
-export { addBackgroundImage } from "./sceneHelpers";
+export { addBackgroundImage, addFullscreenToggle } from "./sceneHelpers";
