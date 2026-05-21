@@ -147,6 +147,31 @@
   cursor: pointer;
 }
 
+.joinButton {
+  width: 222px;
+  height: 40px;
+
+  margin-top: 14px;
+
+  border: 2px solid #ffd28a;
+  border-radius: 20px;
+
+  background-color: #f6a11a;
+  color: white;
+
+  font-size: 18px;
+  line-height: 22px;
+
+  box-shadow: 0 4px 0 #b85f0d;
+
+  cursor: pointer;
+}
+
+.joinButton:hover,
+.joinButton:focus {
+  background-color: #ffb02e;
+}
+
 @media only screen and (min-width: 768px) {
   .pageContainer {
     --container-inline-padding: 40px;

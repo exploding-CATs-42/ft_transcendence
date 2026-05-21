@@ -39,13 +39,7 @@ const LobbyPage = () => {
           items={matches}
           getKey={(match) => match.id}
           renderItem={(match) => (
-            <button
-              type="button"
-              className={s.matchButton}
-              onClick={() => handleOpenJoinModal(match.id)}
-            >
               <MatchListItem match={match} />
-            </button>
         )}
           className={s.list}
       />
