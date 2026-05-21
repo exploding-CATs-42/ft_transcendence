@@ -1,5 +1,6 @@
 import { setup } from "xstate";
 import { Player } from "./types";
+import { GameEvent } from "./events";
 
 export interface GameContext {
   players: Player[];
@@ -8,6 +9,7 @@ export interface GameContext {
 export const gameMachine = setup({
   types: {
     context: {} as GameContext,
+    events: {} as GameEvent,
   },
   actions: {},
 }).createMachine({
@@ -17,7 +19,11 @@ export const gameMachine = setup({
     players: [],
   }),
   states: {
-    waiting: {},
+    waiting: {
+      on: {
+        START_GAME: "playing",
+      },
+    },
     playing: {},
   },
 });
