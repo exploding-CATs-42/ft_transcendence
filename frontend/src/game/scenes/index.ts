@@ -1,4 +1,4 @@
 export { Boot } from "./Boot";
-export { Game } from "./Game";
+export { GameRoom } from "./GameRoom";
 export { Preloader } from "./Preloader";
 export { WaitingRoom } from "./WaitingRoom";
