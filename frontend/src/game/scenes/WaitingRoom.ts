@@ -2,7 +2,7 @@
 import { Scene } from "phaser";
 // Project level
 import { Scenes, Textures, SEATS } from "game/constants";
-import { addBackgroundImage } from "game/utils";
+import { addBackgroundImage, addFullscreenToggle } from "game/utils";
 import type { Player } from "game/entities";
 
 // It's just a placeholder and has to be removed later
@@ -21,44 +21,17 @@ export class WaitingRoom extends Scene {
     super(Scenes.WaitingRoom);
   }
 
-  init() {
-    this.input.keyboard?.on("keydown-F", () => {
-      this.scale.toggleFullscreen();
-    });
-
-    document.getElementById("fullscreen-btn")?.addEventListener("click", () => {
-      this.scale.toggleFullscreen();
-    });
-  }
+  init() {}
 
   preload() {}
 
   create() {
     this.cameras.main.setBackgroundColor("#e09d52");
     addBackgroundImage(this, Textures.waitingRoomBg);
-    this.addFullscreenToggleButton();
+    addFullscreenToggle(this);
 
     this.addPlayers(data.players);
     this.addWaitingLabel();
-  }
-
-  private addFullscreenToggleButton() {
-    const button = this.add.dom(
-      0,
-      0,
-      "button",
-      "position: absolute; bottom: 12px; right: 12px; font-size: 32px; color: black;",
-      "CLICK ME",
-    );
-
-    button.addListener("click");
-    button.on("click", () => {
-      if (this.scale.isFullscreen) {
-        this.scale.stopFullscreen();
-      } else {
-        this.scale.startFullscreen();
-      }
-    });
   }
 
   private addPlayers(players: Player[]) {
