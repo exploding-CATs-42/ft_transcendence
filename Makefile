@@ -14,6 +14,7 @@ up: ## Start containers in detached mode
 
 build: ## Build images and start containers
 	$(COMPOSE) up --build -d --remove-orphans
+	docker logs ft-backend -f
 
 down: ## Stop and remove containers
 	$(COMPOSE) down
