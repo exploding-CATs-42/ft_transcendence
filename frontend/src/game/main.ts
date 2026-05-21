@@ -1,5 +1,5 @@
 import { Game } from "phaser";
-import { Boot, Preloader, WaitingRoom } from "./scenes";
+import { Boot, Preloader, WaitingRoom, GameRoom } from "./scenes";
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
@@ -12,7 +12,7 @@ const config: Phaser.Types.Core.GameConfig = {
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
   dom: { createContainer: true },
-  scene: [Boot, Preloader, WaitingRoom],
+  scene: [Boot, Preloader, WaitingRoom, GameRoom],
 };
 
 const StartGame = (parent: HTMLDivElement) => {
