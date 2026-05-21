@@ -2,7 +2,7 @@
 import { Scene } from "phaser";
 // Project level
 import { Scenes, Textures } from "game/constants";
-import { EventBus, addBackgroundImage } from "game/utils";
+import { EventBus, addBackgroundImage, addFullscreenToggle } from "game/utils";
 
 export class GameRoom extends Scene {
   constructor() {
@@ -11,6 +11,7 @@ export class GameRoom extends Scene {
 
   create() {
     addBackgroundImage(this, Textures.gameRoomBg);
+    addFullscreenToggle(this);
     EventBus.emit("current-scene-ready", this);
   }
 }
