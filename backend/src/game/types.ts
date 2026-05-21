@@ -14,6 +14,7 @@ export interface GameInfo {
   id: string;
   name: string;
   maxPlayers: number;
+  createdAt: number;
 }
 
 export interface Game {
