@@ -4,10 +4,15 @@ import { Avatar, Button, ListItem } from "components";
 import s from "./FriendListItem.module.css";
 
 export type FriendItem = {
-  id: string;
-  username: string;
-  avatarUrl: string;
-  isOnline: boolean;
+  user: {
+    id: string;
+    username: string;
+    avatarUrl: string;
+    isOnline: boolean;
+    lastSeenAt: Date;
+  };
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
+  direction: "outgoing" | "incoming" | "accepted";
 };
 
 interface Props {
