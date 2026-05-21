@@ -19,3 +19,22 @@ export const addBackgroundImage = (
 
   return bg;
 };
+
+export const addFullscreenToggle = (scene: Scene) => {
+  const button = scene.add.dom(
+    0,
+    0,
+    "button",
+    "position: absolute; bottom: 12px; right: 12px; font-size: 32px; color: black;",
+    "CLICK ME",
+  );
+
+  button.addListener("click");
+  button.on("click", () => {
+    scene.scale.toggleFullscreen();
+  });
+
+  scene.input.keyboard?.on("keydown-F", () => {
+    scene.scale.toggleFullscreen();
+  });
+};
