@@ -1,6 +1,7 @@
 // Project level
 import { Avatar, Button, Icon, Section } from "components";
 import { useAuth } from "hooks";
+import api from "api";
 // Local level
 import type { ProfileUser } from "../../types";
 import s from "./UserSection.module.css";
@@ -12,7 +13,8 @@ interface Props {
 const UserSection = ({ user }: Props) => {
   const { clearAccessToken } = useAuth();
 
-  const logoutUser = () => {
+  const logoutUser = async () => {
+    await api.users.logout();
     clearAccessToken();
   };
 
