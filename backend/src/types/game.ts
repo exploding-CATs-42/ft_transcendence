@@ -1,5 +1,6 @@
 import { TurnState } from "./turn";
 import { CardInstance } from "./card";
+import { Player } from '../game/types';
 
 export const GameStatus = {
   LOBBY: "LOBBY",
@@ -27,14 +28,6 @@ export interface GameRules {
 export interface Deck {
   drawPile: CardInstance[];
   discardPile: CardInstance[];
-}
-
-export interface Player {
-  id: UserId;
-  name: string;
-  hand: CardInstance[];
-  isAlive: boolean;
-  turnOrder: number;
 }
 
 export interface GameState {
