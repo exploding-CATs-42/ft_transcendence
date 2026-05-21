@@ -1,6 +1,6 @@
 import { TurnState } from "./turn";
 import { CardInstance } from "./card";
-import { Player } from '../game/types';
+import { Player } from "../game/types";
 
 export const GameStatus = {
   LOBBY: "LOBBY",
