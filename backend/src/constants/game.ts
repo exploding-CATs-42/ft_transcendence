@@ -1,10 +1,10 @@
+import { Player } from "../game/types";
 import {
   Deck,
   GameId,
   GameRules,
   GameState,
   GameStatus,
-  Player,
   TurnState,
 } from "../types";
 
