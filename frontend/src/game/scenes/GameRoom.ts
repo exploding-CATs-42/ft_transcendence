@@ -4,13 +4,13 @@ import { Scene } from "phaser";
 import { Scenes } from "game/constants";
 import { EventBus } from "game/utils";
 
-export class Game extends Scene {
+export class GameRoom extends Scene {
   camera!: Phaser.Cameras.Scene2D.Camera;
   background!: Phaser.GameObjects.Image;
   gameText!: Phaser.GameObjects.Text;
 
   constructor() {
-    super(Scenes.Game);
+    super(Scenes.GameRoom);
   }
 
   create() {
