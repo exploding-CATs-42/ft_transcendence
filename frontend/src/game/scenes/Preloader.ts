@@ -12,7 +12,7 @@ export class Preloader extends Scene {
 
   init() {
     //  We loaded this image in our Boot Scene, so we can display it here
-    addBackgroundImage(this, Textures.background);
+    addBackgroundImage(this, Textures.preloaderBg);
     this.addProgressBar();
   }
 
