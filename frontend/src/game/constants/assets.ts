@@ -1,5 +1,5 @@
 export const Textures = {
-  background: "background",
+  preloaderBg: "preloaderBg",
   avatar: "avatar",
   waitingRoomBg: "waitingRoomBg",
   gameRoomBg: "gameRoomBg",
