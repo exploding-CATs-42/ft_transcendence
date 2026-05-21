@@ -77,21 +77,69 @@ export const matchesMock: LobbyMatch[] = [
 
 export const friendsMock: FriendItem[] = [
   {
-    id: "f-1",
-    username: "Sasha",
-    avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-    isOnline: true,
+    user: {
+      id: "f-1",
+      username: "Sasha",
+      avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      isOnline: true,
+      lastSeenAt: new Date("2026-05-19T14:30:00Z"),
+    },
+    status: "ACCEPTED",
+    direction: "accepted",
   },
   {
-    id: "f-2",
-    username: "Vanya",
-    avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-    isOnline: false,
+    user: {
+      id: "f-2",
+      username: "Vanya",
+      avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      isOnline: false,
+      lastSeenAt: new Date("2026-05-21T09:12:00Z"),
+    },
+    status: "PENDING",
+    direction: "incoming",
   },
   {
-    id: "f-3",
-    username: "Lera",
-    avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-    isOnline: true,
+    user: {
+      id: "f-3",
+      username: "Lera",
+      avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      isOnline: true,
+      lastSeenAt: new Date("2026-05-19T14:30:00Z"),
+    },
+    status: "ACCEPTED",
+    direction: "accepted",
+  },
+  {
+    user: {
+      id: "f-4",
+      username: "Max",
+      avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      isOnline: false,
+      lastSeenAt: new Date("2026-05-20T22:48:00Z"),
+    },
+    status: "PENDING",
+    direction: "outgoing",
+  },
+  {
+    user: {
+      id: "f-5",
+      username: "Anya",
+      avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      isOnline: false,
+      lastSeenAt: new Date("2026-05-19T14:30:00Z"),
+    },
+    status: "REJECTED",
+    direction: "outgoing",
+  },
+  {
+    user: {
+      id: "f-6",
+      username: "Dima",
+      avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+      isOnline: true,
+      lastSeenAt: new Date("2026-05-19T14:30:00Z"),
+    },
+    status: "ACCEPTED",
+    direction: "accepted",
   },
 ];
