@@ -5,28 +5,31 @@ import clsx from "clsx";
 import { Section, Button, List, MatchListItem, Modal } from "components";
 import { useModal } from "hooks";
 import type { LobbyMatch } from "types";
+import { useNavigate } from "react-router-dom";
 // Local level
 import { matchesMock } from "./mocks";
 import s from "./LobbyPage.module.css";
 
 const LobbyPage = () => {
   const matches: LobbyMatch[] = matchesMock;
+  
+  const navigate = useNavigate();
 
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
 
-  const handleOpenJoinModal = () => {
-    setGameId("");
+  const handleOpenJoinModal = (selectedGameId = "") => {
+    setGameId(selectedGameId);
     toggleJoinModal(true);
   };
 
   const handleJoinGame = () => {
-    console.log("Join game:", gameId);
+    const trimmedGameId = gameId.trim();
 
-    // later socket emit will be here
-    // socket.emit("game:join", { gameId });
+    if (!trimmedGameId) return;
 
     toggleJoinModal(false);
+    navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
   };
 
   return (
@@ -35,16 +38,24 @@ const LobbyPage = () => {
         <List
           items={matches}
           getKey={(match) => match.id}
-          renderItem={(match) => <MatchListItem match={match} />}
+          renderItem={(match) => (
+            <button
+              type="button"
+              className={s.matchButton}
+              onClick={() => handleOpenJoinModal(match.id)}
+            >
+              <MatchListItem match={match} />
+            </button>
+        )}
           className={s.list}
-        />
+      />
 
         <div className={s.buttons}>
           <Button className={s.button}>Create table</Button>
 
           <Button
             className={clsx(s.button, s.color)}
-            onClick={handleOpenJoinModal}
+            onClick={() => handleOpenJoinModal()}
           >
             Join table
           </Button>

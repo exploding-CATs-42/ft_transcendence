@@ -11,6 +11,7 @@ declare const styles: {
   readonly "modalInput": string;
   readonly "modalButtons": string;
   readonly "modalButton": string;
+  readonly "matchButton": string;
 };
 export = styles;
 
