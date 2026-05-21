@@ -1,6 +1,14 @@
 import fs from "node:fs/promises";
 import path from "path";
-import { GameId, GameState } from "../types";
+import { GameId } from "../types";
+import { createActor, Snapshot } from "xstate";
+import { gameMachine } from "../game/gameMachine";
+import { Game, GameInfo } from "../game/types";
+
+interface PersistedGame {
+  info: GameInfo;
+  snapshot: Snapshot<unknown>;
+}
 
 const persistencePath = process.env["GAME_PERSISTENCE_FILE_PATH"];
 
@@ -23,7 +31,7 @@ export async function ensurePersistenceDir() {
   }
 }
 
-export async function loadGames(games: Map<GameId, GameState>): Promise<void> {
+export async function loadGames(games: Map<GameId, Game>): Promise<void> {
   try {
     await ensurePersistenceDir();
 
@@ -34,26 +42,33 @@ export async function loadGames(games: Map<GameId, GameState>): Promise<void> {
       return;
     }
 
-    const parsedGames: GameState[] = JSON.parse(raw);
+    const persistedGames: PersistedGame[] = JSON.parse(raw);
 
-    for (const game of parsedGames) {
-      games.set(game.gameId, game);
+    for (const { info, snapshot } of persistedGames) {
+      const actor = createActor(gameMachine, { snapshot });
+      actor.start();
+      games.set(info.id, { info, actor });
     }
 
-    console.log(`Loaded ${parsedGames.length} games`);
+    console.log(`Loaded ${persistedGames.length} games`);
   } catch (error) {
     console.error("Failed to load games", error);
   }
 }
 
-export async function saveGames(games: Map<GameId, GameState>): Promise<void> {
+export async function saveGames(games: Map<GameId, Game>): Promise<void> {
   try {
     if (!games) {
       throw new Error("saveGames called with undefined games");
     }
     await ensurePersistenceDir();
 
-    const data = JSON.stringify([...games.values()], null, 2);
+    const persistedGames: PersistedGame[] = [...games.values()].map((game) => ({
+      info: game.info,
+      snapshot: game.actor.getPersistedSnapshot(),
+    }));
+
+    const data = JSON.stringify(persistedGames, null, 2);
     const tempFilePath = `${FILE_PATH}.tmp`;
 
     await fs.writeFile(tempFilePath, data);
@@ -63,7 +78,7 @@ export async function saveGames(games: Map<GameId, GameState>): Promise<void> {
   }
 }
 
-export function createSaveLoop(games: Map<GameId, GameState>) {
+export function createSaveLoop(games: Map<GameId, Game>) {
   let timeout: ReturnType<typeof setTimeout>;
   let stopped = false;
 
@@ -91,10 +106,7 @@ export function setupSignalHandlers(handler: () => void): void {
   process.on("SIGTERM", handler);
 }
 
-export async function shutdown(
-  games: Map<GameId, GameState>,
-  stop: () => void,
-) {
+export async function shutdown(games: Map<GameId, Game>, stop: () => void) {
   console.log("Shutdown detected");
 
   stop();
