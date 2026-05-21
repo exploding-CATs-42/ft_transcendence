@@ -1,10 +1,9 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { Scenes, Textures } from "game/constants";
+import { Scenes, Textures, SEATS } from "game/constants";
 import { addBackgroundImage } from "game/utils";
 import type { Player } from "game/entities";
-import { SEATS } from "game/constants";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
