@@ -1,4 +1,3 @@
-import { DEFAULT_GAME_STATE, DEFAULT_PLAYER } from "../constants/game";
 import { ApiError } from "../errors/apiError";
 import { SocketError } from "../errors/socketError";
 
@@ -10,9 +9,12 @@ import {
   LeaveGameParams,
 } from "../schemas/games";
 
-import { GameState, Player, UserId } from "../types";
+import { createActor } from "xstate";
+import { GameEventType } from "../game/events";
+import { gameMachine } from "../game/gameMachine";
+import { Game, Player } from "../game/types";
+import { UserId } from "../types";
 import GameStore from "../utils/gameStore";
-
 import { ensureUserExists } from "../utils/users";
 
 function ensureGameExists(gameId: string) {
@@ -25,7 +27,7 @@ function ensureGameExists(gameId: string) {
   return game;
 }
 
-export async function getGames(userId: UserId): Promise<GameState[]> {
+export async function getGames(userId: UserId): Promise<Game[]> {
   await ensureUserExists(userId);
 
   return GameStore.getAllGames();
@@ -34,7 +36,7 @@ export async function getGames(userId: UserId): Promise<GameState[]> {
 export async function getGameById(
   userId: UserId,
   input: GetGameByIdParams,
-): Promise<GameState> {
+): Promise<Game> {
   await ensureUserExists(userId);
 
   return ensureGameExists(input.gameId);
@@ -43,19 +45,21 @@ export async function getGameById(
 export async function createGame(
   userId: UserId,
   input: CreateGameRequestBody,
-): Promise<GameState> {
+): Promise<Game> {
   await ensureUserExists(userId);
 
-  const gameId = crypto.randomUUID();
+  const actor = createActor(gameMachine);
 
-  const game: GameState = {
-    ...DEFAULT_GAME_STATE,
-    gameId: gameId,
-    players: [],
-    name: input.gameName,
-    maxPlayers: input.maxPlayers,
+  const game: Game = {
+    info: {
+      id: crypto.randomUUID(),
+      name: input.gameName,
+      maxPlayers: input.maxPlayers,
+      createdAt: Date.now(),
+    },
+    actor,
   };
-
+  actor.start();
   GameStore.setGame(game);
   return game;
 }
@@ -73,28 +77,35 @@ export async function joinGame(
 ): Promise<string> {
   const user = await ensureUserExists(usedId);
 
-  const playerToJoin: Player = {
-    ...DEFAULT_PLAYER,
-    playerId: user.id,
-    displayName: user.username,
-  };
-
   const game = ensureGameExists(input.gameId);
+  const { players } = game.actor.getSnapshot().context;
 
-  if (game.players.length >= game.maxPlayers) {
+  if (players.length >= game.info.maxPlayers) {
     throw new SocketError("Game is full");
   }
 
-  const alreadyJoined = game.players.some((p) => {
-    return p.playerId == user.id;
+  const alreadyJoined = players.some((p) => {
+    return p.id == user.id;
   });
 
   if (alreadyJoined) {
     throw new SocketError("Player is already in game");
   }
 
-  game.players.push(playerToJoin);
-  return `Player ${user.username} [${user.id}] joined the game ${game.name} [${game.gameId}].`;
+  const player: Player = {
+    id: user.id,
+    name: user.username,
+    hand: [],
+    isAlive: true,
+    turnOrder: 0,
+  };
+
+  game.actor.send({
+    type: GameEventType.JOIN_GAME,
+    player,
+  });
+
+  return `Player ${user.username} [${user.id}] joined the game ${game.info.name} [${game.info.id}].`;
 }
 
 export async function leaveGame(
@@ -104,24 +115,30 @@ export async function leaveGame(
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
+  const { players } = game.actor.getSnapshot().context;
 
-  const indexOf = game.players.findIndex((p) => {
-    return p.playerId === user.id;
+  const player = players.find((player) => {
+    return player.id === user.id;
   });
 
-  if (indexOf === -1) {
+  if (!player) {
     throw new SocketError("Player is not in the game");
   }
 
-  game.players.splice(indexOf, 1);
+  const isLastPlayer = players.length === 1;
 
-  if (game.players.length == 0) {
+  game.actor.send({
+    type: GameEventType.LEAVE_GAME,
+    playerId: player.id,
+  });
+
+  if (isLastPlayer) {
     GameStore.deleteGameById(input.gameId);
     return (
-      `Player ${user.username} [${user.id}] left the game ${game.name} [${game.gameId}].\n` +
+      `Player ${user.username} [${user.id}] left the game ${game.info.name} [${game.info.id}].\n` +
       `Game is empty, removing.`
     );
   }
 
-  return `Player ${user.username}[${user.id}] left the game ${game.name} [${game.gameId}].`;
+  return `Player ${user.username}[${user.id}] left the game ${game.info.name} [${game.info.id}].`;
 }
