@@ -49,12 +49,12 @@ const RegisterPage = () => {
     <div className={s.backgroundContainer}>
       <div className={s.blur} />
       <div className={s.pageContainer}>
-        <div className={s.rightSection}>
+        <div className={s.leftSection}>
           <h1 className={s.title}>
             Exploding <span className={s.kittensSpan}>kittens</span>
           </h1>
         </div>
-        <div className={s.leftSection}>
+        <div className={s.rightSection}>
           <div className={s.formBackground}>
             <AuthForm
               title="Sign up"
