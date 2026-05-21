@@ -85,7 +85,7 @@ export async function joinGame(
   }
 
   const alreadyJoined = players.some((p) => {
-    return p.id == user.id;
+    return p.id === user.id;
   });
 
   if (alreadyJoined) {
