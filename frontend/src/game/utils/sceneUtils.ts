@@ -24,16 +24,17 @@ export const addBackgroundImage = (
 };
 
 export const addFullscreenToggle = (scene: Scene) => {
-  const button = scene.add.dom(
-    0,
-    0,
-    "button",
-    "position: absolute; bottom: 12px; right: 12px; font-size: 32px; color: black;",
-    "CLICK ME",
-  );
+  const button = scene.add
+    .image(
+      scene.scale.width - 12,
+      scene.scale.height - 12,
+      Textures.fullScreenToggle,
+    )
+    .setOrigin(1, 1)
+    .setDisplaySize(70, 70)
+    .setInteractive({ useHandCursor: true });
 
-  button.addListener("click");
-  button.on("click", () => {
+  button.on("pointerdown", () => {
     scene.scale.toggleFullscreen();
   });
 
