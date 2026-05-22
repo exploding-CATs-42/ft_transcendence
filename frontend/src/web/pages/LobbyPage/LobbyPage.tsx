@@ -12,7 +12,7 @@ import s from "./LobbyPage.module.css";
 
 const LobbyPage = () => {
   const matches: LobbyMatch[] = matchesMock;
-  
+
   const navigate = useNavigate();
 
   const [isOpenJoinModal, toggleJoinModal] = useModal();
@@ -38,11 +38,9 @@ const LobbyPage = () => {
         <List
           items={matches}
           getKey={(match) => match.id}
-          renderItem={(match) => (
-              <MatchListItem match={match} />
-        )}
+          renderItem={(match) => <MatchListItem match={match} />}
           className={s.list}
-      />
+        />
 
         <div className={s.buttons}>
           <Button className={s.button}>Create table</Button>
@@ -70,19 +68,13 @@ const LobbyPage = () => {
           placeholder="Table id"
         />
 
-        <Button
-          className={s.joinButton}
-          onClick={handleJoinGame}
-        >
+        <Button className={s.joinButton} onClick={handleJoinGame}>
           Join
         </Button>
 
         <p className={s.createText}>Want to create a room?</p>
 
-        <button
-          className={s.createLink}
-          type="button"
-        >
+        <button className={s.createLink} type="button">
           Create a new one
         </button>
       </Modal>
