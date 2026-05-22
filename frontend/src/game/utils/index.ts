@@ -3,4 +3,4 @@ export {
   addBackgroundImage,
   addFullscreenToggle,
   addPlayers,
-} from "./sceneHelpers";
+} from "./sceneUtils";
