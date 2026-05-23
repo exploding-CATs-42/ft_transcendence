@@ -1,0 +1,73 @@
+{
+  "envList": [
+    {
+      "env_id": "1",
+      "name": "Default Environment",
+      "is_private": -1,
+      "sort": 1,
+      "server_list": [
+        {
+          "name": "Default Services",
+          "server_id": "1",
+          "uri": "",
+          "sort": 1,
+          "is_default": 1
+        }
+      ],
+      "env_var_list": {
+        "accessToken": {
+          "current_value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlZDlkYWIzZi1kNTc0LTRlZjktOTQyYy1kNWI4NmE1OTg5OWYiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzc5NTY5NDc3LCJleHAiOjE3Nzk1NzAzNzd9.Dy5__xj3wzBywlALEKJa90aIVBhLRsJlU15ymBi8zCs",
+          "value": "",
+          "description": ""
+        },
+        "gameId": {
+          "current_value": "e9a7106a-27aa-4525-b980-b98ae706510c",
+          "value": "",
+          "description": ""
+        },
+        "userId": {
+          "current_value": "ed9dab3f-d574-4ef9-942c-d5b86a59899f",
+          "value": "",
+          "description": ""
+        }
+      }
+    }
+  ],
+  "envDetailKeys": "1",
+  "serverList": [
+    {
+      "name": "Default Services",
+      "server_id": "1",
+      "uri": "",
+      "sort": 1,
+      "is_default": 1
+    }
+  ],
+  "globalVars": {
+    "accessToken": {
+      "current_value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlZDlkYWIzZi1kNTc0LTRlZjktOTQyYy1kNWI4NmE1OTg5OWYiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzc5NTM5MzUwLCJleHAiOjE3Nzk1NDAyNTB9.2oZR9bhp_M0t88GsfyDRhxX_DRKDJpqCt_vXFyyAcq0",
+      "value": "",
+      "description": ""
+    }
+  },
+  "cookie": {
+    "cookieObj": {
+      "localhost": [
+        {
+          "key": "refreshToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJlZDlkYWIzZi1kNTc0LTRlZjktOTQyYy1kNWI4NmE1OTg5OWYiLCJzZXNzaW9uSWQiOiI4MTJkMjdmYy1lMzk5LTQ1ZDEtYTBmMy00ZmFkNjRlODczNDciLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc3OTU2OTQ3NywiZXhwIjoxNzgwMTc0Mjc3fQ.6ApHRKikXCnVX2OzTDjbYDNLSrI0UAwldl_a00uNKfE",
+          "expires": "Sat, 30 May 2026 20:51:17 GMT",
+          "maxAge": 604800,
+          "path": "/api/users",
+          "httpOnly": true,
+          "creation": "2026-05-23T20:51:17.124Z",
+          "sameSite": "lax",
+          "name": "refreshToken",
+          "cookie_id": "94fc865786005",
+          "domain": "localhost",
+          "project_id": "-1"
+        }
+      ]
+    }
+  }
+}
