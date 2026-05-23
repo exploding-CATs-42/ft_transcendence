@@ -65,18 +65,17 @@
   height: 458px;
 
   background-color: #641014;
-  background-image: url("../../assets/images/fire-cat/fire-cat.png");
+  background-image: url("../../assets/images/fire-cat/fire-cat2.png");
   background-repeat: no-repeat;
-  background-position: center bottom;
+  background-position: center;
   background-size: 560px auto;
 
   border: 1px solid #9b5a5a;
   border-radius: 30px;
 
-  padding-top: 82px;
-
   display: flex;
   flex-direction: column;
+  justify-content: center;
   align-items: center;
 
   color: white;
@@ -84,6 +83,8 @@
 }
 
 .modalTitle {
+  font-family: "Shantell Sans", sans-serif;
+
   margin: 0 0 38px;
 
   color: white;
@@ -95,20 +96,23 @@
   text-shadow: 3px 3px 0 #b44b1e;
 }
 
+.inputWrapper {
+  position: relative;
+}
+
 .modalInput {
-  width: 334px;
-  height: 40px;
-
-  padding-inline: 42px 16px;
-
   border: 2px solid #9d1b1e;
   border-radius: 8px;
 
-  background-color: #fff1e8;
+  background-color: rgba(255, 241, 232, 0.8);
   color: #9d1b1e;
 
-  font-size: 16px;
-  line-height: 20px;
+  font-family: "Playpen Sans", sans-serif;
+  font-size: 14px;
+  line-height: 1.71;
+
+  padding: 12px 14px 12px 48px;
+  width: 335px;
 
   outline: none;
 }
@@ -117,10 +121,20 @@
   color: #9d1b1e;
 }
 
+.puzzleIcon {
+  position: absolute;
+  top: 50%;
+  fill: none;
+  stroke: #641014;
+  transform: translateY(-50%);
+  left: 14px;
+}
+
 .createText {
   margin: 13px 0 0;
 
   color: #f3c9bd;
+  font-family: "Shantell Sans", sans-serif;
   font-size: 16px;
   line-height: 20px;
   text-align: center;
@@ -137,6 +151,7 @@
 
   color: white;
 
+  font-family: "Shantell Sans", sans-serif;
   font-size: 16px;
   line-height: 20px;
   text-decoration: underline;
@@ -152,16 +167,16 @@
 
   margin-top: 14px;
 
-  border: 2px solid #ffd28a;
+  border: 1px solid rgba(252, 248, 238, 0.3);
   border-radius: 20px;
 
-  background-color: #f6a11a;
+  background-color: var(--throw-throw-burrito);
   color: white;
 
   font-size: 18px;
   line-height: 22px;
 
-  box-shadow: 0 4px 0 #b85f0d;
+  box-shadow: 0 4px 4px 0 rgba(0, 0, 0, 0.25);
 
   cursor: pointer;
 }

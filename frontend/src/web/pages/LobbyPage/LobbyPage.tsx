@@ -2,7 +2,7 @@
 import { useState } from "react";
 import clsx from "clsx";
 // Project level
-import { Section, Button, List, MatchListItem, Modal } from "components";
+import { Section, Button, List, MatchListItem, Modal, Icon } from "components";
 import { useModal } from "hooks";
 import type { LobbyMatch } from "types";
 import { useNavigate } from "react-router-dom";
@@ -17,11 +17,6 @@ const LobbyPage = () => {
 
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
-
-  const handleOpenJoinModal = (selectedGameId = "") => {
-    setGameId(selectedGameId);
-    toggleJoinModal(true);
-  };
 
   const handleJoinGame = () => {
     const trimmedGameId = gameId.trim();
@@ -47,7 +42,7 @@ const LobbyPage = () => {
 
           <Button
             className={clsx(s.button, s.color)}
-            onClick={() => handleOpenJoinModal()}
+            onClick={() => toggleJoinModal()}
           >
             Join table
           </Button>
@@ -61,12 +56,15 @@ const LobbyPage = () => {
       >
         <h2 className={s.modalTitle}>Join table</h2>
 
-        <input
-          className={s.modalInput}
-          value={gameId}
-          onChange={(event) => setGameId(event.target.value)}
-          placeholder="Table id"
-        />
+        <div className={s.inputWrapper}>
+          <input
+            className={s.modalInput}
+            value={gameId}
+            onChange={(event) => setGameId(event.target.value)}
+            placeholder="Table id"
+          />
+          <Icon className={s.puzzleIcon} name="puzzle" width={24} height={24} />
+        </div>
 
         <Button className={s.joinButton} onClick={handleJoinGame}>
           Join
