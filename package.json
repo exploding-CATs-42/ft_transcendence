@@ -9,7 +9,8 @@
     "typecheck": "pnpm run -r typecheck",
     "check": "pnpm run format:check && pnpm run lint:check && pnpm run typecheck",
     "fix": "pnpm run -r format:fix lint:fix",
-    "dev": "make postgres && pnpm run -r dev"
+    "dev": "make postgres && pnpm run -r dev",
+    "install-echo-api": "./backend/scripts/install-echo-api.sh"
   },
   "packageManager": "pnpm@10.33.0"
 }
