@@ -4,22 +4,27 @@ import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 
 // Project level
+import api from "api";
 import { Section, Button, List, MatchListItem } from "components";
 import { useModal } from "hooks";
 import type { LobbyMatch } from "types";
 
 // Local level
+import {
+  CreateTableModal,
+  type CreateTableFormValues,
+} from "./components/CreateTableModal";
 import { JoinGameModal } from "./components/JoinGameModal";
 import { matchesMock } from "./mocks";
 import s from "./LobbyPage.module.css";
 
 const LobbyPage = () => {
-  const matches: LobbyMatch[] = matchesMock;
-
-  const navigate = useNavigate();
-
+  const [matches, setMatches] = useState<LobbyMatch[]>(matchesMock);
+  const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
+
+  const navigate = useNavigate();
 
   const handleOpenJoinModalWithGameId = (selectedGameId: string) => {
     setGameId(selectedGameId);
@@ -33,6 +38,24 @@ const LobbyPage = () => {
 
     toggleJoinModal(false);
     navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
+  };
+
+  const handleCreateTable = async ({
+    gameName,
+    maxPlayers,
+  }: CreateTableFormValues) => {
+    const createdGame = await api.games.create({
+      gameName,
+      maxPlayers,
+    });
+
+    const newMatch: LobbyMatch = {
+      id: createdGame.gameId,
+      title: createdGame.name,
+      players: [],
+    };
+
+    setMatches((prevMatches) => [newMatch, ...prevMatches]);
   };
 
   return (
@@ -54,7 +77,9 @@ const LobbyPage = () => {
         />
 
         <div className={s.buttons}>
-          <Button className={s.button}>Create table</Button>
+          <Button className={s.button} onClick={() => toggleCreateModal(true)}>
+            Create table
+          </Button>
 
           <Button
             className={clsx(s.button, s.color)}
@@ -64,6 +89,12 @@ const LobbyPage = () => {
           </Button>
         </div>
       </Section>
+
+      <CreateTableModal
+        isOpen={isOpenCreateModal}
+        toggleModal={() => toggleCreateModal(false)}
+        onSubmit={handleCreateTable}
+      />
 
       <JoinGameModal
         isOpen={isOpenJoinModal}
