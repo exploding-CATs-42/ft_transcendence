@@ -69,9 +69,9 @@ export async function deleteGame(userId: UserId, input: DeleteGameParams) {
 
 export async function joinGame(
   input: JoinGameParams,
-  currentUserId: string,
+  usedId: string,
 ): Promise<string> {
-  const user = await ensureUserExists(currentUserId);
+  const user = await ensureUserExists(usedId);
 
   const playerToJoin: Player = {
     ...DEFAULT_PLAYER,
@@ -99,9 +99,9 @@ export async function joinGame(
 
 export async function leaveGame(
   input: LeaveGameParams,
-  currentUserId: string,
+  userId: string,
 ): Promise<string> {
-  const user = await ensureUserExists(currentUserId);
+  const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
 
