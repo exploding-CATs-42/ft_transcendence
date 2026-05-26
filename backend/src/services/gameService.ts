@@ -16,7 +16,7 @@ import { Game, GameInfo, Player } from "../game/types";
 import { UserId, WaitingStateView } from "../types";
 import GameStore from "../utils/gameStore";
 import { ensureUserExists } from "../utils/users";
-import { toWaitingPlayerView } from '../game/mappers';
+import { toWaitingPlayerView } from "../game/mappers";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
@@ -113,13 +113,13 @@ export async function joinGame(
 export async function leaveGame(
   input: LeaveGameParams,
   userId: string,
-): Promise<string> {
+): Promise<WaitingStateView> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const { players } = game.actor.getSnapshot().context;
+  const playersBeforeLeave = game.actor.getSnapshot().context.players;
 
-  const player = players.find((player) => {
+  const player = playersBeforeLeave.find((player) => {
     return player.id === user.id;
   });
 
@@ -127,7 +127,7 @@ export async function leaveGame(
     throw new SocketError("Player is not in the game");
   }
 
-  const isLastPlayer = players.length === 1;
+  const isLastPlayer = playersBeforeLeave.length === 1;
 
   game.actor.send({
     type: GameEventType.LEAVE_GAME,
@@ -136,11 +136,9 @@ export async function leaveGame(
 
   if (isLastPlayer) {
     GameStore.deleteGameById(input.gameId);
-    return (
-      `Player ${user.username} [${user.id}] left the game ${game.info.name} [${game.info.id}].\n` +
-      `Game is empty, removing.`
-    );
+    return { players: [] };
   }
 
-  return `Player ${user.username}[${user.id}] left the game ${game.info.name} [${game.info.id}].`;
+  const playersAfterLeave = game.actor.getSnapshot().context.players;
+  return { players: playersAfterLeave.map(toWaitingPlayerView) };
 }
