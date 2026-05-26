@@ -63,69 +63,99 @@
 .joinModal {
   width: 628px;
   height: 458px;
+  box-sizing: border-box;
 
-  background-color: #641014;
+  border: 1px solid rgba(var(--off-white-rgb), 0.4);
+  border-radius: 30px;
+
+  color: var(--off-white);
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+
+  background-color: var(--modal-window-background);
+  position: relative;
+}
+
+.joinModal::before {
+  content: "";
+  display: block;
+
+  position: absolute;
+  left: 17px;
+  top: 12px;
+
+  width: calc(100% - (2 * 17px));
+  height: calc(100% - (2 * 12px));
+
+  opacity: 0.6;
+  pointer-events: none;
+
   background-image: url("../../assets/images/fire-cat/fire-cat.png");
   background-repeat: no-repeat;
   background-position: center bottom;
-  background-size: 560px auto;
+  background-size: 100%;
+}
 
-  border: 1px solid #9b5a5a;
-  border-radius: 30px;
-
-  padding-top: 82px;
+.joinModalContent {
+  position: relative;
+  z-index: 1;
 
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: center;
 
-  color: white;
-  overflow: hidden;
+  max-width: 400px;
 }
 
 .modalTitle {
   margin: 0 0 38px;
 
-  color: white;
+  color: var(--off-white);
 
   font-size: 48px;
   line-height: 56px;
   text-align: center;
 
-  text-shadow: 3px 3px 0 #b44b1e;
+  font-family: "Shantell Sans", sans-serif;
+  text-shadow: 3px 3px 0 var(--throw-throw-burrito-hover);
+
+  letter-spacing: 1px;
 }
 
 .modalInput {
-  width: 334px;
-  height: 40px;
+  font-weight: 400;
 
-  padding-inline: 42px 16px;
+  background-color: var(--off-white);
+  color: var(--exploding-kittens-hover);
+  caret-color: var(--exploding-kittens-hover);
+}
 
-  border: 2px solid #9d1b1e;
-  border-radius: 8px;
+.icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
 
-  background-color: #fff1e8;
-  color: #9d1b1e;
+  transform: translateY(-50%);
 
-  font-size: 16px;
-  line-height: 20px;
-
-  outline: none;
+  color: var(--exploding-kittens-hover);
 }
 
 .modalInput::placeholder {
-  color: #9d1b1e;
+  color: var(--exploding-kittens-hover);
 }
 
 .createText {
   margin: 13px 0 0;
 
-  color: #f3c9bd;
+  color: var(--off-white);
   font-size: 16px;
   line-height: 20px;
   text-align: center;
 
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7);
+  text-shadow: 0 2px 4px rgba(var(--black-rgb), 0.7);
 }
 
 .createLink {
@@ -135,13 +165,13 @@
   border: none;
   background: none;
 
-  color: white;
+  color: var(--off-white);
 
   font-size: 16px;
   line-height: 20px;
   text-decoration: underline;
 
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.8);
+  text-shadow: 0 2px 4px rgba(var(--black-rgb), 0.8);
 
   cursor: pointer;
 }
@@ -152,23 +182,23 @@
 
   margin-top: 14px;
 
-  border: 2px solid #ffd28a;
+  border: 1px solid rgba(var(--off-white-rgb), 0.3);
   border-radius: 20px;
 
-  background-color: #f6a11a;
-  color: white;
+  background-color: var(--throw-throw-burrito);
+  color: var(--off-white);
 
   font-size: 18px;
   line-height: 22px;
 
-  box-shadow: 0 4px 0 #b85f0d;
+  box-shadow: 0 4px 0 var(--throw-throw-burrito-hover);
 
   cursor: pointer;
 }
 
 .joinButton:hover,
 .joinButton:focus {
-  background-color: #ffb02e;
+  background-color: var(--throw-throw-burrito-hover);
 }
 
 @media only screen and (min-width: 768px) {
@@ -213,13 +243,24 @@
 
 .matchButton {
   width: 100%;
+  margin: 0;
   padding: 0;
+
+  display: block;
 
   background: none;
   border: none;
 
+  font: inherit;
+  color: inherit;
   text-align: left;
+
   cursor: pointer;
+  appearance: none;
+}
+
+.matchButton > * {
+  width: 100%;
 }
 
 @media only screen and (min-width: 1920px) {
