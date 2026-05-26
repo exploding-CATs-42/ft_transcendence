@@ -10,6 +10,7 @@ import {
   leaveGameSchema,
 } from "../schemas/games";
 import { ClientEventType, ErrorEventType, PublicEventType } from "../types";
+import { createEmitters } from "../game/room/emitters";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
@@ -19,10 +20,12 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
-        const res = await joinGame(parsed, socket.data.sub);
-        await socket.join(parsed.gameId);
+        const waitingState = await joinGame(parsed, socket.data.sub);
+        const room = parsed.gameId;
+        await socket.join(room);
 
-        io.to(parsed.gameId).emit(PublicEventType.PLAYER_JOINED, res);
+        const emitters = createEmitters(io, room);
+        emitters.emitToRoom(PublicEventType.PLAYER_JOINED, waitingState);
       },
     ),
   );
