@@ -4,19 +4,12 @@ import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 
 // Project level
-import {
-  Section,
-  Button,
-  List,
-  MatchListItem,
-  Modal,
-  Icon,
-  Input,
-} from "components";
+import { Section, Button, List, MatchListItem } from "components";
 import { useModal } from "hooks";
 import type { LobbyMatch } from "types";
 
 // Local level
+import { JoinGameModal } from "./components/JoinGameModal";
 import { matchesMock } from "./mocks";
 import s from "./LobbyPage.module.css";
 
@@ -72,43 +65,13 @@ const LobbyPage = () => {
         </div>
       </Section>
 
-      <Modal
-        className={s.joinModal}
+      <JoinGameModal
         isOpen={isOpenJoinModal}
+        gameId={gameId}
         toggleModal={toggleJoinModal}
-      >
-        <div className={s.joinModalContent}>
-          <h2 className={s.modalTitle}>Join table</h2>
-
-          <Input
-            className={s.modalInput}
-            type="text"
-            value={gameId}
-            onChange={(event) => setGameId(event.target.value)}
-            pdLeft={true}
-            placeholder="Table id"
-          >
-            <Icon
-              className={s.icon}
-              name="puzzle"
-              id="puzzle"
-              stroke="currentColor"
-              width={18}
-              height={18}
-            />
-          </Input>
-
-          <Button className={s.joinButton} onClick={handleJoinGame}>
-            Join
-          </Button>
-
-          <p className={s.createText}>Want to create a room?</p>
-
-          <button className={s.createLink} type="button">
-            Create a new one
-          </button>
-        </div>
-      </Modal>
+        onGameIdChange={setGameId}
+        onJoin={handleJoinGame}
+      />
     </div>
   );
 };
