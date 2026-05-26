@@ -13,9 +13,10 @@ import { createActor } from "xstate";
 import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
 import { Game, GameInfo, Player } from "../game/types";
-import { UserId } from "../types";
+import { UserId, WaitingStateView } from "../types";
 import GameStore from "../utils/gameStore";
 import { ensureUserExists } from "../utils/users";
+import { toWaitingPlayerView } from '../game/mappers';
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
@@ -74,17 +75,17 @@ export async function deleteGame(userId: UserId, input: DeleteGameParams) {
 export async function joinGame(
   input: JoinGameParams,
   userId: string,
-): Promise<string> {
+): Promise<WaitingStateView> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const { players } = game.actor.getSnapshot().context;
+  const playersBeforeJoin = game.actor.getSnapshot().context.players;
 
-  if (players.length >= game.info.maxPlayers) {
+  if (playersBeforeJoin.length >= game.info.maxPlayers) {
     throw new SocketError("Game is full");
   }
 
-  const alreadyJoined = players.some((p) => {
+  const alreadyJoined = playersBeforeJoin.some((p) => {
     return p.id === user.id;
   });
 
@@ -105,7 +106,8 @@ export async function joinGame(
     player,
   });
 
-  return `Player ${user.username} [${user.id}] joined the game ${game.info.name} [${game.info.id}].`;
+  const playersAfterJoin = game.actor.getSnapshot().context.players;
+  return { players: playersAfterJoin.map(toWaitingPlayerView) };
 }
 
 export async function leaveGame(
