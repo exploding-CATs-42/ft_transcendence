@@ -1,10 +1,10 @@
 .joinModal {
-  width: 628px;
-  height: 458px;
+  width: min(360px, calc(100vw - 32px));
+  height: 360px;
   box-sizing: border-box;
 
   border: 1px solid rgba(var(--off-white-rgb), 0.4);
-  border-radius: 30px;
+  border-radius: 24px;
 
   color: var(--off-white);
   overflow: hidden;
@@ -21,11 +21,11 @@
   display: block;
 
   position: absolute;
-  left: 17px;
-  top: 12px;
+  left: 12px;
+  top: 10px;
 
-  width: calc(100% - (2 * 17px));
-  height: calc(100% - (2 * 12px));
+  width: calc(100% - 24px);
+  height: calc(100% - 20px);
 
   opacity: 0.6;
   pointer-events: none;
@@ -33,28 +33,29 @@
   background-image: url("../../../../assets/images/fire-cat/fire-cat.png");
   background-repeat: no-repeat;
   background-position: center bottom;
-  background-size: 100%;
+  background-size: 115%;
 }
 
 .joinModalContent {
   position: relative;
   z-index: 1;
 
+  width: 100%;
+  max-width: 280px;
+
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-
-  max-width: 400px;
 }
 
 .modalTitle {
-  margin: 0 0 38px;
+  margin: 0 0 28px;
 
   color: var(--off-white);
 
-  font-size: 48px;
-  line-height: 56px;
+  font-size: 34px;
+  line-height: 40px;
   text-align: center;
 
   font-family: "Shantell Sans", sans-serif;
@@ -115,8 +116,8 @@
 }
 
 .joinButton {
-  width: 222px;
-  height: 40px;
+  width: 200px;
+  height: 38px;
 
   margin-top: 14px;
 
@@ -137,4 +138,97 @@
 .joinButton:hover,
 .joinButton:focus {
   background-color: var(--throw-throw-burrito-hover);
+}
+
+@media only screen and (min-width: 768px) {
+  .joinModal {
+    width: 560px;
+    height: 420px;
+
+    border-radius: 28px;
+  }
+
+  .joinModal::before {
+    left: 15px;
+    top: 12px;
+
+    width: calc(100% - 30px);
+    height: calc(100% - 24px);
+
+    background-size: 105%;
+  }
+
+  .joinModalContent {
+    max-width: 360px;
+  }
+
+  .modalTitle {
+    margin-bottom: 34px;
+
+    font-size: 42px;
+    line-height: 50px;
+  }
+
+  .joinButton {
+    width: 222px;
+    height: 40px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .joinModal {
+    width: 720px;
+    height: 526px;
+
+    border-radius: 34px;
+  }
+
+  .joinModal::before {
+    left: 20px;
+    top: 16px;
+
+    width: calc(100% - 40px);
+    height: calc(100% - 32px);
+
+    background-size: 100%;
+  }
+
+  .joinModalContent {
+    max-width: 430px;
+  }
+
+  .modalTitle {
+    margin-bottom: 42px;
+
+    font-size: 56px;
+    line-height: 64px;
+  }
+
+  .joinButton {
+    width: 250px;
+    height: 44px;
+
+    font-size: 20px;
+    line-height: 24px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .joinModal {
+    width: 800px;
+    height: 584px;
+  }
+
+  .modalTitle {
+    font-size: 64px;
+    line-height: 72px;
+  }
+
+  .joinButton {
+    width: 280px;
+    height: 50px;
+
+    font-size: 24px;
+    line-height: 30px;
+  }
 }
