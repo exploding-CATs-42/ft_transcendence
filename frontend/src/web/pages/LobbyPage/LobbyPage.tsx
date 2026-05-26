@@ -1,11 +1,21 @@
 // Libraries
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
+
 // Project level
-import { Section, Button, List, MatchListItem, Modal } from "components";
+import {
+  Section,
+  Button,
+  List,
+  MatchListItem,
+  Modal,
+  Icon,
+  Input,
+} from "components";
 import { useModal } from "hooks";
 import type { LobbyMatch } from "types";
-import { useNavigate } from "react-router-dom";
+
 // Local level
 import { matchesMock } from "./mocks";
 import s from "./LobbyPage.module.css";
@@ -18,7 +28,7 @@ const LobbyPage = () => {
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
 
-  const handleOpenJoinModal = (selectedGameId = "") => {
+  const handleOpenJoinModalWithGameId = (selectedGameId: string) => {
     setGameId(selectedGameId);
     toggleJoinModal(true);
   };
@@ -38,7 +48,15 @@ const LobbyPage = () => {
         <List
           items={matches}
           getKey={(match) => match.id}
-          renderItem={(match) => <MatchListItem match={match} />}
+          renderItem={(match) => (
+            <button
+              type="button"
+              className={s.matchButton}
+              onClick={() => handleOpenJoinModalWithGameId(match.id)}
+            >
+              <MatchListItem match={match} />
+            </button>
+          )}
           className={s.list}
         />
 
@@ -47,7 +65,7 @@ const LobbyPage = () => {
 
           <Button
             className={clsx(s.button, s.color)}
-            onClick={() => handleOpenJoinModal()}
+            onClick={() => toggleJoinModal()}
           >
             Join table
           </Button>
@@ -59,24 +77,37 @@ const LobbyPage = () => {
         isOpen={isOpenJoinModal}
         toggleModal={toggleJoinModal}
       >
-        <h2 className={s.modalTitle}>Join table</h2>
+        <div className={s.joinModalContent}>
+          <h2 className={s.modalTitle}>Join table</h2>
 
-        <input
-          className={s.modalInput}
-          value={gameId}
-          onChange={(event) => setGameId(event.target.value)}
-          placeholder="Table id"
-        />
+          <Input
+            className={s.modalInput}
+            type="text"
+            value={gameId}
+            onChange={(event) => setGameId(event.target.value)}
+            pdLeft={true}
+            placeholder="Table id"
+          >
+            <Icon
+              className={s.icon}
+              name="puzzle"
+              id="puzzle"
+              stroke="currentColor"
+              width={18}
+              height={18}
+            />
+          </Input>
 
-        <Button className={s.joinButton} onClick={handleJoinGame}>
-          Join
-        </Button>
+          <Button className={s.joinButton} onClick={handleJoinGame}>
+            Join
+          </Button>
 
-        <p className={s.createText}>Want to create a room?</p>
+          <p className={s.createText}>Want to create a room?</p>
 
-        <button className={s.createLink} type="button">
-          Create a new one
-        </button>
+          <button className={s.createLink} type="button">
+            Create a new one
+          </button>
+        </div>
       </Modal>
     </div>
   );
