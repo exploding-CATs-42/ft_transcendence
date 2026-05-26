@@ -9,7 +9,7 @@ import {
   LeaveGameParams,
   leaveGameSchema,
 } from "../schemas/games";
-import { ClientEventType, PublicEventType } from "../types";
+import { ClientEventType, ErrorEventType, PublicEventType } from "../types";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
@@ -17,7 +17,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
     withErrorHandler(
       joinGameSchema,
       socket,
-      "join-table-error",
+      ErrorEventType.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
         const res = await joinGame(parsed, socket.data.sub);
         await socket.join(parsed.gameId);
