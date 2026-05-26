@@ -24,7 +24,8 @@ interface Props {
     | "settings"
     | "trash-can"
     | "user"
-    | "burger-menu";
+    | "burger-menu"
+    | "puzzle";
 }
 
 const Icon = ({ name, width, height, id, className, stroke, fill }: Props) => {
