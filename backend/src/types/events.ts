@@ -76,6 +76,15 @@ export interface PublicPlayerView {
   turnOrder: number;
 }
 
+export interface WaitingPlayerView {
+  id: string;
+  name: string;
+}
+
+export interface WaitingStateView {
+  players: WaitingPlayerView[];
+}
+
 export interface CardPlayedPayload {
   playerId: string;
   cardType: string;
