@@ -9,24 +9,24 @@ import {
 } from "./turn";
 
 export const ClientEventType = {
-  JOIN_GAME: "JOIN_GAME",
-  LEAVE_GAME: "LEAVE_GAME",
+  JOIN_GAME: "join-game",
+  LEAVE_GAME: "leave-game",
 } as const;
 
 export type ClientEventType =
   (typeof ClientEventType)[keyof typeof ClientEventType];
 
 export const ErrorEventType = {
-  JOIN_GAME_ERROR: "JOIN_GAME_ERROR",
-  LEAVE_GAME_ERROR: "LEAVE_GAME_ERROR",
+  JOIN_GAME_ERROR: "join-game-error",
+  LEAVE_GAME_ERROR: "leave-game-error",
 } as const;
 
 export type ErrorEventType =
   (typeof ErrorEventType)[keyof typeof ErrorEventType];
 
 export const PublicEventType = {
-  PLAYER_JOINED: "PLAYER_JOINED",
-  PLAYER_LEFT: "PLAYER_LEFT",
+  PLAYER_JOINED: "player-joined",
+  PLAYER_LEFT: "player-left",
   GAME_STARTED: "GAME_STARTED",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "CARD_PLAYED",
@@ -114,6 +114,7 @@ export interface NopeWindowResolvedPayload {
 }
 
 export const PrivateEventType = {
+	YOU_LEFT: "you-left",
   YOUR_HAND: "YOUR_HAND",
   CARD_RECEIVED: "CARD_RECEIVED",
   CARD_REMOVED: "CARD_REMOVED",
