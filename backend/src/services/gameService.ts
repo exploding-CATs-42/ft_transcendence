@@ -79,13 +79,13 @@ export async function joinGame(
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const playersBeforeJoin = game.actor.getSnapshot().context.players;
+  const playersBefore = game.actor.getSnapshot().context.players;
 
-  if (playersBeforeJoin.length >= game.info.maxPlayers) {
+  if (playersBefore.length >= game.info.maxPlayers) {
     throw new SocketError("Game is full");
   }
 
-  const alreadyJoined = playersBeforeJoin.some((p) => {
+  const alreadyJoined = playersBefore.some((p) => {
     return p.id === user.id;
   });
 
@@ -106,8 +106,8 @@ export async function joinGame(
     player,
   });
 
-  const playersAfterJoin = game.actor.getSnapshot().context.players;
-  return { players: playersAfterJoin.map(toWaitingPlayerView) };
+  const playersAfter = game.actor.getSnapshot().context.players;
+  return { players: playersAfter.map(toWaitingPlayerView) };
 }
 
 export async function leaveGame(
@@ -117,9 +117,9 @@ export async function leaveGame(
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const playersBeforeLeave = game.actor.getSnapshot().context.players;
+  const playersBefore = game.actor.getSnapshot().context.players;
 
-  const player = playersBeforeLeave.find((player) => {
+  const player = playersBefore.find((player) => {
     return player.id === user.id;
   });
 
@@ -127,7 +127,7 @@ export async function leaveGame(
     throw new SocketError("Player is not in the game");
   }
 
-  const isLastPlayer = playersBeforeLeave.length === 1;
+  const isLastPlayer = playersBefore.length === 1;
 
   game.actor.send({
     type: GameEventType.LEAVE_GAME,
@@ -139,6 +139,6 @@ export async function leaveGame(
     return { players: [] };
   }
 
-  const playersAfterLeave = game.actor.getSnapshot().context.players;
-  return { players: playersAfterLeave.map(toWaitingPlayerView) };
+  const playersAfter = game.actor.getSnapshot().context.players;
+  return { players: playersAfter.map(toWaitingPlayerView) };
 }
