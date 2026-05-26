@@ -74,7 +74,7 @@ export async function deleteGame(userId: UserId, input: DeleteGameParams) {
 
 export async function joinGame(
   input: JoinGameParams,
-  userId: string,
+  userId: UserId,
 ): Promise<WaitingStateView> {
   const user = await ensureUserExists(userId);
 
@@ -112,7 +112,7 @@ export async function joinGame(
 
 export async function leaveGame(
   input: LeaveGameParams,
-  userId: string,
+  userId: UserId,
 ): Promise<WaitingStateView> {
   const user = await ensureUserExists(userId);
 
