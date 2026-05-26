@@ -18,6 +18,7 @@ export type ClientEventType =
 
 export const PublicEventType = {
   PLAYER_JOINED: "PLAYER_JOINED",
+  PLAYER_LEFT: "PLAYER_LEFT",
   GAME_STARTED: "GAME_STARTED",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "CARD_PLAYED",
