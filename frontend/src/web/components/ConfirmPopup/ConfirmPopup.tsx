@@ -19,7 +19,12 @@ const ConfirmPopup = ({ msg, toggleModal, isOpenModal, onConfirm }: Props) => {
           <Button className={s.button} onClick={onConfirm}>
             Yes
           </Button>
-          <Button className={s.button} onClick={toggleModal}>
+          <Button
+            className={s.button}
+            onClick={() => {
+              toggleModal();
+            }}
+          >
             No
           </Button>
         </div>
