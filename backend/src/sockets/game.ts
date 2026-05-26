@@ -39,11 +39,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       async (parsed: LeaveGameParams) => {
         const waitingState = await leaveGame(parsed, socket.data.sub);
         const room = parsed.gameId;
+        await socket.leave(room);
 
         const emitters = createEmitters(io, room);
         emitters.emitToRoom(PublicEventType.PLAYER_LEFT, waitingState);
-
-        await socket.leave(room);
       },
     ),
   );
