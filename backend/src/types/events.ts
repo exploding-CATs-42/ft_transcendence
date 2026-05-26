@@ -16,6 +16,14 @@ export const ClientEventType = {
 export type ClientEventType =
   (typeof ClientEventType)[keyof typeof ClientEventType];
 
+export const ErrorEventType = {
+  JOIN_GAME_ERROR: "JOIN_GAME_ERROR",
+  LEAVE_GAME_ERROR: "LEAVE_GAME_ERROR",
+} as const;
+
+export type ErrorEventType =
+  (typeof ErrorEventType)[keyof typeof ErrorEventType];
+
 export const PublicEventType = {
   PLAYER_JOINED: "PLAYER_JOINED",
   PLAYER_LEFT: "PLAYER_LEFT",
