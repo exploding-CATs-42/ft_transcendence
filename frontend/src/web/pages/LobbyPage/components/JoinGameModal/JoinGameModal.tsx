@@ -7,7 +7,7 @@ import s from "./JoinGameModal.module.css";
 interface Props {
   isOpen: boolean;
   gameId: string;
-  toggleModal: (isOpen?: boolean) => void;
+  toggleModal: () => void;
   onGameIdChange: (value: string) => void;
   onJoin: () => void;
 }
@@ -20,12 +20,12 @@ const JoinGameModal = ({
   onJoin,
 }: Props) => {
   return (
-    <Modal className={s.joinModal} isOpen={isOpen} toggleModal={toggleModal}>
-      <div className={s.joinModalContent}>
-        <h2 className={s.modalTitle}>Join table</h2>
+    <Modal className={s['joinModal']!} isOpen={isOpen} toggleModal={toggleModal}>
+      <div className={s['joinModalContent']!}>
+        <h2 className={s['modalTitle']!}>Join table</h2>
 
         <Input
-          className={s.modalInput}
+          className={s['modalInput']!}
           type="text"
           value={gameId}
           onChange={(event) => onGameIdChange(event.target.value)}
@@ -33,7 +33,7 @@ const JoinGameModal = ({
           placeholder="Table id"
         >
           <Icon
-            className={s.icon}
+            className={s['icon']!}
             name="puzzle"
             id="puzzle"
             stroke="currentColor"
@@ -42,13 +42,13 @@ const JoinGameModal = ({
           />
         </Input>
 
-        <Button className={s.joinButton} onClick={onJoin}>
+        <Button className={s['joinButton']!} onClick={onJoin}>
           Join
         </Button>
 
-        <p className={s.createText}>Want to create a room?</p>
+        <p className={s['createText']!}>Want to create a room?</p>
 
-        <button className={s.createLink} type="button">
+        <button className={s['createLink']!} type="button">
           Create a new one
         </button>
       </div>
