@@ -8,7 +8,7 @@ import {
   FavorState,
 } from "./turn";
 
-export const ServerEventType = {
+export const PublicEventType = {
   GAME_STARTED: "GAME_STARTED",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "CARD_PLAYED",
@@ -26,8 +26,8 @@ export const ServerEventType = {
   GAME_OVER: "GAME_OVER",
 } as const;
 
-export type ServerEventType =
-  (typeof ServerEventType)[keyof typeof ServerEventType];
+export type PublicEventType =
+  (typeof PublicEventType)[keyof typeof PublicEventType];
 
 export interface PublicGameView {
   gameId: string;
