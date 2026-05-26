@@ -17,6 +17,7 @@ export type ClientEventType =
   (typeof ClientEventType)[keyof typeof ClientEventType];
 
 export const PublicEventType = {
+  PLAYER_JOINED: "PLAYER_JOINED",
   GAME_STARTED: "GAME_STARTED",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "CARD_PLAYED",

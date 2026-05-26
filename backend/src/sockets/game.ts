@@ -9,10 +9,11 @@ import {
   LeaveGameParams,
   leaveGameSchema,
 } from "../schemas/games";
+	import { ClientEventType, PublicEventType } from "../types";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
-    "join-table",
+    ClientEventType.JOIN_GAME,
     withErrorHandler(
       joinGameSchema,
       socket,
@@ -21,7 +22,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const res = await joinGame(parsed, socket.data.sub);
         await socket.join(parsed.gameId);
 
-        io.to(parsed.gameId).emit("join-table-response", res);
+        io.to(parsed.gameId).emit(PublicEventType.PLAYER_JOINED, res);
       },
     ),
   );
