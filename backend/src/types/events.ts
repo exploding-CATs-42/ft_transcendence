@@ -8,6 +8,14 @@ import {
   FavorState,
 } from "./turn";
 
+export const ClientEventType = {
+  JOIN_GAME: "JOIN_GAME",
+  LEAVE_GAME: "LEAVE_GAME",
+} as const;
+
+export type ClientEventType =
+  (typeof ClientEventType)[keyof typeof ClientEventType];
+
 export const PublicEventType = {
   GAME_STARTED: "GAME_STARTED",
   TURN_CHANGED: "TURN_CHANGED",
