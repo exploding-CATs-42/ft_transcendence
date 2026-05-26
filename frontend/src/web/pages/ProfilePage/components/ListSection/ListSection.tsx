@@ -24,7 +24,6 @@ const ListSection = ({ matches, friends }: Props) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("matches");
 
   const sortedFriends = [...friends].sort((a, b) => {
-    // accepted first
     const statusOrder = {
       ACCEPTED: 0,
       PENDING: 1,
