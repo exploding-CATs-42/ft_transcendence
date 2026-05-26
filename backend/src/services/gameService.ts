@@ -12,7 +12,7 @@ import {
 import { createActor } from "xstate";
 import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
-import { Game, Player } from "../game/types";
+import { Game, GameInfo, Player } from "../game/types";
 import { UserId } from "../types";
 import GameStore from "../utils/gameStore";
 import { ensureUserExists } from "../utils/users";
@@ -45,7 +45,7 @@ export async function getGameById(
 export async function createGame(
   userId: UserId,
   input: CreateGameRequestBody,
-): Promise<Game> {
+): Promise<GameInfo> {
   await ensureUserExists(userId);
 
   const actor = createActor(gameMachine);
@@ -61,7 +61,7 @@ export async function createGame(
   };
   actor.start();
   GameStore.setGame(game);
-  return game;
+  return game.info;
 }
 
 export async function deleteGame(userId: UserId, input: DeleteGameParams) {
