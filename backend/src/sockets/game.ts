@@ -32,7 +32,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
     withErrorHandler(
       leaveGameSchema,
       socket,
-      "leave-table-error",
+      ErrorEventType.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
         const res = await leaveGame(parsed, socket.data.sub);
         await socket.leave(parsed.gameId);
