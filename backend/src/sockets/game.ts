@@ -10,7 +10,7 @@ import {
   leaveGameSchema,
 } from "../schemas/games";
 import { ClientEventType, ErrorEventType, PublicEventType } from "../types";
-import { createEmitters } from "../game/room/emitters";
+import { createEmitters } from "../game/emitters";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(

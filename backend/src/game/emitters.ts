@@ -1,5 +1,5 @@
 import { Server } from "socket.io";
-import { PrivateEventType, PublicEventType } from "../../types";
+import { PrivateEventType, PublicEventType } from "../types";
 
 export const createEmitters = (
   io: Server,
