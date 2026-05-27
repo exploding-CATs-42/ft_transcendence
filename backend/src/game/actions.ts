@@ -21,3 +21,13 @@ export const removePlayer = ({ context, event }: GameActionArgs) => {
     players: context.players.filter((p) => p.id !== event.playerId),
   };
 };
+
+export const markPlayerReady = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEventType.MARK_READY) return context;
+
+  return {
+    players: context.players.map((p) =>
+      p.id === event.playerId ? { ...p, isReady: true } : p,
+    ),
+  };
+};
