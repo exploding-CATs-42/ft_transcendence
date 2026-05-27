@@ -9,7 +9,12 @@ import {
   LeaveGameParams,
   leaveGameSchema,
 } from "../schemas/games";
-import { ClientEventType, ErrorEventType, PublicEventType } from "../types";
+import {
+  ClientEventType,
+  ErrorEventType,
+  PrivateEventType,
+  PublicEventType,
+} from "../types";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
@@ -39,6 +44,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const room = parsed.gameId;
         await socket.leave(room);
 
+        socket.emit(PrivateEventType.YOU_LEFT);
         io.to(room).emit(PublicEventType.PLAYER_LEFT, waitingState);
       },
     ),
