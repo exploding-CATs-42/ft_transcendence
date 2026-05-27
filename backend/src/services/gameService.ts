@@ -97,6 +97,7 @@ export async function joinGame(
     id: user.id,
     name: user.username,
     hand: [],
+    isReady: false,
     isAlive: true,
     turnOrder: 0,
   };

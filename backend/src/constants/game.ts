@@ -29,6 +29,7 @@ export const DEFAULT_PLAYER: Player = {
   id: "",
   name: "",
   hand: [],
+  isReady: false,
   isAlive: true,
   turnOrder: 0,
 };
