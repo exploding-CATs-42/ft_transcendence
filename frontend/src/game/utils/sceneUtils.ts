@@ -47,6 +47,7 @@ export const addPlayers = (
   scene: Scene,
   players: Player[],
   fontColor: string,
+  strokeColor: string,
 ) => {
   players.forEach((player, i) => {
     const { x, y } = SEATS[i]!;
@@ -67,6 +68,8 @@ export const addPlayers = (
         fontSize: 32,
         color: fontColor || "white",
         fontFamily: "Chewy",
+        stroke: strokeColor || "white",
+        strokeThickness: 2,
       })
       .setOrigin(0.5, 0.5);
   });
