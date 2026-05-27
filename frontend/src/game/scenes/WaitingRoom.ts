@@ -34,7 +34,7 @@ export class WaitingRoom extends Scene {
     addBackgroundImage(this, Textures.waitingRoomBg);
     addFullscreenToggle(this);
 
-    addPlayers(this, data.players, "black");
+    addPlayers(this, data.players, "black", "white");
     this.addWaitingLabel();
   }
 
