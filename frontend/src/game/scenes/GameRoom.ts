@@ -29,7 +29,7 @@ export class GameRoom extends Scene {
   create() {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
-    addPlayers(this, data.players, "white");
+    addPlayers(this, data.players, "white", "black");
     EventBus.emit("current-scene-ready", this);
   }
 }
