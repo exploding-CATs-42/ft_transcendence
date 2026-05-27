@@ -50,7 +50,7 @@ export class GameRoom extends Scene {
 
     this.createDrawPile();
     this.createDiscardPile();
-    this.addCards();
+    this.dealCards();
 
     EventBus.emit("current-scene-ready", this);
   }
@@ -65,7 +65,7 @@ export class GameRoom extends Scene {
     this.addCard(DISCARD_PILE_X, DISCARD_PILE_Y, cardFrame);
   }
 
-  private addCards() {
+  private dealCards() {
     const spacing = this.getCardSpacing(CARDS_TO_DEAL);
     let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
 
