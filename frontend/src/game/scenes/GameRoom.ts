@@ -27,6 +27,9 @@ const CARD_HEIGHT = 260;
 const CARDS_TO_DEAL = 7;
 const HAND_Y = 940; // y position of the player's hand
 
+const MIN_CARD_SPACING = 60;
+const MAX_CARD_SPACING = 120;
+
 export class GameRoom extends Scene {
   constructor() {
     super(Scenes.GameRoom);
@@ -43,7 +46,7 @@ export class GameRoom extends Scene {
   }
 
   private addCards() {
-    const spacing = 100;
+    const spacing = this.getCardSpacing(CARDS_TO_DEAL);
     const handWidth = (CARDS_TO_DEAL - 1) * spacing + CARD_WIDTH;
     let x = this.scale.width / 2 - handWidth / 2;
 
@@ -55,5 +58,33 @@ export class GameRoom extends Scene {
 
       x += spacing;
     }
+  }
+
+  private getCardSpacing(cardCount: number): number {
+    const MIN_SPACING = MIN_CARD_SPACING; // many cards
+    const MAX_SPACING = MAX_CARD_SPACING; // few cards
+    const MAX_COUNT = 20;
+
+    if (cardCount <= 1) return MAX_SPACING;
+    if (cardCount >= MAX_COUNT) return MIN_SPACING;
+
+    // Calculate how full the hand is.
+    // If we have 1 card - it's empty
+    // If we have 20+ cards it's full
+    // The progress is a value from 0 to 1 (0% -> 100%)
+    const progress = (cardCount - 1) / (MAX_COUNT - 1);
+    const SPACE_TO_SHRINK = MAX_SPACING - MIN_SPACING;
+
+    // Decrease the spacing on some amount
+    // from the amount of on how much spacing can shrink
+    // depending on how full the hand is
+    // or in other words:
+    // the more cards we have
+    // the bigger will be progress
+    // and therefore the bigger will be (progress * SPACE_TO_SHRINK)
+    // thus the smaller will be the spacing
+    const spacing = MAX_SPACING - progress * SPACE_TO_SHRINK;
+
+    return spacing;
   }
 }
