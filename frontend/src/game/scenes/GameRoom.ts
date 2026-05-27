@@ -21,6 +21,12 @@ const data: { players: Player[] } = {
   ],
 };
 
+const CARD_WIDTH = 186;
+const CARD_HEIGHT = 260;
+
+const CARDS_TO_DEAL = 7;
+const HAND_Y = 940; // y position of the player's hand
+
 export class GameRoom extends Scene {
   constructor() {
     super(Scenes.GameRoom);
@@ -30,6 +36,21 @@ export class GameRoom extends Scene {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
     addPlayers(this, data.players, "white", "black");
+
+    this.addCards();
+
     EventBus.emit("current-scene-ready", this);
+  }
+
+  private addCards() {
+    let x = this.scale.width / 2 - (CARDS_TO_DEAL * CARD_WIDTH) / 2;
+    for (let i = 0; i < CARDS_TO_DEAL; ++i) {
+      this.add
+        .image(x, HAND_Y, Textures.cards, i)
+        .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
+        .setOrigin(0, 0);
+
+      x += CARD_WIDTH;
+    }
   }
 }
