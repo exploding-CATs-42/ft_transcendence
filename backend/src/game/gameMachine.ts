@@ -1,5 +1,10 @@
 import { assign, setup } from "xstate";
-import { addPlayer, markPlayerReady, removePlayer } from "./actions";
+import {
+  addPlayer,
+  markPlayerReady,
+  markPlayerUnready,
+  removePlayer,
+} from "./actions";
 import { Player } from "./types";
 import { GameEvent } from "./events";
 
@@ -16,6 +21,7 @@ export const gameMachine = setup({
     addPlayer: assign(addPlayer),
     removePlayer: assign(removePlayer),
     markPlayerReady: assign(markPlayerReady),
+    markPlayerUnready: assign(markPlayerUnready),
   },
 }).createMachine({
   id: "game",
@@ -31,6 +37,9 @@ export const gameMachine = setup({
           on: {
             MARK_READY: {
               actions: "markPlayerReady",
+            },
+            MARK_UNREADY: {
+              actions: "markPlayerUnready",
             },
           },
         },
