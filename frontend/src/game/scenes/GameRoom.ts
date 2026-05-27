@@ -47,6 +47,7 @@ const CARD_DROP_ZONE = {
 
 export class GameRoom extends Scene {
   #graphics!: Phaser.GameObjects.Graphics;
+  #cards: Phaser.GameObjects.Image[] = [];
 
   constructor() {
     super(Scenes.GameRoom);
@@ -81,7 +82,8 @@ export class GameRoom extends Scene {
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
       const frame = this.textures.get(Textures.cards).get(i);
-      this.addInteractiveCard(x, HAND_Y, frame).setDepth(i + 1);
+      const card = this.addInteractiveCard(x, HAND_Y, frame).setDepth(i + 1);
+      this.#cards.push(card);
 
       x += spacing;
     }
