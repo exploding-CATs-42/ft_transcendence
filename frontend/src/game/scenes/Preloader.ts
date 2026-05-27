@@ -40,7 +40,7 @@ export class Preloader extends Scene {
     //  For example, you can define global animations here, so we can use them in other scenes.
 
     //  Move to the Game scene. You could also swap this for a Scene Transition, such as a camera fade.
-    this.scene.start(Scenes.WaitingRoom);
+    this.scene.start(Scenes.GameRoom);
   }
 
   private addProgressBar() {
