@@ -8,6 +8,7 @@ import {
 import { Player } from "./types";
 import { GameEvent } from "./events";
 import { canEnterStarting } from "./guards";
+import { START_GAME_COUNTDOWN_MS } from "../constants/game";
 
 export interface GameContext {
   players: Player[];
@@ -51,7 +52,13 @@ export const gameMachine = setup({
             },
           },
         },
-        starting: {},
+        starting: {
+          after: {
+            [START_GAME_COUNTDOWN_MS]: {
+              target: "#game.playing",
+            },
+          },
+        },
       },
       on: {
         START_GAME: "playing",
