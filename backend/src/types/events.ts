@@ -114,7 +114,7 @@ export interface NopeWindowResolvedPayload {
 }
 
 export const PrivateEventType = {
-	YOU_LEFT: "you-left",
+  YOU_LEFT: "you-left",
   YOUR_HAND: "YOUR_HAND",
   CARD_RECEIVED: "CARD_RECEIVED",
   CARD_REMOVED: "CARD_REMOVED",
