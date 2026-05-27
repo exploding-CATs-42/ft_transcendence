@@ -153,6 +153,25 @@ export class GameRoom extends Scene {
   private attachCardDropHandler(card: Phaser.GameObjects.Image) {
     const onCardDrop = () => {
       this.drawCardDropZone(0xffffff);
+
+      // Remove card from player's hand
+      this.#cards = this.#cards.filter((c) => c !== card);
+
+      // make it non-interactive
+      card.off("drop", onCardDrop);
+      card.disableInteractive();
+
+      // move it over the discard pile
+      this.tweens.add({
+        targets: card,
+        x: DISCARD_PILE_X,
+        y: DISCARD_PILE_Y,
+        duration: 300,
+        ease: "Back.Out",
+      });
+
+      // and update it's depth to the lowest
+      card.setDepth(0);
     };
 
     card.on("drop", onCardDrop);
