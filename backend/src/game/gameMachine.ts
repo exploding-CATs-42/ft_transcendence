@@ -7,6 +7,7 @@ import {
 } from "./actions";
 import { Player } from "./types";
 import { GameEvent } from "./events";
+import { canEnterStarting } from "./guards";
 
 export interface GameContext {
   players: Player[];
@@ -23,6 +24,9 @@ export const gameMachine = setup({
     markPlayerReady: assign(markPlayerReady),
     markPlayerUnready: assign(markPlayerUnready),
   },
+  guards: {
+    canEnterStarting,
+  },
 }).createMachine({
   id: "game",
   initial: "waiting",
@@ -34,6 +38,10 @@ export const gameMachine = setup({
       initial: "readying",
       states: {
         readying: {
+          always: {
+            guard: "canEnterStarting",
+            target: "starting",
+          },
           on: {
             MARK_READY: {
               actions: "markPlayerReady",
