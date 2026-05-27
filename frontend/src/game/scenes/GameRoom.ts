@@ -172,6 +172,9 @@ export class GameRoom extends Scene {
 
       // and update it's depth to the lowest
       card.setDepth(0);
+
+      // and reflow cards in player's
+      this.reflowCards();
     };
 
     card.on("drop", onCardDrop);
@@ -212,6 +215,25 @@ export class GameRoom extends Scene {
     const startX = this.scale.width / 2 - handWidth / 2;
 
     return startX;
+  }
+
+  private reflowCards() {
+    const spacing = this.getCardSpacing(this.#cards.length);
+    let x = this.getHandStartX(this.#cards.length, spacing);
+
+    this.#cards.forEach((card, index) => {
+      card.setDepth(index);
+
+      this.tweens.add({
+        targets: card,
+        x: x,
+        y: HAND_Y,
+        duration: 250,
+        ease: "Back.Out",
+      });
+
+      x += spacing;
+    });
   }
 
   private createCardDropZone() {
