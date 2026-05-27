@@ -50,3 +50,4 @@ export const DEFAULT_GAME_STATE: GameState = {
 };
 
 export const MIN_PLAYERS = 2;
+export const START_GAME_COUNTDOWN_MS = 10000;
