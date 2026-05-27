@@ -8,6 +8,7 @@ import {
   gameRoomBg,
   waitingRoomBg,
   cards,
+  cardCover,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 
@@ -33,6 +34,7 @@ export class Preloader extends Scene {
       frameHeight: 520,
       endFrame: 40,
     });
+    this.load.image(Textures.cardCover, cardCover);
   }
 
   create() {
