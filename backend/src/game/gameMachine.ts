@@ -43,6 +43,7 @@ export const gameMachine = setup({
             },
           },
         },
+        starting: {},
       },
       on: {
         START_GAME: "playing",
