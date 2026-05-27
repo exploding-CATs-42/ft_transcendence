@@ -38,7 +38,16 @@ const DRAW_PILE_Y = PILE_Y;
 const DISCARD_PILE_X = 1100;
 const DISCARD_PILE_Y = PILE_Y;
 
+const CARD_DROP_ZONE = {
+  x: 400,
+  y: 340,
+  width: 1090,
+  height: 540,
+};
+
 export class GameRoom extends Scene {
+  #graphics!: Phaser.GameObjects.Graphics;
+
   constructor() {
     super(Scenes.GameRoom);
   }
@@ -48,6 +57,7 @@ export class GameRoom extends Scene {
     addFullscreenToggle(this);
     addPlayers(this, data.players, "white", "black");
 
+    this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
     this.dealCards();
@@ -172,5 +182,22 @@ export class GameRoom extends Scene {
     const startX = this.scale.width / 2 - handWidth / 2;
 
     return startX;
+  }
+
+  private createCardDropZone() {
+    const { x, y, width, height } = CARD_DROP_ZONE;
+    const zone = this.add.zone(x, y, width, height).setOrigin(0, 0);
+    zone.setRectangleDropZone(width, height);
+
+    this.drawCardDropZone(0xffffff);
+  }
+
+  private drawCardDropZone(color: number) {
+    if (!this.#graphics) this.#graphics = this.add.graphics();
+
+    const { x, y, width, height } = CARD_DROP_ZONE;
+    this.#graphics.clear();
+    this.#graphics.lineStyle(2, color);
+    this.#graphics.strokeRect(x, y, width, height);
   }
 }
