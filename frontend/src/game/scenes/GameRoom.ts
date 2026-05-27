@@ -32,8 +32,11 @@ const MAX_CARD_SPACING = 120;
 
 const BIGGEST_DEPTH = 100;
 
+const PILE_Y = 470;
 const DRAW_PILE_X = 610;
-const DRAW_PILE_Y = 470;
+const DRAW_PILE_Y = PILE_Y;
+const DISCARD_PILE_X = 1100;
+const DISCARD_PILE_Y = PILE_Y;
 
 export class GameRoom extends Scene {
   constructor() {
@@ -46,6 +49,7 @@ export class GameRoom extends Scene {
     addPlayers(this, data.players, "white", "black");
 
     this.createDrawPile();
+    this.createDiscardPile();
     this.addCards();
 
     EventBus.emit("current-scene-ready", this);
@@ -54,6 +58,11 @@ export class GameRoom extends Scene {
   private createDrawPile() {
     const cardCover = this.textures.get(Textures.cardCover).get();
     this.addCard(DRAW_PILE_X, DRAW_PILE_Y, cardCover);
+  }
+
+  private createDiscardPile() {
+    const cardFrame = this.textures.get(Textures.cards).get(0);
+    this.addCard(DISCARD_PILE_X, DISCARD_PILE_Y, cardFrame);
   }
 
   private addCards() {
