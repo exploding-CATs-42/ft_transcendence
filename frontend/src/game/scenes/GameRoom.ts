@@ -53,7 +53,7 @@ export class GameRoom extends Scene {
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
       const frame = this.textures.get(Textures.cards).get(i);
-      this.addCard(x, HAND_Y, frame);
+      this.addCard(x, HAND_Y, frame).setDepth(i + 1);
 
       x += spacing;
     }
