@@ -30,6 +30,8 @@ const HAND_Y = 940; // y position of the player's hand
 const MIN_CARD_SPACING = 60;
 const MAX_CARD_SPACING = 120;
 
+const BIGGEST_DEPTH = 100;
+
 export class GameRoom extends Scene {
   constructor() {
     super(Scenes.GameRoom);
@@ -61,9 +63,51 @@ export class GameRoom extends Scene {
     const card = this.add
       .image(x, y, frame.texture.key, frame.name)
       .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
-      .setOrigin(0, 0);
+      .setOrigin(0, 0)
+      .setInteractive({
+        draggable: true,
+        useHandCursor: true,
+      });
+
+    this.attachCardDragHandlers(card);
 
     return card;
+  }
+
+  private attachCardDragHandlers(card: Phaser.GameObjects.Image) {
+    let originX: number;
+    let originDepth: number;
+
+    const onDragStart = () => {
+      originX = card.x;
+      originDepth = card.depth;
+      card.setDepth(BIGGEST_DEPTH);
+    };
+
+    const onDrag = (
+      _pointer: Phaser.Input.Pointer,
+      dragX: number,
+      dragY: number,
+    ) => {
+      card.x = dragX;
+      card.y = dragY;
+    };
+
+    const onDragEnd = () => {
+      card.setDepth(originDepth);
+
+      this.tweens.add({
+        targets: card,
+        x: originX,
+        y: HAND_Y,
+        duration: 300,
+        ease: "Back.Out",
+      });
+    };
+
+    card.on("dragstart", onDragStart);
+    card.on("drag", onDrag);
+    card.on("dragend", onDragEnd);
   }
 
   private getCardSpacing(cardCount: number): number {
