@@ -31,3 +31,13 @@ export const markPlayerReady = ({ context, event }: GameActionArgs) => {
     ),
   };
 };
+
+export const markPlayerUnready = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEventType.MARK_UNREADY) return context;
+
+  return {
+    players: context.players.map((p) =>
+      p.id === event.playerId ? { ...p, isReady: false } : p,
+    ),
+  };
+};
