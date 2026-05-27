@@ -47,8 +47,7 @@ export class GameRoom extends Scene {
 
   private addCards() {
     const spacing = this.getCardSpacing(CARDS_TO_DEAL);
-    const handWidth = (CARDS_TO_DEAL - 1) * spacing + CARD_WIDTH;
-    let x = this.scale.width / 2 - handWidth / 2;
+    let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
       this.add
@@ -86,5 +85,12 @@ export class GameRoom extends Scene {
     const spacing = MAX_SPACING - progress * SPACE_TO_SHRINK;
 
     return spacing;
+  }
+
+  private getHandStartX(cardCount: number, spacing: number): number {
+    const handWidth = (cardCount - 1) * spacing + CARD_WIDTH;
+    const startX = this.scale.width / 2 - handWidth / 2;
+
+    return startX;
   }
 }
