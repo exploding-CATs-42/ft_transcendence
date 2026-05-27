@@ -50,13 +50,20 @@ export class GameRoom extends Scene {
     let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
-      this.add
-        .image(x, HAND_Y, Textures.cards, i)
-        .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
-        .setOrigin(0, 0);
+      const frame = this.textures.get(Textures.cards).get(i);
+      this.addCard(x, HAND_Y, frame);
 
       x += spacing;
     }
+  }
+
+  private addCard(x: number, y: number, frame: Phaser.Textures.Frame) {
+    const card = this.add
+      .image(x, y, frame.texture.key, frame.name)
+      .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
+      .setOrigin(0, 0);
+
+    return card;
   }
 
   private getCardSpacing(cardCount: number): number {
