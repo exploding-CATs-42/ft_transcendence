@@ -43,14 +43,17 @@ export class GameRoom extends Scene {
   }
 
   private addCards() {
-    let x = this.scale.width / 2 - (CARDS_TO_DEAL * CARD_WIDTH) / 2;
+    const spacing = 100;
+    const handWidth = (CARDS_TO_DEAL - 1) * spacing + CARD_WIDTH;
+    let x = this.scale.width / 2 - handWidth / 2;
+
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
       this.add
         .image(x, HAND_Y, Textures.cards, i)
         .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
         .setOrigin(0, 0);
 
-      x += CARD_WIDTH;
+      x += spacing;
     }
   }
 }
