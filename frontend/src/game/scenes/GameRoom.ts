@@ -88,6 +88,8 @@ export class GameRoom extends Scene {
   }
 
   private getHandStartX(cardCount: number, spacing: number): number {
+    if (cardCount === 0) return this.scale.width / 2 - CARD_WIDTH / 2;
+
     const handWidth = (cardCount - 1) * spacing + CARD_WIDTH;
     const startX = this.scale.width / 2 - handWidth / 2;
 
