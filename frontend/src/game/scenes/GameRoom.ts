@@ -90,7 +90,7 @@ export class GameRoom extends Scene {
     let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
-      const frame = this.textures.get(Textures.cards).get(i);
+      const frame = this.getRandomCardFrame();
       const card = this.addInteractiveCard(x, HAND_Y, frame).setDepth(i + 1);
       this.#cards.push(card);
 
