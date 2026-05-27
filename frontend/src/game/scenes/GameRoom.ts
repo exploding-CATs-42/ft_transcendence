@@ -71,7 +71,13 @@ export class GameRoom extends Scene {
 
   private createDrawPile() {
     const cardCover = this.textures.get(Textures.cardCover).get();
-    this.addCard(DRAW_PILE_X, DRAW_PILE_Y, cardCover);
+    const drawPile = this.addCard(
+      DRAW_PILE_X,
+      DRAW_PILE_Y,
+      cardCover,
+    ).setInteractive({ useHandCursor: true });
+
+    drawPile.on("pointerdown", this.drawCard);
   }
 
   private createDiscardPile() {
@@ -326,5 +332,76 @@ export class GameRoom extends Scene {
     this.#graphics.clear();
     this.#graphics.lineStyle(2, color);
     this.#graphics.strokeRect(x, y, width, height);
+  }
+
+  private drawCard = () => {
+    // Generate random insert index
+    const insertIndex = Phaser.Math.Between(0, this.#cards.length);
+    // Calculate current card spacing
+    const spacing = this.getCardSpacing(this.#cards.length);
+
+    // Using that spacing calculate where to insert the card
+    let targetX;
+    if (this.#cards.length === 0) targetX = this.getHandStartX(1, spacing);
+    else if (insertIndex === 0) targetX = this.#cards[0]!.x - spacing / 2;
+    else targetX = this.#cards[insertIndex - 1]!.x + spacing / 2;
+
+    // Update the depth of the cards in player's hand,
+    // so that new card doesn't overlay them
+    this.#cards.forEach((card, index) => {
+      if (index >= insertIndex) card.setDepth(index + 1 + 1);
+      else card.setDepth(index + 1);
+    });
+
+    // Create face down card
+    const cardCover = this.textures.get(Textures.cardCover).get();
+    const faceDownCard = this.addCard(DRAW_PILE_X, DRAW_PILE_Y, cardCover);
+
+    // and move it below the screen
+    // at the x position calculated earlier
+    this.tweens.add({
+      targets: faceDownCard,
+      x: targetX,
+      y: this.scale.height + CARD_HEIGHT / 2,
+      duration: 400,
+      ease: "Sine.easeInOut",
+
+      onComplete: () => {
+        // then destroy it
+        faceDownCard.destroy();
+        // and spawn the real card into player's hand
+        spawnNewCard(targetX, insertIndex);
+      },
+    });
+
+    const spawnNewCard = (targetX: number, insertIndex: number) => {
+      const frame = this.getRandomCardFrame();
+
+      const newCard = this.addInteractiveCard(
+        targetX,
+        this.scale.height,
+        frame,
+      ).setDepth(insertIndex);
+
+      this.tweens.add({
+        targets: newCard,
+        x: targetX,
+        y: HAND_Y,
+        duration: 500,
+        ease: "Back.easeOut",
+
+        onComplete: () => {
+          this.#cards.splice(insertIndex, 0, newCard);
+          if (this.#cards.length > 1) this.reflowCards();
+        },
+      });
+    };
+  };
+
+  private getRandomCardFrame() {
+    const cardSpreadsheet = this.textures.get(Textures.cards);
+    const frameName = Phaser.Math.RND.pick(cardSpreadsheet.getFrameNames());
+    const frame = cardSpreadsheet.get(frameName);
+    return frame;
   }
 }
