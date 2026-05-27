@@ -32,6 +32,9 @@ const MAX_CARD_SPACING = 120;
 
 const BIGGEST_DEPTH = 100;
 
+const DRAW_PILE_X = 610;
+const DRAW_PILE_Y = 470;
+
 export class GameRoom extends Scene {
   constructor() {
     super(Scenes.GameRoom);
@@ -42,9 +45,15 @@ export class GameRoom extends Scene {
     addFullscreenToggle(this);
     addPlayers(this, data.players, "white", "black");
 
+    this.createDrawPile();
     this.addCards();
 
     EventBus.emit("current-scene-ready", this);
+  }
+
+  private createDrawPile() {
+    const cardCover = this.textures.get(Textures.cardCover).get();
+    this.addCard(DRAW_PILE_X, DRAW_PILE_Y, cardCover);
   }
 
   private addCards() {
