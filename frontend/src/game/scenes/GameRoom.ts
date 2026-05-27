@@ -165,7 +165,7 @@ export class GameRoom extends Scene {
       card.off("drop", onCardDrop);
       card.disableInteractive();
 
-      // move it over the discard pile
+      // move it to the discard pile
       this.tweens.add({
         targets: card,
         x: DISCARD_PILE_X,
@@ -174,10 +174,10 @@ export class GameRoom extends Scene {
         ease: "Back.Out",
       });
 
-      // and update it's depth to the lowest
+      // update it's depth to the lowest
       card.setDepth(0);
 
-      // and reflow cards in player's
+      // and reflow cards in player's hand
       this.reflowCards();
     };
 
