@@ -45,6 +45,9 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
+const HOVER_LIFT = 30; // How many px the hovered card rises
+const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
+
 export class GameRoom extends Scene {
   #graphics!: Phaser.GameObjects.Graphics;
   #cards: Phaser.GameObjects.Image[] = [];
@@ -110,6 +113,7 @@ export class GameRoom extends Scene {
 
     this.attachCardDragHandlers(card);
     this.attachCardDropHandler(card);
+    this.attachCardHoverHandler(card);
 
     return card;
   }
@@ -178,6 +182,69 @@ export class GameRoom extends Scene {
     };
 
     card.on("drop", onCardDrop);
+  }
+
+  private attachCardHoverHandler(card: Phaser.GameObjects.Image) {
+    const tween = (target: Phaser.GameObjects.Image, props: object) => {
+      this.tweens.add({
+        targets: target,
+        duration: 120,
+        ease: "Power2",
+        ...props,
+      });
+    };
+
+    const getLayout = () => {
+      const spacing = this.getCardSpacing(this.#cards.length);
+      const startX = this.getHandStartX(this.#cards.length, spacing);
+
+      const getBaseX = (index: number) => startX + index * spacing;
+
+      return { getBaseX };
+    };
+
+    const applyHoverLayout = (hoveredIndex: number) => {
+      const { getBaseX } = getLayout();
+
+      this.#cards.forEach((card, index) => {
+        if (index === hoveredIndex) return;
+
+        const offset = index < hoveredIndex ? -HOVER_OFFSET : HOVER_OFFSET;
+
+        tween(card, {
+          x: getBaseX(index) + offset,
+        });
+      });
+    };
+
+    const resetLayout = () => {
+      const { getBaseX } = getLayout();
+
+      this.#cards.forEach((c, index) => {
+        tween(c, {
+          x: getBaseX(index),
+        });
+      });
+    };
+
+    const liftCard = () => {
+      tween(card, { y: HAND_Y - HOVER_LIFT });
+    };
+
+    const lowerCard = () => {
+      tween(card, { y: HAND_Y });
+    };
+
+    card.on("pointerover", () => {
+      const hoveredIndex = this.#cards.indexOf(card);
+      liftCard();
+      applyHoverLayout(hoveredIndex);
+    });
+
+    card.on("pointerout", () => {
+      lowerCard();
+      resetLayout();
+    });
   }
 
   private getCardSpacing(cardCount: number): number {
