@@ -66,7 +66,7 @@ export class GameRoom extends Scene {
     this.createDiscardPile();
     this.dealCards();
 
-    EventBus.emit("current-scene-ready", this);
+    EventBus.emit("scene-ready", this);
   }
 
   private createDrawPile() {
