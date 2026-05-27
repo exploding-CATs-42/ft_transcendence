@@ -62,7 +62,7 @@ export class GameRoom extends Scene {
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
       const frame = this.textures.get(Textures.cards).get(i);
-      this.addCard(x, HAND_Y, frame).setDepth(i + 1);
+      this.addInteractiveCard(x, HAND_Y, frame).setDepth(i + 1);
 
       x += spacing;
     }
@@ -72,11 +72,20 @@ export class GameRoom extends Scene {
     const card = this.add
       .image(x, y, frame.texture.key, frame.name)
       .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
-      .setOrigin(0, 0)
-      .setInteractive({
-        draggable: true,
-        useHandCursor: true,
-      });
+      .setOrigin(0, 0);
+
+    return card;
+  }
+
+  private addInteractiveCard(
+    x: number,
+    y: number,
+    frame: Phaser.Textures.Frame,
+  ): Phaser.GameObjects.Image {
+    const card = this.addCard(x, y, frame).setInteractive({
+      draggable: true,
+      useHandCursor: true,
+    });
 
     this.attachCardDragHandlers(card);
 
