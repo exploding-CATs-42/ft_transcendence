@@ -7,6 +7,7 @@ import {
   fullScreenToggle,
   gameRoomBg,
   waitingRoomBg,
+  cards,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 
@@ -27,6 +28,11 @@ export class Preloader extends Scene {
     this.load.image(Textures.waitingRoomBg, waitingRoomBg);
     this.load.image(Textures.avatar, avatar);
     this.load.image(Textures.gameRoomBg, gameRoomBg);
+    this.load.spritesheet(Textures.cards, cards, {
+      frameWidth: 372,
+      frameHeight: 520,
+      endFrame: 40,
+    });
   }
 
   create() {
