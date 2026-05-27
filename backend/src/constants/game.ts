@@ -48,3 +48,5 @@ export const DEFAULT_GAME_STATE: GameState = {
   startedAt: null,
   finishedAt: null,
 };
+
+export const MIN_PLAYERS = 2;
