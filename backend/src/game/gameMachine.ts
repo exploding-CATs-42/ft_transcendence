@@ -24,6 +24,10 @@ export const gameMachine = setup({
   }),
   states: {
     waiting: {
+      initial: "readying",
+      states: {
+        readying: {},
+      },
       on: {
         START_GAME: "playing",
         JOIN_GAME: {
