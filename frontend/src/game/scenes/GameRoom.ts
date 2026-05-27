@@ -107,6 +107,7 @@ export class GameRoom extends Scene {
     });
 
     this.attachCardDragHandlers(card);
+    this.attachCardDropHandler(card);
 
     return card;
   }
@@ -145,6 +146,14 @@ export class GameRoom extends Scene {
     card.on("dragstart", onDragStart);
     card.on("drag", onDrag);
     card.on("dragend", onDragEnd);
+  }
+
+  private attachCardDropHandler(card: Phaser.GameObjects.Image) {
+    const onCardDrop = () => {
+      this.drawCardDropZone(0xffffff);
+    };
+
+    card.on("drop", onCardDrop);
   }
 
   private getCardSpacing(cardCount: number): number {
@@ -190,6 +199,14 @@ export class GameRoom extends Scene {
     zone.setRectangleDropZone(width, height);
 
     this.drawCardDropZone(0xffffff);
+
+    this.input.on("dragenter", () => {
+      this.drawCardDropZone(0x00ff00);
+    });
+
+    this.input.on("dragleave", () => {
+      this.drawCardDropZone(0xffffff);
+    });
   }
 
   private drawCardDropZone(color: number) {
