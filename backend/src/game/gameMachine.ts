@@ -64,6 +64,12 @@ export const gameMachine = setup({
               target: "#game.playing",
             },
           },
+          on: {
+            JOIN_GAME: {
+              target: "#game.waiting.readying",
+              actions: "addPlayer",
+            },
+          },
         },
       },
     },
