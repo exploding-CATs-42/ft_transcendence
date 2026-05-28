@@ -98,9 +98,15 @@ export class GameRoom extends Scene {
     }
   }
 
-  private addCard(x: number, y: number, frame: Phaser.Textures.Frame) {
+  private addCard(
+    x: number,
+    y: number,
+    frame: Phaser.Textures.Frame,
+    width = CARD_WIDTH,
+    height = CARD_HEIGHT,
+  ) {
     const card = this.addRoundedCard(x, y, frame)
-      .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
+      .setDisplaySize(width, height)
       .setOrigin(0, 0);
 
     return card;
@@ -250,20 +256,21 @@ export class GameRoom extends Scene {
     });
   }
 
-  private getCardSpacing(cardCount: number): number {
-    const MIN_SPACING = MIN_CARD_SPACING; // many cards
-    const MAX_SPACING = MAX_CARD_SPACING; // few cards
-    const MAX_COUNT = 20;
-
-    if (cardCount <= 1) return MAX_SPACING;
-    if (cardCount >= MAX_COUNT) return MIN_SPACING;
+  private getCardSpacing(
+    cardCount: number,
+    minSpacing = MIN_CARD_SPACING,
+    maxSpacing = MAX_CARD_SPACING,
+    maxCount = 20,
+  ): number {
+    if (cardCount <= 1) return maxSpacing;
+    if (cardCount >= maxCount) return minSpacing;
 
     // Calculate how full the hand is.
     // If we have 1 card - it's empty
     // If we have 20+ cards it's full
     // The progress is a value from 0 to 1 (0% -> 100%)
-    const progress = (cardCount - 1) / (MAX_COUNT - 1);
-    const SPACE_TO_SHRINK = MAX_SPACING - MIN_SPACING;
+    const progress = (cardCount - 1) / (maxCount - 1);
+    const SPACE_TO_SHRINK = maxSpacing - minSpacing;
 
     // Decrease the spacing on some amount
     // from the amount of on how much spacing can shrink
@@ -273,16 +280,21 @@ export class GameRoom extends Scene {
     // the bigger will be progress
     // and therefore the bigger will be (progress * SPACE_TO_SHRINK)
     // thus the smaller will be the spacing
-    const spacing = MAX_SPACING - progress * SPACE_TO_SHRINK;
+    const spacing = maxSpacing - progress * SPACE_TO_SHRINK;
 
     return spacing;
   }
 
-  private getHandStartX(cardCount: number, spacing: number): number {
-    if (cardCount === 0) return this.scale.width / 2 - CARD_WIDTH / 2;
+  private getHandStartX(
+    cardCount: number,
+    spacing: number,
+    cardWidth = CARD_WIDTH,
+    baseX = this.scale.width / 2,
+  ): number {
+    if (cardCount === 0) return baseX - cardWidth / 2;
 
-    const handWidth = (cardCount - 1) * spacing + CARD_WIDTH;
-    const startX = this.scale.width / 2 - handWidth / 2;
+    const handWidth = (cardCount - 1) * spacing + cardWidth;
+    const startX = baseX - handWidth / 2;
 
     return startX;
   }
