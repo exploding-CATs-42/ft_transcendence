@@ -49,7 +49,6 @@ const HOVER_LIFT = 30; // How many px the hovered card rises
 const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
 
 export class GameRoom extends Scene {
-  #graphics!: Phaser.GameObjects.Graphics;
   #cards: Phaser.GameObjects.Image[] = [];
 
   constructor() {
@@ -161,8 +160,6 @@ export class GameRoom extends Scene {
 
   private attachCardDropHandler(card: Phaser.GameObjects.Image) {
     const onCardDrop = () => {
-      this.drawCardDropZone(0xffffff);
-
       // Remove card from player's hand
       this.#cards = this.#cards.filter((c) => c !== card);
 
@@ -312,25 +309,6 @@ export class GameRoom extends Scene {
     const { x, y, width, height } = CARD_DROP_ZONE;
     const zone = this.add.zone(x, y, width, height).setOrigin(0, 0);
     zone.setRectangleDropZone(width, height);
-
-    this.drawCardDropZone(0xffffff);
-
-    this.input.on("dragenter", () => {
-      this.drawCardDropZone(0x00ff00);
-    });
-
-    this.input.on("dragleave", () => {
-      this.drawCardDropZone(0xffffff);
-    });
-  }
-
-  private drawCardDropZone(color: number) {
-    if (!this.#graphics) this.#graphics = this.add.graphics();
-
-    const { x, y, width, height } = CARD_DROP_ZONE;
-    this.#graphics.clear();
-    this.#graphics.lineStyle(2, color);
-    this.#graphics.strokeRect(x, y, width, height);
   }
 
   private drawCard = () => {
