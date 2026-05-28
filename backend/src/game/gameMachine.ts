@@ -47,6 +47,9 @@ export const gameMachine = setup({
             JOIN_GAME: {
               actions: "addPlayer",
             },
+            LEAVE_GAME: {
+              actions: "removePlayer",
+            },
             MARK_READY: {
               actions: "markPlayerReady",
             },
@@ -65,9 +68,6 @@ export const gameMachine = setup({
       },
       on: {
         START_GAME: "playing",
-        LEAVE_GAME: {
-          actions: "removePlayer",
-        },
       },
     },
     playing: {},
