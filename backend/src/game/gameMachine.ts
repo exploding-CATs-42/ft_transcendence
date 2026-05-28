@@ -73,6 +73,10 @@ export const gameMachine = setup({
               target: "#game.waiting.readying",
               actions: "removePlayer",
             },
+            MARK_UNREADY: {
+              target: "#game.waiting.readying",
+              actions: "markPlayerUnready",
+            },
           },
         },
       },
