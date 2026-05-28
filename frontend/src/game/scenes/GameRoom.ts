@@ -23,6 +23,7 @@ const data: { players: Player[] } = {
 
 const CARD_WIDTH = 186;
 const CARD_HEIGHT = 260;
+const CARD_BORDER_RADIUS = 20;
 
 const CARDS_TO_DEAL = 7;
 const HAND_Y = 940; // y position of the player's hand
@@ -386,7 +387,7 @@ export class GameRoom extends Scene {
     x: number,
     y: number,
     frame: Phaser.Textures.Frame,
-    radius = 20,
+    radius = CARD_BORDER_RADIUS,
   ) {
     const scaledRadius = (radius / CARD_HEIGHT) * frame.realHeight;
     const textureKey = `rounded_card_${frame.name}`;
