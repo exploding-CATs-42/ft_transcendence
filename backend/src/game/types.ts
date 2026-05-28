@@ -6,7 +6,7 @@ export interface Player {
   id: UserId;
   name: string;
   hand: CardInstance[];
-  isReady: boolean;
+  isConfirmed: boolean;
   isAlive: boolean;
   turnOrder: number;
 }

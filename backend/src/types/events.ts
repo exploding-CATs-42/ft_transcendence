@@ -79,7 +79,7 @@ export interface PublicPlayerView {
 export interface WaitingPlayerView {
   id: string;
   name: string;
-	isReady: boolean;
+  isConfirmed: boolean;
 }
 
 export interface WaitingStateView {

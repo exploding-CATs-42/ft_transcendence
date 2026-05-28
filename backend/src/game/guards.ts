@@ -8,6 +8,6 @@ export interface GameGuardArgs {
 export const canEnterStarting = ({ context }: GameGuardArgs) => {
   return (
     context.players.length >= MIN_PLAYERS &&
-    context.players.every((p) => p.isReady)
+    context.players.every((p) => p.isConfirmed)
   );
 };
