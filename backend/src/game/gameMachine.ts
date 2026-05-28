@@ -69,6 +69,10 @@ export const gameMachine = setup({
               target: "#game.waiting.readying",
               actions: "addPlayer",
             },
+            LEAVE_GAME: {
+              target: "#game.waiting.readying",
+              actions: "removePlayer",
+            },
           },
         },
       },
