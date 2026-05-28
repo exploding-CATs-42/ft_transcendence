@@ -22,22 +22,25 @@ export const removePlayer = ({ context, event }: GameActionArgs) => {
   };
 };
 
-export const markPlayerReady = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEventType.MARK_READY) return context;
+export const addPlayerConfirmation = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEventType.CONFIRM_START) return context;
 
   return {
     players: context.players.map((p) =>
-      p.id === event.playerId ? { ...p, isReady: true } : p,
+      p.id === event.playerId ? { ...p, isConfirmed: true } : p,
     ),
   };
 };
 
-export const markPlayerUnready = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEventType.MARK_UNREADY) return context;
+export const removePlayerConfirmation = ({
+  context,
+  event,
+}: GameActionArgs) => {
+  if (event.type !== GameEventType.CANCEL_START) return context;
 
   return {
     players: context.players.map((p) =>
-      p.id === event.playerId ? { ...p, isReady: false } : p,
+      p.id === event.playerId ? { ...p, isConfirmed: false } : p,
     ),
   };
 };

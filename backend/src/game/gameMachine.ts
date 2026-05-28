@@ -1,9 +1,9 @@
 import { assign, setup } from "xstate";
 import {
   addPlayer,
-  markPlayerReady,
-  markPlayerUnready,
+  addPlayerConfirmation,
   removePlayer,
+  removePlayerConfirmation,
 } from "./actions";
 import { Player } from "./types";
 import { GameEvent } from "./events";
@@ -22,8 +22,8 @@ export const gameMachine = setup({
   actions: {
     addPlayer: assign(addPlayer),
     removePlayer: assign(removePlayer),
-    markPlayerReady: assign(markPlayerReady),
-    markPlayerUnready: assign(markPlayerUnready),
+    addPlayerConfirmation: assign(addPlayerConfirmation),
+    removePlayerConfirmation: assign(removePlayerConfirmation),
   },
   guards: {
     canEnterStarting,
@@ -36,9 +36,9 @@ export const gameMachine = setup({
   }),
   states: {
     waiting: {
-      initial: "readying",
+      initial: "confirming",
       states: {
-        readying: {
+        confirming: {
           always: {
             guard: "canEnterStarting",
             target: "starting",
@@ -50,11 +50,11 @@ export const gameMachine = setup({
             LEAVE_GAME: {
               actions: "removePlayer",
             },
-            MARK_READY: {
-              actions: "markPlayerReady",
+            CONFIRM_START: {
+              actions: "addPlayerConfirmation",
             },
-            MARK_UNREADY: {
-              actions: "markPlayerUnready",
+            CANCEL_START: {
+              actions: "removePlayerConfirmation",
             },
           },
         },
@@ -66,16 +66,16 @@ export const gameMachine = setup({
           },
           on: {
             JOIN_GAME: {
-              target: "#game.waiting.readying",
+              target: "#game.waiting.confirming",
               actions: "addPlayer",
             },
             LEAVE_GAME: {
-              target: "#game.waiting.readying",
+              target: "#game.waiting.confirming",
               actions: "removePlayer",
             },
-            MARK_UNREADY: {
-              target: "#game.waiting.readying",
-              actions: "markPlayerUnready",
+            CANCEL_START: {
+              target: "#game.waiting.confirming",
+              actions: "removePlayerConfirmation",
             },
           },
         },
