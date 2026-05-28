@@ -73,9 +73,9 @@ export async function deleteGame(userId: UserId, input: DeleteGameParams) {
 
 export async function joinGame(
   input: JoinGameParams,
-  usedId: string,
+  userId: string,
 ): Promise<string> {
-  const user = await ensureUserExists(usedId);
+  const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
   const { players } = game.actor.getSnapshot().context;
