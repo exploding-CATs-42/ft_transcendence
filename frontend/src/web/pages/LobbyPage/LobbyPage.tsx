@@ -1,15 +1,10 @@
-// Libraries
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
-
-// Project level
 import api from "api";
 import { Section, Button, List, MatchListItem } from "components";
 import { useModal } from "hooks";
 import type { LobbyMatch } from "types";
-
-// Local level
 import {
   CreateTableModal,
   type CreateTableFormValues,
