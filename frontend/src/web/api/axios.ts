@@ -10,6 +10,15 @@ export const api = axios.create({
   withCredentials: true,
 });
 
+let refreshPromise: Promise<string> | null = null;
+
+const refreshAccessToken = async () => {
+  const refreshResponse = await api.post("/users/refresh");
+  const { accessToken } = refreshResponse.data;
+
+  return accessToken;
+};
+
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
@@ -23,8 +32,13 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
-      const refreshResponse = await api.post("/users/refresh");
-      const { accessToken } = refreshResponse.data;
+      if (!refreshPromise) {
+        refreshPromise = refreshAccessToken().finally(() => {
+          refreshPromise = null;
+        });
+      }
+
+      const accessToken = await refreshPromise;
 
       setAxiosToken(accessToken);
 
