@@ -33,9 +33,9 @@ export type LoginResponse = RegisterResponse;
 
 const login = async (body: UserCredentials): Promise<LoginResponse> => {
   const result = await api.post("/users/login", body);
-  const { token } = result.data;
+  const { accessToken } = result.data;
 
-  setAxiosToken(token);
+  setAxiosToken(accessToken);
   return result.data;
 };
 
