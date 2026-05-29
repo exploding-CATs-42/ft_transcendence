@@ -1,7 +1,7 @@
 import { prisma } from "../lib/prisma";
 import { hashPassword } from "../utils/hash";
-import { selfProfileSelect, toSelfProfileUser } from "./usersService";
 import type { SelfProfileUser } from "../types/auth";
+import { selfProfileSelect, toSelfProfileUser } from "../utils/users";
 
 export class MeServiceError extends Error {
   public statusCode: number;
