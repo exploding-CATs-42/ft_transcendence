@@ -1,7 +1,12 @@
-import express from "express";
-import { authMiddleware } from "../../middlewares";
+import { errorMiddleware } from "../../middlewares";
+
 import { updateMeController } from "../../controllers/meController";
 
-export const meRouter = express.Router();
+import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
+import { asyncHandler } from "../../utils/asyncHandler";
 
-meRouter.patch("/", authMiddleware, updateMeController);
+export const meRouter = createAuthenticatedRouter();
+
+meRouter.patch("/", asyncHandler(updateMeController));
+
+meRouter.use(errorMiddleware);
