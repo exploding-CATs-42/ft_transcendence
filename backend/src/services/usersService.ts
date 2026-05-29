@@ -25,12 +25,9 @@ export const publicProfileSelect = {
 } satisfies Prisma.UserSelect;
 
 export const selfProfileSelect = {
-  id: true,
+  ...publicProfileSelect,
+
   email: true,
-  username: true,
-  avatarUrl: true,
-  isOnline: true,
-  lastSeenAt: true,
 } satisfies Prisma.UserSelect;
 
 export function toFriendUser(user: {
