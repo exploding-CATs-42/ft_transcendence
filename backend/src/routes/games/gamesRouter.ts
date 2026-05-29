@@ -4,7 +4,7 @@ import {
   getGameByIdController,
   getGamesController,
 } from "../../controllers/gamesController";
-import { errorMiddleware } from "../../middlewares/games/ErrorRequestMiddleware";
+import { errorMiddleware } from "../../middlewares";
 import { asyncHandler } from "../../utils/asyncHandler";
 import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
 
