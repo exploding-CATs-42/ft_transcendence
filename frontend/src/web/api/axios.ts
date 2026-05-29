@@ -110,3 +110,7 @@ export const setAccessTokenRefreshHandler = (
 ) => {
   onAccessTokenRefresh = handler;
 };
+
+export const clearAxiosToken = () => {
+  delete api.defaults.headers.common.Authorization;
+};
