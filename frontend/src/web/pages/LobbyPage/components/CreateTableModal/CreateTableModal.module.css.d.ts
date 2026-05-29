@@ -1,24 +1,17 @@
 declare const styles: {
-  readonly modal: string;
-  readonly form: string;
-  readonly backgroundImage: string;
-  readonly overlay: string;
-  readonly content: string;
-  readonly title: string;
-  readonly inputWrapper: string;
-  readonly textInput: string;
-  readonly inputIcon: string;
-  readonly puzzleIcon: string;
-  readonly userIcon: string;
-  readonly selectField: string;
-  readonly select: string;
-  readonly selectArrowWrapper: string;
-  readonly selectArrow: string;
-  readonly submitError: string;
-  readonly submitButton: string;
-  readonly footer: string;
-  readonly footerText: string;
-  readonly joinButton: string;
+  readonly "createButton": string;
+  readonly "createModal": string;
+  readonly "createModalContent": string;
+  readonly "icon": string;
+  readonly "joinLink": string;
+  readonly "joinText": string;
+  readonly "modalInput": string;
+  readonly "modalSelect": string;
+  readonly "modalTitle": string;
+  readonly "selectArrow": string;
+  readonly "selectArrowWrapper": string;
+  readonly "selectField": string;
+  readonly "submitError": string;
 };
 
-export default styles;
+export = styles;
