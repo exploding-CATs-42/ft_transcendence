@@ -7,7 +7,8 @@ services:
     ports:
       - "${NGINX_PORT}:80"
     environment:
-      PARANOIA: 1
+      PARANOIA: 2
+      BLOCKING_PARANOIA: 2
       ANOMALY_INBOUND: 5
       ANOMALY_OUTBOUND: 4
       MODSEC_RULE_ENGINE: On
