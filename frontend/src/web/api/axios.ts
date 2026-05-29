@@ -59,3 +59,7 @@ api.interceptors.response.use(
 export const setAxiosToken = (token: string) => {
   api.defaults.headers.common.Authorization = `Bearer ${token}`;
 };
+
+export const clearAxiosToken = () => {
+  delete api.defaults.headers.common.Authorization;
+};
