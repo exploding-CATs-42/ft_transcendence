@@ -155,7 +155,7 @@ export async function refreshController(
       accessToken: result.accessToken,
     });
   } catch (error) {
-    if (error instanceof UsersServiceError) {
+    if (error instanceof AuthServiceError) {
       return res.status(error.statusCode).json({ message: error.message });
     }
 
