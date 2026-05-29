@@ -1,5 +1,4 @@
 import { errorMiddleware } from "../../middlewares";
-
 import { updateMeController } from "../../controllers/meController";
 
 import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
