@@ -23,12 +23,14 @@ api.interceptors.response.use(
   (res) => res,
   async (error) => {
     const originalRequest = error.config;
+    const requestUrl = originalRequest?.url;
 
     if (
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
-      originalRequest.url !== "/users/refresh"
+      requestUrl !== "/users/refresh" &&
+      requestUrl !== "/users/logout"
     ) {
       originalRequest._retry = true;
 
