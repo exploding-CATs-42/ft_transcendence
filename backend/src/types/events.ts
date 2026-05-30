@@ -33,6 +33,8 @@ export const PublicEventType = {
   PLAYER_LEFT: "player-left",
   PLAYER_CONFIRMED: "player-confirmed",
   PLAYER_CANCELED: "player-canceled",
+  COUNTDOWN_STARTED: "countdown-started",
+  COUNTDOWN_CANCELED: "countdown-canceled",
   GAME_STARTED: "GAME_STARTED",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "CARD_PLAYED",
