@@ -2,6 +2,7 @@ import { ApiError } from "../errors/apiError";
 import { SocketError } from "../errors/socketError";
 
 import {
+  CancelStartParams,
   ConfirmStartParams,
   CreateGameRequestBody,
   DeleteGameParams,
@@ -161,6 +162,29 @@ export async function confirmStart(input: ConfirmStartParams, userId: UserId) {
 
   game.actor.send({
     type: GameEventType.CONFIRM_START,
+    playerId: player.id,
+  });
+
+  const playersAfter = game.actor.getSnapshot().context.players;
+  return { players: playersAfter.map(toWaitingPlayerView) };
+}
+
+export async function cancelStart(input: CancelStartParams, userId: UserId) {
+  const user = await ensureUserExists(userId);
+
+  const game = ensureGameExists(input.gameId);
+  const playersBefore = game.actor.getSnapshot().context.players;
+
+  const player = playersBefore.find((player) => {
+    return player.id === user.id;
+  });
+
+  if (!player) {
+    throw new SocketError("Player is not in the game");
+  }
+
+  game.actor.send({
+    type: GameEventType.CANCEL_START,
     playerId: player.id,
   });
 
