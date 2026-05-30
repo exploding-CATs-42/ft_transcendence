@@ -30,7 +30,8 @@ api.interceptors.response.use(
       originalRequest &&
       !originalRequest._retry &&
       requestUrl !== "/users/refresh" &&
-      requestUrl !== "/users/logout"
+      requestUrl !== "/users/logout" &&
+      requestUrl !== "/users/login"
     ) {
       originalRequest._retry = true;
 
