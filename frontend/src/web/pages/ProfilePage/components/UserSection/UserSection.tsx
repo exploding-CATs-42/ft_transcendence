@@ -16,8 +16,6 @@ const UserSection = ({ user }: Props) => {
   const logoutUser = async () => {
     try {
       await api.auth.logout();
-    } catch {
-      // Logout is best-effort because the backend session may already be expired.
     } finally {
       clearAccessToken();
     }
