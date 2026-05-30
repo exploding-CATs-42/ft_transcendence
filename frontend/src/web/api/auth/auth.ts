@@ -40,8 +40,11 @@ const login = async (body: UserCredentials): Promise<LoginResponse> => {
 };
 
 const logout = async () => {
-  await api.post("/users/logout");
-  clearAxiosToken();
+  try {
+    await api.post("/users/logout");
+  } finally {
+    clearAxiosToken();
+  }
 };
 
 const refresh = async () => {
