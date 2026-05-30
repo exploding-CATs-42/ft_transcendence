@@ -1,4 +1,4 @@
-import { assign, setup } from "xstate";
+import { assign, emit, setup } from "xstate";
 import {
   addPlayer,
   addPlayerConfirmation,
@@ -9,6 +9,7 @@ import { Player } from "./types";
 import { GameEvent } from "./events";
 import { canEnterStarting } from "./guards";
 import { START_GAME_COUNTDOWN_MS } from "../constants/game";
+import { GameEmitter } from "./emitters";
 
 export interface GameContext {
   players: Player[];
@@ -18,6 +19,7 @@ export const gameMachine = setup({
   types: {
     context: {} as GameContext,
     events: {} as GameEvent,
+    emitted: {} as GameEmitter,
   },
   actions: {
     addPlayer: assign(addPlayer),
@@ -59,6 +61,10 @@ export const gameMachine = setup({
           },
         },
         starting: {
+          entry: emit(() => ({
+            type: "COUNTDOWN_STARTED",
+            endsAt: Date.now() + START_GAME_COUNTDOWN_MS,
+          })),
           after: {
             [START_GAME_COUNTDOWN_MS]: {
               target: "#game.playing",
