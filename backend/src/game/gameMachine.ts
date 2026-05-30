@@ -73,15 +73,18 @@ export const gameMachine = setup({
           on: {
             JOIN_GAME: {
               target: "#game.waiting.confirming",
-              actions: "addPlayer",
+              actions: ["addPlayer", emit({ type: "COUNTDOWN_CANCELED" })],
             },
             LEAVE_GAME: {
               target: "#game.waiting.confirming",
-              actions: "removePlayer",
+              actions: ["removePlayer", emit({ type: "COUNTDOWN_CANCELED" })],
             },
             CANCEL_START: {
               target: "#game.waiting.confirming",
-              actions: "removePlayerConfirmation",
+              actions: [
+                "removePlayerConfirmation",
+                emit({ type: "COUNTDOWN_CANCELED" }),
+              ],
             },
           },
         },
