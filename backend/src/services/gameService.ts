@@ -176,7 +176,10 @@ export async function confirmStart(
   return { playerId: player.id };
 }
 
-export async function cancelStart(input: CancelStartParams, userId: UserId) {
+export async function cancelStart(
+  input: CancelStartParams,
+  userId: UserId,
+): Promise<PlayerIdPayload> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
@@ -195,6 +198,5 @@ export async function cancelStart(input: CancelStartParams, userId: UserId) {
     playerId: player.id,
   });
 
-  const playersAfter = game.actor.getSnapshot().context.players;
-  return { players: playersAfter.map(toWaitingPlayerView) };
+  return { playerId: player.id };
 }
