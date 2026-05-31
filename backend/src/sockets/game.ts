@@ -70,10 +70,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.CONFIRM_START_ERROR,
       async (parsed: ConfirmStartParams) => {
-        const waitingState = await confirmStart(parsed, socket.data.sub);
+        const { playerId } = await confirmStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(PublicEventType.PLAYER_CONFIRMED, waitingState);
+        io.to(room).emit(PublicEventType.PLAYER_CONFIRMED, { playerId });
       },
     ),
   );
