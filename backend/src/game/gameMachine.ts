@@ -90,6 +90,8 @@ export const gameMachine = setup({
         },
       },
     },
-    playing: {},
+    playing: {
+      entry: emit({ type: "GAME_STARTED" }),
+    },
   },
 });
