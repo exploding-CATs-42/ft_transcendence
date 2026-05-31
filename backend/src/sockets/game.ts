@@ -85,10 +85,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.CANCEL_START_ERROR,
       async (parsed: CancelStartParams) => {
-        const waitingState = await cancelStart(parsed, socket.data.sub);
+        const { playerId } = await cancelStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(PublicEventType.PLAYER_CANCELED, waitingState);
+        io.to(room).emit(PublicEventType.PLAYER_CANCELED, { playerId });
       },
     ),
   );
