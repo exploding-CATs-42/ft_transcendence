@@ -18,6 +18,10 @@ export function attachBroadcaster(
     throw new Error("io for broadcaster wasn't initialized.");
   }
 
+  actor.on(GameEmitterType.GAME_STARTED, () => {
+    io!.to(gameId).emit(PublicEventType.GAME_STARTED);
+  });
+
   actor.on(GameEmitterType.COUNTDOWN_STARTED, (event) => {
     io!
       .to(gameId)
