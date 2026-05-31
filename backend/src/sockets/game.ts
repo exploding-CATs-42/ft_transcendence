@@ -53,12 +53,12 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
-        const waitingState = await leaveGame(parsed, socket.data.sub);
+        const { playerId } = await leaveGame(parsed, socket.data.sub);
         const room = parsed.gameId;
         await socket.leave(room);
 
-        socket.emit(PrivateEventType.YOU_LEFT);
-        io.to(room).emit(PublicEventType.PLAYER_LEFT, waitingState);
+        socket.emit(PrivateEventType.LEFT_GAME);
+        io.to(room).emit(PublicEventType.PLAYER_LEFT, { playerId });
       },
     ),
   );

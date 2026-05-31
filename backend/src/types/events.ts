@@ -99,6 +99,10 @@ export interface JoinGameResult {
   waitingState: WaitingStateView;
 }
 
+export interface PlayerIdPayload {
+  playerId: string;
+}
+
 export interface CardPlayedPayload {
   playerId: string;
   cardType: string;
@@ -128,7 +132,7 @@ export interface NopeWindowResolvedPayload {
 }
 
 export const PrivateEventType = {
-  YOU_LEFT: "you-left",
+  LEFT_GAME: "left-game",
   WAITING_STATE: "waiting-state",
   YOUR_HAND: "YOUR_HAND",
   CARD_RECEIVED: "CARD_RECEIVED",
