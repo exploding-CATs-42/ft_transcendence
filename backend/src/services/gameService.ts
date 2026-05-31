@@ -15,7 +15,7 @@ import { createActor } from "xstate";
 import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
 import { Game, GameInfo, Player } from "../game/types";
-import { UserId, WaitingStateView } from "../types";
+import { JoinGameResult, UserId, WaitingStateView } from "../types";
 import GameStore from "../utils/gameStore";
 import { ensureUserExists } from "../utils/users";
 import { toWaitingPlayerView } from "../game/mappers";
@@ -79,7 +79,7 @@ export async function deleteGame(userId: UserId, input: DeleteGameParams) {
 export async function joinGame(
   input: JoinGameParams,
   userId: UserId,
-): Promise<WaitingStateView> {
+): Promise<JoinGameResult> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
@@ -112,7 +112,11 @@ export async function joinGame(
   });
 
   const playersAfter = game.actor.getSnapshot().context.players;
-  return { players: playersAfter.map(toWaitingPlayerView) };
+
+  return {
+    player: toWaitingPlayerView(player),
+    waitingState: { players: playersAfter.map(toWaitingPlayerView) },
+  };
 }
 
 export async function leaveGame(
