@@ -33,11 +33,15 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
-        const waitingState = await joinGame(parsed, socket.data.sub);
+        const { waitingState, player } = await joinGame(
+          parsed,
+          socket.data.sub,
+        );
         const room = parsed.gameId;
         await socket.join(room);
 
-        io.to(room).emit(PublicEventType.PLAYER_JOINED, waitingState);
+        socket.emit(PrivateEventType.WAITING_STATE, { waitingState });
+        socket.to(room).emit(PublicEventType.PLAYER_JOINED, { player });
       },
     ),
   );
