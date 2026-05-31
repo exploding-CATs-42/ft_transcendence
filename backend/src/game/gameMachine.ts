@@ -9,7 +9,12 @@ import { Player } from "./types";
 import { GameEvent } from "./events";
 import { canEnterStarting } from "./guards";
 import { START_GAME_COUNTDOWN_MS } from "../constants/game";
-import { GameEmitter } from "./emitters";
+import {
+  countdownCanceled,
+  countdownStarted,
+  GameEmitter,
+  gameStarted,
+} from "./emitters";
 
 export interface GameContext {
   players: Player[];
@@ -61,10 +66,7 @@ export const gameMachine = setup({
           },
         },
         starting: {
-          entry: emit(() => ({
-            type: "COUNTDOWN_STARTED",
-            endsAt: Date.now() + START_GAME_COUNTDOWN_MS,
-          })),
+          entry: emit(countdownStarted),
           after: {
             [START_GAME_COUNTDOWN_MS]: {
               target: "#game.playing",
@@ -81,17 +83,14 @@ export const gameMachine = setup({
             },
             CANCEL_START: {
               target: "#game.waiting.confirming",
-              actions: [
-                "removePlayerConfirmation",
-                emit({ type: "COUNTDOWN_CANCELED" }),
-              ],
+              actions: ["removePlayerConfirmation", emit(countdownCanceled)],
             },
           },
         },
       },
     },
     playing: {
-      entry: emit({ type: "GAME_STARTED" }),
+      entry: emit(gameStarted),
     },
   },
 });
