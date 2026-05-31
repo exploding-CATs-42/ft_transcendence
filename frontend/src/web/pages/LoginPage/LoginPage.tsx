@@ -68,6 +68,7 @@ const LoginPage = () => {
               <EmailInput
                 {...register("email")}
                 status={errors.email ? "error" : "normal"}
+                autoFocus
               />
             </FormField>
             <FormField error={errors.password?.message && "Invalid password"}>
