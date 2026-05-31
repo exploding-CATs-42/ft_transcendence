@@ -19,6 +19,7 @@ import { UserId, WaitingStateView } from "../types";
 import GameStore from "../utils/gameStore";
 import { ensureUserExists } from "../utils/users";
 import { toWaitingPlayerView } from "../game/mappers";
+import { attachBroadcaster } from "../game/broadcaster";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
@@ -62,6 +63,7 @@ export async function createGame(
     },
     actor,
   };
+  attachBroadcaster(game.info.id, actor);
   actor.start();
   GameStore.setGame(game);
   return game.info;
