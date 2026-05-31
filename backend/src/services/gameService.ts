@@ -15,12 +15,7 @@ import { createActor } from "xstate";
 import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
 import { Game, GameInfo, Player } from "../game/types";
-import {
-  JoinGameResult,
-  LeaveGameResult,
-  PlayerIdPayload,
-  UserId,
-} from "../types";
+import { JoinGameResult, PlayerIdPayload, UserId } from "../types";
 import GameStore from "../utils/gameStore";
 import { ensureUserExists } from "../utils/users";
 import { toWaitingPlayerView } from "../game/mappers";
@@ -156,7 +151,10 @@ export async function leaveGame(
   return { playerId: player.id };
 }
 
-export async function confirmStart(input: ConfirmStartParams, userId: UserId) {
+export async function confirmStart(
+  input: ConfirmStartParams,
+  userId: UserId,
+): Promise<PlayerIdPayload> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
@@ -175,8 +173,7 @@ export async function confirmStart(input: ConfirmStartParams, userId: UserId) {
     playerId: player.id,
   });
 
-  const playersAfter = game.actor.getSnapshot().context.players;
-  return { players: playersAfter.map(toWaitingPlayerView) };
+  return { playerId: player.id };
 }
 
 export async function cancelStart(input: CancelStartParams, userId: UserId) {
