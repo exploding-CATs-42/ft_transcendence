@@ -5,5 +5,5 @@ export const getAccessToken = (): string | null => {
 
   if (!keys) return null;
 
-  return JSON.parse(keys).accessToken ?? null;
+  return JSON.parse(keys)?.accessToken ?? null;
 };
