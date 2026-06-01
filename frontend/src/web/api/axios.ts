@@ -1,13 +1,23 @@
 // Libraries
 import axios from "axios";
 // Project level
-import { getErrorMessage } from "utils";
+import { getAccessToken, getErrorMessage } from "utils";
 
 const { VITE_API_BASE_URL } = import.meta.env;
 
 export const api = axios.create({
   baseURL: VITE_API_BASE_URL,
 });
+
+export const setAxiosToken = (token: string) => {
+  api.defaults.headers.common.Authorization = `Bearer ${token}`;
+};
+
+const accessToken = getAccessToken();
+
+if (accessToken) {
+  setAxiosToken(accessToken);
+}
 
 api.interceptors.response.use(
   (res) => res,
@@ -19,7 +29,3 @@ api.interceptors.response.use(
     });
   },
 );
-
-export const setAxiosToken = (token: string) => {
-  api.defaults.headers.common.Authorization = `Bearer ${token}`;
-};
