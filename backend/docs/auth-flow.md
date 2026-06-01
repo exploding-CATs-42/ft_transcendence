@@ -291,7 +291,8 @@ api.interceptors.response.use(
       originalRequest &&
       !originalRequest._retry &&
       requestUrl !== "/users/refresh" &&
-      requestUrl !== "/users/logout"
+      requestUrl !== "/users/logout" &&
+      requestUrl !== "/users/login"
     ) {
       originalRequest._retry = true;
 
@@ -335,7 +336,8 @@ requests fail with `401` at the same time.
 The interceptor intentionally skips:
 
 - `/users/refresh`, to avoid refreshing the refresh request itself;
-- `/users/logout`, because logout should not try to recover by refreshing.
+- `/users/logout`, because logout should not try to recover by refreshing;
+- `/users/login`, because invalid login credentials should not trigger a token refresh.
 
 ## Frontend: Logout Handling
 
