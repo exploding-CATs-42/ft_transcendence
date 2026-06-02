@@ -34,6 +34,17 @@ export interface SelfProfileUser {
   lastSeenAt: Date | null;
 }
 
+export interface MeUser {
+  id: string;
+  email: string;
+  username: string;
+  avatarUrl: string | null;
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+  totalMatches: number;
+  wins: number;
+}
+
 export type FriendDirection = "incoming" | "outgoing" | "accepted";
 
 export interface FriendListItem {
