@@ -53,3 +53,17 @@ export function toPublicProfileUser(
     wins: stats.wins,
   };
 }
+
+export function toMeUser(
+  user: SelfProfileUser,
+  stats: {
+    totalMatches: number;
+    wins: number;
+  },
+) {
+  return {
+    ...user,
+    totalMatches: stats.totalMatches,
+    wins: stats.wins,
+  };
+}
