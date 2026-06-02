@@ -1,1 +1,1 @@
-export type { RegisterSchema } from "schemas/registerSchema";
+export type { RegisterSchema } from "schemas/auth/registerSchema";
