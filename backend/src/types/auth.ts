@@ -7,14 +7,17 @@ export interface PublicUser {
   avatarUrl: string | null;
 }
 
-export interface PublicProfileUser {
+export interface UserStats {
+  totalMatches: number;
+  wins: number;
+}
+
+export interface PublicProfileUser extends UserStats {
   id: string;
   username: string;
   avatarUrl: string | null;
   isOnline: boolean;
   lastSeenAt: Date | null;
-  totalMatches: number;
-  wins: number;
 }
 
 export interface FriendUser {
@@ -34,15 +37,13 @@ export interface SelfProfileUser {
   lastSeenAt: Date | null;
 }
 
-export interface MeUser {
+export interface MeUser extends UserStats {
   id: string;
   email: string;
   username: string;
   avatarUrl: string | null;
   isOnline: boolean;
   lastSeenAt: Date | null;
-  totalMatches: number;
-  wins: number;
 }
 
 export type FriendDirection = "incoming" | "outgoing" | "accepted";
