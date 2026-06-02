@@ -1,4 +1,4 @@
-import { CardInstance } from "./card";
+import { CardInstance } from "../game/types/card";
 import { GameStatus } from "./game";
 import {
   TurnPhase,
