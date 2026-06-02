@@ -6,7 +6,7 @@ import {
   PendingActionType,
   NopeChain,
   FavorState,
-} from "./turn";
+} from "../game/types/turn";
 
 export const ClientEventType = {
   JOIN_GAME: "join-game",
