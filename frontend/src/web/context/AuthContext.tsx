@@ -1,7 +1,6 @@
 import { createContext } from "react";
-import { z } from "zod";
 
-export type AccessToken = z.ZodUUID;
+export type AccessToken = string;
 
 export interface AuthContextValue {
   accessToken: AccessToken | null;
