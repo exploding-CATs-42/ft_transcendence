@@ -7,6 +7,7 @@ import {
   addBackgroundImage,
   addFullscreenToggle,
   addPlayers,
+  createRoundedCardTexture,
 } from "game/utils";
 import type { Player } from "game/entities";
 
@@ -509,88 +510,8 @@ export class GameRoom extends Scene {
     radius = CARD_BORDER_RADIUS,
   ) {
     const scaledRadius = (radius / CARD_HEIGHT) * frame.realHeight;
-    const textureKey = `rounded_card_${frame.name}`;
+    const textureKey = createRoundedCardTexture(this, frame, scaledRadius);
 
-    if (!this.textures.exists(textureKey)) {
-      this.createRoundedCardTexture(textureKey, frame, scaledRadius);
-    }
-
-    // Return a Phaser image created using generated texture
     return this.add.image(x, y, textureKey);
-  }
-
-  private createRoundedCardTexture(
-    key: string,
-    frame: Phaser.Textures.Frame,
-    radius: number,
-  ) {
-    if (this.textures.exists(key)) return;
-
-    const w = frame.realWidth;
-    const h = frame.realHeight;
-
-    // Create a new canvas-based texture in Phaser's Texture Manager.
-    // This texture will later be used like any other image in the game.
-    const canvasTexture = this.textures.createCanvas(key, w, h)!;
-    const ctx = canvasTexture.context;
-
-    // Save the current canvas state so we can safely modify clip paths
-    // without affecting any future drawing operations on this context.
-    // In our case it's unnecessary, but if we'd want to add any
-    // other modifications to this texture in the future it is needed
-    ctx.save();
-
-    {
-      // Define a rounded-rectangle clipping region.
-      // Everything drawn after this will be masked by this shape.
-      this.applyRoundedClip(ctx, w, h, radius);
-
-      // img is the original spritesheet image
-      const img = frame.source.image as HTMLImageElement;
-
-      // This reads as:
-      // Take this rectangle of pixels from img
-      // (defined by frame.cutX, frame.cutY, frame.cutWidth, frame.cutHeight)
-      // and draw it onto the canvas at position (0, 0) scaled to size (w, h).
-      ctx.drawImage(
-        img,
-        frame.cutX,
-        frame.cutY,
-        frame.cutWidth,
-        frame.cutHeight,
-        0,
-        0,
-        w,
-        h,
-      );
-    }
-
-    // restore canvas context
-    ctx.restore();
-
-    // Notify Phaser that the canvas content has changed and must be uploaded
-    // to the GPU / refreshed for rendering.
-    canvasTexture.refresh();
-  }
-
-  private applyRoundedClip(
-    ctx: CanvasRenderingContext2D,
-    w: number,
-    h: number,
-    radius: number,
-  ) {
-    ctx.beginPath();
-    ctx.moveTo(radius, 0);
-    ctx.lineTo(w - radius, 0);
-    ctx.quadraticCurveTo(w, 0, w, radius);
-    ctx.lineTo(w, h - radius);
-    ctx.quadraticCurveTo(w, h, w - radius, h);
-    ctx.lineTo(radius, h);
-    ctx.quadraticCurveTo(0, h, 0, h - radius);
-    ctx.lineTo(0, radius);
-    ctx.quadraticCurveTo(0, 0, radius, 0);
-    ctx.closePath();
-
-    ctx.clip();
   }
 }
