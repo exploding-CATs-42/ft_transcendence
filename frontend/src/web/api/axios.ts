@@ -53,7 +53,10 @@ api.interceptors.response.use(
 
       setAxiosToken(accessToken);
 
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      originalRequest.headers = {
+        ...(originalRequest.headers ?? {}),
+        Authorization: `Bearer ${accessToken}`,
+      };
 
       return api(originalRequest);
     }
