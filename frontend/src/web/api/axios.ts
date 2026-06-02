@@ -5,6 +5,8 @@ import { getErrorMessage } from "utils";
 
 const { VITE_API_BASE_URL } = import.meta.env;
 
+let authVersion = 0;
+
 export const api = axios.create({
   baseURL: VITE_API_BASE_URL,
   withCredentials: true,
@@ -35,6 +37,8 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
+      const refreshAuthVersion = authVersion;
+
       if (!refreshPromise) {
         refreshPromise = refreshAccessToken().finally(() => {
           refreshPromise = null;
@@ -42,6 +46,10 @@ api.interceptors.response.use(
       }
 
       const accessToken = await refreshPromise;
+
+      if (refreshAuthVersion !== authVersion) {
+        return Promise.reject(error);
+      }
 
       setAxiosToken(accessToken);
 
@@ -64,5 +72,6 @@ export const setAxiosToken = (token: string) => {
 };
 
 export const clearAxiosToken = () => {
+  authVersion += 1;
   delete api.defaults.headers.common.Authorization;
 };
