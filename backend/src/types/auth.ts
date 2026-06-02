@@ -7,44 +7,28 @@ export interface PublicUser {
   avatarUrl: string | null;
 }
 
+export interface ProfileUser {
+  id: string;
+  username: string;
+  isOnline: boolean;
+  avatarUrl: string | null;
+  lastSeenAt: Date | null;
+}
+
 export interface UserStats {
   totalMatches: number;
   wins: number;
 }
 
-export interface PublicProfileUser extends UserStats {
-  id: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
-}
+export interface PublicProfileUser extends ProfileUser, UserStats {}
 
-export interface FriendUser {
-  id: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
-}
-
-export interface SelfProfileUser {
-  id: string;
+export interface SelfProfileUser extends ProfileUser {
   email: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
 }
 
-export interface MeUser extends UserStats {
-  id: string;
-  email: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
-}
+export interface MeUser extends SelfProfileUser, UserStats {}
+
+export interface FriendUser extends ProfileUser {}
 
 export type FriendDirection = "incoming" | "outgoing" | "accepted";
 
