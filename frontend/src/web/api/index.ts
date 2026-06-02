@@ -1,9 +1,9 @@
-import users from "./users/users";
+import auth from "./auth/auth";
 import games from "./games/games";
 //import your api endpoint group here
 
-export default { games, users }; //end then export it within this default object
+export default { auth, games }; //end then export it within this default object
 
 //this way you will be able to use api in your code like :
 //import api from "api"
-//api.users.login({email: "user@example.com", password: "qwerty123"})
+//api.auth.login({email: "user@example.com", password: "qwerty123"})

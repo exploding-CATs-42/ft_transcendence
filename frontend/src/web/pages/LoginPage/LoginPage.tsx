@@ -23,7 +23,7 @@ const LoginPage = () => {
 
   const onSubmit: SubmitHandler<LoginSchema> = async (data) => {
     try {
-      const { accessToken } = await api.users.login(data);
+      const { accessToken } = await api.auth.login(data);
       setAccessToken(accessToken);
       toast.success("Success");
     } catch (error) {
