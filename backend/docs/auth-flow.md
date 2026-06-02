@@ -220,10 +220,13 @@ it is protected.
 The frontend stores auth state through `AuthProvider`:
 
 ```ts
-const [accessToken, saveAccessToken] = useLocalStorage<AccessToken | null>(
-  AUTH_STORAGE_KEY,
-  null,
-);
+const [storedAccessToken, saveAccessToken] =
+  useLocalStorage<StoredAccessToken>(
+    AUTH_STORAGE_KEY,
+    null,
+  );
+
+const accessToken = getStoredAccessToken(storedAccessToken);
 ```
 
 `AUTH_STORAGE_KEY` is:
@@ -235,6 +238,15 @@ export const AUTH_STORAGE_KEY = "keys";
 This means the access token is stored in browser `localStorage`. This survives
 page refreshes.
 
+The current local storage shape is:
+
+```json
+{ "accessToken": "..." }
+```
+
+`AuthProvider` normalizes this stored value before exposing it to the rest of
+the app. This keeps `accessToken` as either a JWT string or `null`.
+
 Important distinction:
 
 ```txt
@@ -244,6 +256,23 @@ cookies store refreshToken
 
 `localStorage` does not know whether the stored access token is expired. It only
 stores data until the app or user removes it.
+
+`AuthProvider` also synchronizes auth state with axios:
+
+```ts
+useEffect(() => {
+  if (accessToken) {
+    setAxiosToken(accessToken);
+    return;
+  }
+
+  clearAxiosToken();
+}, [accessToken]);
+```
+
+This restores the axios `Authorization` header after a page refresh. Without
+this sync, React could still consider the user logged in from `localStorage`,
+while axios would have lost its in-memory default header.
 
 ## Frontend: Axios Setup
 
@@ -274,6 +303,10 @@ export const clearAxiosToken = () => {
   delete api.defaults.headers.common.Authorization;
 };
 ```
+
+Axios defaults are kept only in JavaScript memory. They are lost on page
+refresh, so `AuthProvider` re-applies the stored access token to axios when the
+app starts.
 
 ## Frontend: Automatic Access Token Refresh
 
@@ -348,6 +381,8 @@ logout request fails:
 const logoutUser = async () => {
   try {
     await api.users.logout();
+  } catch {
+    // Logout is best-effort because the backend session may already be expired.
   } finally {
     clearAccessToken();
   }
@@ -357,6 +392,38 @@ const logoutUser = async () => {
 This matters because if the refresh token cookie is already missing or expired,
 the backend may return `401`. The frontend should still clear local auth state
 so the user is not stuck in a visually logged-in state.
+
+## Frontend: Page Refresh Behavior
+
+After a page refresh, browser storage survives but JavaScript memory is reset:
+
+```txt
+localStorage still contains accessToken
+axios default Authorization header is lost
+```
+
+`AuthProvider` fixes this by reading the stored token and calling
+`setAxiosToken(accessToken)` when the app starts.
+
+This fixes:
+
+```txt
+F5 -> axios loses Authorization header
+```
+
+It does not validate the backend session. If the refresh token cookie has
+expired but `localStorage` still contains an old access token, the user may
+still appear logged in until an authenticated request fails.
+
+A future improvement could validate the session on app startup:
+
+```txt
+app starts
+if localStorage has accessToken:
+  call /users/refresh
+  if 200: keep user logged in
+  if 401: clear local auth state
+```
 
 ## Manual Testing
 
