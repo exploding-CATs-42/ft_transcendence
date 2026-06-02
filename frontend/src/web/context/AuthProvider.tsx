@@ -32,10 +32,7 @@ const getStoredAccessToken = (value: StoredAccessToken): AccessToken | null => {
 
 const AuthProvider = ({ children }: Props) => {
   const [storedAccessToken, saveAccessToken] =
-    useLocalStorage<StoredAccessToken>(
-      AUTH_STORAGE_KEY,
-      null,
-    );
+    useLocalStorage<StoredAccessToken>(AUTH_STORAGE_KEY, null);
 
   const accessToken = getStoredAccessToken(storedAccessToken);
 
