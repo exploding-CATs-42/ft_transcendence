@@ -4,3 +4,4 @@ export {
   addFullscreenToggle,
   addPlayers,
 } from "./sceneUtils";
+export { createRoundedCardTexture } from "./textureUtils";
