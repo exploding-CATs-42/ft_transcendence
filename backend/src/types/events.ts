@@ -1,5 +1,4 @@
 import { CardInstance } from "../game/types/card";
-import { GameStatus } from "../game/types/game";
 import {
   TurnPhase,
   PendingAction,
@@ -57,7 +56,6 @@ export type PublicEventType =
 
 export interface PublicGameView {
   gameId: string;
-  status: GameStatus;
   turn: PublicTurnView;
   players: PublicPlayerView[];
   deckSize: number;
