@@ -12,12 +12,12 @@ import {
   registerUser,
 } from "../services/authService";
 import {
-  getPublicUserById,
   getUserGames,
   searchUsersByUsername,
   UsersServiceError,
 } from "../services/usersService";
 import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
+import { getPublicUserById } from "../utils/users";
 
 const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = getRefreshTokenLifetimeMs();
