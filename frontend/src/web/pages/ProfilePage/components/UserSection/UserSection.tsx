@@ -14,7 +14,7 @@ const UserSection = ({ user }: Props) => {
   const { clearAccessToken } = useAuth();
 
   const logoutUser = async () => {
-    await api.users.logout();
+    await api.auth.logout();
     clearAccessToken();
   };
 

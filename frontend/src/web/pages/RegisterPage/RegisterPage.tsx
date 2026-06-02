@@ -29,10 +29,10 @@ const RegisterPage = () => {
 
   const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
     try {
-      await api.users.register(data);
+      await api.auth.register(data);
       toast.success("Success");
 
-      const { accessToken } = await api.users.login({
+      const { accessToken } = await api.auth.login({
         email: data.email,
         password: data.password,
       });
