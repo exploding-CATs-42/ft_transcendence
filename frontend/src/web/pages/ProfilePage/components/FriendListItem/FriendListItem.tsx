@@ -3,18 +3,7 @@ import { Avatar, Button, ConfirmPopup, Icon, ListItem } from "components";
 //Local level
 import s from "./FriendListItem.module.css";
 import { useModal } from "hooks";
-
-export type FriendItem = {
-  user: {
-    id: string;
-    username: string;
-    avatarUrl: string;
-    isOnline: boolean;
-    lastSeenAt: Date;
-  };
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
-  direction: "outgoing" | "incoming" | "accepted";
-};
+import type { FriendItem } from "pages/ProfilePage/types/friendItem";
 
 interface Props {
   friend: FriendItem;
