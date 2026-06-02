@@ -5,7 +5,7 @@ import {
   removePlayer,
   removePlayerConfirmation,
 } from "./actions";
-import { Player } from "./types";
+import { Player } from "./types/player";
 import { GameEvent } from "./events";
 import { canEnterStarting } from "./guards";
 import { START_GAME_COUNTDOWN_MS } from "../constants/game";

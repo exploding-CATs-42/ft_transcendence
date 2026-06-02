@@ -1,4 +1,4 @@
-import { Player } from "../game/types";
+import { Player } from "../game/types/player";
 import { Deck, GameId, GameRules, GameState, TurnState } from "../types";
 
 export const DEFAULT_GAME_RULES: GameRules = {
