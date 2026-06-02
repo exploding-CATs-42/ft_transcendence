@@ -1,6 +1,7 @@
 import { ApiError } from "../errors/apiError";
 import { Prisma } from "../generated/prisma/client";
 import { prisma } from "../lib/prisma";
+import { UsersServiceError } from "../services/usersService";
 import { FriendUser, PublicProfileUser, SelfProfileUser } from "../types/auth";
 
 export const publicProfileSelect = {
@@ -103,6 +104,21 @@ export async function toPublicProfileUser(user: {
     totalMatches: stats.totalMatches,
     wins: stats.wins,
   };
+}
+
+export async function getPublicUserById(
+  userId: string,
+): Promise<PublicProfileUser> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: publicProfileSelect,
+  });
+
+  if (!user) {
+    throw new UsersServiceError("User not found", 404);
+  }
+
+  return toPublicProfileUser(user);
 }
 
 export async function ensureUserExists(userId: string) {

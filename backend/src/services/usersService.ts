@@ -16,21 +16,6 @@ export class UsersServiceError extends Error {
   }
 }
 
-export async function getPublicUserById(
-  userId: string,
-): Promise<PublicProfileUser> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: publicProfileSelect,
-  });
-
-  if (!user) {
-    throw new UsersServiceError("User not found", 404);
-  }
-
-  return toPublicProfileUser(user);
-}
-
 export async function searchUsersByUsername(
   username: string,
 ): Promise<PublicProfileUser[]> {
