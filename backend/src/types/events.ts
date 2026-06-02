@@ -1,5 +1,5 @@
 import { CardInstance } from "../game/types/card";
-import { GameStatus } from "./game";
+import { GameStatus } from "../game/types/game";
 import {
   TurnPhase,
   PendingAction,
