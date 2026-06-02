@@ -2,14 +2,6 @@ import { TurnState } from "./turn";
 import { Deck } from "./card";
 import { Player } from "../types";
 
-export const GameStatus = {
-  LOBBY: "LOBBY",
-  PLAYING: "PLAYING",
-  FINISHED: "FINISHED",
-} as const;
-
-export type GameStatus = (typeof GameStatus)[keyof typeof GameStatus];
-
 export type GameId = string;
 export type UserId = string;
 
@@ -27,7 +19,6 @@ export interface GameRules {
 
 export interface GameState {
   gameId: GameId;
-  status: GameStatus;
   name: string;
   maxPlayers: number;
   players: Player[];
