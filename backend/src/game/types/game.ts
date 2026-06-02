@@ -1,6 +1,6 @@
-import { TurnState } from "../game/types/turn";
-import { CardInstance } from "../game/types/card";
-import { Player } from "../game/types";
+import { TurnState } from "./turn";
+import { CardInstance } from "./card";
+import { Player } from "../types";
 
 export const GameStatus = {
   LOBBY: "LOBBY",
