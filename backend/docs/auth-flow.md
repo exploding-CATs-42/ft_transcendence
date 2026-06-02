@@ -300,6 +300,7 @@ Logout removes it:
 
 ```ts
 export const clearAxiosToken = () => {
+  authVersion += 1;
   delete api.defaults.headers.common.Authorization;
 };
 ```
@@ -307,6 +308,9 @@ export const clearAxiosToken = () => {
 Axios defaults are kept only in JavaScript memory. They are lost on page
 refresh, so `AuthProvider` re-applies the stored access token to axios when the
 app starts.
+
+`authVersion` is incremented whenever axios auth is cleared. This lets pending
+refresh work detect that the user logged out before the refresh completed.
 
 ## Frontend: Automatic Access Token Refresh
 
@@ -329,6 +333,8 @@ api.interceptors.response.use(
     ) {
       originalRequest._retry = true;
 
+      const refreshAuthVersion = authVersion;
+
       if (!refreshPromise) {
         refreshPromise = refreshAccessToken().finally(() => {
           refreshPromise = null;
@@ -336,6 +342,10 @@ api.interceptors.response.use(
       }
 
       const accessToken = await refreshPromise;
+
+      if (refreshAuthVersion !== authVersion) {
+        return Promise.reject(error);
+      }
 
       setAxiosToken(accessToken);
 
@@ -365,6 +375,22 @@ axios retries the original request
 
 `refreshPromise` prevents multiple simultaneous refresh calls when several
 requests fail with `401` at the same time.
+
+`authVersion` prevents stale refresh results from being applied after logout.
+A refresh request stores the current version before awaiting `/users/refresh`.
+If logout clears axios auth while refresh is pending, the version changes, so
+the returned access token is ignored and the original request is not retried.
+
+This prevents this race:
+
+```txt
+protected request -> 401
+/users/refresh starts
+user logs out
+axios Authorization is cleared
+/users/refresh returns a new accessToken
+stale accessToken must not be written back to axios
+```
 
 The interceptor intentionally skips:
 
