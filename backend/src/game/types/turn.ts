@@ -1,4 +1,4 @@
-import { CardInstance, CardType } from "../../types/card";
+import { CardInstance, CardType } from "./card";
 
 export const TurnPhase = {
   ACTION: "ACTION",
