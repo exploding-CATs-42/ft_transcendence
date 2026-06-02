@@ -1,14 +1,27 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { Scenes, SEATS, Textures } from "game/constants";
+import {
+  Scenes,
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+  SEATS,
+  Textures,
+} from "game/constants";
 import {
   EventBus,
   addBackgroundImage,
+  addCardVisual,
   addFullscreenToggle,
-  addPlayers,
 } from "game/utils";
-import type { Player } from "game/entities";
+import {
+  GraphicPlayer,
+  Hand,
+  OpponentHand,
+  PlayerSeat,
+  type Player,
+} from "game/entities";
+import type { CardConfig, LabelConfig, Point } from "game/@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -21,23 +34,29 @@ const data: { players: Player[] } = {
   ],
 };
 
+// Opponents
+const NAME_LABEL_CONFIG: LabelConfig = {
+  fontColor: "white",
+  strokeColor: "black",
+};
+
+const OPPONENT_HAND_X_OFFSET = 96;
+const OPPONENT_HAND_Y_OFFSET = 180;
+
+// Draw and discard piles
 const CARD_WIDTH = 186;
 const CARD_HEIGHT = 260;
 const CARD_BORDER_RADIUS = 20;
 
-const CARDS_TO_DEAL = 7;
-const HAND_Y = 940; // y position of the player's hand
-
-const MIN_CARD_SPACING = 60;
-const MAX_CARD_SPACING = 120;
-
-const BIGGEST_DEPTH = 100;
-
-const PILE_Y = 470;
-const DRAW_PILE_X = 610;
-const DRAW_PILE_Y = PILE_Y;
-const DISCARD_PILE_X = 1100;
-const DISCARD_PILE_Y = PILE_Y;
+const PILES_Y = 470;
+const DRAW_PILE_POSITION: Point = {
+  x: 610,
+  y: PILES_Y,
+};
+const DISCARD_PILE_POSITION: Point = {
+  x: 1100,
+  y: PILES_Y,
+};
 
 const CARD_DROP_ZONE = {
   x: 400,
@@ -46,17 +65,16 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
-const HOVER_LIFT = 30; // How many px the hovered card rises
-const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
-
-const OPPONENT_CARD_WIDTH = CARD_WIDTH / 4;
-const OPPONENT_CARD_HEIGHT = CARD_HEIGHT / 4;
-const OPPONENT_HAND_MAX_CARDS = 5;
-const OPPONENT_HAND_X_OFFSET = 96;
-const OPPONENT_HAND_Y_OFFSET = 180;
+// My hand
+const HAND_POSITION: Point = {
+  x: SCREEN_WIDTH / 2,
+  y: 940,
+};
 
 export class GameRoom extends Scene {
-  #cards: Phaser.GameObjects.Image[] = [];
+  #seats: PlayerSeat[] = [];
+  #opponentHands: OpponentHand[] = [];
+  #myHand!: Hand;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -65,364 +83,101 @@ export class GameRoom extends Scene {
   create() {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
-    addPlayers(this, data.players, "white", "black");
+
+    const players = this.createPlayers(data.players);
+    this.createOpponentHands(players);
+    this.fillSeats(players);
 
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
-    this.dealCards();
-    this.addOpponentHands();
+    this.createMyHand();
+
+    // Demonstration code
+    this.#seats[1]?.moveTo(SEATS[4]!);
+    this.#seats[4]?.moveTo(SEATS[1]!);
+    const intervalId = setInterval(() => {
+      this.#opponentHands[3]?.addCard();
+      clearInterval(intervalId);
+    }, 500 * 15);
 
     EventBus.emit("scene-ready", this);
   }
 
-  private addOpponentHands() {
-    for (let i = 1; i < data.players.length; ++i) {
-      const { x, y } = SEATS[i]!;
-      const baseX = x + OPPONENT_HAND_X_OFFSET;
-      const baseY = y + OPPONENT_HAND_Y_OFFSET;
-      this.addOpponentHand(Phaser.Math.Between(0, 20), baseX, baseY);
-    }
+  private createMyHand() {
+    const onCardDrop = (card: Phaser.GameObjects.Image) => {
+      // move it to the discard pile
+      this.tweens.add({
+        targets: card,
+        x: DISCARD_PILE_POSITION.x,
+        y: DISCARD_PILE_POSITION.y,
+        duration: 300,
+        ease: "Back.Out",
+      });
+    };
+
+    this.#myHand = new Hand(this, HAND_POSITION, onCardDrop);
   }
 
-  private addOpponentHand(cardCount: number, baseX: number, y: number) {
-    const count = Math.min(cardCount, OPPONENT_HAND_MAX_CARDS);
-
-    const spacing = this.getCardSpacing(
-      count,
-      OPPONENT_CARD_WIDTH / 3,
-      OPPONENT_CARD_WIDTH / 2,
-      OPPONENT_HAND_MAX_CARDS,
-    );
-
-    const startX = this.getHandStartX(
-      count,
-      spacing,
-      OPPONENT_CARD_WIDTH,
-      baseX,
-    );
-
-    let x = startX;
-
-    for (let i = 0; i < count; ++i) {
-      // Draw card
-      const cardCover = this.textures.get(Textures.cardCover).get();
-      const card = this.addCard(
-        x,
-        y,
-        cardCover,
-        OPPONENT_CARD_WIDTH,
-        OPPONENT_CARD_HEIGHT,
-      );
-
-      // Add card outline
-      const scaledRadius =
-        (CARD_BORDER_RADIUS / CARD_HEIGHT) * OPPONENT_CARD_HEIGHT;
-      const border = this.add.graphics();
-      border.lineStyle(1, 0x000000);
-      border.strokeRoundedRect(
-        card.x,
-        card.y,
-        card.displayWidth,
-        card.displayHeight,
-        scaledRadius,
-      );
-
-      x += spacing;
-    }
-
-    if (cardCount > 0) {
-      /**
-       * Hand bounds
-       */
-      const handWidth = OPPONENT_CARD_WIDTH + (count - 1) * spacing;
-      const handRightX = startX + handWidth;
-
-      const badgeOffsetX = 4;
-      const badgeOffsetY = 4;
-
-      const badgeX = handRightX + badgeOffsetX;
-      const badgeY = y - badgeOffsetY;
-
-      this.addCardCountBadge(badgeX, badgeY, cardCount);
-    }
-  }
-
-  private addCardCountBadge(x: number, y: number, amount: number) {
-    const badgeRadius = 17;
-
-    /**
-     * Shadow
-     */
-    const shadow = this.add.graphics();
-    shadow.fillStyle(0x000000, 0.3);
-    shadow.fillCircle(x - 1, y + 3, badgeRadius + 1);
-
-    /**
-     * Yellow circle
-     */
-    const amountCircle = this.add.graphics();
-    amountCircle.fillStyle(0xfac700, 1);
-    amountCircle.fillCircle(x, y, badgeRadius);
-
-    /**
-     * Amount text
-     */
-    const amountText = this.add.text(x, y, `${amount}`, {
-      color: "#000000",
-      fontFamily: "Chewy",
-      fontSize: "20px",
+  private createPlayers(players: Player[]) {
+    return players.map((player) => {
+      return new GraphicPlayer(this, { x: 0, y: 0 }, player, NAME_LABEL_CONFIG);
     });
-    amountText.setOrigin(0.5);
+  }
+
+  private fillSeats(players: GraphicPlayer[]) {
+    const mySeat = new PlayerSeat(this, SEATS[0]!);
+    mySeat.addPlayer(players[0]!);
+    this.#seats.push(mySeat);
+
+    for (let i = 1; i < players.length; ++i) {
+      const opponentSeat = new PlayerSeat(this, SEATS[i]!);
+      opponentSeat.addPlayer(players[i]!);
+      opponentSeat.addHand(this.#opponentHands[i - 1]!);
+
+      this.#seats.push(opponentSeat);
+    }
+  }
+
+  private createOpponentHands(players: GraphicPlayer[]) {
+    for (let i = 1; i < players.length; ++i) {
+      const x = OPPONENT_HAND_X_OFFSET;
+      const y = OPPONENT_HAND_Y_OFFSET;
+
+      const hand = new OpponentHand(this, { x, y });
+      this.#opponentHands.push(hand);
+
+      // Demonstration code
+      let count = 0;
+      const intervalId = setInterval(() => {
+        if (count < 7) hand.addCard();
+        else hand.removeCard();
+        count++;
+
+        if (count === 14) {
+          clearInterval(intervalId);
+        }
+      }, 500);
+    }
   }
 
   private createDrawPile() {
     const cardCover = this.textures.get(Textures.cardCover).get();
-    const drawPile = this.addCard(
-      DRAW_PILE_X,
-      DRAW_PILE_Y,
-      cardCover,
-    ).setInteractive({ useHandCursor: true });
+    const drawPile = this.addCard(cardCover, DRAW_PILE_POSITION);
 
+    drawPile.setInteractive({ useHandCursor: true });
     drawPile.on("pointerdown", this.drawCard);
   }
 
   private createDiscardPile() {
     const cardFrame = this.textures.get(Textures.cards).get(0);
-    this.addCard(DISCARD_PILE_X, DISCARD_PILE_Y, cardFrame);
+    this.addCard(cardFrame, DISCARD_PILE_POSITION);
   }
 
-  private dealCards() {
-    const spacing = this.getCardSpacing(CARDS_TO_DEAL);
-    let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
-
-    for (let i = 0; i < CARDS_TO_DEAL; ++i) {
-      const frame = this.getRandomCardFrame();
-      const card = this.addInteractiveCard(x, HAND_Y, frame).setDepth(i + 1);
-      this.#cards.push(card);
-
-      x += spacing;
-    }
-  }
-
-  private addCard(
-    x: number,
-    y: number,
-    frame: Phaser.Textures.Frame,
-    width = CARD_WIDTH,
-    height = CARD_HEIGHT,
-  ) {
-    const card = this.addRoundedCard(x, y, frame)
-      .setDisplaySize(width, height)
-      .setOrigin(0, 0);
-
+  private addCard(frame: Phaser.Textures.Frame, position: Point) {
+    const cardConfig = this.buildCardConfig(frame);
+    const card = addCardVisual(this, position, cardConfig, CARD_BORDER_RADIUS);
     return card;
-  }
-
-  private addInteractiveCard(
-    x: number,
-    y: number,
-    frame: Phaser.Textures.Frame,
-  ): Phaser.GameObjects.Image {
-    const card = this.addCard(x, y, frame).setInteractive({
-      draggable: true,
-      useHandCursor: true,
-    });
-
-    this.attachCardDragHandlers(card);
-    this.attachCardDropHandler(card);
-    this.attachCardHoverHandler(card);
-
-    return card;
-  }
-
-  private attachCardDragHandlers(card: Phaser.GameObjects.Image) {
-    let originX: number;
-    let originDepth: number;
-
-    const onDragStart = () => {
-      originX = card.x;
-      originDepth = card.depth;
-      card.setDepth(BIGGEST_DEPTH);
-    };
-
-    const onDrag = (
-      _pointer: Phaser.Input.Pointer,
-      dragX: number,
-      dragY: number,
-    ) => {
-      card.x = dragX;
-      card.y = dragY;
-    };
-
-    const onDragEnd = () => {
-      card.setDepth(originDepth);
-
-      this.tweens.add({
-        targets: card,
-        x: originX,
-        y: HAND_Y,
-        duration: 300,
-        ease: "Back.Out",
-      });
-    };
-
-    card.on("dragstart", onDragStart);
-    card.on("drag", onDrag);
-    card.on("dragend", onDragEnd);
-  }
-
-  private attachCardDropHandler(card: Phaser.GameObjects.Image) {
-    const onCardDrop = () => {
-      // Remove card from player's hand
-      this.#cards = this.#cards.filter((c) => c !== card);
-
-      // make it non-interactive
-      card.off("drop", onCardDrop);
-      card.disableInteractive();
-
-      // move it to the discard pile
-      this.tweens.add({
-        targets: card,
-        x: DISCARD_PILE_X,
-        y: DISCARD_PILE_Y,
-        duration: 300,
-        ease: "Back.Out",
-      });
-
-      // update it's depth to the lowest
-      card.setDepth(0);
-
-      // and reflow cards in player's hand
-      this.reflowCards();
-    };
-
-    card.on("drop", onCardDrop);
-  }
-
-  private attachCardHoverHandler(card: Phaser.GameObjects.Image) {
-    const tween = (target: Phaser.GameObjects.Image, props: object) => {
-      this.tweens.add({
-        targets: target,
-        duration: 120,
-        ease: "Power2",
-        ...props,
-      });
-    };
-
-    const getLayout = () => {
-      const spacing = this.getCardSpacing(this.#cards.length);
-      const startX = this.getHandStartX(this.#cards.length, spacing);
-
-      const getBaseX = (index: number) => startX + index * spacing;
-
-      return { getBaseX };
-    };
-
-    const applyHoverLayout = (hoveredIndex: number) => {
-      const { getBaseX } = getLayout();
-
-      this.#cards.forEach((card, index) => {
-        if (index === hoveredIndex) return;
-
-        const offset = index < hoveredIndex ? -HOVER_OFFSET : HOVER_OFFSET;
-
-        tween(card, {
-          x: getBaseX(index) + offset,
-        });
-      });
-    };
-
-    const resetLayout = () => {
-      const { getBaseX } = getLayout();
-
-      this.#cards.forEach((c, index) => {
-        tween(c, {
-          x: getBaseX(index),
-        });
-      });
-    };
-
-    const liftCard = () => {
-      tween(card, { y: HAND_Y - HOVER_LIFT });
-    };
-
-    const lowerCard = () => {
-      tween(card, { y: HAND_Y });
-    };
-
-    card.on("pointerover", () => {
-      const hoveredIndex = this.#cards.indexOf(card);
-      liftCard();
-      applyHoverLayout(hoveredIndex);
-    });
-
-    card.on("pointerout", () => {
-      lowerCard();
-      resetLayout();
-    });
-  }
-
-  private getCardSpacing(
-    cardCount: number,
-    minSpacing = MIN_CARD_SPACING,
-    maxSpacing = MAX_CARD_SPACING,
-    maxCount = 20,
-  ): number {
-    if (cardCount <= 1) return maxSpacing;
-    if (cardCount >= maxCount) return minSpacing;
-
-    // Calculate how full the hand is.
-    // If we have 1 card - it's empty
-    // If we have 20+ cards it's full
-    // The progress is a value from 0 to 1 (0% -> 100%)
-    const progress = (cardCount - 1) / (maxCount - 1);
-    const SPACE_TO_SHRINK = maxSpacing - minSpacing;
-
-    // Decrease the spacing on some amount
-    // from the amount of on how much spacing can shrink
-    // depending on how full the hand is
-    // or in other words:
-    // the more cards we have
-    // the bigger will be progress
-    // and therefore the bigger will be (progress * SPACE_TO_SHRINK)
-    // thus the smaller will be the spacing
-    const spacing = maxSpacing - progress * SPACE_TO_SHRINK;
-
-    return spacing;
-  }
-
-  private getHandStartX(
-    cardCount: number,
-    spacing: number,
-    cardWidth = CARD_WIDTH,
-    baseX = this.scale.width / 2,
-  ): number {
-    if (cardCount === 0) return baseX - cardWidth / 2;
-
-    const handWidth = (cardCount - 1) * spacing + cardWidth;
-    const startX = baseX - handWidth / 2;
-
-    return startX;
-  }
-
-  private reflowCards() {
-    const spacing = this.getCardSpacing(this.#cards.length);
-    let x = this.getHandStartX(this.#cards.length, spacing);
-
-    this.#cards.forEach((card, index) => {
-      card.setDepth(index);
-
-      this.tweens.add({
-        targets: card,
-        x: x,
-        y: HAND_Y,
-        duration: 250,
-        ease: "Back.Out",
-      });
-
-      x += spacing;
-    });
   }
 
   private createCardDropZone() {
@@ -433,33 +188,27 @@ export class GameRoom extends Scene {
 
   private drawCard = () => {
     // Generate random insert index
-    const insertIndex = Phaser.Math.Between(0, this.#cards.length);
-    // Calculate current card spacing
-    const spacing = this.getCardSpacing(this.#cards.length);
+    const cardCount = this.#myHand.getCount();
+    const insertIndex = Phaser.Math.Between(0, cardCount);
 
-    // Using that spacing calculate where to insert the card
+    // Get current card spacing and most left card position
+    const { startX, spacing } = this.#myHand.getLayout();
+
+    // Using that calculate where to insert the card
     let targetX;
-    if (this.#cards.length === 0) targetX = this.getHandStartX(1, spacing);
-    else if (insertIndex === 0) targetX = this.#cards[0]!.x - spacing / 2;
-    else targetX = this.#cards[insertIndex - 1]!.x + spacing / 2;
-
-    // Update the depth of the cards in player's hand,
-    // so that new card doesn't overlay them
-    this.#cards.forEach((card, index) => {
-      if (index >= insertIndex) card.setDepth(index + 1 + 1);
-      else card.setDepth(index + 1);
-    });
+    if (cardCount === 0) targetX = HAND_POSITION.x;
+    else targetX = startX + spacing * insertIndex - spacing / 2;
 
     // Create face down card
     const cardCover = this.textures.get(Textures.cardCover).get();
-    const faceDownCard = this.addCard(DRAW_PILE_X, DRAW_PILE_Y, cardCover);
+    const faceDownCard = this.addCard(cardCover, DRAW_PILE_POSITION);
 
     // and move it below the screen
     // at the x position calculated earlier
     this.tweens.add({
       targets: faceDownCard,
       x: targetX,
-      y: this.scale.height + CARD_HEIGHT / 2,
+      y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
       duration: 400,
       ease: "Sine.easeInOut",
 
@@ -467,130 +216,18 @@ export class GameRoom extends Scene {
         // then destroy it
         faceDownCard.destroy();
         // and spawn the real card into player's hand
-        spawnNewCard(targetX, insertIndex);
+        this.#myHand.addCard(insertIndex);
       },
     });
-
-    const spawnNewCard = (targetX: number, insertIndex: number) => {
-      const frame = this.getRandomCardFrame();
-
-      const newCard = this.addInteractiveCard(
-        targetX,
-        this.scale.height,
-        frame,
-      ).setDepth(insertIndex);
-
-      this.tweens.add({
-        targets: newCard,
-        x: targetX,
-        y: HAND_Y,
-        duration: 500,
-        ease: "Back.easeOut",
-
-        onComplete: () => {
-          this.#cards.splice(insertIndex, 0, newCard);
-          if (this.#cards.length > 1) this.reflowCards();
-        },
-      });
-    };
   };
 
-  private getRandomCardFrame() {
-    const cardSpreadsheet = this.textures.get(Textures.cards);
-    const frameName = Phaser.Math.RND.pick(cardSpreadsheet.getFrameNames());
-    const frame = cardSpreadsheet.get(frameName);
-    return frame;
-  }
-
-  private addRoundedCard(
-    x: number,
-    y: number,
-    frame: Phaser.Textures.Frame,
-    radius = CARD_BORDER_RADIUS,
-  ) {
-    const scaledRadius = (radius / CARD_HEIGHT) * frame.realHeight;
-    const textureKey = `rounded_card_${frame.name}`;
-
-    if (!this.textures.exists(textureKey)) {
-      this.createRoundedCardTexture(textureKey, frame, scaledRadius);
-    }
-
-    // Return a Phaser image created using generated texture
-    return this.add.image(x, y, textureKey);
-  }
-
-  private createRoundedCardTexture(
-    key: string,
-    frame: Phaser.Textures.Frame,
-    radius: number,
-  ) {
-    if (this.textures.exists(key)) return;
-
-    const w = frame.realWidth;
-    const h = frame.realHeight;
-
-    // Create a new canvas-based texture in Phaser's Texture Manager.
-    // This texture will later be used like any other image in the game.
-    const canvasTexture = this.textures.createCanvas(key, w, h)!;
-    const ctx = canvasTexture.context;
-
-    // Save the current canvas state so we can safely modify clip paths
-    // without affecting any future drawing operations on this context.
-    // In our case it's unnecessary, but if we'd want to add any
-    // other modifications to this texture in the future it is needed
-    ctx.save();
-
-    {
-      // Define a rounded-rectangle clipping region.
-      // Everything drawn after this will be masked by this shape.
-      this.applyRoundedClip(ctx, w, h, radius);
-
-      // img is the original spritesheet image
-      const img = frame.source.image as HTMLImageElement;
-
-      // This reads as:
-      // Take this rectangle of pixels from img
-      // (defined by frame.cutX, frame.cutY, frame.cutWidth, frame.cutHeight)
-      // and draw it onto the canvas at position (0, 0) scaled to size (w, h).
-      ctx.drawImage(
-        img,
-        frame.cutX,
-        frame.cutY,
-        frame.cutWidth,
-        frame.cutHeight,
-        0,
-        0,
-        w,
-        h,
-      );
-    }
-
-    // restore canvas context
-    ctx.restore();
-
-    // Notify Phaser that the canvas content has changed and must be uploaded
-    // to the GPU / refreshed for rendering.
-    canvasTexture.refresh();
-  }
-
-  private applyRoundedClip(
-    ctx: CanvasRenderingContext2D,
-    w: number,
-    h: number,
-    radius: number,
-  ) {
-    ctx.beginPath();
-    ctx.moveTo(radius, 0);
-    ctx.lineTo(w - radius, 0);
-    ctx.quadraticCurveTo(w, 0, w, radius);
-    ctx.lineTo(w, h - radius);
-    ctx.quadraticCurveTo(w, h, w - radius, h);
-    ctx.lineTo(radius, h);
-    ctx.quadraticCurveTo(0, h, 0, h - radius);
-    ctx.lineTo(0, radius);
-    ctx.quadraticCurveTo(0, 0, radius, 0);
-    ctx.closePath();
-
-    ctx.clip();
+  private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
+    return {
+      frame: frame,
+      size: {
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+      },
+    };
   }
 }

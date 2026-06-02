@@ -1,6 +1,7 @@
 export { EventBus } from "./EventBus";
+export { addBackgroundImage, addFullscreenToggle } from "./sceneUtils";
 export {
-  addBackgroundImage,
-  addFullscreenToggle,
-  addPlayers,
-} from "./sceneUtils";
+  getRoundedAvatarTexture,
+  createRoundedCardTexture,
+} from "./textureUtils";
+export { getCardSpacing, getHandStartX, addCardVisual } from "./cardUtils";
