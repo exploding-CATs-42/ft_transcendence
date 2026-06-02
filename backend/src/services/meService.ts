@@ -1,7 +1,9 @@
 import { prisma, selfProfileSelect } from "../lib/prisma";
 import { hashPassword } from "../utils/hash";
-import type { SelfProfileUser } from "../types/auth";
-import { toSelfProfileUser } from "../utils/users";
+import { toMeUser, toSelfProfileUser } from "../utils/users";
+import { MeUser, SelfProfileUser } from "../types/auth";
+import { getFinishedGamesStats } from "./usersService";
+import { ApiError } from "../errors";
 
 export class MeServiceError extends Error {
   public statusCode: number;
@@ -89,5 +91,21 @@ export async function updateMe(
 
   return {
     user: toSelfProfileUser(updatedUser),
+  };
+}
+
+export async function getMe(userId: string): Promise<{ user: MeUser }> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: selfProfileSelect,
+  });
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  const stats = await getFinishedGamesStats(user.id);
+  return {
+    user: toMeUser(user, stats),
   };
 }

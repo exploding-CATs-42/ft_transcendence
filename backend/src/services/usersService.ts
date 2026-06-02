@@ -11,7 +11,7 @@ export class UsersServiceError extends Error {
   }
 }
 
-async function getFinishedGamesStats(userId: string): Promise<{
+export async function getFinishedGamesStats(userId: string): Promise<{
   totalMatches: number;
   wins: number;
 }> {
