@@ -1,6 +1,6 @@
 import { TurnState } from "./turn";
 import { Deck } from "./card";
-import { Player } from "../types";
+import { Player } from "./player";
 
 export type GameId = string;
 export type UserId = string;

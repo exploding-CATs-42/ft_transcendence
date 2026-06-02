@@ -14,7 +14,8 @@ import {
 import { createActor } from "xstate";
 import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
-import { Game, GameInfo, Player } from "../game/types";
+import { Game, GameInfo } from "../game/types";
+import { Player } from "../game/types/player";
 import { JoinGameResult, PlayerIdPayload, UserId } from "../types";
 import GameStore from "../utils/gameStore";
 import { toWaitingPlayerView } from "../game/mappers";

@@ -1,15 +1,5 @@
 import { Actor } from "xstate";
-import { CardInstance, UserId } from "../types";
 import { gameMachine } from "./gameMachine";
-
-export interface Player {
-  id: UserId;
-  name: string;
-  hand: CardInstance[];
-  isConfirmed: boolean;
-  isAlive: boolean;
-  turnOrder: number;
-}
 
 export interface GameInfo {
   id: string;
