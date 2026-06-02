@@ -32,3 +32,8 @@ export interface CardInstance {
   definitionId: string;
   type: CardType;
 }
+
+export interface Deck {
+  drawPile: CardInstance[];
+  discardPile: CardInstance[];
+}

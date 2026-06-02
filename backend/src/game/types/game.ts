@@ -1,5 +1,5 @@
 import { TurnState } from "./turn";
-import { CardInstance } from "./card";
+import { Deck } from "./card";
 import { Player } from "../types";
 
 export const GameStatus = {
@@ -23,11 +23,6 @@ export interface GameRules {
   maxPlayers: number;
   fasterVariantRemoveFraction: number;
   nopeWindowMs: number;
-}
-
-export interface Deck {
-  drawPile: CardInstance[];
-  discardPile: CardInstance[];
 }
 
 export interface GameState {
