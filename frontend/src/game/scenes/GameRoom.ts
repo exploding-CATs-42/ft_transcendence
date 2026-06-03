@@ -11,6 +11,7 @@ import {
   getCardSpacing,
 } from "game/utils";
 import type { Player } from "game/entities";
+import type { SpacingConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -30,9 +31,11 @@ const CARD_BORDER_RADIUS = 20;
 const CARDS_TO_DEAL = 7;
 const HAND_Y = 940; // y position of the player's hand
 
-const MIN_CARD_SPACING = 60;
-const MAX_CARD_SPACING = 120;
-const CARDS_BEFORE_MIN_SPACING = 20;
+const CARD_SPACING_CONFIG: SpacingConfig = {
+  minSpacing: 60,
+  maxSpacing: 120,
+  cardsBeforeMinSpacing: 20,
+};
 
 const BIGGEST_DEPTH = 100;
 
@@ -391,6 +394,9 @@ export class GameRoom extends Scene {
   }
 
   private reflowCards() {
+    const spacingConfig: SpacingConfig = {
+      minSpacing: MIN_CARD_SPACING,
+    };
     const spacing = getCardSpacing(
       this.#cards.length,
       MIN_CARD_SPACING,
