@@ -1,10 +1,16 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { Scenes, SEATS, Textures } from "game/constants";
+import {
+  Scenes,
+  SCREEN_HEIGHT,
+  SCREEN_WIDTH,
+  SEATS,
+  Textures,
+} from "game/constants";
 import { addBackgroundImage, addFullscreenToggle } from "game/utils";
-import { GraphicPlayer, type Player, PlayerSeat } from "game/entities";
-import type { LabelConfig } from "game/@types";
+import { Button, GraphicPlayer, type Player, PlayerSeat } from "game/entities";
+import type { LabelConfig, Size } from "game/@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -22,6 +28,16 @@ const NAME_LABEL_CONFIG: LabelConfig = {
   strokeColor: "white",
 };
 
+const BUTTON_SIZE: Size = {
+  width: 350,
+  height: 100,
+};
+
+const BUTTON_POSITION = {
+  x: SCREEN_WIDTH / 2 - BUTTON_SIZE.width / 2,
+  y: SCREEN_HEIGHT - 200,
+};
+
 export class WaitingRoom extends Scene {
   #seats: PlayerSeat[] = [];
 
@@ -36,6 +52,8 @@ export class WaitingRoom extends Scene {
 
     this.#seats = this.buildSeats();
     this.createPlayers();
+
+    this.addReadinessButton();
   }
 
   private buildSeats() {
@@ -55,5 +73,29 @@ export class WaitingRoom extends Scene {
       );
       seat.addPlayer(graphicPlayer);
     });
+  }
+
+  private addReadinessButton() {
+    let ready: boolean = false;
+    const onClick = (button: Button) => {
+      if (ready) {
+        ready = false;
+        button.setBackgroundColor(0x61c51b);
+        button.setText("Ready");
+      } else {
+        ready = true;
+        button.setBackgroundColor(0xff0000);
+        button.setText("Cancel");
+      }
+    };
+
+    const button = new Button(
+      this,
+      BUTTON_POSITION,
+      BUTTON_SIZE,
+      "Ready",
+      onClick,
+    );
+    return button;
   }
 }
