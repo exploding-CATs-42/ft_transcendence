@@ -86,7 +86,19 @@ export class GameRoom extends Scene {
       const x = SEATS[i]!.x + OPPONENT_HAND_X_OFFSET;
       const y = SEATS[i]!.y + OPPONENT_HAND_Y_OFFSET;
 
-      new OpponentHand(this, { x, y });
+      const hand = new OpponentHand(this, { x, y });
+
+      // Demonstration code
+      let count = 0;
+      const intervalId = setInterval(() => {
+        if (count < 7) hand.addCard();
+        else hand.removeCard();
+        count++;
+
+        if (count === 14) {
+          clearInterval(intervalId);
+        }
+      }, 500);
     }
   }
 
