@@ -31,6 +31,7 @@ const HAND_Y = 940; // y position of the player's hand
 
 const MIN_CARD_SPACING = 60;
 const MAX_CARD_SPACING = 120;
+const CARDS_BEFORE_MIN_SPACING = 20;
 
 const BIGGEST_DEPTH = 100;
 
@@ -368,7 +369,7 @@ export class GameRoom extends Scene {
     cardCount: number,
     minSpacing = MIN_CARD_SPACING,
     maxSpacing = MAX_CARD_SPACING,
-    maxCount = 20,
+    maxCount = CARDS_BEFORE_MIN_SPACING,
   ): number {
     if (cardCount <= 1) return maxSpacing;
     if (cardCount >= maxCount) return minSpacing;
