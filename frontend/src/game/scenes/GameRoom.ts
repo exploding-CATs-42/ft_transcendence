@@ -21,7 +21,7 @@ import {
   PlayerSeat,
   type Player,
 } from "game/entities";
-import type { Point, Size, LabelConfig } from "game/@types";
+import type { Point, LabelConfig, CardConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -166,20 +166,9 @@ export class GameRoom extends Scene {
     this.addCard(DISCARD_PILE_POSITION, cardFrame);
   }
 
-  private addCard(
-    position: Point,
-    frame: Phaser.Textures.Frame,
-    width = CARD_WIDTH,
-    height = CARD_HEIGHT,
-  ) {
-    const size: Size = { width, height };
-    const card = addCardVisual(
-      this,
-      position,
-      { frame, size },
-      CARD_BORDER_RADIUS,
-    );
-
+  private addCard(position: Point, frame: Phaser.Textures.Frame) {
+    const cardConfig = this.buildCardConfig(frame);
+    const card = addCardVisual(this, position, cardConfig, CARD_BORDER_RADIUS);
     return card;
   }
 
@@ -223,4 +212,14 @@ export class GameRoom extends Scene {
       },
     });
   };
+
+  private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
+    return {
+      frame: frame,
+      size: {
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+      },
+    };
+  }
 }
