@@ -61,6 +61,7 @@ const HAND_POSITION: Point = {
 };
 
 export class GameRoom extends Scene {
+  #opponentHands: OpponentHand[] = [];
   #myHand!: Hand;
 
   constructor() {
@@ -109,6 +110,7 @@ export class GameRoom extends Scene {
       const y = SEATS[i]!.y + OPPONENT_HAND_Y_OFFSET;
 
       const hand = new OpponentHand(this, { x, y });
+      this.#opponentHands.push(hand);
 
       // Demonstration code
       let count = 0;
