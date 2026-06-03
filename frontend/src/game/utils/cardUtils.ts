@@ -32,3 +32,17 @@ export const getCardSpacing = (
 
   return spacing;
 };
+
+export const getHandStartX = (
+  cardCount: number,
+  spacing: number,
+  cardWidth: number,
+  baseX: number,
+): number => {
+  if (cardCount === 0) return baseX - cardWidth / 2;
+
+  const handWidth = (cardCount - 1) * spacing + cardWidth;
+  const startX = baseX - handWidth / 2;
+
+  return startX;
+};
