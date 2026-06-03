@@ -1,12 +1,13 @@
 import { Game } from "phaser";
 import { Boot, Preloader, WaitingRoom, GameRoom } from "./scenes";
+import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants";
 
 //  Find out more information about the Game Config at:
 //  https://docs.phaser.io/api-documentation/typedef/types-core#gameconfig
 const config: Phaser.Types.Core.GameConfig = {
   type: Phaser.AUTO,
-  width: 1920,
-  height: 1080,
+  width: SCREEN_WIDTH,
+  height: SCREEN_HEIGHT,
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
