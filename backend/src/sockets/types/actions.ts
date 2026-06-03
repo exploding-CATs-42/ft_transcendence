@@ -1,4 +1,4 @@
-import { CardType } from "../game/types/card";
+import { CardType } from "../../game/types";
 
 export const ClientActionType = {
   PLAY_CARD: "PLAY_CARD",
