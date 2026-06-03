@@ -2,8 +2,9 @@ export const getCardSpacing = (
   cardCount: number,
   minSpacing: number,
   maxSpacing: number,
-  maxCount: number,
+  cardsBeforeMinSpacing: number,
 ): number => {
+  const maxCount = cardsBeforeMinSpacing;
   if (cardCount <= 1) return maxSpacing;
   if (cardCount >= maxCount) return minSpacing;
 
