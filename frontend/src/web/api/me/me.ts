@@ -1,5 +1,5 @@
 // Local level
-import type { ProfileUser } from "pages/ProfilePage/types";
+import type { FriendItem, ProfileUser } from "pages/ProfilePage/types";
 import { api } from "../axios";
 
 const getMe = async (): Promise<ProfileUser> => {
@@ -7,6 +7,12 @@ const getMe = async (): Promise<ProfileUser> => {
   return result.data.user;
 };
 
+const getMeFriends = async (): Promise<FriendItem[]> => {
+  const result = await api.get("/me/friends");
+  return result.data.friends;
+};
+
 export default {
   getMe,
+  getMeFriends,
 };

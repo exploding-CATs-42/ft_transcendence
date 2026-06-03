@@ -1,27 +1,30 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 import api from "api";
+import { getErrorMessage } from "utils";
 
 import { ListSection, StatsSection, UserSection } from "./components";
-import { friendsMock, matchesMock, statsMock } from "./mocks";
+import { matchesMock, statsMock } from "./mocks";
 
-import type { ProfileUser } from "./types/ProfileUser";
+import type { ProfileUser, FriendItem } from "./types";
 import s from "./ProfilePage.module.css";
-import { toast } from "react-toastify";
-import { getErrorMessage } from "utils";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState<ProfileUser | null>(null);
+  const [friends, setFriends] = useState<FriendItem[]>([]);
 
   useEffect(() => {
     async function loadProfile() {
       try {
         const userData = await api.me.getMe();
+        const friendsData = await api.me.getMeFriends();
 
+        setFriends(friendsData);
         setUser(userData);
       } catch (error) {
         const errorMessage = getErrorMessage(error);
@@ -50,7 +53,7 @@ const ProfilePage = () => {
         <UserSection user={user} />
         <StatsSection stats={statsMock} />
       </div>
-      <ListSection matches={matchesMock} friends={friendsMock} />
+      <ListSection matches={matchesMock} friends={friends} />
     </div>
   );
 };
