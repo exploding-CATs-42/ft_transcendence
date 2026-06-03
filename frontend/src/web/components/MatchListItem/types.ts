@@ -1,15 +1,18 @@
-export type LobbyPlayer = {
-  id: string;
-  avatarUrl: string;
-};
+import type { ProfileUser } from "pages/ProfilePage/types";
+import type { UserId } from "pages/ProfilePage/types/ProfileUser";
 
 export type LobbyMatch = {
-  id: string;
-  title: string;
-  players: LobbyPlayer[];
+  gameId: string;
+  gameName: string;
+  players: ProfileUser[];
 };
 
+export interface UserGameHistoryItem extends LobbyMatch {
+  endedAt: Date;
+  winnerId: UserId;
+}
+
 export type MatchSlot = { id: number } & (
-  | { kind: "real"; player: LobbyPlayer }
+  | { kind: "real"; player: ProfileUser }
   | { kind: "placeholder" }
 );

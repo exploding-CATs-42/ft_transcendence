@@ -1,5 +1,7 @@
+export type UserId = string;
+
 export interface ProfileUser {
-  id: string;
+  id: UserId;
   username: string;
   isOnline: boolean;
   avatarUrl: string | null;
