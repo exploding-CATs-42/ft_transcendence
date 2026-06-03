@@ -1,13 +1,13 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { Scenes, Textures } from "game/constants";
+import { Scenes, SEATS, Textures } from "game/constants";
 import {
   addBackgroundImage,
   addFullscreenToggle,
   addPlayers,
 } from "game/utils";
-import type { Player } from "game/entities";
+import { type Player, PlayerSeat } from "game/entities";
 import type { LabelConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
@@ -39,6 +39,12 @@ export class WaitingRoom extends Scene {
     const { fontColor, strokeColor } = NAME_LABEL_CONFIG;
     addPlayers(this, data.players, fontColor, strokeColor);
     this.addWaitingLabel();
+  }
+
+  private buildSeats() {
+    return SEATS.map((seat) => {
+      return new PlayerSeat(this, seat);
+    });
   }
 
   private addWaitingLabel() {
