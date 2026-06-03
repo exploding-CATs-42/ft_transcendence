@@ -25,10 +25,6 @@ export class WaitingRoom extends Scene {
     super(Scenes.WaitingRoom);
   }
 
-  init() {}
-
-  preload() {}
-
   create() {
     this.cameras.main.setBackgroundColor("#e09d52");
     addBackgroundImage(this, Textures.waitingRoomBg);
