@@ -3,7 +3,7 @@ import path from "path";
 import { GameId } from "../types";
 import { createActor, Snapshot } from "xstate";
 import { gameMachine } from "../game/gameMachine";
-import { GameInstance, GameInfo } from "../game/types";
+import { GameInstance, GameInfo } from "../game/instance";
 import { attachBroadcaster } from "../game/broadcaster";
 
 interface PersistedGame {

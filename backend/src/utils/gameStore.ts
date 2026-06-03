@@ -1,4 +1,4 @@
-import { GameInstance } from "../game/types";
+import { GameInstance } from "../game/instance";
 import { GameId } from "../types";
 import {
   createSaveLoop,
