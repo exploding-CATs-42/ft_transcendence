@@ -38,11 +38,15 @@ const CARD_WIDTH = 186;
 const CARD_HEIGHT = 260;
 const CARD_BORDER_RADIUS = 20;
 
-const PILE_Y = 470;
-const DRAW_PILE_X = 610;
-const DRAW_PILE_Y = PILE_Y;
-const DISCARD_PILE_X = 1100;
-const DISCARD_PILE_Y = PILE_Y;
+const PILES_Y = 470;
+const DRAW_PILE_POSITION: Point = {
+  x: 610,
+  y: PILES_Y,
+};
+const DISCARD_PILE_POSITION: Point = {
+  x: 1100,
+  y: PILES_Y,
+};
 
 const CARD_DROP_ZONE = {
   x: 400,
@@ -116,8 +120,8 @@ export class GameRoom extends Scene {
       // move it to the discard pile
       this.tweens.add({
         targets: card,
-        x: DISCARD_PILE_X,
-        y: DISCARD_PILE_Y,
+        x: DISCARD_PILE_POSITION.x,
+        y: DISCARD_PILE_POSITION.y,
         duration: 300,
         ease: "Back.Out",
       });
@@ -150,17 +154,16 @@ export class GameRoom extends Scene {
 
   private createDrawPile() {
     const cardCover = this.textures.get(Textures.cardCover).get();
-    const drawPile = this.addCard(
-      { x: DRAW_PILE_X, y: DRAW_PILE_Y },
-      cardCover,
-    ).setInteractive({ useHandCursor: true });
+    const drawPile = this.addCard(DRAW_PILE_POSITION, cardCover).setInteractive(
+      { useHandCursor: true },
+    );
 
     drawPile.on("pointerdown", this.drawCard);
   }
 
   private createDiscardPile() {
     const cardFrame = this.textures.get(Textures.cards).get(0);
-    this.addCard({ x: DISCARD_PILE_X, y: DISCARD_PILE_Y }, cardFrame);
+    this.addCard(DISCARD_PILE_POSITION, cardFrame);
   }
 
   private addCard(
@@ -201,10 +204,7 @@ export class GameRoom extends Scene {
 
     // Create face down card
     const cardCover = this.textures.get(Textures.cardCover).get();
-    const faceDownCard = this.addCard(
-      { x: DRAW_PILE_X, y: DRAW_PILE_Y },
-      cardCover,
-    );
+    const faceDownCard = this.addCard(DRAW_PILE_POSITION, cardCover);
 
     // and move it below the screen
     // at the x position calculated earlier
