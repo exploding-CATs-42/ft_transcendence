@@ -3,10 +3,10 @@ import { Scene } from "phaser";
 // Project level
 import {
   Scenes,
+  SCREEN_HEIGHT,
   SCREEN_WIDTH,
   SEATS,
   Textures,
-  SCREEN_HEIGHT,
 } from "game/constants";
 import {
   EventBus,
@@ -15,11 +15,11 @@ import {
   addFullscreenToggle,
 } from "game/utils";
 import {
-  OpponentHand,
   GraphicPlayer,
-  type Player,
   Hand,
+  OpponentHand,
   PlayerSeat,
+  type Player,
 } from "game/entities";
 import type { Point, Size, LabelConfig } from "game/@types";
 
