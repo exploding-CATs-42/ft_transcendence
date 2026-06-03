@@ -2,12 +2,8 @@
 import { Scene } from "phaser";
 // Project level
 import { Scenes, SEATS, Textures } from "game/constants";
-import {
-  addBackgroundImage,
-  addFullscreenToggle,
-  addPlayers,
-} from "game/utils";
-import { type Player, PlayerSeat } from "game/entities";
+import { addBackgroundImage, addFullscreenToggle } from "game/utils";
+import { GraphicPlayer, type Player, PlayerSeat } from "game/entities";
 import type { LabelConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
@@ -27,6 +23,8 @@ const NAME_LABEL_CONFIG: LabelConfig = {
 };
 
 export class WaitingRoom extends Scene {
+  #seats: PlayerSeat[] = [];
+
   constructor() {
     super(Scenes.WaitingRoom);
   }
@@ -36,14 +34,28 @@ export class WaitingRoom extends Scene {
     addBackgroundImage(this, Textures.waitingRoomBg);
     addFullscreenToggle(this);
 
-    const { fontColor, strokeColor } = NAME_LABEL_CONFIG;
-    addPlayers(this, data.players, fontColor, strokeColor);
+    this.#seats = this.buildSeats();
+    this.createPlayers();
+
     this.addWaitingLabel();
   }
 
   private buildSeats() {
     return SEATS.map((seat) => {
       return new PlayerSeat(this, seat);
+    });
+  }
+
+  private createPlayers() {
+    this.#seats.forEach((seat, i) => {
+      const player = data.players[i]!;
+      const graphicPlayer = new GraphicPlayer(
+        this,
+        { x: 0, y: 0 },
+        player,
+        NAME_LABEL_CONFIG,
+      );
+      seat.addPlayer(graphicPlayer);
     });
   }
 
