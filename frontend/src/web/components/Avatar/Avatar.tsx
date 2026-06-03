@@ -16,16 +16,18 @@ const variantClass: Record<Variant, string> = {
 interface Props {
   className?: string;
   variant?: Variant;
-  src?: string;
+  src?: string | null;
   alt?: string;
 }
 
 const Avatar = ({
   className,
   variant = "profile",
-  src = "/src/web/assets/images/avatar/avatar-193w.png",
+  src,
   alt = "Fierce cat mascot logo in red and gold",
 }: Props) => {
+  const avatarSrc = src ?? "/src/web/assets/images/avatar/avatar-193w.png";
+
   return (
     <img
       className={clsx(s.avatar, variantClass[variant], className)}
@@ -39,7 +41,7 @@ const Avatar = ({
       (min-width: 375px) 116px,
       45px
     "
-      src={src}
+      src={avatarSrc}
       alt={alt}
     />
   );
