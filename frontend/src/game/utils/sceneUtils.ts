@@ -3,6 +3,7 @@ import { Scene, GameObjects } from "phaser";
 // Project level
 import { SEATS, Textures } from "game/constants";
 import type { Player } from "game/entities";
+import { GraphicPlayer } from "game/entities/GraphicPlayer";
 
 export const addBackgroundImage = (
   scene: Scene,
@@ -50,27 +51,6 @@ export const addPlayers = (
   strokeColor: string,
 ) => {
   players.forEach((player, i) => {
-    const { x, y } = SEATS[i]!;
-    const avatar = scene.add.image(x, y, Textures.avatar).setOrigin(0, 0);
-
-    const radius = Math.min(avatar.displayWidth, avatar.displayHeight) / 2;
-    const cx = x + radius;
-    const cy = y + radius;
-
-    avatar.setPosition(cx, cy).setOrigin(0.5, 0.5);
-
-    const mask = scene.add.graphics();
-    mask.fillCircle(cx, cy, radius);
-    avatar.setMask(mask.createGeometryMask());
-
-    scene.add
-      .text(cx, cy - radius - 30, player.username, {
-        fontSize: 32,
-        color: fontColor || "white",
-        fontFamily: "Chewy",
-        stroke: strokeColor || "white",
-        strokeThickness: 2,
-      })
-      .setOrigin(0.5, 0.5);
+    return new GraphicPlayer(scene, SEATS[i]!, player, fontColor, strokeColor);
   });
 };
