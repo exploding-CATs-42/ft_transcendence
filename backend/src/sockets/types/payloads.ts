@@ -1,5 +1,5 @@
 import { CardInstance, PendingActionType } from "../../game/types";
-import { WaitingPlayerView, WaitingStateView } from "./events";
+import { WaitingPlayerView, WaitingStateView } from "./views";
 
 export interface JoinGameResult {
   player: WaitingPlayerView;
