@@ -1,4 +1,4 @@
-import type { Point } from "game/@types";
+import type { Point, LabelConfig } from "game/@types";
 import { Textures } from "game/constants";
 import type { Player } from "game/entities";
 
@@ -18,8 +18,7 @@ export class GraphicPlayer implements Player {
     scene: Phaser.Scene,
     position: Point,
     player: Player,
-    fontColor: string,
-    strokeColor: string,
+    labelConfig: LabelConfig,
   ) {
     this.username = player.username;
     this.imageUrl = player.imageUrl;
@@ -34,12 +33,7 @@ export class GraphicPlayer implements Player {
     this.avatarMask = this.addAvatarMask();
     this.avatar.setMask(this.avatarMask.createGeometryMask());
     this.drawMask();
-    this.label = this.addUsernameLabel(
-      scene,
-      player.username,
-      fontColor,
-      strokeColor,
-    );
+    this.label = this.addUsernameLabel(scene, player.username, labelConfig);
 
     this.container.add([this.avatar, this.label]);
   }
@@ -72,12 +66,12 @@ export class GraphicPlayer implements Player {
   private addUsernameLabel(
     scene: Phaser.Scene,
     text: string,
-    fontColor: string,
-    strokeColor: string,
+    labelConfig: LabelConfig,
   ) {
     const x = AVATAR_WIDTH / 2;
     const y = -8;
 
+    const { fontColor, strokeColor } = labelConfig;
     const label = scene.add
       .text(x, y, text, {
         fontSize: 32,
