@@ -1,3 +1,5 @@
+import { Textures } from "game/constants";
+
 /**
  * Creates (or reuses) a rounded-corner texture derived from a Phaser texture frame.
  */
@@ -67,4 +69,41 @@ const applyRoundedClip = (
   ctx.beginPath();
   ctx.roundRect(0, 0, w, h, radius);
   ctx.clip();
+};
+
+export const getRoundedAvatarTexture = (scene: Phaser.Scene) => {
+  const textureKey = `rounded_${Textures.avatar}`;
+  // Avoid recreating texture
+  if (scene.textures.exists(textureKey)) return textureKey;
+
+  // Get original image source
+  const sourceImage = scene.textures
+    .get(Textures.avatar)
+    .getSourceImage() as HTMLImageElement;
+
+  const size = Math.min(sourceImage.width, sourceImage.height);
+  const radius = size / 2;
+
+  // Create canvas texture
+  const canvasTexture = scene.textures.createCanvas(textureKey, size, size)!;
+
+  const canvas = canvasTexture.getSourceImage() as HTMLCanvasElement;
+  const ctx = canvas.getContext("2d")!;
+
+  // Clear canvas
+  ctx.clearRect(0, 0, size, size);
+
+  // Create circular clipping path
+  ctx.beginPath();
+  ctx.arc(radius, radius, radius, 0, Math.PI * 2);
+  ctx.closePath();
+  ctx.clip();
+
+  // Draw original image inside clipped area
+  ctx.drawImage(sourceImage, 0, 0, size, size);
+
+  // Refresh Phaser texture
+  canvasTexture.refresh();
+
+  return textureKey;
 };
