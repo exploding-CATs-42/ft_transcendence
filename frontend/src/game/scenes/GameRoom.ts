@@ -8,6 +8,7 @@ import {
   addFullscreenToggle,
   addPlayers,
   createRoundedCardTexture,
+  getCardSpacing,
 } from "game/utils";
 import type { Player } from "game/entities";
 
@@ -90,7 +91,7 @@ export class GameRoom extends Scene {
   private addOpponentHand(cardCount: number, baseX: number, y: number) {
     const count = Math.min(cardCount, OPPONENT_HAND_MAX_CARDS);
 
-    const spacing = this.getCardSpacing(
+    const spacing = getCardSpacing(
       count,
       OPPONENT_CARD_WIDTH / 3,
       OPPONENT_CARD_WIDTH / 2,
@@ -195,7 +196,12 @@ export class GameRoom extends Scene {
   }
 
   private dealCards() {
-    const spacing = this.getCardSpacing(CARDS_TO_DEAL);
+    const spacing = getCardSpacing(
+      CARDS_TO_DEAL,
+      MIN_CARD_SPACING,
+      MAX_CARD_SPACING,
+      CARDS_BEFORE_MIN_SPACING,
+    );
     let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
@@ -313,7 +319,12 @@ export class GameRoom extends Scene {
     };
 
     const getLayout = () => {
-      const spacing = this.getCardSpacing(this.#cards.length);
+      const spacing = getCardSpacing(
+        this.#cards.length,
+        MIN_CARD_SPACING,
+        MAX_CARD_SPACING,
+        CARDS_BEFORE_MIN_SPACING,
+      );
       const startX = this.getHandStartX(this.#cards.length, spacing);
 
       const getBaseX = (index: number) => startX + index * spacing;
@@ -365,35 +376,6 @@ export class GameRoom extends Scene {
     });
   }
 
-  private getCardSpacing(
-    cardCount: number,
-    minSpacing = MIN_CARD_SPACING,
-    maxSpacing = MAX_CARD_SPACING,
-    maxCount = CARDS_BEFORE_MIN_SPACING,
-  ): number {
-    if (cardCount <= 1) return maxSpacing;
-    if (cardCount >= maxCount) return minSpacing;
-
-    // Calculate how full the hand is.
-    // If we have 1 card - it's empty
-    // If we have 20+ cards it's full
-    // The progress is a value from 0 to 1 (0% -> 100%)
-    const progress = (cardCount - 1) / (maxCount - 1);
-    const SPACE_TO_SHRINK = maxSpacing - minSpacing;
-
-    // Decrease the spacing on some amount
-    // from the amount of on how much spacing can shrink
-    // depending on how full the hand is
-    // or in other words:
-    // the more cards we have
-    // the bigger will be progress
-    // and therefore the bigger will be (progress * SPACE_TO_SHRINK)
-    // thus the smaller will be the spacing
-    const spacing = maxSpacing - progress * SPACE_TO_SHRINK;
-
-    return spacing;
-  }
-
   private getHandStartX(
     cardCount: number,
     spacing: number,
@@ -409,7 +391,12 @@ export class GameRoom extends Scene {
   }
 
   private reflowCards() {
-    const spacing = this.getCardSpacing(this.#cards.length);
+    const spacing = getCardSpacing(
+      this.#cards.length,
+      MIN_CARD_SPACING,
+      MAX_CARD_SPACING,
+      CARDS_BEFORE_MIN_SPACING,
+    );
     let x = this.getHandStartX(this.#cards.length, spacing);
 
     this.#cards.forEach((card, index) => {
@@ -437,7 +424,12 @@ export class GameRoom extends Scene {
     // Generate random insert index
     const insertIndex = Phaser.Math.Between(0, this.#cards.length);
     // Calculate current card spacing
-    const spacing = this.getCardSpacing(this.#cards.length);
+    const spacing = getCardSpacing(
+      this.#cards.length,
+      MIN_CARD_SPACING,
+      MAX_CARD_SPACING,
+      CARDS_BEFORE_MIN_SPACING,
+    );
 
     // Using that spacing calculate where to insert the card
     let targetX;
