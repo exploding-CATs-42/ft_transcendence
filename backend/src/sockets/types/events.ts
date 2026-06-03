@@ -1,11 +1,3 @@
-import {
-  TurnPhase,
-  PendingAction,
-  NopeChain,
-  FavorState,
-  CardInstance,
-} from "../../game/types";
-
 export const ClientEventType = {
   JOIN_GAME: "join-game",
   LEAVE_GAME: "leave-game",
@@ -52,44 +44,6 @@ export const PublicEventType = {
 
 export type PublicEventType =
   (typeof PublicEventType)[keyof typeof PublicEventType];
-
-export interface PublicGameView {
-  gameId: string;
-  turn: PublicTurnView;
-  players: PublicPlayerView[];
-  deckSize: number;
-  discardPileTop: CardInstance | null;
-  winnerId: string | null;
-}
-
-export interface PublicTurnView {
-  currentPlayerId: string;
-  phase: TurnPhase;
-  attackCount: number;
-  isUnderAttack: boolean;
-  pendingAction: PendingAction | null;
-  nopeChain: NopeChain | null;
-  favorState: FavorState | null;
-  turnNumber: number;
-}
-
-export interface PublicPlayerView {
-  id: string;
-  name: string;
-  handSize: number;
-  isAlive: boolean;
-  turnOrder: number;
-}
-
-export interface WaitingPlayerView {
-  id: string;
-  name: string;
-  isConfirmed: boolean;
-}
-
-export interface WaitingStateView {
-  players: WaitingPlayerView[];
-}
 
 export const PrivateEventType = {
   LEFT_GAME: "left-game",
