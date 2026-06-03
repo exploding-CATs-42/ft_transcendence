@@ -1,7 +1,13 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { Scenes, SCREEN_WIDTH, SEATS, Textures } from "game/constants";
+import {
+  Scenes,
+  SCREEN_WIDTH,
+  SEATS,
+  Textures,
+  SCREEN_HEIGHT,
+} from "game/constants";
 import {
   EventBus,
   addBackgroundImage,
@@ -11,7 +17,12 @@ import {
   getCardSpacing,
   getHandStartX,
 } from "game/utils";
-import { OpponentHand, type GraphicPlayer, type Player } from "game/entities";
+import {
+  OpponentHand,
+  type GraphicPlayer,
+  type Player,
+  Hand,
+} from "game/entities";
 import type { Point, Size, SpacingConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
@@ -59,8 +70,15 @@ const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to th
 const OPPONENT_HAND_X_OFFSET = 96;
 const OPPONENT_HAND_Y_OFFSET = 180;
 
+// My hand
+const HAND_POSITION: Point = {
+  x: SCREEN_WIDTH / 2,
+  y: 940,
+};
+
 export class GameRoom extends Scene {
   #cards: Phaser.GameObjects.Image[] = [];
+  #myHand!: Hand;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -76,9 +94,24 @@ export class GameRoom extends Scene {
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
-    this.dealCards();
+    this.createMyHand();
 
     EventBus.emit("scene-ready", this);
+  }
+
+  private createMyHand() {
+    const onCardDrop = (card: Phaser.GameObjects.Image) => {
+      // move it to the discard pile
+      this.tweens.add({
+        targets: card,
+        x: DISCARD_PILE_X,
+        y: DISCARD_PILE_Y,
+        duration: 300,
+        ease: "Back.Out",
+      });
+    };
+
+    this.#myHand = new Hand(this, HAND_POSITION, onCardDrop);
   }
 
   private createOpponentHands(players: GraphicPlayer[]) {
@@ -116,19 +149,6 @@ export class GameRoom extends Scene {
   private createDiscardPile() {
     const cardFrame = this.textures.get(Textures.cards).get(0);
     this.addCard(DISCARD_PILE_X, DISCARD_PILE_Y, cardFrame);
-  }
-
-  private dealCards() {
-    const spacing = getCardSpacing(CARDS_TO_DEAL, CARD_SPACING_CONFIG);
-    let x = getHandStartX(CARDS_TO_DEAL, spacing, CARD_WIDTH, SCREEN_WIDTH / 2);
-
-    for (let i = 0; i < CARDS_TO_DEAL; ++i) {
-      const frame = this.getRandomCardFrame();
-      const card = this.addInteractiveCard(x, HAND_Y, frame).setDepth(i + 1);
-      this.#cards.push(card);
-
-      x += spacing;
-    }
   }
 
   private addCard(
@@ -331,23 +351,16 @@ export class GameRoom extends Scene {
 
   private drawCard = () => {
     // Generate random insert index
-    const insertIndex = Phaser.Math.Between(0, this.#cards.length);
-    // Calculate current card spacing
-    const spacing = getCardSpacing(this.#cards.length, CARD_SPACING_CONFIG);
+    const cardCount = this.#myHand.getCount();
+    const insertIndex = Phaser.Math.Between(0, cardCount);
 
-    // Using that spacing calculate where to insert the card
+    // Get current card spacing and most left card position
+    const { startX, spacing } = this.#myHand.getLayout();
+
+    // Using that calculate where to insert the card
     let targetX;
-    if (this.#cards.length === 0)
-      targetX = getHandStartX(1, spacing, CARD_WIDTH, SCREEN_WIDTH / 2);
-    else if (insertIndex === 0) targetX = this.#cards[0]!.x - spacing / 2;
-    else targetX = this.#cards[insertIndex - 1]!.x + spacing / 2;
-
-    // Update the depth of the cards in player's hand,
-    // so that new card doesn't overlay them
-    this.#cards.forEach((card, index) => {
-      if (index >= insertIndex) card.setDepth(index + 1 + 1);
-      else card.setDepth(index + 1);
-    });
+    if (cardCount === 0) targetX = HAND_POSITION.x;
+    else targetX = startX + spacing * insertIndex - spacing / 2;
 
     // Create face down card
     const cardCover = this.textures.get(Textures.cardCover).get();
@@ -358,7 +371,7 @@ export class GameRoom extends Scene {
     this.tweens.add({
       targets: faceDownCard,
       x: targetX,
-      y: this.scale.height + CARD_HEIGHT / 2,
+      y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
       duration: 400,
       ease: "Sine.easeInOut",
 
@@ -366,32 +379,9 @@ export class GameRoom extends Scene {
         // then destroy it
         faceDownCard.destroy();
         // and spawn the real card into player's hand
-        spawnNewCard(targetX, insertIndex);
+        this.#myHand.addCard(insertIndex);
       },
     });
-
-    const spawnNewCard = (targetX: number, insertIndex: number) => {
-      const frame = this.getRandomCardFrame();
-
-      const newCard = this.addInteractiveCard(
-        targetX,
-        this.scale.height,
-        frame,
-      ).setDepth(insertIndex);
-
-      this.tweens.add({
-        targets: newCard,
-        x: targetX,
-        y: HAND_Y,
-        duration: 500,
-        ease: "Back.easeOut",
-
-        onComplete: () => {
-          this.#cards.splice(insertIndex, 0, newCard);
-          if (this.#cards.length > 1) this.reflowCards();
-        },
-      });
-    };
   };
 
   private getRandomCardFrame() {
