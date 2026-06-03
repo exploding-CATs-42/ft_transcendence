@@ -50,7 +50,8 @@ export const addPlayers = (
   fontColor: string,
   strokeColor: string,
 ) => {
+  const labelConfig = { fontColor, strokeColor };
   players.forEach((player, i) => {
-    return new GraphicPlayer(scene, SEATS[i]!, player, fontColor, strokeColor);
+    return new GraphicPlayer(scene, SEATS[i]!, player, labelConfig);
   });
 };
