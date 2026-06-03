@@ -3,7 +3,6 @@ import { Deck } from "./card";
 import { Player } from "./player";
 
 export type GameId = string;
-export type UserId = string;
 
 export interface GameRules {
   dealtCardsPerPlayer: number;

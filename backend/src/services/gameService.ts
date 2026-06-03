@@ -16,11 +16,12 @@ import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
 import { GameInstance, GameInfo } from "../game/instance";
 import { Player } from "../game/types/player";
-import { JoinGameResult, PlayerIdPayload, UserId } from "../types";
+import { JoinGameResult, PlayerIdPayload } from "../types";
 import GameStore from "../utils/gameStore";
 import { toWaitingPlayerView } from "../game/mappers";
 import { attachBroadcaster } from "../game/broadcaster";
 import { ensureUserExists } from "./usersService";
+import { UserId } from "../types/auth";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
