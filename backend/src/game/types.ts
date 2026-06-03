@@ -8,7 +8,7 @@ export interface GameInfo {
   createdAt: number;
 }
 
-export interface Game {
+export interface GameInstance {
   info: GameInfo;
   actor: Actor<typeof gameMachine>;
 }
