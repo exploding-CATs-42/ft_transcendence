@@ -212,8 +212,14 @@ meRouter.patch("/", authMiddleware, updateMeController);
 export const gamesRouter = createAuthenticatedRouter();
 ```
 
-`GET /api/games` is useful for manually testing expired access tokens because
-it is protected.
+Currently useful protected endpoints for manual refresh testing:
+
+- `GET /api/games`, protected through `createAuthenticatedRouter()`;
+- `GET /api/me/friends`, protected through `friendsRouter.use(authMiddleware)`;
+- `PATCH /api/me`, protected directly with `authMiddleware`.
+
+`GET /api/games` is the easiest one to use in browser console tests because it
+does not need a request body.
 
 ## Frontend: Access Token Storage
 
@@ -274,7 +280,30 @@ This restores the axios `Authorization` header after a page refresh. Without
 this sync, React could still consider the user logged in from `localStorage`,
 while axios would have lost its in-memory default header.
 
+`AuthProvider` also registers a callback for refreshed access tokens:
+
+```ts
+useEffect(() => {
+  setAccessTokenRefreshHandler((accessToken) => {
+    saveAccessToken({ accessToken });
+  });
+
+  return () => {
+    setAccessTokenRefreshHandler(null);
+  };
+}, [saveAccessToken]);
+```
+
+This lets the axios interceptor update frontend auth storage after a successful
+refresh without importing React hooks into `axios.ts`.
+
 ## Frontend: Axios Setup
+
+`axios.ts` keeps a callback for refreshed access tokens at module level:
+
+```ts
+let onAccessTokenRefresh: ((accessToken: string) => void) | null = null;
+```
 
 Axios is configured with credentials enabled:
 
@@ -312,6 +341,19 @@ app starts.
 `authVersion` is incremented whenever axios auth is cleared. This lets pending
 refresh work detect that the user logged out before the refresh completed.
 
+The refresh callback is registered from `AuthProvider`:
+
+```ts
+export const setAccessTokenRefreshHandler = (
+  handler: ((accessToken: string) => void) | null,
+) => {
+  onAccessTokenRefresh = handler;
+};
+```
+
+When refresh succeeds, axios can update its own header and notify
+`AuthProvider` to save the same token in auth state and `localStorage`.
+
 ## Frontend: Automatic Access Token Refresh
 
 Axios has a response interceptor:
@@ -348,8 +390,12 @@ api.interceptors.response.use(
       }
 
       setAxiosToken(accessToken);
+      onAccessTokenRefresh?.(accessToken);
 
-      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      originalRequest.headers = {
+        ...(originalRequest.headers ?? {}),
+        Authorization: `Bearer ${accessToken}`,
+      };
 
       return api(originalRequest);
     }
@@ -370,6 +416,7 @@ Flow:
 protected request -> 401
 /users/refresh -> 200
 axios stores the new access token
+AuthProvider stores the new access token in localStorage
 axios retries the original request
 ```
 
@@ -390,6 +437,16 @@ user logs out
 axios Authorization is cleared
 /users/refresh returns a new accessToken
 stale accessToken must not be written back to axios
+```
+
+The callback prevents a different stale-token problem:
+
+```txt
+protected request -> 401
+/users/refresh returns a new accessToken
+axios Authorization is updated
+localStorage is updated with the same new accessToken
+page refresh restores the fresh accessToken instead of the expired one
 ```
 
 The interceptor intentionally skips:
