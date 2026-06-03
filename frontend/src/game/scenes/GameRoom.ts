@@ -21,7 +21,7 @@ import {
   type Player,
   Hand,
 } from "game/entities";
-import type { Point, Size } from "game/@types";
+import type { Point, Size, LabelConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -51,6 +51,12 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
+// Opponents
+const NAME_LABEL_CONFIG: LabelConfig = {
+  fontColor: "white",
+  strokeColor: "black",
+};
+
 const OPPONENT_HAND_X_OFFSET = 96;
 const OPPONENT_HAND_Y_OFFSET = 180;
 
@@ -71,7 +77,8 @@ export class GameRoom extends Scene {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
 
-    const players = addPlayers(this, data.players, "white", "black");
+    const { fontColor, strokeColor } = NAME_LABEL_CONFIG;
+    const players = addPlayers(this, data.players, fontColor, strokeColor);
     this.createOpponentHands(players);
 
     this.createCardDropZone();
