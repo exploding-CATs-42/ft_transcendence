@@ -1,6 +1,7 @@
 import type { Point, LabelConfig } from "game/@types";
 import { Textures } from "game/constants";
 import type { Player } from "game/entities";
+import { getRoundedAvatarTexture } from "game/utils";
 
 const AVATAR_WIDTH = 193;
 
@@ -30,16 +31,14 @@ export class GraphicPlayer implements Player {
     this.container = scene.add.container(x, y);
 
     this.avatar = this.addAvatar(scene);
-    this.avatarMask = this.addAvatarMask();
-    this.avatar.setMask(this.avatarMask.createGeometryMask());
-    this.drawMask();
     this.label = this.addUsernameLabel(scene, player.username, labelConfig);
 
     this.container.add([this.avatar, this.label]);
   }
 
   private addAvatar(scene: Phaser.Scene) {
-    const avatar = scene.add.image(0, 0, Textures.avatar).setOrigin(0, 0);
+    const textureKey = getRoundedAvatarTexture(scene);
+    const avatar = scene.add.image(0, 0, textureKey).setOrigin(0, 0);
     return avatar;
   }
 
@@ -88,6 +87,5 @@ export class GraphicPlayer implements Player {
   moveTo(x: number, y: number) {
     this.position = { x, y };
     this.container.setPosition(x, y);
-    this.drawMask();
   }
 }
