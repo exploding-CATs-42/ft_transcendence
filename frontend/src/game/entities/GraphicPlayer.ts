@@ -1,5 +1,4 @@
 import type { Point, LabelConfig } from "game/@types";
-import { Textures } from "game/constants";
 import type { Player } from "game/entities";
 import { getRoundedAvatarTexture } from "game/utils";
 
@@ -8,12 +7,9 @@ const AVATAR_WIDTH = 193;
 export class GraphicPlayer implements Player {
   readonly username: string;
   readonly imageUrl: string | null;
-  private scene: Phaser.Scene;
   readonly container: Phaser.GameObjects.Container;
   private avatar: Phaser.GameObjects.Image;
   private label: Phaser.GameObjects.Text;
-  private position: Point;
-  private avatarMask: Phaser.GameObjects.Graphics;
 
   constructor(
     scene: Phaser.Scene,
@@ -24,9 +20,6 @@ export class GraphicPlayer implements Player {
     this.username = player.username;
     this.imageUrl = player.imageUrl;
 
-    this.scene = scene;
-
-    this.position = position;
     const { x, y } = position;
     this.container = scene.add.container(x, y);
 
@@ -40,26 +33,6 @@ export class GraphicPlayer implements Player {
     const textureKey = getRoundedAvatarTexture(scene);
     const avatar = scene.add.image(0, 0, textureKey).setOrigin(0, 0);
     return avatar;
-  }
-
-  private addAvatarMask() {
-    const mask = this.scene.add.graphics();
-    mask.setVisible(false);
-    return mask;
-  }
-
-  private drawMask() {
-    const radius = AVATAR_WIDTH / 2;
-
-    // Unfortunately Phaser geometry masks always use scene/world coordinates,
-    // not container-local coordinates.
-    // So when container moves, I need to move the mask with it,
-    // otherwise it stays behind and I don't see the avatar
-    const x = this.position.x + radius; // world coords
-    const y = this.position.y + radius; // world coords
-
-    this.avatarMask.clear();
-    this.avatarMask.fillCircle(x, y, radius);
   }
 
   private addUsernameLabel(
@@ -85,7 +58,6 @@ export class GraphicPlayer implements Player {
   }
 
   moveTo(x: number, y: number) {
-    this.position = { x, y };
     this.container.setPosition(x, y);
   }
 }
