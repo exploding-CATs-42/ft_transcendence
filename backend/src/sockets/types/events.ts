@@ -1,11 +1,11 @@
-import { CardInstance } from "../game/types/card";
 import {
   TurnPhase,
   PendingAction,
   PendingActionType,
   NopeChain,
   FavorState,
-} from "../game/types/turn";
+  CardInstance,
+} from "../../game/types";
 
 export const ClientEventType = {
   JOIN_GAME: "join-game",
