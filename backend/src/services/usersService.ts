@@ -132,7 +132,7 @@ export async function getUserGames(
       gameId: membership.game.id,
       gameName: membership.game.gameName,
       endedAt: membership.game.endedAt as Date,
-      isWinner: membership.game.winnerUserId === userId,
+      winnerId: membership.game.winnerUserId,
       players: membership.game.memberships.map((gameMembership) =>
         toProfileUser(gameMembership.user),
       ),
