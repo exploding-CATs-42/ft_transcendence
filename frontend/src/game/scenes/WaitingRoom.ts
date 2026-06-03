@@ -5,7 +5,7 @@ import {
   Scenes,
   SCREEN_HEIGHT,
   SCREEN_WIDTH,
-  SEATS,
+  WAITING_ROOM_SEATS,
   Textures,
 } from "game/constants";
 import { addBackgroundImage, addFullscreenToggle } from "game/utils";
@@ -57,7 +57,7 @@ export class WaitingRoom extends Scene {
   }
 
   private buildSeats() {
-    return SEATS.map((seat) => {
+    return WAITING_ROOM_SEATS.map((seat) => {
       return new PlayerSeat(this, seat);
     });
   }
