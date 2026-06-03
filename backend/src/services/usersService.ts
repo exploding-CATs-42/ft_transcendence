@@ -1,6 +1,6 @@
 import { prisma, publicProfileSelect } from "../lib/prisma";
 import { ProfileUserWithStats, UserGameHistoryItem } from "../types";
-import { toFriendUser, toProfileUserWithStats } from "../utils/users";
+import { toProfileUser, toProfileUserWithStats } from "../utils/users";
 
 export class UsersServiceError extends Error {
   public statusCode: number;
@@ -134,7 +134,7 @@ export async function getUserGames(
       endedAt: membership.game.endedAt as Date,
       isWinner: membership.game.winnerUserId === userId,
       players: membership.game.memberships.map((gameMembership) =>
-        toFriendUser(gameMembership.user),
+        toProfileUser(gameMembership.user),
       ),
     }))
     .sort((left, right) => {

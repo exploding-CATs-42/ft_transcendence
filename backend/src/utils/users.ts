@@ -1,12 +1,12 @@
-import { FriendUser, MyProfileUser } from "../types";
+import { MyProfileUser, ProfileUser } from "../types";
 
-export function toFriendUser(user: {
+export function toProfileUser(user: {
   id: string;
   username: string;
   avatarUrl: string | null;
   isOnline: boolean;
   lastSeenAt: Date | null;
-}): FriendUser {
+}): ProfileUser {
   return {
     id: user.id,
     username: user.username,
