@@ -1,8 +1,7 @@
 import { CardInstance } from "./card";
-import { UserId } from "../../types/auth";
 
 export interface Player {
-  id: UserId;
+  id: string;
   name: string;
   hand: CardInstance[];
   isConfirmed: boolean;
