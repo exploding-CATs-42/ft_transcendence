@@ -34,6 +34,16 @@ const data: { players: Player[] } = {
   ],
 };
 
+// Opponents
+const NAME_LABEL_CONFIG: LabelConfig = {
+  fontColor: "white",
+  strokeColor: "black",
+};
+
+const OPPONENT_HAND_X_OFFSET = 96;
+const OPPONENT_HAND_Y_OFFSET = 180;
+
+// Draw and discard piles
 const CARD_WIDTH = 186;
 const CARD_HEIGHT = 260;
 const CARD_BORDER_RADIUS = 20;
@@ -54,15 +64,6 @@ const CARD_DROP_ZONE = {
   width: 1090,
   height: 540,
 };
-
-// Opponents
-const NAME_LABEL_CONFIG: LabelConfig = {
-  fontColor: "white",
-  strokeColor: "black",
-};
-
-const OPPONENT_HAND_X_OFFSET = 96;
-const OPPONENT_HAND_Y_OFFSET = 180;
 
 // My hand
 const HAND_POSITION: Point = {
