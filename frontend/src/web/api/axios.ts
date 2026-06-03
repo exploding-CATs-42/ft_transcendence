@@ -1,9 +1,13 @@
 // Libraries
-import axios from "axios";
+import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from "axios";
 // Project level
 import { getErrorMessage } from "utils";
 
 const { VITE_API_BASE_URL } = import.meta.env;
+
+type RetriableAxiosRequestConfig = InternalAxiosRequestConfig & {
+  _retry?: boolean;
+};
 
 let authVersion = 0;
 let onAccessTokenRefresh: ((accessToken: string) => void) | null = null;
@@ -25,7 +29,9 @@ const refreshAccessToken = async () => {
 api.interceptors.response.use(
   (res) => res,
   async (error) => {
-    const originalRequest = error.config;
+    const originalRequest = error.config as
+      | RetriableAxiosRequestConfig
+      | undefined;
     const requestUrl = originalRequest?.url;
 
     if (
@@ -55,10 +61,8 @@ api.interceptors.response.use(
       setAxiosToken(accessToken);
       onAccessTokenRefresh?.(accessToken);
 
-      originalRequest.headers = {
-        ...(originalRequest.headers ?? {}),
-        Authorization: `Bearer ${accessToken}`,
-      };
+      originalRequest.headers = AxiosHeaders.from(originalRequest.headers);
+      originalRequest.headers.set("Authorization", `Bearer ${accessToken}`);
 
       return api(originalRequest);
     }
