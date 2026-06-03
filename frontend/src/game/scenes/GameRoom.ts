@@ -5,7 +5,7 @@ import {
   Scenes,
   SCREEN_HEIGHT,
   SCREEN_WIDTH,
-  SEATS,
+  GAME_ROOM_SEATS,
   Textures,
 } from "game/constants";
 import {
@@ -94,8 +94,8 @@ export class GameRoom extends Scene {
     this.createMyHand();
 
     // Demonstration code
-    this.#seats[1]?.moveTo(SEATS[4]!);
-    this.#seats[4]?.moveTo(SEATS[1]!);
+    this.#seats[1]?.moveTo(GAME_ROOM_SEATS[4]!);
+    this.#seats[4]?.moveTo(GAME_ROOM_SEATS[1]!);
     const intervalId = setInterval(() => {
       this.#opponentHands[3]?.addCard();
       clearInterval(intervalId);
@@ -111,12 +111,12 @@ export class GameRoom extends Scene {
   }
 
   private fillSeats(players: GraphicPlayer[]) {
-    const mySeat = new PlayerSeat(this, SEATS[0]!);
+    const mySeat = new PlayerSeat(this, GAME_ROOM_SEATS[0]!);
     mySeat.addPlayer(players[0]!);
     this.#seats.push(mySeat);
 
     for (let i = 1; i < players.length; ++i) {
-      const opponentSeat = new PlayerSeat(this, SEATS[i]!);
+      const opponentSeat = new PlayerSeat(this, GAME_ROOM_SEATS[i]!);
       opponentSeat.addPlayer(players[i]!);
       opponentSeat.addHand(this.#opponentHands[i - 1]!);
 
