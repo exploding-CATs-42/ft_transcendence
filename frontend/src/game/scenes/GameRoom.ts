@@ -151,8 +151,7 @@ export class GameRoom extends Scene {
   private createDrawPile() {
     const cardCover = this.textures.get(Textures.cardCover).get();
     const drawPile = this.addCard(
-      DRAW_PILE_X,
-      DRAW_PILE_Y,
+      { x: DRAW_PILE_X, y: DRAW_PILE_Y },
       cardCover,
     ).setInteractive({ useHandCursor: true });
 
@@ -161,17 +160,15 @@ export class GameRoom extends Scene {
 
   private createDiscardPile() {
     const cardFrame = this.textures.get(Textures.cards).get(0);
-    this.addCard(DISCARD_PILE_X, DISCARD_PILE_Y, cardFrame);
+    this.addCard({ x: DISCARD_PILE_X, y: DISCARD_PILE_Y }, cardFrame);
   }
 
   private addCard(
-    x: number,
-    y: number,
+    position: Point,
     frame: Phaser.Textures.Frame,
     width = CARD_WIDTH,
     height = CARD_HEIGHT,
   ) {
-    const position: Point = { x, y };
     const size: Size = { width, height };
     const card = addCardVisual(
       this,
@@ -204,7 +201,10 @@ export class GameRoom extends Scene {
 
     // Create face down card
     const cardCover = this.textures.get(Textures.cardCover).get();
-    const faceDownCard = this.addCard(DRAW_PILE_X, DRAW_PILE_Y, cardCover);
+    const faceDownCard = this.addCard(
+      { x: DRAW_PILE_X, y: DRAW_PILE_Y },
+      cardCover,
+    );
 
     // and move it below the screen
     // at the x position calculated earlier
