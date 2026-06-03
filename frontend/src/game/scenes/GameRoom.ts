@@ -94,12 +94,12 @@ export class GameRoom extends Scene {
   private addOpponentHand(cardCount: number, baseX: number, y: number) {
     const count = Math.min(cardCount, OPPONENT_HAND_MAX_CARDS);
 
-    const spacing = getCardSpacing(
-      count,
-      OPPONENT_CARD_WIDTH / 3,
-      OPPONENT_CARD_WIDTH / 2,
-      OPPONENT_HAND_MAX_CARDS,
-    );
+    const spacingConfig: SpacingConfig = {
+      minSpacing: OPPONENT_CARD_WIDTH / 3,
+      maxSpacing: OPPONENT_CARD_WIDTH / 2,
+      cardsBeforeMinSpacing: OPPONENT_HAND_MAX_CARDS,
+    };
+    const spacing = getCardSpacing(count, spacingConfig);
 
     const startX = this.getHandStartX(
       count,
@@ -199,12 +199,7 @@ export class GameRoom extends Scene {
   }
 
   private dealCards() {
-    const spacing = getCardSpacing(
-      CARDS_TO_DEAL,
-      MIN_CARD_SPACING,
-      MAX_CARD_SPACING,
-      CARDS_BEFORE_MIN_SPACING,
-    );
+    const spacing = getCardSpacing(CARDS_TO_DEAL, CARD_SPACING_CONFIG);
     let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
@@ -322,12 +317,7 @@ export class GameRoom extends Scene {
     };
 
     const getLayout = () => {
-      const spacing = getCardSpacing(
-        this.#cards.length,
-        MIN_CARD_SPACING,
-        MAX_CARD_SPACING,
-        CARDS_BEFORE_MIN_SPACING,
-      );
+      const spacing = getCardSpacing(this.#cards.length, CARD_SPACING_CONFIG);
       const startX = this.getHandStartX(this.#cards.length, spacing);
 
       const getBaseX = (index: number) => startX + index * spacing;
@@ -394,15 +384,7 @@ export class GameRoom extends Scene {
   }
 
   private reflowCards() {
-    const spacingConfig: SpacingConfig = {
-      minSpacing: MIN_CARD_SPACING,
-    };
-    const spacing = getCardSpacing(
-      this.#cards.length,
-      MIN_CARD_SPACING,
-      MAX_CARD_SPACING,
-      CARDS_BEFORE_MIN_SPACING,
-    );
+    const spacing = getCardSpacing(this.#cards.length, CARD_SPACING_CONFIG);
     let x = this.getHandStartX(this.#cards.length, spacing);
 
     this.#cards.forEach((card, index) => {
@@ -430,12 +412,7 @@ export class GameRoom extends Scene {
     // Generate random insert index
     const insertIndex = Phaser.Math.Between(0, this.#cards.length);
     // Calculate current card spacing
-    const spacing = getCardSpacing(
-      this.#cards.length,
-      MIN_CARD_SPACING,
-      MAX_CARD_SPACING,
-      CARDS_BEFORE_MIN_SPACING,
-    );
+    const spacing = getCardSpacing(this.#cards.length, CARD_SPACING_CONFIG);
 
     // Using that spacing calculate where to insert the card
     let targetX;
