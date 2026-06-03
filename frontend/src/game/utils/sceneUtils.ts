@@ -1,9 +1,7 @@
 // Libraries
 import { Scene, GameObjects } from "phaser";
 // Project level
-import { SEATS, Textures } from "game/constants";
-import type { Player } from "game/entities";
-import { GraphicPlayer } from "game/entities/GraphicPlayer";
+import { Textures } from "game/constants";
 
 export const addBackgroundImage = (
   scene: Scene,
@@ -41,17 +39,5 @@ export const addFullscreenToggle = (scene: Scene) => {
 
   scene.input.keyboard?.on("keydown-F", () => {
     scene.scale.toggleFullscreen();
-  });
-};
-
-export const addPlayers = (
-  scene: Scene,
-  players: Player[],
-  fontColor: string,
-  strokeColor: string,
-) => {
-  const labelConfig = { fontColor, strokeColor };
-  return players.map((player, i) => {
-    return new GraphicPlayer(scene, SEATS[i]!, player, labelConfig);
   });
 };

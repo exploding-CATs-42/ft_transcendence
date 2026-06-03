@@ -1,9 +1,5 @@
 export { EventBus } from "./EventBus";
-export {
-  addBackgroundImage,
-  addFullscreenToggle,
-  addPlayers,
-} from "./sceneUtils";
+export { addBackgroundImage, addFullscreenToggle } from "./sceneUtils";
 export {
   createRoundedCardTexture,
   getRoundedAvatarTexture,
