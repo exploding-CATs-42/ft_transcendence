@@ -13,14 +13,8 @@ import {
   addBackgroundImage,
   addCardVisual,
   addFullscreenToggle,
-  addPlayers,
 } from "game/utils";
-import {
-  OpponentHand,
-  type GraphicPlayer,
-  type Player,
-  Hand,
-} from "game/entities";
+import { OpponentHand, GraphicPlayer, type Player, Hand } from "game/entities";
 import type { Point, Size, LabelConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
@@ -77,8 +71,7 @@ export class GameRoom extends Scene {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
 
-    const { fontColor, strokeColor } = NAME_LABEL_CONFIG;
-    const players = addPlayers(this, data.players, fontColor, strokeColor);
+    const players = this.createPlayers(data.players);
     this.createOpponentHands(players);
 
     this.createCardDropZone();
@@ -87,6 +80,12 @@ export class GameRoom extends Scene {
     this.createMyHand();
 
     EventBus.emit("scene-ready", this);
+  }
+
+  private createPlayers(players: Player[]) {
+    return players.map((player, i) => {
+      return new GraphicPlayer(this, SEATS[i]!, player, NAME_LABEL_CONFIG);
+    });
   }
 
   private createMyHand() {
