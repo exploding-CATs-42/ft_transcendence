@@ -14,7 +14,13 @@ import {
   addCardVisual,
   addFullscreenToggle,
 } from "game/utils";
-import { OpponentHand, GraphicPlayer, type Player, Hand } from "game/entities";
+import {
+  OpponentHand,
+  GraphicPlayer,
+  type Player,
+  Hand,
+  PlayerSeat,
+} from "game/entities";
 import type { Point, Size, LabelConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
@@ -61,6 +67,7 @@ const HAND_POSITION: Point = {
 };
 
 export class GameRoom extends Scene {
+  #seats: PlayerSeat[] = [];
   #opponentHands: OpponentHand[] = [];
   #myHand!: Hand;
 
@@ -74,6 +81,7 @@ export class GameRoom extends Scene {
 
     const players = this.createPlayers(data.players);
     this.createOpponentHands(players);
+    this.fillSeats(players);
 
     this.createCardDropZone();
     this.createDrawPile();
@@ -87,6 +95,20 @@ export class GameRoom extends Scene {
     return players.map((player, i) => {
       return new GraphicPlayer(this, SEATS[i]!, player, NAME_LABEL_CONFIG);
     });
+  }
+
+  private fillSeats(players: GraphicPlayer[]) {
+    const mySeat = new PlayerSeat(this, SEATS[0]!);
+    mySeat.addPlayer(players[0]!);
+    this.#seats.push(mySeat);
+
+    for (let i = 1; i < players.length; ++i) {
+      const opponentSeat = new PlayerSeat(this, SEATS[i]!);
+      opponentSeat.addPlayer(players[i]!);
+      opponentSeat.addHand(this.#opponentHands[i - 1]!);
+
+      this.#seats.push(opponentSeat);
+    }
   }
 
   private createMyHand() {
