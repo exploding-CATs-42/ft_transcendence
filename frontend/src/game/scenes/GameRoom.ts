@@ -92,8 +92,8 @@ export class GameRoom extends Scene {
   }
 
   private createPlayers(players: Player[]) {
-    return players.map((player, i) => {
-      return new GraphicPlayer(this, SEATS[i]!, player, NAME_LABEL_CONFIG);
+    return players.map((player) => {
+      return new GraphicPlayer(this, { x: 0, y: 0 }, player, NAME_LABEL_CONFIG);
     });
   }
 
@@ -128,8 +128,8 @@ export class GameRoom extends Scene {
 
   private createOpponentHands(players: GraphicPlayer[]) {
     for (let i = 1; i < players.length; ++i) {
-      const x = SEATS[i]!.x + OPPONENT_HAND_X_OFFSET;
-      const y = SEATS[i]!.y + OPPONENT_HAND_Y_OFFSET;
+      const x = OPPONENT_HAND_X_OFFSET;
+      const y = OPPONENT_HAND_Y_OFFSET;
 
       const hand = new OpponentHand(this, { x, y });
       this.#opponentHands.push(hand);
