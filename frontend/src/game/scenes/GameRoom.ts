@@ -154,10 +154,9 @@ export class GameRoom extends Scene {
 
   private createDrawPile() {
     const cardCover = this.textures.get(Textures.cardCover).get();
-    const drawPile = this.addCard(cardCover, DRAW_PILE_POSITION).setInteractive(
-      { useHandCursor: true },
-    );
+    const drawPile = this.addCard(cardCover, DRAW_PILE_POSITION);
 
+    drawPile.setInteractive({ useHandCursor: true });
     drawPile.on("pointerdown", this.drawCard);
   }
 
