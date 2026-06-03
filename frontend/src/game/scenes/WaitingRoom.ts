@@ -8,6 +8,7 @@ import {
   addPlayers,
 } from "game/utils";
 import type { Player } from "game/entities";
+import type { LabelConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -20,6 +21,11 @@ const data: { players: Player[] } = {
   ],
 };
 
+const NAME_LABEL_CONFIG: LabelConfig = {
+  fontColor: "black",
+  strokeColor: "white",
+};
+
 export class WaitingRoom extends Scene {
   constructor() {
     super(Scenes.WaitingRoom);
@@ -30,7 +36,8 @@ export class WaitingRoom extends Scene {
     addBackgroundImage(this, Textures.waitingRoomBg);
     addFullscreenToggle(this);
 
-    addPlayers(this, data.players, "black", "white");
+    const { fontColor, strokeColor } = NAME_LABEL_CONFIG;
+    addPlayers(this, data.players, fontColor, strokeColor);
     this.addWaitingLabel();
   }
 
