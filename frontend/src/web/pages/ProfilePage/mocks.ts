@@ -1,4 +1,4 @@
-import type { LobbyMatch } from "types";
+import type { UserGameHistoryItem } from "components/MatchListItem/types";
 import type { ProfileStat, ProfileUser, FriendItem } from "./types";
 
 export const profileUserMock: ProfileUser = {
@@ -40,36 +40,77 @@ export const statsMock: ProfileStat[] = [
   },
 ];
 
-export const matchesMock: LobbyMatch[] = [
+export const matchesMock: UserGameHistoryItem[] = [
   {
-    id: "g-100",
-    title: "Table 1",
+    gameId: "g-1",
+    gameName: "Table 1",
+    endedAt: new Date("2026-06-01T14:30:00Z"),
+    winnerId: "u-1",
     players: [
       {
         id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+        username: "alice",
+        avatarUrl: null,
+        isOnline: true,
+        lastSeenAt: new Date(),
       },
       {
         id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-3",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+        username: "bob",
+        avatarUrl: null,
+        isOnline: false,
+        lastSeenAt: new Date("2026-06-01T14:35:00Z"),
       },
     ],
   },
   {
-    id: "g-101",
-    title: "Table 2",
+    gameId: "g-2",
+    gameName: "Table 2",
+    endedAt: new Date("2026-05-30T18:15:00Z"),
+    winnerId: "u-1",
     players: [
       {
-        id: "u-4",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+        id: "u-1",
+        username: "alice",
+        avatarUrl: null,
+        isOnline: true,
+        lastSeenAt: new Date(),
       },
       {
-        id: "u-5",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
+        id: "u-3",
+        username: "charlie",
+        avatarUrl: null,
+        isOnline: true,
+        lastSeenAt: new Date(),
+      },
+    ],
+  },
+  {
+    gameId: "g-3",
+    gameName: "Table 3",
+    endedAt: new Date("2026-05-28T20:45:00Z"),
+    winnerId: "u-2",
+    players: [
+      {
+        id: "u-1",
+        username: "alice",
+        avatarUrl: null,
+        isOnline: true,
+        lastSeenAt: new Date(),
+      },
+      {
+        id: "u-2",
+        username: "bob",
+        avatarUrl: null,
+        isOnline: false,
+        lastSeenAt: new Date(),
+      },
+      {
+        id: "u-4",
+        username: "david",
+        avatarUrl: null,
+        isOnline: false,
+        lastSeenAt: new Date("2026-05-29T08:00:00Z"),
       },
     ],
   },
