@@ -3,7 +3,7 @@ import { Avatar, Button, ConfirmPopup, Icon, ListItem } from "components";
 //Local level
 import s from "./FriendListItem.module.css";
 import { useModal } from "hooks";
-import type { FriendItem } from "pages/ProfilePage/types/friendItem";
+import type { FriendItem } from "pages/ProfilePage/types";
 
 interface Props {
   friend: FriendItem;

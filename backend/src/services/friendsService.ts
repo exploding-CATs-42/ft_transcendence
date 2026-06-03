@@ -1,7 +1,7 @@
 import { FriendshipStatus } from "../generated/prisma/client";
 import { publicProfileSelect, prisma } from "../lib/prisma";
 import { FriendDirection, FriendListItem } from "../types";
-import { toFriendUser } from "../utils/users";
+import { toProfileUser } from "../utils/users";
 
 export class FriendsServiceError extends Error {
   public statusCode: number;
@@ -68,7 +68,7 @@ export async function listFriends(params: {
         : friendship.userLow;
 
     return {
-      user: toFriendUser(otherUser),
+      user: toProfileUser(otherUser),
       status: friendship.status as "PENDING" | "ACCEPTED" | "REJECTED",
       direction: getDirection({
         currentUserId: params.currentUserId,
