@@ -1,10 +1,15 @@
+import type { SpacingConfig } from "game/@types";
+
 export const getCardSpacing = (
   cardCount: number,
-  minSpacing: number,
-  maxSpacing: number,
-  cardsBeforeMinSpacing: number,
+  spacingConfig: SpacingConfig,
 ): number => {
-  const maxCount = cardsBeforeMinSpacing;
+  const {
+    minSpacing,
+    maxSpacing,
+    cardsBeforeMinSpacing: maxCount,
+  } = spacingConfig;
+
   if (cardCount <= 1) return maxSpacing;
   if (cardCount >= maxCount) return minSpacing;
 
