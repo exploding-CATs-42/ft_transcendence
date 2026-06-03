@@ -93,6 +93,14 @@ export class GameRoom extends Scene {
     this.createDiscardPile();
     this.createMyHand();
 
+    // Demonstration code
+    this.#seats[1]?.moveTo(SEATS[4]!);
+    this.#seats[4]?.moveTo(SEATS[1]!);
+    const intervalId = setInterval(() => {
+      this.#opponentHands[3]?.addCard();
+      clearInterval(intervalId);
+    }, 500 * 15);
+
     EventBus.emit("scene-ready", this);
   }
 
