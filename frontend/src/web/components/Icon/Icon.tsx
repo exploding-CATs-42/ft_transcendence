@@ -25,7 +25,11 @@ interface Props {
     | "trash-can"
     | "user"
     | "burger-menu"
-    | "puzzle";
+    | "puzzle"
+    | "percent"
+    | "medal"
+    | "bomb"
+    | "gamepad";
 }
 
 const Icon = ({ name, width, height, id, className, stroke, fill }: Props) => {
