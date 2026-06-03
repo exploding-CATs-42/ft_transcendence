@@ -1,6 +1,8 @@
 import { Request } from "express";
 import { PublicUser, User } from "./users";
 
+export type UserId = string;
+
 export interface AuthResponse {
   user: User;
   accessToken: string;

@@ -1,5 +1,5 @@
 import { CardInstance } from "./card";
-import { UserId } from "./game";
+import { UserId } from "../../types/auth";
 
 export interface Player {
   id: UserId;
