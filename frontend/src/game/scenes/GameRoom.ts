@@ -1,7 +1,7 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { Scenes, SEATS, Textures } from "game/constants";
+import { Scenes, SCREEN_WIDTH, SEATS, Textures } from "game/constants";
 import {
   EventBus,
   addBackgroundImage,
@@ -9,6 +9,7 @@ import {
   addPlayers,
   createRoundedCardTexture,
   getCardSpacing,
+  getHandStartX,
 } from "game/utils";
 import type { Player } from "game/entities";
 import type { SpacingConfig } from "game/@types";
@@ -101,12 +102,7 @@ export class GameRoom extends Scene {
     };
     const spacing = getCardSpacing(count, spacingConfig);
 
-    const startX = this.getHandStartX(
-      count,
-      spacing,
-      OPPONENT_CARD_WIDTH,
-      baseX,
-    );
+    const startX = getHandStartX(count, spacing, OPPONENT_CARD_WIDTH, baseX);
 
     let x = startX;
 
@@ -200,7 +196,7 @@ export class GameRoom extends Scene {
 
   private dealCards() {
     const spacing = getCardSpacing(CARDS_TO_DEAL, CARD_SPACING_CONFIG);
-    let x = this.getHandStartX(CARDS_TO_DEAL, spacing);
+    let x = getHandStartX(CARDS_TO_DEAL, spacing, CARD_WIDTH, SCREEN_WIDTH / 2);
 
     for (let i = 0; i < CARDS_TO_DEAL; ++i) {
       const frame = this.getRandomCardFrame();
@@ -318,7 +314,12 @@ export class GameRoom extends Scene {
 
     const getLayout = () => {
       const spacing = getCardSpacing(this.#cards.length, CARD_SPACING_CONFIG);
-      const startX = this.getHandStartX(this.#cards.length, spacing);
+      const startX = getHandStartX(
+        this.#cards.length,
+        spacing,
+        CARD_WIDTH,
+        SCREEN_WIDTH / 2,
+      );
 
       const getBaseX = (index: number) => startX + index * spacing;
 
@@ -369,23 +370,14 @@ export class GameRoom extends Scene {
     });
   }
 
-  private getHandStartX(
-    cardCount: number,
-    spacing: number,
-    cardWidth = CARD_WIDTH,
-    baseX = this.scale.width / 2,
-  ): number {
-    if (cardCount === 0) return baseX - cardWidth / 2;
-
-    const handWidth = (cardCount - 1) * spacing + cardWidth;
-    const startX = baseX - handWidth / 2;
-
-    return startX;
-  }
-
   private reflowCards() {
     const spacing = getCardSpacing(this.#cards.length, CARD_SPACING_CONFIG);
-    let x = this.getHandStartX(this.#cards.length, spacing);
+    let x = getHandStartX(
+      this.#cards.length,
+      spacing,
+      CARD_WIDTH,
+      SCREEN_WIDTH / 2,
+    );
 
     this.#cards.forEach((card, index) => {
       card.setDepth(index);
@@ -416,7 +408,8 @@ export class GameRoom extends Scene {
 
     // Using that spacing calculate where to insert the card
     let targetX;
-    if (this.#cards.length === 0) targetX = this.getHandStartX(1, spacing);
+    if (this.#cards.length === 0)
+      targetX = getHandStartX(1, spacing, CARD_WIDTH, SCREEN_WIDTH / 2);
     else if (insertIndex === 0) targetX = this.#cards[0]!.x - spacing / 2;
     else targetX = this.#cards[insertIndex - 1]!.x + spacing / 2;
 
