@@ -5,14 +5,14 @@ import { Scenes, SCREEN_WIDTH, SEATS, Textures } from "game/constants";
 import {
   EventBus,
   addBackgroundImage,
+  addCardVisual,
   addFullscreenToggle,
   addPlayers,
-  createRoundedCardTexture,
   getCardSpacing,
   getHandStartX,
 } from "game/utils";
 import type { Player } from "game/entities";
-import type { SpacingConfig } from "game/@types";
+import type { Point, Size, SpacingConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -214,9 +214,14 @@ export class GameRoom extends Scene {
     width = CARD_WIDTH,
     height = CARD_HEIGHT,
   ) {
-    const card = this.addRoundedCard(x, y, frame)
-      .setDisplaySize(width, height)
-      .setOrigin(0, 0);
+    const position: Point = { x, y };
+    const size: Size = { width, height };
+    const card = addCardVisual(
+      this,
+      position,
+      { frame, size },
+      CARD_BORDER_RADIUS,
+    );
 
     return card;
   }
@@ -470,17 +475,5 @@ export class GameRoom extends Scene {
     const frameName = Phaser.Math.RND.pick(cardSpreadsheet.getFrameNames());
     const frame = cardSpreadsheet.get(frameName);
     return frame;
-  }
-
-  private addRoundedCard(
-    x: number,
-    y: number,
-    frame: Phaser.Textures.Frame,
-    radius = CARD_BORDER_RADIUS,
-  ) {
-    const scaledRadius = (radius / CARD_HEIGHT) * frame.realHeight;
-    const textureKey = createRoundedCardTexture(this, frame, scaledRadius);
-
-    return this.add.image(x, y, textureKey);
   }
 }
