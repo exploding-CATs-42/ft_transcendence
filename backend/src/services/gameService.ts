@@ -14,7 +14,7 @@ import {
 import { createActor } from "xstate";
 import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
-import { Game, GameInfo } from "../game/types";
+import { GameInstance, GameInfo } from "../game/types";
 import { Player } from "../game/types/player";
 import { JoinGameResult, PlayerIdPayload, UserId } from "../types";
 import GameStore from "../utils/gameStore";
@@ -26,13 +26,13 @@ function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
 
   if (!game) {
-    throw new ApiError("Game not found", 404);
+    throw new ApiError("GameInstance not found", 404);
   }
 
   return game;
 }
 
-export async function getGames(userId: UserId): Promise<Game[]> {
+export async function getGames(userId: UserId): Promise<GameInstance[]> {
   await ensureUserExists(userId);
 
   return GameStore.getAllGames();
@@ -41,7 +41,7 @@ export async function getGames(userId: UserId): Promise<Game[]> {
 export async function getGameById(
   userId: UserId,
   input: GetGameByIdParams,
-): Promise<Game> {
+): Promise<GameInstance> {
   await ensureUserExists(userId);
 
   return ensureGameExists(input.gameId);
@@ -55,7 +55,7 @@ export async function createGame(
 
   const actor = createActor(gameMachine);
 
-  const game: Game = {
+  const game: GameInstance = {
     info: {
       id: crypto.randomUUID(),
       name: input.gameName,
@@ -87,7 +87,7 @@ export async function joinGame(
   const playersBefore = game.actor.getSnapshot().context.players;
 
   if (playersBefore.length >= game.info.maxPlayers) {
-    throw new SocketError("Game is full");
+    throw new SocketError("GameInstance is full");
   }
 
   const alreadyJoined = playersBefore.some((p) => {
