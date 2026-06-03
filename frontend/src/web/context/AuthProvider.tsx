@@ -3,7 +3,11 @@ import { useCallback, useEffect, type ReactNode } from "react";
 // Project level
 import { useLocalStorage } from "hooks";
 import { AUTH_STORAGE_KEY } from "constants";
-import { clearAxiosToken, setAxiosToken } from "api/axios";
+import {
+  clearAxiosToken,
+  setAccessTokenRefreshHandler,
+  setAxiosToken,
+} from "api/axios";
 // Local level
 import { AuthContext, type AccessToken } from "./AuthContext";
 
@@ -44,6 +48,16 @@ const AuthProvider = ({ children }: Props) => {
 
     clearAxiosToken();
   }, [accessToken]);
+
+  useEffect(() => {
+    setAccessTokenRefreshHandler((accessToken) => {
+      saveAccessToken({ accessToken });
+    });
+
+    return () => {
+      setAccessTokenRefreshHandler(null);
+    };
+  }, [saveAccessToken]);
 
   const setAccessToken = useCallback(
     (accessToken: AccessToken) => {
