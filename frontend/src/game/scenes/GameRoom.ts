@@ -11,7 +11,7 @@ import {
   getCardSpacing,
   getHandStartX,
 } from "game/utils";
-import type { Player } from "game/entities";
+import { OpponentHand, type GraphicPlayer, type Player } from "game/entities";
 import type { Point, Size, SpacingConfig } from "game/@types";
 
 // It's just a placeholder and has to be removed later
@@ -56,9 +56,6 @@ const CARD_DROP_ZONE = {
 const HOVER_LIFT = 30; // How many px the hovered card rises
 const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
 
-const OPPONENT_CARD_WIDTH = CARD_WIDTH / 4;
-const OPPONENT_CARD_HEIGHT = CARD_HEIGHT / 4;
-const OPPONENT_HAND_MAX_CARDS = 5;
 const OPPONENT_HAND_X_OFFSET = 96;
 const OPPONENT_HAND_Y_OFFSET = 180;
 
@@ -72,110 +69,25 @@ export class GameRoom extends Scene {
   create() {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
-    addPlayers(this, data.players, "white", "black");
+
+    const players = addPlayers(this, data.players, "white", "black");
+    this.createOpponentHands(players);
 
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
     this.dealCards();
-    this.addOpponentHands();
 
     EventBus.emit("scene-ready", this);
   }
 
-  private addOpponentHands() {
-    for (let i = 1; i < data.players.length; ++i) {
-      const { x, y } = SEATS[i]!;
-      const baseX = x + OPPONENT_HAND_X_OFFSET;
-      const baseY = y + OPPONENT_HAND_Y_OFFSET;
-      this.addOpponentHand(Phaser.Math.Between(0, 20), baseX, baseY);
+  private createOpponentHands(players: GraphicPlayer[]) {
+    for (let i = 1; i < players.length; ++i) {
+      const x = SEATS[i]!.x + OPPONENT_HAND_X_OFFSET;
+      const y = SEATS[i]!.y + OPPONENT_HAND_Y_OFFSET;
+
+      new OpponentHand(this, { x, y });
     }
-  }
-
-  private addOpponentHand(cardCount: number, baseX: number, y: number) {
-    const count = Math.min(cardCount, OPPONENT_HAND_MAX_CARDS);
-
-    const spacingConfig: SpacingConfig = {
-      minSpacing: OPPONENT_CARD_WIDTH / 3,
-      maxSpacing: OPPONENT_CARD_WIDTH / 2,
-      cardsBeforeMinSpacing: OPPONENT_HAND_MAX_CARDS,
-    };
-    const spacing = getCardSpacing(count, spacingConfig);
-
-    const startX = getHandStartX(count, spacing, OPPONENT_CARD_WIDTH, baseX);
-
-    let x = startX;
-
-    for (let i = 0; i < count; ++i) {
-      // Draw card
-      const cardCover = this.textures.get(Textures.cardCover).get();
-      const card = this.addCard(
-        x,
-        y,
-        cardCover,
-        OPPONENT_CARD_WIDTH,
-        OPPONENT_CARD_HEIGHT,
-      );
-
-      // Add card outline
-      const scaledRadius =
-        (CARD_BORDER_RADIUS / CARD_HEIGHT) * OPPONENT_CARD_HEIGHT;
-      const border = this.add.graphics();
-      border.lineStyle(1, 0x000000);
-      border.strokeRoundedRect(
-        card.x,
-        card.y,
-        card.displayWidth,
-        card.displayHeight,
-        scaledRadius,
-      );
-
-      x += spacing;
-    }
-
-    if (cardCount > 0) {
-      /**
-       * Hand bounds
-       */
-      const handWidth = OPPONENT_CARD_WIDTH + (count - 1) * spacing;
-      const handRightX = startX + handWidth;
-
-      const badgeOffsetX = 4;
-      const badgeOffsetY = 4;
-
-      const badgeX = handRightX + badgeOffsetX;
-      const badgeY = y - badgeOffsetY;
-
-      this.addCardCountBadge(badgeX, badgeY, cardCount);
-    }
-  }
-
-  private addCardCountBadge(x: number, y: number, amount: number) {
-    const badgeRadius = 17;
-
-    /**
-     * Shadow
-     */
-    const shadow = this.add.graphics();
-    shadow.fillStyle(0x000000, 0.3);
-    shadow.fillCircle(x - 1, y + 3, badgeRadius + 1);
-
-    /**
-     * Yellow circle
-     */
-    const amountCircle = this.add.graphics();
-    amountCircle.fillStyle(0xfac700, 1);
-    amountCircle.fillCircle(x, y, badgeRadius);
-
-    /**
-     * Amount text
-     */
-    const amountText = this.add.text(x, y, `${amount}`, {
-      color: "#000000",
-      fontFamily: "Chewy",
-      fontSize: "20px",
-    });
-    amountText.setOrigin(0.5);
   }
 
   private createDrawPile() {
