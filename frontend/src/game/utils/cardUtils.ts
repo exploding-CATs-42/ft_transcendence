@@ -1,4 +1,5 @@
-import type { SpacingConfig } from "game/@types";
+import type { CardConfig, Point, SpacingConfig } from "game/@types";
+import { createRoundedCardTexture } from "game/utils";
 
 export const getCardSpacing = (
   cardCount: number,
@@ -45,4 +46,29 @@ export const getHandStartX = (
   const startX = baseX - handWidth / 2;
 
   return startX;
+};
+
+export const addCardVisual = (
+  scene: Phaser.Scene,
+  position: Point,
+  config: CardConfig,
+  borderRadius?: number,
+) => {
+  const { frame, size } = config;
+  const { width, height } = size;
+  const { x, y } = position;
+
+  let card;
+  if (borderRadius) {
+    const scaledRadius = (borderRadius / height) * frame.realHeight;
+
+    const textureKey = createRoundedCardTexture(scene, frame, scaledRadius);
+    card = scene.add.image(x, y, textureKey);
+  } else {
+    card = scene.add.image(x, y, frame.texture, frame.name);
+  }
+
+  card.setDisplaySize(width, height).setOrigin(0, 0);
+
+  return card;
 };
