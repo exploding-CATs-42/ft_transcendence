@@ -39,6 +39,6 @@ export interface UserGameHistoryItem {
   gameId: string;
   gameName: string;
   endedAt: Date;
-  isWinner: boolean;
+  winnerId: string | null;
   players: FriendUser[];
 }
