@@ -8,4 +8,4 @@ export {
   createRoundedCardTexture,
   getRoundedAvatarTexture,
 } from "./textureUtils";
-export { getCardSpacing, getHandStartX } from "./cardUtils";
+export { getCardSpacing, getHandStartX, addCardVisual } from "./cardUtils";
