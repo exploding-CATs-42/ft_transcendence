@@ -1,5 +1,7 @@
 // Libraries
 import clsx from "clsx";
+// Project level
+import { Avatar as placeholder } from "assets";
 // Local level
 import s from "./Avatar.module.css";
 
@@ -26,7 +28,7 @@ const Avatar = ({
   src,
   alt = "Fierce cat mascot logo in red and gold",
 }: Props) => {
-  const avatarSrc = src ?? "/src/web/assets/images/avatar/avatar-193w.png";
+  const avatarSrc = src ?? placeholder;
 
   return (
     <img
