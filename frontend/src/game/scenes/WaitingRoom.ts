@@ -39,6 +39,7 @@ const BUTTON_POSITION = {
 
 export class WaitingRoom extends Scene {
   #seats: PlayerSeat[] = [];
+  #players: GraphicPlayer[] = [];
 
   constructor() {
     super(Scenes.WaitingRoom);
