@@ -15,6 +15,13 @@ export class PlayerSeat {
     this.player = player;
   }
 
+  removePlayer() {
+    if (!this.player) return;
+
+    this.#container.remove(this.player.container, true);
+    this.player = null;
+  }
+
   addHand(hand: OpponentHand) {
     this.#container.add(hand.container);
   }
