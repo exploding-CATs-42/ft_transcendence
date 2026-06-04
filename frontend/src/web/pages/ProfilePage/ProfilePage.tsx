@@ -6,11 +6,11 @@ import api from "api";
 import { getErrorMessage } from "utils";
 
 import { ListSection, StatsSection, UserSection } from "./components";
-import { statsMock } from "./mocks";
 
-import type { ProfileUser, FriendItem } from "./types";
+import type { ProfileUser, FriendItem, ProfileStat } from "./types";
 import s from "./ProfilePage.module.css";
 import type { UserGameHistoryItem } from "components/MatchListItem/types";
+import { buildStats } from "./utils/buildStats";
 
 const ProfilePage = () => {
   const navigate = useNavigate();
@@ -19,6 +19,7 @@ const ProfilePage = () => {
   const [user, setUser] = useState<ProfileUser | null>(null);
   const [friends, setFriends] = useState<FriendItem[]>([]);
   const [matches, setMatches] = useState<UserGameHistoryItem[]>([]);
+  const [stats, setStats] = useState<ProfileStat[]>([]);
 
   useEffect(() => {
     async function loadProfile() {
@@ -26,13 +27,14 @@ const ProfilePage = () => {
         const userData = await api.me.getMe();
         setUser(userData);
 
+        if (!user) return;
+
         const friendsData = await api.me.getMeFriends();
         setFriends(friendsData);
 
-        if (user) {
-          const matchesData = await api.users.getLastMatches(user?.id);
-          setMatches(matchesData);
-        }
+        const matchesData = await api.users.getLastMatches(user?.id);
+        setMatches(matchesData);
+        setStats(buildStats(userData.id, matchesData));
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         toast(errorMessage);
@@ -58,7 +60,7 @@ const ProfilePage = () => {
     <div className={s.pageContainer}>
       <div className={s.flexContainer}>
         <UserSection user={user} />
-        <StatsSection stats={statsMock} />
+        <StatsSection stats={stats} />
       </div>
       <ListSection matches={matches} friends={friends} />
     </div>
