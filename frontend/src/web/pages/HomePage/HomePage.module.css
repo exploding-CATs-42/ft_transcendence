@@ -105,6 +105,7 @@
 
   .titleButtonsContainer {
     align-items: flex-start;
+    row-gap: 44px;
   }
 }
 
