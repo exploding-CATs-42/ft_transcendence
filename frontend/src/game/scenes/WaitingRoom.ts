@@ -75,6 +75,10 @@ export class WaitingRoom extends Scene {
   }
 
   private addPlayer(player: Player) {
+    const emptySeat = this.#seats.find((seat) => !seat.player);
+
+    if (!emptySeat) return;
+
     const newPlayer = new GraphicPlayer(
       this,
       { x: 0, y: 0 },
@@ -83,7 +87,6 @@ export class WaitingRoom extends Scene {
     );
 
     this.#players.push(newPlayer);
-    const emptySeat = this.#seats.find((seat) => !seat.player)!;
     emptySeat.addPlayer(newPlayer);
   }
 
