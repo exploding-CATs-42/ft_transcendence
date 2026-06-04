@@ -12,6 +12,7 @@ export class PlayerSeat {
 
   addPlayer(player: GraphicPlayer) {
     this.#container.add(player.container);
+    this.player = player;
   }
 
   addHand(hand: OpponentHand) {
