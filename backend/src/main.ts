@@ -1,6 +1,6 @@
 import "dotenv/config";
 import app from "./app";
-import { ensureDatabaseConnection } from "./utils/database";
+import { ensureDatabaseConnection } from "./utils";
 
 const { PORT = 3000 } = process.env;
 
