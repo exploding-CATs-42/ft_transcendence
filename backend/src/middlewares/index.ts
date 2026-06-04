@@ -1,3 +1,3 @@
-export * from "./games/ErrorRequestMiddleware";
-export * from "./authMiddleware";
+export { errorMiddleware } from "./ErrorRequestMiddleware";
+export { authMiddleware } from "./authMiddleware";
 export { authMiddleware as socketAuthMiddleware } from "./sockets/authMiddleware";
