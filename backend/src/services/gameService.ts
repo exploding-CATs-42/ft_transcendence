@@ -17,9 +17,9 @@ import { gameMachine } from "../game/gameMachine";
 import { Game, GameInfo, Player } from "../game/types";
 import { JoinGameResult, PlayerIdPayload, UserId } from "../types";
 import GameStore from "../utils/gameStore";
-import { ensureUserExists } from "../utils/users";
 import { toWaitingPlayerView } from "../game/mappers";
 import { attachBroadcaster } from "../game/broadcaster";
+import { ensureUserExists } from "./usersService";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);

@@ -1,8 +1,5 @@
-import { ApiError } from "../errors/apiError";
 import { Prisma } from "../generated/prisma/client";
-import { prisma } from "../lib/prisma";
-import { UsersServiceError } from "../services/usersService";
-import { FriendUser, PublicProfileUser, SelfProfileUser } from "../types/auth";
+import { FriendUser, SelfProfileUser } from "../types/auth";
 
 export const publicProfileSelect = {
   id: true,
@@ -55,80 +52,22 @@ export function toSelfProfileUser(user: {
   };
 }
 
-async function getFinishedGamesStats(userId: string): Promise<{
-  totalMatches: number;
-  wins: number;
-}> {
-  const [totalMatches, wins] = await Promise.all([
-    prisma.userGame.count({
-      where: {
-        userId,
-        game: {
-          endedAt: {
-            not: null,
-          },
-        },
-      },
-    }),
-    prisma.game.count({
-      where: {
-        winnerUserId: userId,
-        endedAt: {
-          not: null,
-        },
-      },
-    }),
-  ]);
-
+export function toPublicProfileUser(
+  user: {
+    id: string;
+    username: string;
+    avatarUrl: string | null;
+    isOnline: boolean;
+    lastSeenAt: Date | null;
+  },
+  stats: {
+    totalMatches: number;
+    wins: number;
+  },
+) {
   return {
-    totalMatches,
-    wins,
-  };
-}
-
-export async function toPublicProfileUser(user: {
-  id: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
-}): Promise<PublicProfileUser> {
-  const stats = await getFinishedGamesStats(user.id);
-
-  return {
-    id: user.id,
-    username: user.username,
-    avatarUrl: user.avatarUrl,
-    isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
+    ...user,
     totalMatches: stats.totalMatches,
     wins: stats.wins,
   };
-}
-
-export async function getPublicUserById(
-  userId: string,
-): Promise<PublicProfileUser> {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: publicProfileSelect,
-  });
-
-  if (!user) {
-    throw new UsersServiceError("User not found", 404);
-  }
-
-  return toPublicProfileUser(user);
-}
-
-export async function ensureUserExists(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, username: true },
-  });
-
-  if (!user) {
-    throw new ApiError("User not found", 404);
-  }
-  return user;
 }
