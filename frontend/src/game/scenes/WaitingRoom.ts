@@ -15,7 +15,6 @@ import type { LabelConfig, Size } from "game/@types";
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
   players: [
-    { username: "You", imageUrl: null },
     { username: "Player 2", imageUrl: null },
     { username: "Player 3", imageUrl: null },
     { username: "Player 4", imageUrl: null },
