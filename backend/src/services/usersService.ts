@@ -1,10 +1,6 @@
-import { prisma } from "../lib/prisma";
+import { prisma, publicProfileSelect } from "../lib/prisma";
 import type { PublicProfileUser, UserGameHistoryItem } from "../types/auth";
-import {
-  publicProfileSelect,
-  toFriendUser,
-  toPublicProfileUser,
-} from "../utils/users";
+import { toFriendUser, toPublicProfileUser } from "../utils/users";
 
 export class UsersServiceError extends Error {
   public statusCode: number;
