@@ -91,7 +91,7 @@ export class WaitingRoom extends Scene {
   }
 
   private removePlayer(player: Player) {
-    this.#players.filter((p) => p !== player);
+    this.#players = this.#players.filter((p) => p !== player);
     this.#seats.forEach((seat) => {
       if (seat.player === player) seat.removePlayer();
     });
