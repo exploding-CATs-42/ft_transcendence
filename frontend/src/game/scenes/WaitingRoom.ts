@@ -74,6 +74,13 @@ export class WaitingRoom extends Scene {
     this.#seats[seatIndex]?.addPlayer(newPlayer);
   }
 
+  private removePlayer(player: Player) {
+    this.#players.filter((p) => p !== player);
+    this.#seats.forEach((seat) => {
+      if (seat.player === player) seat.removePlayer();
+    });
+  }
+
   private addReadinessButton() {
     let ready: boolean = false;
     const onClick = (button: Button) => {
