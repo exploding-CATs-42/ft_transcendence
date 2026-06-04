@@ -11,6 +11,8 @@ export class PlayerSeat {
   }
 
   addPlayer(player: GraphicPlayer) {
+    if (this.player) return;
+
     this.#container.add(player.container);
     this.player = player;
   }
