@@ -52,6 +52,7 @@ export class WaitingRoom extends Scene {
 
     this.#seats = this.buildSeats();
 
+    this.addWaitingLabel();
     this.addReadinessButton();
 
     // Demonstration code
@@ -124,5 +125,16 @@ export class WaitingRoom extends Scene {
       onClick,
     );
     return button;
+  }
+
+  private addWaitingLabel() {
+    this.add
+      .text(
+        this.scale.width / 2,
+        this.scale.height / 2,
+        "Waiting for other players to join...",
+        { fontSize: 80, color: "black", fontFamily: "Chewy" },
+      )
+      .setOrigin(0.5, 0);
   }
 }
