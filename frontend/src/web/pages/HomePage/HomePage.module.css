@@ -40,6 +40,12 @@
     8px 8px var(--shadow);
 }
 
+@media only screen and (max-width: 767.98px) {
+  .title {
+    text-align: center;
+  }
+}
+
 .kittensSpan {
   font-size: 40px;
 }
