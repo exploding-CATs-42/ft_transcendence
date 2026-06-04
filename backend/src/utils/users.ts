@@ -1,22 +1,4 @@
-import { Prisma } from "../generated/prisma/client";
 import { FriendUser, SelfProfileUser } from "../types/auth";
-
-export const publicProfileSelect = {
-  id: true,
-  username: true,
-  avatarUrl: true,
-  isOnline: true,
-  lastSeenAt: true,
-} satisfies Prisma.UserSelect;
-
-export const selfProfileSelect = {
-  id: true,
-  email: true,
-  username: true,
-  avatarUrl: true,
-  isOnline: true,
-  lastSeenAt: true,
-} satisfies Prisma.UserSelect;
 
 export function toFriendUser(user: {
   id: string;
