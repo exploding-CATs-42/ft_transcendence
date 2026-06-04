@@ -13,8 +13,8 @@
 }
 
 .avatarBadge {
-  width: 30px;
-  height: 30px;
+  width: 40px;
+  height: 40px;
 }
 
 .avatarFriend {
@@ -28,6 +28,11 @@
 }
 
 @media only screen and (min-width: 768px) {
+  .avatarBadge {
+    width: 30px;
+    height: 30px;
+  }
+
   .avatarProfile {
     width: 116px;
     height: 116px;
