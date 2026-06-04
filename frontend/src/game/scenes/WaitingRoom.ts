@@ -61,6 +61,19 @@ export class WaitingRoom extends Scene {
     });
   }
 
+  private addPlayer(player: Player) {
+    const newPlayer = new GraphicPlayer(
+      this,
+      { x: 0, y: 0 },
+      player,
+      NAME_LABEL_CONFIG,
+    );
+
+    this.#players.push(newPlayer);
+    const seatIndex = this.#players.length - 1;
+    this.#seats[seatIndex]?.addPlayer(newPlayer);
+  }
+
   private addReadinessButton() {
     let ready: boolean = false;
     const onClick = (button: Button) => {
