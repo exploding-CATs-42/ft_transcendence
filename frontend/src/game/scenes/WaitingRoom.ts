@@ -90,7 +90,7 @@ export class WaitingRoom extends Scene {
     emptySeat.addPlayer(newPlayer);
   }
 
-  private removePlayer(player: Player) {
+  private removePlayer(player: GraphicPlayer) {
     this.#players = this.#players.filter((p) => p !== player);
     this.#seats.forEach((seat) => {
       if (seat.player === player) seat.removePlayer();
