@@ -3,9 +3,11 @@ import type { GraphicPlayer, OpponentHand } from "game/entities";
 
 export class PlayerSeat {
   #container: Phaser.GameObjects.Container;
+  player: GraphicPlayer | null;
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#container = scene.add.container(position.x, position.y);
+    this.player = null;
   }
 
   addPlayer(player: GraphicPlayer) {
