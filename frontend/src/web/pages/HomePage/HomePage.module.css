@@ -124,6 +124,7 @@
     align-items: flex-start;
 
     max-width: 732px;
+    row-gap: 80px;
   }
 
   .title {
@@ -164,10 +165,6 @@
   .pageContainer {
     width: 1920px;
     padding: 70px 71px;
-  }
-
-  .titleButtonsContainer {
-    row-gap: 52px;
   }
 
   .title {
