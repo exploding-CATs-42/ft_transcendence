@@ -63,7 +63,7 @@ export class WaitingRoom extends Scene {
   }
 
   private createPlayers() {
-    this.#seats.forEach((seat, i) => {
+    for (let i = 1; i < data.players.length; ++i) {
       const player = data.players[i]!;
       const graphicPlayer = new GraphicPlayer(
         this,
@@ -71,8 +71,9 @@ export class WaitingRoom extends Scene {
         player,
         NAME_LABEL_CONFIG,
       );
-      seat.addPlayer(graphicPlayer);
-    });
+
+      this.#seats[i - 1]!.addPlayer(graphicPlayer);
+    }
   }
 
   private addReadinessButton() {
