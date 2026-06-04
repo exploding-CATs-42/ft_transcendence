@@ -83,8 +83,8 @@ export class WaitingRoom extends Scene {
     );
 
     this.#players.push(newPlayer);
-    const seatIndex = this.#players.length - 1;
-    this.#seats[seatIndex]?.addPlayer(newPlayer);
+    const emptySeat = this.#seats.find((seat) => !seat.player)!;
+    emptySeat.addPlayer(newPlayer);
   }
 
   private removePlayer(player: Player) {
