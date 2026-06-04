@@ -1,13 +1,8 @@
 import "dotenv/config";
 import app from "./app";
-import { prisma } from "./lib/prisma";
+import { ensureDatabaseConnection } from "./utils/database";
 
 const { PORT = 3000 } = process.env;
-
-async function ensureDatabaseConnection() {
-  await prisma.$connect();
-  await prisma.$queryRaw`SELECT 1`;
-}
 
 async function startServer() {
   try {
