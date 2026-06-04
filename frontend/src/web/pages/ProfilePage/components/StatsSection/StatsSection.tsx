@@ -1,5 +1,5 @@
 // Project level
-import { Section } from "components";
+import { Icon, Section } from "components";
 // Local level
 import type { ProfileStat } from "../../types";
 import s from "./StatsSection.module.css";
@@ -14,13 +14,7 @@ const StatsSection = ({ stats }: Props) => {
       <ul className={s.list}>
         {stats.map((stat) => (
           <li className={s.item} key={stat.id}>
-            <img
-              className={s.iconContainer}
-              src={stat.icon}
-              alt={stat.alt}
-              width={30}
-              height={30}
-            />
+            <Icon name={stat.icon} height={50} width={50} />
             <div className={s.flexContainer}>
               <span className={s.amount}>{stat.amount}</span>
               <span className={s.name}>{stat.name}</span>
