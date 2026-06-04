@@ -61,7 +61,7 @@ export class WaitingRoom extends Scene {
         this.addPlayer(data.players[count]!);
         ++count;
       } else if (count < 8) {
-        const player = this.#players[count % 4]!;
+        const player = this.#players[0]!;
         this.removePlayer(player);
         ++count;
       } else clearInterval(intervalId);
