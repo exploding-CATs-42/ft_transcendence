@@ -1,7 +1,6 @@
 import { prisma } from "../lib/prisma";
 import type { PublicProfileUser, UserGameHistoryItem } from "../types/auth";
 import {
-  ensureUserExists,
   publicProfileSelect,
   toFriendUser,
   toPublicProfileUser,
@@ -14,6 +13,65 @@ export class UsersServiceError extends Error {
     super(message);
     this.statusCode = statusCode;
   }
+}
+
+async function getFinishedGamesStats(userId: string): Promise<{
+  totalMatches: number;
+  wins: number;
+}> {
+  const [totalMatches, wins] = await Promise.all([
+    prisma.userGame.count({
+      where: {
+        userId,
+        game: {
+          endedAt: {
+            not: null,
+          },
+        },
+      },
+    }),
+    prisma.game.count({
+      where: {
+        winnerUserId: userId,
+        endedAt: {
+          not: null,
+        },
+      },
+    }),
+  ]);
+
+  return {
+    totalMatches,
+    wins,
+  };
+}
+
+export async function getPublicUserById(
+  userId: string,
+): Promise<PublicProfileUser> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: publicProfileSelect,
+  });
+
+  if (!user) {
+    throw new UsersServiceError("User not found", 404);
+  }
+
+  const stats = await getFinishedGamesStats(user.id);
+  return toPublicProfileUser(user, stats);
+}
+
+export async function ensureUserExists(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, username: true },
+  });
+
+  if (!user) {
+    throw new UsersServiceError("User not found", 404);
+  }
+  return user;
 }
 
 export async function searchUsersByUsername(
@@ -32,7 +90,12 @@ export async function searchUsersByUsername(
     },
   });
 
-  return Promise.all(users.map(toPublicProfileUser));
+  return Promise.all(
+    users.map(async (user) => {
+      const stats = await getFinishedGamesStats(user.id);
+      return toPublicProfileUser(user, stats);
+    }),
+  );
 }
 
 export async function getUserGames(
