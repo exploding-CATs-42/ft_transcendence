@@ -53,6 +53,19 @@ export class WaitingRoom extends Scene {
     this.#seats = this.buildSeats();
 
     this.addReadinessButton();
+
+    // Demonstration code
+    let count = 0;
+    const intervalId = setInterval(() => {
+      if (count < 4) {
+        this.addPlayer(data.players[count]!);
+        ++count;
+      } else if (count < 8) {
+        const player = this.#players[count % 4]!;
+        this.removePlayer(player);
+        ++count;
+      } else clearInterval(intervalId);
+    }, 500);
   }
 
   private buildSeats() {
