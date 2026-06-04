@@ -50,7 +50,6 @@ export class WaitingRoom extends Scene {
     addFullscreenToggle(this);
 
     this.#seats = this.buildSeats();
-    this.createPlayers();
 
     this.addReadinessButton();
   }
@@ -59,20 +58,6 @@ export class WaitingRoom extends Scene {
     return WAITING_ROOM_SEATS.map((seat) => {
       return new PlayerSeat(this, seat);
     });
-  }
-
-  private createPlayers() {
-    for (let i = 1; i < data.players.length; ++i) {
-      const player = data.players[i]!;
-      const graphicPlayer = new GraphicPlayer(
-        this,
-        { x: 0, y: 0 },
-        player,
-        NAME_LABEL_CONFIG,
-      );
-
-      this.#seats[i - 1]!.addPlayer(graphicPlayer);
-    }
   }
 
   private addReadinessButton() {
