@@ -2,14 +2,14 @@ import express from "express";
 import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 import SwaggerParser from "@apidevtools/swagger-parser";
+import { getPublicUrl } from "../../utils/publicUrl";
 
 export const docsRouter = express.Router();
 
 docsRouter.get("/", (req, res) => {
-  const forwardedPrefix = req.get("x-forwarded-prefix") ?? "";
-  const publicBaseUrl = `${forwardedPrefix}${req.baseUrl}`;
+  const publicUrl = getPublicUrl(req, "/rest-api/");
 
-  res.redirect(`${publicBaseUrl}/rest-api/`);
+  res.redirect(publicUrl);
 });
 
 docsRouter.use("/rest-api", swaggerUi.serve);
