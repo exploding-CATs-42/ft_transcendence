@@ -27,12 +27,10 @@ const ProfilePage = () => {
         const userData = await api.me.getMe();
         setUser(userData);
 
-        if (!userData) return;
-
         const friendsData = await api.me.getMeFriends();
         setFriends(friendsData);
 
-        const matchesData = await api.users.getUserGames(userData?.id);
+        const matchesData = await api.users.getUserGames(userData.id);
         setMatches(matchesData);
         setStats(buildStats(userData.id, matchesData));
       } catch (error) {
