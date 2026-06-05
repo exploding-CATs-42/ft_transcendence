@@ -30,22 +30,6 @@ export interface MeUser extends SelfProfileUser, UserStats {}
 
 export interface FriendUser extends ProfileUser {}
 
-export type FriendDirection = "incoming" | "outgoing" | "accepted";
-
-export interface FriendListItem {
-  user: FriendUser;
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
-  direction: FriendDirection;
-}
-
-export interface UserGameHistoryItem {
-  gameId: string;
-  gameName: string;
-  endedAt: Date;
-  isWinner: boolean;
-  players: FriendUser[];
-}
-
 export interface AuthResponse {
   user: PublicUser;
   accessToken: string;
