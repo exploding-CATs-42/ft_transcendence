@@ -157,6 +157,11 @@ export async function refreshController(
     });
   } catch (error) {
     if (error instanceof AuthServiceError) {
+      res.clearCookie(
+        REFRESH_TOKEN_COOKIE_NAME,
+        getRefreshTokenClearCookieOptions(),
+      );
+
       return res.status(error.statusCode).json({ message: error.message });
     }
 
