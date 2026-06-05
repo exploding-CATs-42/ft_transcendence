@@ -122,15 +122,16 @@ If the cookie is missing, the backend returns:
 
 `refreshSession`:
 
-1. Verifies the refresh token JWT.
-2. Reads `sub` and `sessionId` from the payload.
-3. Finds the session in `user_sessions`.
-4. Checks that the session belongs to the same user.
-5. Hashes the incoming refresh token and compares it with the stored hash.
-6. Checks that the session is not expired.
-7. Creates a new refresh token for the same session.
-8. Updates the stored refresh token hash and expiration date.
-9. Creates and returns a new access token.
+1. Deletes expired rows from `user_sessions`.
+2. Verifies the refresh token JWT.
+3. Reads `sub` and `sessionId` from the payload.
+4. Finds the session in `user_sessions`.
+5. Checks that the session belongs to the same user.
+6. Hashes the incoming refresh token and compares it with the stored hash.
+7. Checks that the session is not expired.
+8. Creates a new refresh token for the same session.
+9. Updates the stored refresh token hash and expiration date.
+10. Creates and returns a new access token.
 
 The controller then sets the new refresh token cookie:
 
@@ -145,6 +146,35 @@ res.cookie(
 This means refresh tokens are rotated. After a successful refresh, the previous
 refresh token is no longer valid.
 
+If refresh fails with an auth error, the controller clears the refresh cookie
+before returning the error response:
+
+```ts
+res.clearCookie(
+  REFRESH_TOKEN_COOKIE_NAME,
+  getRefreshTokenClearCookieOptions(),
+);
+```
+
+This removes stale refresh token cookies when the token is expired, invalid, or
+points to a missing session. The frontend still receives a `401`, clears local
+access token state, and redirects protected pages to `/login`.
+
+Expired database sessions are also cleaned during refresh:
+
+```ts
+await prisma.userSession.deleteMany({
+  where: {
+    expiresAt: {
+      lt: new Date(),
+    },
+  },
+});
+```
+
+This prevents expired rows from staying in `user_sessions` after the refresh
+token can no longer be used.
+
 ## Backend: Logout
 
 Logout route:
@@ -157,12 +187,10 @@ Logout also uses the refresh token cookie. If the cookie is valid, the backend
 deletes the matching session from `user_sessions` and clears the cookie:
 
 ```ts
-res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
-  httpOnly: true,
-  secure: process.env["NODE_ENV"] === "production",
-  sameSite: "lax",
-  path: "/api/users",
-});
+res.clearCookie(
+  REFRESH_TOKEN_COOKIE_NAME,
+  getRefreshTokenClearCookieOptions(),
+);
 ```
 
 The browser receives a cookie with an expiration date in the past:
@@ -577,6 +605,7 @@ If refresh fails because the refresh token cookie is missing or expired:
 
 ```txt
 /users/refresh -> 401
+backend clears refreshToken cookie when present
 clear local auth state
 authStatus = anonymous
 ```
@@ -684,10 +713,18 @@ games status: 200
 ```
 
 After the refresh cookie expires, `/api/users/refresh` should return `401`.
-If the browser has already deleted the expired cookie, the message is:
+When the expired cookie is still sent, the response should include a
+`Set-Cookie` header that clears `refreshToken`. If the browser has already
+deleted the expired cookie, the message is:
 
 ```json
 { "message": "Refresh token required" }
+```
+
+Expired database rows should also be removed:
+
+```sql
+select * from user_sessions where expires_at < now();
 ```
 
 ## Socket.IO Note
