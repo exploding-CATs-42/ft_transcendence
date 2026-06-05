@@ -31,7 +31,7 @@ docsRouter.get("/rest-api/", async (_, res, next) => {
 });
 
 docsRouter.get("/sockets", (_, res) => {
-  res.send(`
+  res.type("html").send(`
     <!DOCTYPE html>
     <html>
       <head>
