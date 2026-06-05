@@ -15,6 +15,10 @@ type RetriableAxiosRequestConfig = InternalAxiosRequestConfig & {
   _retry?: boolean;
 };
 
+function getResponseStatus(error: unknown): number | undefined {
+  return (error as { response?: { status?: number } }).response?.status;
+}
+
 let authVersion = 0;
 let onAccessTokenRefresh: ((accessToken: string) => void) | null = null;
 let onSessionExpired: (() => void) | null = null;
@@ -78,8 +82,10 @@ api.interceptors.response.use(
       try {
         accessToken = await refreshPromise;
       } catch (refreshError) {
-        clearAccessTokenForRequests();
-        onSessionExpired?.();
+        if (getResponseStatus(refreshError) === 401) {
+          clearAccessTokenForRequests();
+          onSessionExpired?.();
+        }
 
         const message = getErrorMessage(refreshError);
 
