@@ -42,6 +42,10 @@ const getStoredAccessToken = (value: StoredAccessToken): AccessToken | null => {
   return null;
 };
 
+function getResponseStatus(error: unknown): number | undefined {
+  return (error as { response?: { status?: number } }).response?.status;
+}
+
 const AuthProvider = ({ children }: Props) => {
   const [storedAccessToken, saveAccessToken] =
     useLocalStorage<StoredAccessToken>(AUTH_STORAGE_KEY, null);
@@ -101,10 +105,14 @@ const AuthProvider = ({ children }: Props) => {
         if (!isActive) return;
 
         setAccessToken(result.data.accessToken);
-      } catch {
+      } catch (error) {
         if (!isActive) return;
 
-        clearAccessToken();
+        if (getResponseStatus(error) === 401) {
+          clearAccessToken();
+        } else {
+          setAuthStatus("authenticated");
+        }
       }
     };
 
