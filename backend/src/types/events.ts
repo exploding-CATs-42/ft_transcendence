@@ -11,6 +11,8 @@ import {
 export const ClientEventType = {
   JOIN_GAME: "join-game",
   LEAVE_GAME: "leave-game",
+  CONFIRM_START: "confirm-start",
+  CANCEL_START: "cancel-start",
 } as const;
 
 export type ClientEventType =
@@ -19,6 +21,8 @@ export type ClientEventType =
 export const ErrorEventType = {
   JOIN_GAME_ERROR: "join-game-error",
   LEAVE_GAME_ERROR: "leave-game-error",
+  CONFIRM_START_ERROR: "confirm-start-error",
+  CANCEL_START_ERROR: "cancel-start-error",
 } as const;
 
 export type ErrorEventType =
@@ -27,7 +31,11 @@ export type ErrorEventType =
 export const PublicEventType = {
   PLAYER_JOINED: "player-joined",
   PLAYER_LEFT: "player-left",
-  GAME_STARTED: "GAME_STARTED",
+  PLAYER_CONFIRMED: "player-confirmed",
+  PLAYER_CANCELED: "player-canceled",
+  COUNTDOWN_STARTED: "countdown-started",
+  COUNTDOWN_CANCELED: "countdown-canceled",
+  GAME_STARTED: "game-started",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "CARD_PLAYED",
   COMBO_PLAYED: "COMBO_PLAYED",
@@ -79,6 +87,7 @@ export interface PublicPlayerView {
 export interface WaitingPlayerView {
   id: string;
   name: string;
+  isConfirmed: boolean;
 }
 
 export interface WaitingStateView {

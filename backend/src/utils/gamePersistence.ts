@@ -4,6 +4,7 @@ import { GameId } from "../types";
 import { createActor, Snapshot } from "xstate";
 import { gameMachine } from "../game/gameMachine";
 import { Game, GameInfo } from "../game/types";
+import { attachBroadcaster } from "../game/broadcaster";
 
 interface PersistedGame {
   info: GameInfo;
@@ -46,6 +47,7 @@ export async function loadGames(games: Map<GameId, Game>): Promise<void> {
 
     for (const { info, snapshot } of persistedGames) {
       const actor = createActor(gameMachine, { snapshot });
+      attachBroadcaster(info.id, actor);
       actor.start();
       games.set(info.id, { info, actor });
     }

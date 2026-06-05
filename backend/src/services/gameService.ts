@@ -2,6 +2,8 @@ import { ApiError } from "../errors/apiError";
 import { SocketError } from "../errors/socketError";
 
 import {
+  CancelStartParams,
+  ConfirmStartParams,
   CreateGameRequestBody,
   DeleteGameParams,
   GetGameByIdParams,
@@ -17,6 +19,7 @@ import { UserId, WaitingStateView } from "../types";
 import GameStore from "../utils/gameStore";
 import { ensureUserExists } from "../utils/users";
 import { toWaitingPlayerView } from "../game/mappers";
+import { attachBroadcaster } from "../game/broadcaster";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
@@ -60,6 +63,7 @@ export async function createGame(
     },
     actor,
   };
+  attachBroadcaster(game.info.id, actor);
   actor.start();
   GameStore.setGame(game);
   return game.info;
@@ -97,6 +101,7 @@ export async function joinGame(
     id: user.id,
     name: user.username,
     hand: [],
+    isConfirmed: false,
     isAlive: true,
     turnOrder: 0,
   };
@@ -138,6 +143,52 @@ export async function leaveGame(
     GameStore.deleteGameById(input.gameId);
     return { players: [] };
   }
+
+  const playersAfter = game.actor.getSnapshot().context.players;
+  return { players: playersAfter.map(toWaitingPlayerView) };
+}
+
+export async function confirmStart(input: ConfirmStartParams, userId: UserId) {
+  const user = await ensureUserExists(userId);
+
+  const game = ensureGameExists(input.gameId);
+  const playersBefore = game.actor.getSnapshot().context.players;
+
+  const player = playersBefore.find((player) => {
+    return player.id === user.id;
+  });
+
+  if (!player) {
+    throw new SocketError("Player is not in the game");
+  }
+
+  game.actor.send({
+    type: GameEventType.CONFIRM_START,
+    playerId: player.id,
+  });
+
+  const playersAfter = game.actor.getSnapshot().context.players;
+  return { players: playersAfter.map(toWaitingPlayerView) };
+}
+
+export async function cancelStart(input: CancelStartParams, userId: UserId) {
+  const user = await ensureUserExists(userId);
+
+  const game = ensureGameExists(input.gameId);
+  const playersBefore = game.actor.getSnapshot().context.players;
+
+  const player = playersBefore.find((player) => {
+    return player.id === user.id;
+  });
+
+  if (!player) {
+    throw new SocketError("Player is not in the game");
+  }
+
+  game.actor.send({
+    type: GameEventType.CANCEL_START,
+    playerId: player.id,
+  });
 
   const playersAfter = game.actor.getSnapshot().context.players;
   return { players: playersAfter.map(toWaitingPlayerView) };

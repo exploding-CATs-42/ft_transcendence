@@ -29,6 +29,7 @@ export const DEFAULT_PLAYER: Player = {
   id: "",
   name: "",
   hand: [],
+  isConfirmed: false,
   isAlive: true,
   turnOrder: 0,
 };
@@ -47,3 +48,6 @@ export const DEFAULT_GAME_STATE: GameState = {
   startedAt: null,
   finishedAt: null,
 };
+
+export const MIN_PLAYERS = 2;
+export const START_GAME_COUNTDOWN_MS = 10000;

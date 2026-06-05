@@ -1,9 +1,18 @@
 // Libraries
 import { Socket, Server } from "socket.io";
 // Project level
-import { joinGame, leaveGame } from "../services/gameService";
+import {
+  cancelStart,
+  confirmStart,
+  joinGame,
+  leaveGame,
+} from "../services/gameService";
 import { withErrorHandler } from "../utils/asyncHandler";
 import {
+  CancelStartParams,
+  cancelStartSchema,
+  ConfirmStartParams,
+  confirmStartSchema,
   JoinGameParams,
   joinGameSchema,
   LeaveGameParams,
@@ -46,6 +55,36 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(PrivateEventType.YOU_LEFT);
         io.to(room).emit(PublicEventType.PLAYER_LEFT, waitingState);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEventType.CONFIRM_START,
+    withErrorHandler(
+      confirmStartSchema,
+      socket,
+      ErrorEventType.CONFIRM_START_ERROR,
+      async (parsed: ConfirmStartParams) => {
+        const waitingState = await confirmStart(parsed, socket.data.sub);
+        const room = parsed.gameId;
+
+        io.to(room).emit(PublicEventType.PLAYER_CONFIRMED, waitingState);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEventType.CANCEL_START,
+    withErrorHandler(
+      cancelStartSchema,
+      socket,
+      ErrorEventType.CANCEL_START_ERROR,
+      async (parsed: CancelStartParams) => {
+        const waitingState = await cancelStart(parsed, socket.data.sub);
+        const room = parsed.gameId;
+
+        io.to(room).emit(PublicEventType.PLAYER_CANCELED, waitingState);
       },
     ),
   );
