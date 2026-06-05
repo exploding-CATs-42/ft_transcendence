@@ -263,22 +263,24 @@ cookies store refreshToken
 `localStorage` does not know whether the stored access token is expired. It only
 stores data until the app or user removes it.
 
-`AuthProvider` also synchronizes auth state with axios:
+`AuthProvider` also writes auth changes to request token storage:
 
 ```ts
-useEffect(() => {
-  if (accessToken) {
-    setAxiosToken(accessToken);
-    return;
-  }
+const setAccessToken = useCallback(
+  (accessToken: AccessToken) => {
+    saveAccessTokenForRequests(accessToken);
+    saveAccessToken({ accessToken });
+  },
+  [saveAccessToken],
+);
 
-  clearAxiosToken();
-}, [accessToken]);
+const clearAccessToken = useCallback(() => {
+  clearAccessTokenForRequests();
+  saveAccessToken(null);
+}, [saveAccessToken]);
 ```
 
-This restores the axios `Authorization` header after a page refresh. Without
-this sync, React could still consider the user logged in from `localStorage`,
-while axios would have lost its in-memory default header.
+This keeps React auth state and the storage used by axios in sync.
 
 `AuthProvider` also registers a callback for refreshed access tokens:
 
@@ -299,6 +301,15 @@ refresh without importing React hooks into `axios.ts`.
 
 ## Frontend: Axios Setup
 
+The frontend auth API is exposed as `api.auth`, but the backend route names are
+still `/users/...`:
+
+```ts
+api.auth.login();   // POST /users/login
+api.auth.logout();  // POST /users/logout
+api.auth.refresh(); // POST /users/refresh
+```
+
 `axios.ts` keeps a callback for refreshed access tokens at module level:
 
 ```ts
@@ -317,28 +328,49 @@ export const api = axios.create({
 `withCredentials: true` is required so the browser sends the refresh token
 cookie to the backend.
 
-The access token is attached to axios requests with:
+Access token persistence for requests lives in `authTokenStorage.ts`:
 
 ```ts
-export const setAxiosToken = (token: string) => {
-  api.defaults.headers.common.Authorization = `Bearer ${token}`;
-};
+getStoredAccessToken();
+saveStoredAccessToken(accessToken);
+clearStoredAccessToken();
 ```
 
-Logout removes it:
+This module reads and writes the same local storage key used by `AuthProvider`.
+It exists because `axios.ts` is not a React component and cannot use React hooks.
+
+The access token is attached to axios requests by a request interceptor:
 
 ```ts
-export const clearAxiosToken = () => {
+api.interceptors.request.use((config) => {
+  const accessToken = getStoredAccessToken();
+
+  config.headers = AxiosHeaders.from(config.headers);
+
+  if (accessToken) {
+    config.headers.set("Authorization", `Bearer ${accessToken}`);
+  } else {
+    config.headers.delete("Authorization");
+  }
+
+  return config;
+});
+```
+
+This means axios reads the current access token for every request. After a page
+refresh, axios does not need an in-memory default header to be restored; it reads
+the persisted token before sending the request.
+
+Logout clears request token storage:
+
+```ts
+export const clearAccessTokenForRequests = () => {
   authVersion += 1;
-  delete api.defaults.headers.common.Authorization;
+  clearStoredAccessToken();
 };
 ```
 
-Axios defaults are kept only in JavaScript memory. They are lost on page
-refresh, so `AuthProvider` re-applies the stored access token to axios when the
-app starts.
-
-`authVersion` is incremented whenever axios auth is cleared. This lets pending
+`authVersion` is incremented whenever request auth is cleared. This lets pending
 refresh work detect that the user logged out before the refresh completed.
 
 The refresh callback is registered from `AuthProvider`:
@@ -351,8 +383,8 @@ export const setAccessTokenRefreshHandler = (
 };
 ```
 
-When refresh succeeds, axios can update its own header and notify
-`AuthProvider` to save the same token in auth state and `localStorage`.
+When refresh succeeds, axios saves the new access token to request storage and
+notifies `AuthProvider` to save the same token in React auth state.
 
 ## Frontend: Automatic Access Token Refresh
 
@@ -389,13 +421,11 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      setAxiosToken(accessToken);
+      saveStoredAccessToken(accessToken);
       onAccessTokenRefresh?.(accessToken);
 
-      originalRequest.headers = {
-        ...(originalRequest.headers ?? {}),
-        Authorization: `Bearer ${accessToken}`,
-      };
+      originalRequest.headers = AxiosHeaders.from(originalRequest.headers);
+      originalRequest.headers.set("Authorization", `Bearer ${accessToken}`);
 
       return api(originalRequest);
     }
@@ -415,7 +445,7 @@ Flow:
 ```txt
 protected request -> 401
 /users/refresh -> 200
-axios stores the new access token
+axios stores the new access token in request storage
 AuthProvider stores the new access token in localStorage
 axios retries the original request
 ```
@@ -434,9 +464,9 @@ This prevents this race:
 protected request -> 401
 /users/refresh starts
 user logs out
-axios Authorization is cleared
+request auth storage is cleared
 /users/refresh returns a new accessToken
-stale accessToken must not be written back to axios
+stale accessToken must not be written back to storage
 ```
 
 The callback prevents a different stale-token problem:
@@ -444,7 +474,6 @@ The callback prevents a different stale-token problem:
 ```txt
 protected request -> 401
 /users/refresh returns a new accessToken
-axios Authorization is updated
 localStorage is updated with the same new accessToken
 page refresh restores the fresh accessToken instead of the expired one
 ```
@@ -463,7 +492,7 @@ logout request fails:
 ```ts
 const logoutUser = async () => {
   try {
-    await api.users.logout();
+    await api.auth.logout();
   } catch {
     // Logout is best-effort because the backend session may already be expired.
   } finally {
@@ -482,16 +511,16 @@ After a page refresh, browser storage survives but JavaScript memory is reset:
 
 ```txt
 localStorage still contains accessToken
-axios default Authorization header is lost
+axios module memory is reset
 ```
 
-`AuthProvider` fixes this by reading the stored token and calling
-`setAxiosToken(accessToken)` when the app starts.
+The request interceptor handles this by reading the stored token from
+`authTokenStorage` before each request.
 
 This fixes:
 
 ```txt
-F5 -> axios loses Authorization header
+F5 -> axios can still attach Authorization from localStorage
 ```
 
 It does not validate the backend session. If the refresh token cookie has
