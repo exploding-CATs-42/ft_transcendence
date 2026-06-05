@@ -4,7 +4,7 @@ paths:
       tags:
         - Users
       summary: Register a new user
-      description: Creates a new user account, creates the first session, sets the refresh token HttpOnly cookie, and returns the access token.
+      description: Creates a new user account without creating an authenticated session. Call /users/login after registration to receive tokens.
       operationId: registerUser
       requestBody:
         required: true
@@ -15,15 +15,10 @@ paths:
       responses:
         "201":
           description: User registered successfully
-          headers:
-            Set-Cookie:
-              description: HttpOnly refresh token cookie.
-              schema:
-                type: string
           content:
             application/json:
               schema:
-                $ref: "./users.schemas.yaml#/components/schemas/AuthResponse"
+                $ref: "./users.schemas.yaml#/components/schemas/RegisterResponse"
         "400":
           description: Validation error
           content:
