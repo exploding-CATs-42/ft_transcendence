@@ -54,7 +54,10 @@ docsRouter.get("/sockets", (req, res) => {
   `);
 });
 
-docsRouter.get(
-  "/asyncapi.yaml",
-  express.static(path.join(__dirname, "../../../docs/sockets/asyncapi.yaml")),
-);
+docsRouter.get("/asyncapi.yaml", (_, res) => {
+  const rootPath = path.resolve(
+    __dirname,
+    "../../../docs/sockets/asyncapi.yaml",
+  );
+  res.type("text/yaml").sendFile(rootPath);
+});
