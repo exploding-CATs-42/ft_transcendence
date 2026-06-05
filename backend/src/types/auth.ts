@@ -55,6 +55,10 @@ export interface AuthResponse {
   accessToken: string;
 }
 
+export interface RegisterResponse {
+  user: PublicUser;
+}
+
 export interface RefreshResponse {
   accessToken: string;
 }
