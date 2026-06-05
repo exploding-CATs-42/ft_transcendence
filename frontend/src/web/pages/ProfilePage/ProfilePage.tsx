@@ -33,13 +33,13 @@ const ProfilePage = () => {
         const matchesData = await api.users.getUserGames(userData.id);
         setMatches(matchesData);
         setStats(buildStats(userData.id, matchesData));
+
+        setLoading(false);
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         toast(errorMessage);
 
         navigate("/");
-      } finally {
-        setLoading(false);
       }
     }
 
