@@ -10,7 +10,8 @@ interface Props {
 }
 
 const Navigation = ({ onLinkClick }: Props) => {
-  const { accessToken: isLoggedIn } = useAuth();
+  const { authStatus } = useAuth();
+  const isLoggedIn = authStatus === "authenticated";
 
   const navLinks = [
     { path: "/lobby", label: "Play" },

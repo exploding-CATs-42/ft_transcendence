@@ -17,6 +17,7 @@ type RetriableAxiosRequestConfig = InternalAxiosRequestConfig & {
 
 let authVersion = 0;
 let onAccessTokenRefresh: ((accessToken: string) => void) | null = null;
+let onSessionExpired: (() => void) | null = null;
 
 export const api = axios.create({
   baseURL: VITE_API_BASE_URL,
@@ -72,7 +73,21 @@ api.interceptors.response.use(
         });
       }
 
-      const accessToken = await refreshPromise;
+      let accessToken: string;
+
+      try {
+        accessToken = await refreshPromise;
+      } catch (refreshError) {
+        clearAccessTokenForRequests();
+        onSessionExpired?.();
+
+        const message = getErrorMessage(refreshError);
+
+        return Promise.reject({
+          ...(refreshError instanceof Error ? refreshError : error),
+          message,
+        });
+      }
 
       if (refreshAuthVersion !== authVersion) {
         return Promise.reject(error);
@@ -111,6 +126,6 @@ export const setAccessTokenRefreshHandler = (
   onAccessTokenRefresh = handler;
 };
 
-export const clearAxiosToken = () => {
-  delete api.defaults.headers.common.Authorization;
+export const setSessionExpiredHandler = (handler: (() => void) | null) => {
+  onSessionExpired = handler;
 };

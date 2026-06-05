@@ -1,1 +1,5 @@
-export type { AuthContextValue, AccessToken } from "../../context/AuthContext";
+export type {
+  AuthContextValue,
+  AccessToken,
+  AuthStatus,
+} from "../../context/AuthContext";
