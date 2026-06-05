@@ -4,10 +4,14 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "hooks";
 
 const PrivateRoute = () => {
-  const { accessToken: isLoggedIn } = useAuth();
+  const { authStatus } = useAuth();
   const location = useLocation();
 
-  if (!isLoggedIn) {
+  if (authStatus === "loading") {
+    return null;
+  }
+
+  if (authStatus === "anonymous") {
     return <Navigate to="/login" state={{ from: location }} replace />;
   }
 

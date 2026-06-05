@@ -1,9 +1,11 @@
 import { createContext } from "react";
 
 export type AccessToken = string;
+export type AuthStatus = "loading" | "authenticated" | "anonymous";
 
 export interface AuthContextValue {
   accessToken: AccessToken | null;
+  authStatus: AuthStatus;
   setAccessToken: (accessToken: AccessToken) => void;
   clearAccessToken: () => void;
 }

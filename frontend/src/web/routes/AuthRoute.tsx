@@ -4,11 +4,15 @@ import { Navigate, Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "hooks";
 
 const AuthRoute = () => {
-  const { accessToken: isLoggedIn } = useAuth();
+  const { authStatus } = useAuth();
   const location = useLocation();
   const from = location.state?.from?.pathname;
 
-  if (isLoggedIn) {
+  if (authStatus === "loading") {
+    return null;
+  }
+
+  if (authStatus === "authenticated") {
     return <Navigate to={from || "/lobby"} replace />;
   }
 

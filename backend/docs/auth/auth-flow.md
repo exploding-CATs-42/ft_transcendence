@@ -439,7 +439,15 @@ api.interceptors.response.use(
         });
       }
 
-      const accessToken = await refreshPromise;
+      let accessToken: string;
+
+      try {
+        accessToken = await refreshPromise;
+      } catch (refreshError) {
+        clearAccessTokenForRequests();
+        onSessionExpired?.();
+        return Promise.reject(refreshError);
+      }
 
       if (refreshAuthVersion !== authVersion) {
         return Promise.reject(error);
@@ -476,6 +484,10 @@ axios retries the original request
 
 `refreshPromise` prevents multiple simultaneous refresh calls when several
 requests fail with `401` at the same time.
+
+If `/users/refresh` fails, axios clears request token storage and notifies
+`AuthProvider` that the session expired. This makes protected routes treat the
+user as anonymous instead of leaving a stale access token in the UI.
 
 `authVersion` prevents stale refresh results from being applied after logout.
 A refresh request stores the current version before awaiting `/users/refresh`.
@@ -531,6 +543,12 @@ so the user is not stuck in a visually logged-in state.
 
 ## Frontend: Page Refresh Behavior
 
+Auth state has an explicit status:
+
+```ts
+type AuthStatus = "loading" | "authenticated" | "anonymous";
+```
+
 After a page refresh, browser storage survives but JavaScript memory is reset:
 
 ```txt
@@ -538,27 +556,50 @@ localStorage still contains accessToken
 axios module memory is reset
 ```
 
-The request interceptor handles this by reading the stored token from
-`authTokenStorage` before each request.
+`AuthProvider` starts in `loading` when a stored access token exists. It then
+checks whether the backend session is still valid by calling `/users/refresh`:
+
+```txt
+app starts
+localStorage has accessToken
+AuthProvider calls /users/refresh
+```
+
+If refresh succeeds:
+
+```txt
+/users/refresh -> 200
+store new accessToken
+authStatus = authenticated
+```
+
+If refresh fails because the refresh token cookie is missing or expired:
+
+```txt
+/users/refresh -> 401
+clear local auth state
+authStatus = anonymous
+```
+
+`PrivateRoute` waits while auth is loading, then redirects anonymous users:
+
+```txt
+loading -> render nothing
+anonymous -> redirect /login
+authenticated -> render protected page
+```
+
+`AuthRoute` also waits while auth is loading. If the user is authenticated, it
+redirects away from login/register routes.
+
+The request interceptor still reads the stored token from `authTokenStorage`
+before each request.
 
 This fixes:
 
 ```txt
 F5 -> axios can still attach Authorization from localStorage
-```
-
-It does not validate the backend session. If the refresh token cookie has
-expired but `localStorage` still contains an old access token, the user may
-still appear logged in until an authenticated request fails.
-
-A future improvement could validate the session on app startup:
-
-```txt
-app starts
-if localStorage has accessToken:
-  call /users/refresh
-  if 200: keep user logged in
-  if 401: clear local auth state
+F5 with expired/missing refreshToken -> clear auth -> /login
 ```
 
 ## Manual Testing
