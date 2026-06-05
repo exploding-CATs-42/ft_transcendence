@@ -30,7 +30,9 @@ docsRouter.get("/rest-api/", async (_, res, next) => {
   }
 });
 
-docsRouter.get("/sockets", (_, res) => {
+docsRouter.get("/sockets", (req, res) => {
+  const publicUrl = getPublicUrl(req, "/asyncapi.yaml");
+
   res.type("html").send(`
     <!DOCTYPE html>
     <html>
@@ -43,7 +45,7 @@ docsRouter.get("/sockets", (_, res) => {
         <script src="https://unpkg.com/@asyncapi/react-component@3.1.3/browser/standalone/index.js"></script>
         <script>
           AsyncApiStandalone.render({
-            schema: { url: './asyncapi.yaml' },
+            schema: { url: '${publicUrl}' },
             config: { show: { sidebar: true } },
           }, document.getElementById('asyncapi'));
         </script>
