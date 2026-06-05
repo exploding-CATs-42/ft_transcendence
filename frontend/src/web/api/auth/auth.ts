@@ -1,7 +1,11 @@
 // Project level
 import type { AccessToken } from "types";
 // Local level
-import { api, setAxiosToken, clearAxiosToken } from "../axios";
+import {
+  api,
+  clearAccessTokenForRequests,
+  saveAccessTokenForRequests,
+} from "../axios";
 
 export type RegisterReqBody = {
   username: string;
@@ -35,7 +39,7 @@ const login = async (body: UserCredentials): Promise<LoginResponse> => {
   const result = await api.post("/users/login", body);
   const { accessToken } = result.data;
 
-  setAxiosToken(accessToken);
+  saveAccessTokenForRequests(accessToken);
   return result.data;
 };
 
@@ -43,7 +47,7 @@ const logout = async () => {
   try {
     await api.post("/users/logout");
   } finally {
-    clearAxiosToken();
+    clearAccessTokenForRequests();
   }
 };
 
@@ -51,7 +55,7 @@ const refresh = async () => {
   const result = await api.post("/users/refresh");
   const { accessToken } = result.data;
 
-  setAxiosToken(accessToken);
+  saveAccessTokenForRequests(accessToken);
   return result.data;
 };
 
