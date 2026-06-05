@@ -36,11 +36,11 @@ docsRouter.get("/sockets", (_, res) => {
     <html>
       <head>
         <title>API Docs</title>
-        <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@3.1.3/styles/default.min.css">
       </head>
       <body>
         <div id="asyncapi"></div>
-        <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+        <script src="https://unpkg.com/@asyncapi/react-component@3.1.3/browser/standalone/index.js"></script>
         <script>
           AsyncApiStandalone.render({
             schema: { url: './asyncapi.yaml' },
