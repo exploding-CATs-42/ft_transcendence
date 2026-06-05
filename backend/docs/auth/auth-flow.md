@@ -36,6 +36,29 @@ JWT_REFRESH_EXPIRES_IN=2m
 After changing these values, restart the backend/container. Otherwise the old
 values remain active.
 
+## Backend: Register
+
+Register route:
+
+```ts
+usersRouter.post("/register", registerController);
+```
+
+Registration creates only the user account. It does not create an authenticated
+session, does not set the refresh token cookie, and does not return an access
+token:
+
+```ts
+const result = await registerUser(parsed.data);
+
+return res.status(201).json({
+  user: result.user,
+});
+```
+
+After registration, the frontend should call `api.auth.login()` if it wants to
+authenticate the new user immediately.
+
 ## Backend: Login
 
 Login route:
@@ -305,6 +328,7 @@ The frontend auth API is exposed as `api.auth`, but the backend route names are
 still `/users/...`:
 
 ```ts
+api.auth.register(); // POST /users/register
 api.auth.login();   // POST /users/login
 api.auth.logout();  // POST /users/logout
 api.auth.refresh(); // POST /users/refresh
