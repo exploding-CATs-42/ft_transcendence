@@ -168,6 +168,9 @@ export async function logoutUser(refreshToken: string): Promise<void> {
 export async function refreshSession(
   refreshToken: string,
 ): Promise<RefreshSessionResponse> {
+
+  await deleteExpiredRefreshSessions();
+
   let payload;
 
   try {
