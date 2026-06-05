@@ -122,7 +122,7 @@ If the cookie is missing, the backend returns:
 
 `refreshSession`:
 
-1. Deletes expired rows from `user_sessions`.
+1. Runs a rate-limited cleanup for expired rows in `user_sessions`.
 2. Verifies the refresh token JWT.
 3. Reads `sub` and `sessionId` from the payload.
 4. Finds the session in `user_sessions`.
@@ -160,20 +160,16 @@ This removes stale refresh token cookies when the token is expired, invalid, or
 points to a missing session. The frontend still receives a `401`, clears local
 access token state, and redirects protected pages to `/login`.
 
-Expired database sessions are also cleaned during refresh:
+Expired database sessions are also cleaned during refresh, but the cleanup is
+rate-limited so the endpoint does not run a delete query on every request:
 
 ```ts
-await prisma.userSession.deleteMany({
-  where: {
-    expiresAt: {
-      lt: new Date(),
-    },
-  },
-});
+await deleteExpiredRefreshSessionsIfDue();
 ```
 
 This prevents expired rows from staying in `user_sessions` after the refresh
-token can no longer be used.
+token can no longer be used, while avoiding unnecessary writes on the refresh
+hot path.
 
 ## Backend: Logout
 
@@ -472,9 +468,17 @@ api.interceptors.response.use(
       try {
         accessToken = await refreshPromise;
       } catch (refreshError) {
-        clearAccessTokenForRequests();
-        onSessionExpired?.();
-        return Promise.reject(refreshError);
+        if (getResponseStatus(refreshError) === 401) {
+          clearAccessTokenForRequests();
+          onSessionExpired?.();
+        }
+
+        const message = getErrorMessage(refreshError);
+
+        return Promise.reject({
+          ...(refreshError instanceof Error ? refreshError : error),
+          message,
+        });
       }
 
       if (refreshAuthVersion !== authVersion) {
@@ -513,9 +517,13 @@ axios retries the original request
 `refreshPromise` prevents multiple simultaneous refresh calls when several
 requests fail with `401` at the same time.
 
-If `/users/refresh` fails, axios clears request token storage and notifies
-`AuthProvider` that the session expired. This makes protected routes treat the
-user as anonymous instead of leaving a stale access token in the UI.
+If `/users/refresh` fails with `401`, axios clears request token storage and
+notifies `AuthProvider` that the session expired. This makes protected routes
+treat the user as anonymous instead of leaving a stale access token in the UI.
+
+If refresh fails because of a transient network error or a `5xx` backend error,
+axios keeps the existing auth state and propagates the error. The app should not
+log the user out unless the backend explicitly rejects the session.
 
 `authVersion` prevents stale refresh results from being applied after logout.
 A refresh request stores the current version before awaiting `/users/refresh`.
@@ -609,6 +617,10 @@ backend clears refreshToken cookie when present
 clear local auth state
 authStatus = anonymous
 ```
+
+If startup refresh fails because of a transient network error or a `5xx` backend
+error, `AuthProvider` keeps the user in `authenticated` state so the app can
+continue rendering and retry later.
 
 `PrivateRoute` waits while auth is loading, then redirects anonymous users:
 
