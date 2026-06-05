@@ -20,7 +20,6 @@ export type RegisterResponse = {
     username: string;
     avatarUrl: string | null;
   };
-  accessToken: AccessToken;
 };
 
 const register = async (body: RegisterReqBody): Promise<RegisterResponse> => {
@@ -33,7 +32,9 @@ export type UserCredentials = {
   password: string;
 };
 
-export type LoginResponse = RegisterResponse;
+export type LoginResponse = RegisterResponse & {
+  accessToken: AccessToken;
+};
 
 const login = async (body: UserCredentials): Promise<LoginResponse> => {
   const result = await api.post("/users/login", body);
