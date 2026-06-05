@@ -1,4 +1,4 @@
-import { FriendUser, SelfProfileUser } from "../types/auth";
+import { FriendUser, MyProfileUser } from "../types";
 
 export function toFriendUser(user: {
   id: string;
@@ -23,7 +23,7 @@ export function toSelfProfileUser(user: {
   avatarUrl: string | null;
   isOnline: boolean;
   lastSeenAt: Date | null;
-}): SelfProfileUser {
+}): MyProfileUser {
   return {
     id: user.id,
     email: user.email,
@@ -34,7 +34,7 @@ export function toSelfProfileUser(user: {
   };
 }
 
-export function toPublicProfileUser(
+export function toProfileUserWithStats(
   user: {
     id: string;
     username: string;
@@ -54,8 +54,8 @@ export function toPublicProfileUser(
   };
 }
 
-export function toMeUser(
-  user: SelfProfileUser,
+export function toMyProfileUser(
+  user: MyProfileUser,
   stats: {
     totalMatches: number;
     wins: number;

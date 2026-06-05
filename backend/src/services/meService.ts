@@ -1,9 +1,9 @@
 import { prisma, selfProfileSelect } from "../lib/prisma";
 import { hashPassword } from "../utils/hash";
-import { toMeUser, toSelfProfileUser } from "../utils/users";
-import { MeUser, SelfProfileUser } from "../types/auth";
+import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
 import { getFinishedGamesStats } from "./usersService";
 import { ApiError } from "../errors";
+import { MyProfileUser } from "../types";
 
 export class MeServiceError extends Error {
   public statusCode: number;
@@ -24,7 +24,7 @@ export interface UpdateMeInput {
 export async function updateMe(
   currentUserId: string,
   input: UpdateMeInput,
-): Promise<{ user: SelfProfileUser }> {
+): Promise<{ user: MyProfileUser }> {
   const currentUser = await prisma.user.findUnique({
     where: { id: currentUserId },
     select: { id: true },
@@ -94,7 +94,7 @@ export async function updateMe(
   };
 }
 
-export async function getMe(userId: string): Promise<{ user: MeUser }> {
+export async function getMe(userId: string): Promise<{ user: MyProfileUser }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: selfProfileSelect,
@@ -106,6 +106,6 @@ export async function getMe(userId: string): Promise<{ user: MeUser }> {
 
   const stats = await getFinishedGamesStats(user.id);
   return {
-    user: toMeUser(user, stats),
+    user: toMyProfileUser(user, stats),
   };
 }
