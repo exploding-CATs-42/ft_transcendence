@@ -48,15 +48,9 @@ export async function registerController(
 
   try {
     const result = await registerUser(parsed.data);
-    res.cookie(
-      REFRESH_TOKEN_COOKIE_NAME,
-      result.refreshToken,
-      getRefreshTokenCookieOptions(),
-    );
 
     return res.status(201).json({
       user: result.user,
-      accessToken: result.accessToken,
     });
   } catch (error) {
     if (error instanceof AuthServiceError) {
