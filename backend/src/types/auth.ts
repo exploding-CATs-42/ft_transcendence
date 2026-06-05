@@ -1,37 +1,8 @@
 import { Request } from "express";
-
-export interface PublicUser {
-  id: string;
-  email: string;
-  username: string;
-  avatarUrl: string | null;
-}
-
-export interface ProfileUser {
-  id: string;
-  username: string;
-  isOnline: boolean;
-  avatarUrl: string | null;
-  lastSeenAt: Date | null;
-}
-
-export interface UserStats {
-  totalMatches: number;
-  wins: number;
-}
-
-export interface PublicProfileUser extends ProfileUser, UserStats {}
-
-export interface SelfProfileUser extends ProfileUser {
-  email: string;
-}
-
-export interface MeUser extends SelfProfileUser, UserStats {}
-
-export interface FriendUser extends ProfileUser {}
+import { PublicUser, User } from "./users";
 
 export interface AuthResponse {
-  user: PublicUser;
+  user: User;
   accessToken: string;
 }
 
@@ -44,7 +15,7 @@ export interface RefreshResponse {
 }
 
 export interface AuthSessionResponse {
-  user: PublicUser;
+  user: User;
   accessToken: string;
   refreshToken: string;
 }

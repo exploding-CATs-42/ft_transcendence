@@ -1,6 +1,6 @@
 import { prisma, publicProfileSelect } from "../lib/prisma";
-import type { PublicProfileUser, UserGameHistoryItem } from "../types/auth";
-import { toFriendUser, toPublicProfileUser } from "../utils/users";
+import { ProfileUserWithStats, UserGameHistoryItem } from "../types";
+import { toFriendUser, toProfileUserWithStats } from "../utils/users";
 
 export class UsersServiceError extends Error {
   public statusCode: number;
@@ -44,7 +44,7 @@ export async function getFinishedGamesStats(userId: string): Promise<{
 
 export async function getPublicUserById(
   userId: string,
-): Promise<PublicProfileUser> {
+): Promise<ProfileUserWithStats> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: publicProfileSelect,
@@ -55,7 +55,7 @@ export async function getPublicUserById(
   }
 
   const stats = await getFinishedGamesStats(user.id);
-  return toPublicProfileUser(user, stats);
+  return toProfileUserWithStats(user, stats);
 }
 
 export async function ensureUserExists(userId: string) {
@@ -72,7 +72,7 @@ export async function ensureUserExists(userId: string) {
 
 export async function searchUsersByUsername(
   username: string,
-): Promise<PublicProfileUser[]> {
+): Promise<ProfileUserWithStats[]> {
   const users = await prisma.user.findMany({
     where: {
       username: {
@@ -89,7 +89,7 @@ export async function searchUsersByUsername(
   return Promise.all(
     users.map(async (user) => {
       const stats = await getFinishedGamesStats(user.id);
-      return toPublicProfileUser(user, stats);
+      return toProfileUserWithStats(user, stats);
     }),
   );
 }

@@ -10,11 +10,11 @@ import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 import type {
   AuthSessionResponse,
   RefreshSessionResponse,
-  PublicUser,
   RegisterResponse,
 } from "../types/auth";
 import type { RegisterRequestBody } from "../schemas/users/registerSchema";
 import type { LoginRequestBody } from "../schemas/users/loginSchema";
+import { User } from "../types";
 
 export class AuthServiceError extends Error {
   public statusCode: number;
@@ -25,7 +25,7 @@ export class AuthServiceError extends Error {
   }
 }
 
-function toPublicUser(user: PublicUser): PublicUser {
+function toPublicUser(user: User): User {
   return {
     id: user.id,
     email: user.email,
