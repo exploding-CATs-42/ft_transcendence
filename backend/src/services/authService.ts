@@ -11,6 +11,7 @@ import type {
   AuthSessionResponse,
   RefreshSessionResponse,
   PublicUser,
+  RegisterResponse,
 } from "../types/auth";
 import type { RegisterRequestBody } from "../schemas/users/registerSchema";
 import type { LoginRequestBody } from "../schemas/users/loginSchema";
@@ -41,7 +42,7 @@ function getRefreshTokenExpiresAt(): Date {
 
 export async function registerUser(
   input: RegisterRequestBody,
-): Promise<AuthSessionResponse> {
+): Promise<RegisterResponse> {
   const existingByEmail = await prisma.user.findUnique({
     where: { email: input.email },
   });
@@ -68,31 +69,8 @@ export async function registerUser(
     },
   });
 
-  const sessionId = randomUUID();
-  const refreshToken = signRefreshToken({
-    sub: user.id,
-    sessionId,
-  });
-
-  const refreshTokenHash = hashRefreshToken(refreshToken);
-
-  await prisma.userSession.create({
-    data: {
-      id: sessionId,
-      userId: user.id,
-      refreshTokenHash,
-      expiresAt: getRefreshTokenExpiresAt(),
-    },
-  });
-
-  const accessToken = signAccessToken({
-    sub: user.id,
-  });
-
   return {
     user: toPublicUser(user),
-    accessToken,
-    refreshToken,
   };
 }
 
