@@ -1,22 +1,28 @@
 export type UserId = string;
 
-export interface ProfileUser {
-  id: UserId;
-  username: string;
-  isOnline: boolean;
-  avatarUrl: string | null;
-  lastSeenAt: Date | null;
-}
-
-export interface UserStats {
+export interface GameStats {
   totalMatches: number;
   wins: number;
 }
 
-export interface PublicProfileUser extends ProfileUser, UserStats {}
-
-export interface SelfProfileUser extends ProfileUser {
-  email: string;
+export interface OnlineStatus {
+  isOnline: boolean;
+  lastSeenAt: Date | null;
 }
 
-export interface MeUser extends SelfProfileUser, UserStats {}
+export interface User {
+  id: string;
+  email: string;
+  username: string;
+  avatarUrl: string | null;
+}
+
+export type PublicUser = Omit<User, "email">;
+
+export type ProfileUser = PublicUser & OnlineStatus;
+export type ProfileUserWithStats = ProfileUser & GameStats;
+
+export type MyProfileUser = User & OnlineStatus;
+export type MyProfileUserWithStats = MyProfileUser & GameStats;
+
+export type FriendUser = ProfileUser;

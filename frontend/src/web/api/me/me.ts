@@ -1,9 +1,9 @@
 // Local level
-import type { MeUser } from "pages/ProfilePage/types/ProfileUser";
+import type { MyProfileUser } from "pages/ProfilePage/types/ProfileUser";
 import type { FriendItem } from "pages/ProfilePage/types";
 import { api } from "../axios";
 
-const getMe = async (): Promise<MeUser> => {
+const getMe = async (): Promise<MyProfileUser> => {
   const result = await api.get("/me");
   return result.data.user;
 };
