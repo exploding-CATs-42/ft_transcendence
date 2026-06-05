@@ -2,6 +2,7 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 // Project level
 import {
   AuthForm,
@@ -12,12 +13,11 @@ import {
 } from "components";
 import { registerSchema, type RegisterSchema } from "schemas";
 import api from "api";
-import { useAuth } from "hooks";
 // Local level
 import s from "./RegisterPage.module.css";
 
 const RegisterPage = () => {
-  const { setAccessToken } = useAuth();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -30,13 +30,8 @@ const RegisterPage = () => {
   const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
     try {
       await api.auth.register(data);
-      toast.success("Success");
-
-      const { accessToken } = await api.auth.login({
-        email: data.email,
-        password: data.password,
-      });
-      setAccessToken(accessToken);
+      toast.success("Account created");
+      navigate("/login");
     } catch (error) {
       toast.error((error as Error).message, { autoClose: 5000 });
     }
