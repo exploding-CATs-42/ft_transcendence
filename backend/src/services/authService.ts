@@ -35,6 +35,9 @@ function toPublicUser(user: User): User {
 }
 
 const REFRESH_TOKEN_LIFETIME_MS = getRefreshTokenLifetimeMs();
+const EXPIRED_SESSION_CLEANUP_INTERVAL_MS = 60_000;
+
+let lastExpiredSessionCleanupAt = 0;
 
 function getRefreshTokenExpiresAt(): Date {
   return new Date(Date.now() + REFRESH_TOKEN_LIFETIME_MS);
@@ -49,6 +52,18 @@ export async function deleteExpiredRefreshSessions(): Promise<number> {
     },
   });
   return result.count;
+}
+
+async function deleteExpiredRefreshSessionsIfDue(): Promise<void> {
+  const now = Date.now();
+
+  if (now - lastExpiredSessionCleanupAt < EXPIRED_SESSION_CLEANUP_INTERVAL_MS) {
+    return;
+  }
+
+  lastExpiredSessionCleanupAt = now;
+
+  await deleteExpiredRefreshSessions();
 }
 
 export async function registerUser(
@@ -168,7 +183,7 @@ export async function logoutUser(refreshToken: string): Promise<void> {
 export async function refreshSession(
   refreshToken: string,
 ): Promise<RefreshSessionResponse> {
-  await deleteExpiredRefreshSessions();
+  await deleteExpiredRefreshSessionsIfDue();
 
   let payload;
 
