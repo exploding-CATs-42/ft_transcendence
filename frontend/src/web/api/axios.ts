@@ -2,6 +2,12 @@
 import axios, { AxiosHeaders, type InternalAxiosRequestConfig } from "axios";
 // Project level
 import { getErrorMessage } from "utils";
+// Local level
+import {
+  clearStoredAccessToken,
+  getStoredAccessToken,
+  saveStoredAccessToken,
+} from "./authTokenStorage";
 
 const { VITE_API_BASE_URL } = import.meta.env;
 
@@ -25,6 +31,20 @@ const refreshAccessToken = async () => {
 
   return accessToken;
 };
+
+api.interceptors.request.use((config) => {
+  const accessToken = getStoredAccessToken();
+
+  config.headers = AxiosHeaders.from(config.headers);
+
+  if (accessToken) {
+    config.headers.set("Authorization", `Bearer ${accessToken}`);
+  } else {
+    config.headers.delete("Authorization");
+  }
+
+  return config;
+});
 
 api.interceptors.response.use(
   (res) => res,
@@ -58,7 +78,7 @@ api.interceptors.response.use(
         return Promise.reject(error);
       }
 
-      setAxiosToken(accessToken);
+      saveStoredAccessToken(accessToken);
       onAccessTokenRefresh?.(accessToken);
 
       originalRequest.headers = AxiosHeaders.from(originalRequest.headers);
@@ -76,13 +96,13 @@ api.interceptors.response.use(
   },
 );
 
-export const setAxiosToken = (token: string) => {
-  api.defaults.headers.common.Authorization = `Bearer ${token}`;
+export const saveAccessTokenForRequests = (token: string) => {
+  saveStoredAccessToken(token);
 };
 
-export const clearAxiosToken = () => {
+export const clearAccessTokenForRequests = () => {
   authVersion += 1;
-  delete api.defaults.headers.common.Authorization;
+  clearStoredAccessToken();
 };
 
 export const setAccessTokenRefreshHandler = (
