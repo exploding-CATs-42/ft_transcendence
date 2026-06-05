@@ -22,6 +22,15 @@ import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = getRefreshTokenLifetimeMs();
 
+function getRefreshTokenClearCookieOptions() {
+  return {
+    httpOnly: true,
+    secure: process.env["NODE_ENV"] === "production",
+    sameSite: "lax" as const,
+    path: "/api/users",
+  };
+}
+
 function getRefreshTokenCookieOptions() {
   return {
     httpOnly: true,
@@ -109,12 +118,10 @@ export async function logoutController(
 
   try {
     await logoutUser(refreshToken);
-    res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, {
-      httpOnly: true,
-      secure: process.env["NODE_ENV"] === "production",
-      sameSite: "lax",
-      path: "/api/users",
-    });
+    res.clearCookie(
+      REFRESH_TOKEN_COOKIE_NAME,
+      getRefreshTokenClearCookieOptions(),
+    );
 
     return res.status(204).send();
   } catch (error) {
