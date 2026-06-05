@@ -1,6 +1,6 @@
 import { FriendshipStatus } from "../generated/prisma/client";
 import { publicProfileSelect, prisma } from "../lib/prisma";
-import type { FriendDirection, FriendListItem } from "../types/auth";
+import { FriendDirection, FriendListItem } from "../types";
 import { toFriendUser } from "../utils/users";
 
 export class FriendsServiceError extends Error {
