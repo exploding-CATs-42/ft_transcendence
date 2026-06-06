@@ -1,3 +1,5 @@
+// Libraries
+import clsx from "clsx";
 // Project level
 import type { DevProfile } from "types";
 // CSS
@@ -12,17 +14,29 @@ const ContactCard = (props: DevProfile) => {
 
       <ul className={s.socialsList}>
         <li>
-          <a className={s.socialLink} href={linkedInUrl} target="_blank">
+          <a
+            className={clsx(s.socialLink, s.linkedIn)}
+            href={linkedInUrl}
+            target="_blank"
+          >
             LinkedIn
           </a>
         </li>
         <li>
-          <a className={s.socialLink} href={githubUrl} target="_blank">
+          <a
+            className={clsx(s.socialLink, s.gitHub)}
+            href={githubUrl}
+            target="_blank"
+          >
             GitHub
           </a>
         </li>
         <li>
-          <a className={s.socialLink} href={`mailto:${email}`} target="_blank">
+          <a
+            className={clsx(s.socialLink, s.email)}
+            href={`mailto:${email}`}
+            target="_blank"
+          >
             Email
           </a>
         </li>
