@@ -18,8 +18,23 @@
   margin-bottom: 24px;
 }
 
+.description {
+  font-size: 20px;
+}
+
 @media only screen and (min-width: 480px) {
   .sectionHeader {
     font-size: 36px;
+  }
+
+  .description {
+    font-size: 24px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .description {
+    font-size: 30px;
+    text-align: center;
   }
 }
