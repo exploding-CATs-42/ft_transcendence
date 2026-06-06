@@ -1,5 +1,7 @@
 // Libraries
 import { useEffect } from "react";
+// CSS
+import s from "./RulesPage.module.css";
 
 const RulesPage = () => {
   const tutorialVideoLink =
@@ -37,12 +39,14 @@ const RulesPage = () => {
   }, []);
 
   return (
-    <iframe
-      src={tutorialVideoLink}
-      allowFullScreen={true}
-      width={960}
-      height={540}
-    />
+    <div className={s.pageContainer}>
+      <iframe
+        src={tutorialVideoLink}
+        allowFullScreen={true}
+        width={960}
+        height={540}
+      />
+    </div>
   );
 };
 
