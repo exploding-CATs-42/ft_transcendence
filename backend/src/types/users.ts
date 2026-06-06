@@ -8,8 +8,10 @@ export interface OnlineStatus {
   lastSeenAt: Date | null;
 }
 
+export type UserId = string;
+
 export interface User {
-  id: string;
+  id: UserId;
   email: string;
   username: string;
   avatarUrl: string | null;

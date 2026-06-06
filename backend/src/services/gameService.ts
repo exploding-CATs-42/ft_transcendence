@@ -21,7 +21,7 @@ import GameStore from "../utils/gameStore";
 import { toWaitingPlayerView } from "../game/mappers";
 import { attachBroadcaster } from "../game/broadcaster";
 import { ensureUserExists } from "./usersService";
-import { UserId } from "../types/auth";
+import { UserId } from "../types/users";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
