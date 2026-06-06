@@ -40,7 +40,7 @@ export function withErrorHandler<T>(
       if (error instanceof SocketError || error instanceof ValidationError) {
         socket.emit(errorEvent, {
           message: error.message,
-          details: error.details,
+          errors: error.errors,
         });
 
         return;
