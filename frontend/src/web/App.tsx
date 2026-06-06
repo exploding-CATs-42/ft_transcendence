@@ -16,6 +16,7 @@ const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/RegisterPage/RegisterPage"));
 const ChatPage = lazy(() => import("./pages/ChatPage/ChatPage"));
 const RulesPage = lazy(() => import("./pages/RulesPage/RulesPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage/AboutPage"));
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         {/* Public routes */}
         <Route index element={<HomePage />} />
         <Route path="rules" element={<RulesPage />} />
+        <Route path="about" element={<AboutPage />} />
 
         {/* Login/Register routes */}
         <Route element={<AuthRoute />}>
