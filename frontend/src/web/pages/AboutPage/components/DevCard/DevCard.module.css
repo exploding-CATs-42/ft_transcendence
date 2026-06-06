@@ -1,0 +1,10 @@
+* {
+  --white-grey: rgb(203, 212, 219);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--white-grey);
+}
