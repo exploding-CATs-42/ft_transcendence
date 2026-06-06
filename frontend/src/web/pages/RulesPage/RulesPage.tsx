@@ -41,12 +41,13 @@ const RulesPage = () => {
   return (
     <div className={s.pageContainer}>
       <p className={s.topText}>You can watch it</p>
-      <iframe
-        src={tutorialVideoLink}
-        allowFullScreen={true}
-        width={960}
-        height={540}
-      />
+      <div className={s.videoWrapper}>
+        <iframe
+          className={s.video}
+          src={tutorialVideoLink}
+          allowFullScreen={true}
+        />
+      </div>
       <p className={s.bottomText}>or download full rulebook as a PDF</p>
     </div>
   );
