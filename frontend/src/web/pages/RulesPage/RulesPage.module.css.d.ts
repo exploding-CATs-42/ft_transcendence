@@ -2,6 +2,7 @@ declare const styles: {
   readonly "bottomText": string;
   readonly "downloadLink": string;
   readonly "pageContainer": string;
+  readonly "pdfDownloadContainer": string;
   readonly "playButton": string;
   readonly "poster": string;
   readonly "posterContainer": string;
