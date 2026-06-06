@@ -20,6 +20,23 @@
   width: 100%;
 }
 
+.socialsList {
+  display: flex;
+  width: 100%;
+
+  & > li {
+    width: 100%;
+  }
+}
+
+.socialLink {
+  display: block;
+  padding: 4px 10px;
+  text-align: center;
+
+  background-color: var(--black);
+}
+
 .name {
   font-family: "Playpen sans";
   text-align: center;
