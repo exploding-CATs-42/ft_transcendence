@@ -1,7 +1,5 @@
 // Libraries
 import { useEffect } from "react";
-// Project level
-import { PdfViewer } from "components";
 
 const RulesPage = () => {
   useEffect(() => {
@@ -35,7 +33,7 @@ const RulesPage = () => {
     };
   }, []);
 
-  return <PdfViewer />;
+  return <></>;
 };
 
 export default RulesPage;
