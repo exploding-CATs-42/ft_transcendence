@@ -1,7 +1,8 @@
 // Libraries
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 // Project level
 import { Icon } from "components";
+import { PlayIcon } from "assets";
 // Local level
 import { Poster } from "./components";
 // CSS
@@ -11,7 +12,7 @@ const RulesPage = () => {
   const tutorialVideoLink =
     "https://www.youtube.com/embed/rcVpTb-iPoQ?playsinline=1&amp;autoplay=1&amp;rel=0&amp;";
 
-  const isPlaying = false;
+  const [isPlaying, setIsPlaying] = useState(false);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -55,7 +56,17 @@ const RulesPage = () => {
             allowFullScreen={true}
           />
         ) : (
-          <Poster className={s.poster} />
+          <div className={s.posterContainer}>
+            <Poster className={s.poster} />
+            <button
+              className={s.playButton}
+              type="button"
+              title="Play video"
+              onClick={() => setIsPlaying(true)}
+            >
+              <PlayIcon width={64} height={64} />
+            </button>
+          </div>
         )}
       </div>
       <p className={s.bottomText}>or download full rulebook as a PDF</p>
