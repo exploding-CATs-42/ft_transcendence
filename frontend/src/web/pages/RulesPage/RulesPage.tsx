@@ -47,6 +47,7 @@ const RulesPage = () => {
         width={960}
         height={540}
       />
+      <p className={s.bottomText}>or download full rulebook as a PDF</p>
     </div>
   );
 };

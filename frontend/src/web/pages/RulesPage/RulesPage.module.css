@@ -12,14 +12,27 @@
   text-align: center;
 }
 
+.bottomText {
+  font-size: 24px;
+  text-align: center;
+}
+
 @media only screen and (min-width: 480px) {
   .topText {
     font-size: 36px;
+  }
+
+  .bottomText {
+    font-size: 30px;
   }
 }
 
 @media only screen and (min-width: 768px) {
   .topText {
     font-size: 48px;
+  }
+
+  .bottomText {
+    font-size: 36px;
   }
 }
