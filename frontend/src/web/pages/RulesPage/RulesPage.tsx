@@ -70,11 +70,13 @@ const RulesPage = () => {
           </div>
         )}
       </div>
-      <p className={s.bottomText}>or download full rulebook as a PDF</p>
-      <a className={s.downloadLink} href="rules.pdf" target="_blank">
-        Download
-        <Icon name="download" width={20} height={20} />
-      </a>
+      <div className={s.pdfDownloadContainer}>
+        <p className={s.bottomText}>or download full rulebook as a PDF</p>
+        <a className={s.downloadLink} href="rules.pdf" target="_blank">
+          Download
+          <Icon name="download" width={20} height={20} />
+        </a>
+      </div>
     </div>
   );
 };
