@@ -30,6 +30,12 @@
   border-radius: 40px;
 }
 
+.poster {
+  height: 100%;
+  width: 100%;
+  border-radius: 40px;
+}
+
 .bottomText {
   font-size: 24px;
   text-align: center;
