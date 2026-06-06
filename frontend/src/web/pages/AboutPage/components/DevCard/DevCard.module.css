@@ -2,6 +2,8 @@
   --white: rgb(255, 255, 255);
   --white-grey: rgb(203, 212, 219);
   --black: rgb(0, 0, 0);
+  --red: rgb(221, 67, 67);
+  --blue: rgb(0, 119, 181);
 }
 
 .card {
@@ -33,8 +35,18 @@
   display: block;
   padding: 4px 10px;
   text-align: center;
+}
 
+.linkedIn {
+  background-color: var(--blue);
+}
+
+.gitHub {
   background-color: var(--black);
+}
+
+.email {
+  background-color: var(--red);
 }
 
 .name {
