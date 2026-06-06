@@ -26,6 +26,17 @@
   }
 }
 
+.contactsList {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.contactsList > li {
+  width: 100%;
+}
+
 @media only screen and (min-width: 480px) {
   .sectionHeader {
     font-size: 36px;
@@ -40,5 +51,21 @@
   .description {
     font-size: 30px;
     text-align: center;
+  }
+
+  .contactsList > li {
+    width: calc((100% - 32px) / 2);
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .contactsList > li {
+    width: calc((100% - 32px * 2) / 3);
+  }
+}
+
+@media only screen and (min-width: 1280px) {
+  .contactsList > li {
+    width: calc((100% - 32px * 4) / 5);
   }
 }
