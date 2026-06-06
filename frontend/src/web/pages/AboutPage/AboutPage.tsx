@@ -31,6 +31,7 @@ const AboutPage = () => {
           .
         </p>
       </section>
+      <section className={s.section}></section>
     </div>
   );
 };
