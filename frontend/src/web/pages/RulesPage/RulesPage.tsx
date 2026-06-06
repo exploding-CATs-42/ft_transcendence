@@ -2,6 +2,9 @@
 import { useEffect } from "react";
 
 const RulesPage = () => {
+  const tutorialVideoLink =
+    "https://www.youtube.com/embed/rcVpTb-iPoQ?playsinline=1&amp;autoplay=1&amp;rel=0&amp;";
+
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -33,7 +36,14 @@ const RulesPage = () => {
     };
   }, []);
 
-  return <></>;
+  return (
+    <iframe
+      src={tutorialVideoLink}
+      allowFullScreen={true}
+      width={960}
+      height={540}
+    />
+  );
 };
 
 export default RulesPage;
