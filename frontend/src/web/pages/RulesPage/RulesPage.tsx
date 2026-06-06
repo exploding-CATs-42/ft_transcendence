@@ -54,6 +54,7 @@ const RulesPage = () => {
             className={s.video}
             src={tutorialVideoLink}
             allowFullScreen={true}
+            allow="autoplay"
           />
         ) : (
           <div className={s.posterContainer}>
