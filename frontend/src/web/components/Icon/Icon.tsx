@@ -29,7 +29,8 @@ interface Props {
     | "percent"
     | "medal"
     | "bomb"
-    | "gamepad";
+    | "gamepad"
+    | "download";
 }
 
 const Icon = ({ name, width, height, id, className, stroke, fill }: Props) => {
