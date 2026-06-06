@@ -1,5 +1,7 @@
 // Libraries
 import { useEffect } from "react";
+// Project level
+import { Icon } from "components";
 // CSS
 import s from "./RulesPage.module.css";
 
@@ -51,6 +53,7 @@ const RulesPage = () => {
       <p className={s.bottomText}>or download full rulebook as a PDF</p>
       <a className={s.downloadLink} href="rules.pdf" target="_blank">
         Download
+        <Icon name="download" width={20} height={20} />
       </a>
     </div>
   );

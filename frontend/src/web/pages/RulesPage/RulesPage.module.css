@@ -36,10 +36,18 @@
 }
 
 .downloadLink {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+
   background-color: var(--throw-throw-burrito);
   border-radius: 24px;
   padding: 4px 24px;
   font-size: 24px;
+
+  & > svg {
+    fill: var(--off-white);
+  }
 }
 
 @media only screen and (min-width: 480px) {
