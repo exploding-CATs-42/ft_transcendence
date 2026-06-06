@@ -34,6 +34,7 @@ function App() {
 
         {/* Private routes */}
         <Route element={<PrivateRoute />}>
+          <Route path="users/:userId" element={<ProfilePage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="lobby" element={<LobbyPage />} />
           <Route path="game" element={<GamePage />} />
