@@ -31,7 +31,9 @@ const AboutPage = () => {
           .
         </p>
       </section>
-      <section className={s.section}></section>
+      <section className={s.section}>
+        <h2 className={s.sectionHeader}>Our team</h2>
+      </section>
     </div>
   );
 };
