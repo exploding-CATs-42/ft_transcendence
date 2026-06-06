@@ -40,6 +40,7 @@ const RulesPage = () => {
 
   return (
     <div className={s.pageContainer}>
+      <p className={s.topText}>You can watch it</p>
       <iframe
         src={tutorialVideoLink}
         allowFullScreen={true}
