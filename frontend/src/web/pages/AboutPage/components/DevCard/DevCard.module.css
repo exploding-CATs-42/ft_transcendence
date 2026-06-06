@@ -7,6 +7,9 @@
   flex-direction: column;
 
   background-color: var(--white-grey);
+
+  border-radius: 20px;
+  overflow: hidden;
 }
 
 .photo {
