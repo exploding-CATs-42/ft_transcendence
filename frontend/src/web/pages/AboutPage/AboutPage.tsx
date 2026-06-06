@@ -1,3 +1,7 @@
+// Project level
+import { PROFILES as profiles } from "constants";
+// Local level
+import { DevCard } from "./components";
 // CSS
 import s from "./AboutPage.module.css";
 
@@ -33,6 +37,13 @@ const AboutPage = () => {
       </section>
       <section className={s.section}>
         <h2 className={s.sectionHeader}>Our team</h2>
+        <ul className={s.contactsList}>
+          {profiles.map((profile, index) => (
+            <li key={index}>
+              <DevCard {...profile} />
+            </li>
+          ))}
+        </ul>
       </section>
     </div>
   );
