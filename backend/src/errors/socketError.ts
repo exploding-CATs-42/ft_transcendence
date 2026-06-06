@@ -1,11 +1,11 @@
 export class SocketError extends Error {
-  public readonly details?: unknown;
+  public readonly errors?: unknown;
 
-  constructor(message: string, details?: unknown) {
+  constructor(message: string, errors?: unknown) {
     super(message);
 
     this.name = "SocketError";
-    this.details = details;
+    this.errors = errors;
 
     Object.setPrototypeOf(this, SocketError.prototype);
   }

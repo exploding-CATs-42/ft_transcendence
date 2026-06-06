@@ -1,12 +1,12 @@
 export class ApiError extends Error {
   public readonly statusCode: number;
-  public readonly details?: unknown;
+  public readonly errors?: unknown;
 
-  constructor(message: string, statusCode = 400, details?: unknown) {
+  constructor(message: string, statusCode = 400, errors?: unknown) {
     super(message);
 
     this.statusCode = statusCode;
-    this.details = details;
+    this.errors = errors;
 
     this.name = new.target.name;
   }

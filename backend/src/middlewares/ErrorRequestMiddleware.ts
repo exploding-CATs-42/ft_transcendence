@@ -5,7 +5,7 @@ export const errorMiddleware: ErrorRequestHandler = (error, _, res, __) => {
   if (error instanceof ApiError) {
     res.status(error.statusCode).json({
       message: error.message,
-      details: error.details,
+      errors: error.errors,
     });
     return;
   }
