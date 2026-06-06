@@ -2,7 +2,7 @@
   position: relative;
 
   min-width: 300px;
-  min-height: 400px;
+  min-height: 600px;
 
   margin: 20px;
   padding: 20px;
@@ -12,6 +12,15 @@
 
   background-color: var(--modal-window-background);
   color: var(--off-white);
+}
+
+.editPlayerForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 15px;
 }
 
 .editPlayerButton {
@@ -42,4 +51,22 @@
 .editPlayerButton:disabled {
   cursor: not-allowed;
   opacity: 0.7;
+}
+
+.modalTitle {
+  font-family: "Shantell Sans", sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+}
+
+.inputContainer {
+  width: 100%;
+}
+
+@media only screen and (min-width: 768px) {
 }
