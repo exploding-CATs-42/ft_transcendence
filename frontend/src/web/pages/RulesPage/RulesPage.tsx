@@ -2,12 +2,16 @@
 import { useEffect } from "react";
 // Project level
 import { Icon } from "components";
+// Local level
+import { Poster } from "./components";
 // CSS
 import s from "./RulesPage.module.css";
 
 const RulesPage = () => {
   const tutorialVideoLink =
     "https://www.youtube.com/embed/rcVpTb-iPoQ?playsinline=1&amp;autoplay=1&amp;rel=0&amp;";
+
+  const isPlaying = false;
 
   useEffect(() => {
     const html = document.documentElement;
@@ -44,11 +48,15 @@ const RulesPage = () => {
     <div className={s.pageContainer}>
       <p className={s.topText}>You can watch it</p>
       <div className={s.videoWrapper}>
-        <iframe
-          className={s.video}
-          src={tutorialVideoLink}
-          allowFullScreen={true}
-        />
+        {isPlaying ? (
+          <iframe
+            className={s.video}
+            src={tutorialVideoLink}
+            allowFullScreen={true}
+          />
+        ) : (
+          <Poster className={s.poster} />
+        )}
       </div>
       <p className={s.bottomText}>or download full rulebook as a PDF</p>
       <a className={s.downloadLink} href="rules.pdf" target="_blank">
