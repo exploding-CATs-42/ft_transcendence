@@ -49,6 +49,9 @@ const RulesPage = () => {
         />
       </div>
       <p className={s.bottomText}>or download full rulebook as a PDF</p>
+      <a className={s.downloadLink} href="rules.pdf" target="_blank">
+        Download
+      </a>
     </div>
   );
 };
