@@ -8,3 +8,8 @@
 
   background-color: var(--white-grey);
 }
+
+.photo {
+  object-fit: contain;
+  width: 100%;
+}
