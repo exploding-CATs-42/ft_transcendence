@@ -77,14 +77,6 @@ export async function registerUser(
     throw new AuthServiceError("Email already in use", 409);
   }
 
-  const existingByUsername = await prisma.user.findUnique({
-    where: { username: input.username },
-  });
-
-  if (existingByUsername) {
-    throw new AuthServiceError("Username already in use", 409);
-  }
-
   const passwordHash = await hashPassword(input.password);
 
   const user = await prisma.user.create({
