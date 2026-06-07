@@ -1,5 +1,3 @@
-import { errorMiddleware } from "../../middlewares";
-
 import {
   getMeController,
   updateMeController,
@@ -12,5 +10,3 @@ export const meRouter = createAuthenticatedRouter();
 
 meRouter.patch("/", errorHandler(updateMeController));
 meRouter.get("/", errorHandler(getMeController));
-
-meRouter.use(errorMiddleware);

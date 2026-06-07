@@ -4,7 +4,6 @@ import {
   getGameByIdController,
   getGamesController,
 } from "../../controllers/gamesController";
-import { errorMiddleware } from "../../middlewares";
 import { errorHandler } from "../../utils/errorHandler";
 import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
 
@@ -29,10 +28,3 @@ gamesRouter.get("/", errorHandler(getGamesController));
 gamesRouter.get("/:gameId", errorHandler(getGameByIdController));
 gamesRouter.post("/", errorHandler(createGameController));
 gamesRouter.delete("/:gameId", errorHandler(deleteGameController));
-
-/**
- * Error handling middleware for all game routes.
- * It catches all errors thrown in route handlers,
- * allowing to avoid the duplicated try catch statements
- */
-gamesRouter.use(errorMiddleware);
