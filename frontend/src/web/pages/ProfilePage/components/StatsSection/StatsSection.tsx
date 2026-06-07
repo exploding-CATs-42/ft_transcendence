@@ -16,7 +16,10 @@ const StatsSection = ({ stats }: Props) => {
           <li className={s.item} key={stat.id}>
             <Icon name={stat.icon} height={50} width={50} />
             <div className={s.flexContainer}>
-              <span className={s.amount}>{stat.amount}</span>
+              <span className={s.amount}>
+                {stat.amount}
+                {stat.icon === "percent" && "%"}
+              </span>
               <span className={s.name}>{stat.name}</span>
             </div>
           </li>
