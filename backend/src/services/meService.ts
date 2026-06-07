@@ -7,12 +7,9 @@ import { comparePassword, hashPassword } from "../utils/hash";
 import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
 import { getFinishedGamesStats } from "./usersService";
 
-export class MeServiceError extends Error {
-  public statusCode: number;
-
+export class MeServiceError extends ApiError {
   constructor(message: string, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
+    super(message, statusCode);
   }
 }
 
