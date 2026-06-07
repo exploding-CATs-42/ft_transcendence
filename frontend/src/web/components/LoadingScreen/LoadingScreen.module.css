@@ -1,0 +1,98 @@
+.loadingScreen {
+  height: 100vh;
+  display: flex;
+
+  flex-direction: column;
+  justify-content: center;
+
+  align-items: center;
+}
+
+.loaderGif {
+  width: 120px;
+  height: 120px;
+}
+
+.loader {
+  position: relative;
+  width: 64px;
+  height: 64px;
+
+  background-color: var(--shadow);
+  transform: rotate(45deg);
+
+  overflow: hidden;
+}
+
+.loader:after {
+  content: "";
+  position: absolute;
+
+  inset: 8px;
+  background: var(--off-white);
+}
+
+.loader:before {
+  content: "";
+  position: absolute;
+  inset: -15px;
+  margin: auto;
+  background: var(--exploding-kittens);
+  animation: diamondLoader 2s linear infinite;
+}
+@keyframes diamondLoader {
+  0%,
+  10% {
+    transform: translate(-64px, -64px) rotate(-45deg);
+  }
+  90%,
+  100% {
+    transform: translate(0px, 0px) rotate(-45deg);
+  }
+}
+
+.loadingText {
+  position: relative;
+  margin-top: 12px;
+
+  font-size: 50px;
+  font-family: "Shantell Sans", sans-serif;
+  color: var(--off-white);
+
+  text-shadow: 3px 3px 0 var(--shadow);
+  font-weight: 500;
+}
+
+.loadingText::after {
+  content: "";
+
+  width: 5px;
+  height: 5px;
+
+  background: currentColor;
+  position: absolute;
+
+  bottom: 18px;
+  right: -10px;
+
+  box-sizing: border-box;
+  animation: animloader 1s linear infinite;
+}
+
+@keyframes animloader {
+  0% {
+    box-shadow:
+      10px 0 rgba(255, 255, 255, 0),
+      20px 0 rgba(255, 255, 255, 0);
+  }
+  50% {
+    box-shadow:
+      10px 0 white,
+      20px 0 rgba(255, 255, 255, 0);
+  }
+  100% {
+    box-shadow:
+      10px 0 white,
+      20px 0 white;
+  }
+}
