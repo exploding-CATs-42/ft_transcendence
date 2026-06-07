@@ -11,7 +11,7 @@ export type AsyncController = (
   res: Response,
 ) => Promise<void>;
 
-export function asyncHandler(controller: AsyncController) {
+export function errorHandler(controller: AsyncController) {
   return (
     req: AuthenticatedRequest,
     res: Response,
