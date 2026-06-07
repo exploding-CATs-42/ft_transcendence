@@ -11,7 +11,6 @@ import {
 } from "./components/CreateTableModal";
 import { ExistingGameModal } from "./components/ExistingGameModal";
 import { JoinGameModal } from "./components/JoinGameModal";
-import { matchesMock } from "./mocks";
 import s from "./LobbyPage.module.css";
 
 type ExistingGame = {
@@ -43,13 +42,41 @@ const getExistingGameIdFromError = (error: unknown) => {
 };
 
 const LobbyPage = () => {
-  const [matches, setMatches] = useState<LobbyMatch[]>(matchesMock);
+  const [matches, setMatches] = useState<LobbyMatch[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
   const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadGames = async () => {
+      try {
+        const games = await api.games.getAll();
+
+        if (ignore) return;
+
+        setMatches(
+          games.map((game) => ({
+            gameId: game.id,
+            gameName: game.name,
+            players: [],
+          })),
+        );
+      } catch (error) {
+        console.error("Failed to load lobby games:", error);
+      }
+    };
+
+    void loadGames();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   useEffect(() => {
     let ignore = false;
