@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import api from "api";
@@ -13,7 +13,6 @@ import type { UserGameHistoryItem } from "components/MatchListItem/types";
 import { buildStats } from "./utils/buildStats";
 
 const ProfilePage = () => {
-  const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState<ProfileUser | null>(null);
@@ -33,25 +32,23 @@ const ProfilePage = () => {
         const matchesData = await api.users.getUserGames(userData.id);
         setMatches(matchesData);
         setStats(buildStats(userData.id, matchesData));
-
-        setLoading(false);
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         toast(errorMessage);
-
-        navigate("/");
+      } finally {
+        setLoading(false);
       }
     }
 
     loadProfile();
-  }, [navigate]);
+  }, []);
 
   if (loading) {
     return <div>Loading...</div>;
   }
 
   if (!user) {
-    return null;
+    return <Navigate to="/" replace />;
   }
 
   return (
