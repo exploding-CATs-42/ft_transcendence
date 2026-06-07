@@ -29,18 +29,18 @@ const ProfilePage = () => {
   const { pathname } = useLocation();
   const isMyProfile = pathname === "/profile";
 
-  async function getUserData(): Promise<ProfileUser | MyProfileUser | null> {
-    if (isMyProfile) {
-      return api.me.getMe();
-    }
-
-    if (userId) {
-      return api.users.getUserById(userId);
-    }
-    return null;
-  }
-
   useEffect(() => {
+    async function getUserData(): Promise<ProfileUser | MyProfileUser | null> {
+      if (isMyProfile) {
+        return api.me.getMe();
+      }
+
+      if (userId) {
+        return api.users.getUserById(userId);
+      }
+      return null;
+    }
+
     async function loadProfile() {
       try {
         const userData = await getUserData();
