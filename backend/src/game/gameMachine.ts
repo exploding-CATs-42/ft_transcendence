@@ -16,7 +16,7 @@ import {
   GameEmitter,
   gameStarted,
 } from "./emitters";
-import { GameStateType } from "./states";
+import { GAME_MACHINE_ID, GameStateType } from "./states";
 
 export interface GameContext {
   players: Player[];
@@ -40,7 +40,7 @@ export const gameMachine = setup({
     [GameGuardType.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
   },
 }).createMachine({
-  id: "game",
+  id: GAME_MACHINE_ID,
   initial: GameStateType.WAITING,
   context: () => ({
     players: [],
