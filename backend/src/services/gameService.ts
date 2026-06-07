@@ -33,10 +33,12 @@ function ensureGameExists(gameId: string) {
   return game;
 }
 
-export async function getGames(userId: UserId): Promise<GameInstance[]> {
+export async function getGames(userId: UserId): Promise<GameInfo[]> {
   await ensureUserExists(userId);
 
-  return GameStore.getAllGames();
+  return GameStore.getAllGames().map((game) => {
+    return game.info;
+  });
 }
 
 export async function getGameById(

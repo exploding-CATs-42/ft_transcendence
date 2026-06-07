@@ -12,13 +12,6 @@ export type GameInfo = {
   createdAt: number;
 };
 
-export type GameState = {
-  gameId: string;
-  name: string;
-  maxPlayers: number;
-  players: unknown[];
-};
-
 const create = async (body: CreateGameReqBody): Promise<GameInfo> => {
   const result = await api.post<GameInfo>("/games", body);
   return result.data;
@@ -29,7 +22,13 @@ const getCurrent = async (): Promise<GameInfo | null> => {
   return result.data;
 };
 
+const getAll = async (): Promise<GameInfo[]> => {
+  const result = await api.get<GameInfo[]>("/games");
+  return result.data;
+};
+
 export default {
   create,
   getCurrent,
+  getAll,
 };
