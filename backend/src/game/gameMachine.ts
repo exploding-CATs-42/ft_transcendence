@@ -7,7 +7,7 @@ import {
   removePlayerConfirmation,
 } from "./actions";
 import { Player } from "./types/player";
-import { GameEvent } from "./events";
+import { GameEvent, GameEventType } from "./events";
 import { GameGuardType, hasEnoughPlayers } from "./guards";
 import { START_GAME_COUNTDOWN_MS } from "../constants/game";
 import {
@@ -55,16 +55,16 @@ export const gameMachine = setup({
             target: GameStatePath.WAITING_STARTING,
           },
           on: {
-            JOIN_GAME: {
+            [GameEventType.JOIN_GAME]: {
               actions: GameActionType.ADD_PLAYER,
             },
-            LEAVE_GAME: {
+            [GameEventType.LEAVE_GAME]: {
               actions: GameActionType.REMOVE_PLAYER,
             },
-            CONFIRM_START: {
+            [GameEventType.CONFIRM_START]: {
               actions: GameActionType.ADD_PLAYER_CONFIRMATION,
             },
-            CANCEL_START: {
+            [GameEventType.CANCEL_START]: {
               actions: GameActionType.REMOVE_PLAYER_CONFIRMATION,
             },
           },
@@ -77,15 +77,15 @@ export const gameMachine = setup({
             },
           },
           on: {
-            JOIN_GAME: {
+            [GameEventType.JOIN_GAME]: {
               target: GameStatePath.WAITING_CONFIRMING,
               actions: [GameActionType.ADD_PLAYER, emit(countdownCanceled)],
             },
-            LEAVE_GAME: {
+            [GameEventType.LEAVE_GAME]: {
               target: GameStatePath.WAITING_CONFIRMING,
               actions: [GameActionType.REMOVE_PLAYER, emit(countdownCanceled)],
             },
-            CANCEL_START: {
+            [GameEventType.CANCEL_START]: {
               target: GameStatePath.WAITING_CONFIRMING,
               actions: [
                 GameActionType.REMOVE_PLAYER_CONFIRMATION,
