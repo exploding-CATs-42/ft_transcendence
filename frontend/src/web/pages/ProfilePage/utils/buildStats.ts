@@ -30,15 +30,15 @@ export function buildStats(
     },
     {
       id: 2,
-      icon: "percent",
-      name: "Success rate",
-      amount: successRate,
-    },
-    {
-      id: 3,
       icon: "gamepad",
       name: "Games played",
       amount: totalMatches,
+    },
+    {
+      id: 3,
+      icon: "percent",
+      name: "Success rate",
+      amount: successRate,
     },
   ];
 }
