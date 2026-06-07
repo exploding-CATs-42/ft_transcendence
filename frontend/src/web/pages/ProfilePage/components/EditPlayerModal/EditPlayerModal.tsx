@@ -10,13 +10,15 @@ import {
 import s from "./EditPlayerModal.module.css";
 import type { MyProfileUser } from "pages/ProfilePage/types";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
-import type { UseFormRegister } from "react-hook-form";
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface Props {
   isOpen: boolean;
   toggleModal: () => void;
   onSubmit: () => void;
   user: MyProfileUser;
+  disabled: boolean;
+  errors: FieldErrors<UpdateMeRequestBody>;
   register: UseFormRegister<UpdateMeRequestBody>;
 }
 
@@ -25,6 +27,8 @@ const EditPlayerModal = ({
   toggleModal,
   onSubmit,
   user,
+  disabled,
+  errors,
   register,
 }: Props) => {
   return (
@@ -37,23 +41,41 @@ const EditPlayerModal = ({
         <h2 className={s.modalTitle}> Profile Settings </h2>
         <Avatar className={s.avatar} variant="profile" src={user.avatarUrl} />
 
-        <FormField>
-          <EmailInput {...register("email")} />
+        <FormField error={errors.email?.message}>
+          <EmailInput
+            {...register("email")}
+            status={errors.email ? "error" : "normal"}
+          />
         </FormField>
 
-        <FormField>
-          <NameInput {...register("username")} />
+        <FormField error={errors.username?.message}>
+          <NameInput
+            {...register("username")}
+            status={errors.username ? "error" : "normal"}
+          />
         </FormField>
 
-        <FormField>
-          <PasswordInput {...register("passwordOld")} />
+        <FormField error={errors.passwordOld?.message}>
+          <PasswordInput
+            {...register("passwordOld")}
+            status={errors.passwordOld ? "error" : "normal"}
+          />
         </FormField>
 
-        <FormField>
-          <PasswordInput {...register("passwordNew")} />
+        <FormField error={errors.passwordNew?.message}>
+          <PasswordInput
+            {...register("passwordNew")}
+            status={errors.passwordNew ? "error" : "normal"}
+          />
         </FormField>
 
-        <Button className={s.editPlayerButton} type="submit">
+        {errors.root && <p>{errors.root.message}</p>}
+
+        <Button
+          className={s.editPlayerButton}
+          type="submit"
+          disabled={disabled}
+        >
           Update user
         </Button>
       </form>
