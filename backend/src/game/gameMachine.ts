@@ -7,7 +7,7 @@ import {
 } from "./actions";
 import { Player } from "./types/player";
 import { GameEvent } from "./events";
-import { hasEnoughPlayers } from "./guards";
+import { GameGuardType, hasEnoughPlayers } from "./guards";
 import { START_GAME_COUNTDOWN_MS } from "../constants/game";
 import {
   countdownCanceled,
@@ -33,7 +33,7 @@ export const gameMachine = setup({
     removePlayerConfirmation: assign(removePlayerConfirmation),
   },
   guards: {
-    hasEnoughPlayers,
+    [GameGuardType.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
   },
 }).createMachine({
   id: "game",
@@ -47,7 +47,7 @@ export const gameMachine = setup({
       states: {
         confirming: {
           always: {
-            guard: "hasEnoughPlayers",
+            guard: GameGuardType.HAS_ENOUGH_PLAYERS,
             target: "starting",
           },
           on: {
