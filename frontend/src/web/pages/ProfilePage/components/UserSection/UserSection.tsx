@@ -1,5 +1,9 @@
+import { useForm, type SubmitHandler } from "react-hook-form";
+import { toast } from "react-toastify";
+import type { Dispatch, SetStateAction } from "react";
 // Project level
 import { Avatar, Button, Icon, Section } from "components";
+import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 import { useAuth, useModal } from "hooks";
 import api from "api";
 // Local level
@@ -11,13 +15,15 @@ type Props =
   | {
       isMyProfile: true;
       user: MyProfileUser;
+      setUser: Dispatch<SetStateAction<ProfileUser | null>>;
     }
   | {
       isMyProfile: false;
       user: ProfileUser;
+      setUser?: undefined;
     };
 
-const UserSection = ({ user, isMyProfile }: Props) => {
+const UserSection = ({ user, setUser, isMyProfile }: Props) => {
   const { clearAccessToken } = useAuth();
   const [isOpenEditPlayerModal, toggleOpenEditPlayerModal] = useModal();
 
@@ -31,7 +37,31 @@ const UserSection = ({ user, isMyProfile }: Props) => {
     }
   };
 
-  const onSubmit = async () => {};
+  const { register, handleSubmit } = useForm<UpdateMeRequestBody>();
+
+  const emptyToUndefined = (value: string | null | undefined) =>
+    value === "" || value == null ? undefined : value;
+
+  const valuesToUpdate = (data: UpdateMeRequestBody) => ({
+    username: emptyToUndefined(data.username),
+    email: emptyToUndefined(data.email),
+    passwordNew: emptyToUndefined(data.passwordNew),
+    passwordOld: emptyToUndefined(data.passwordOld),
+    avatarUrl: emptyToUndefined(data.avatarUrl),
+  });
+
+  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (data) => {
+    try {
+      const updates = valuesToUpdate(data);
+      console.log(updates);
+      const updatedUser = await api.me.updateMe(updates);
+
+      if (setUser) setUser((p) => (p ? { ...p, ...updatedUser } : null));
+      toast.success("Success");
+    } catch (error) {
+      console.error(error);
+    }
+  };
 
   return (
     <Section className={s.section}>
@@ -58,10 +88,9 @@ const UserSection = ({ user, isMyProfile }: Props) => {
         <EditPlayerModal
           isOpen={isOpenEditPlayerModal}
           toggleModal={() => toggleOpenEditPlayerModal(false)}
-          onSubmit={() => {
-            onSubmit();
-          }}
+          onSubmit={handleSubmit(onSubmit)}
           user={user}
+          register={register}
         />
       )}
     </Section>

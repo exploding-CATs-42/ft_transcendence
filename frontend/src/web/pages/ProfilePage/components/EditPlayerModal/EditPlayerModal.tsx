@@ -9,47 +9,51 @@ import {
 } from "components";
 import s from "./EditPlayerModal.module.css";
 import type { MyProfileUser } from "pages/ProfilePage/types";
+import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
+import type { UseFormRegister } from "react-hook-form";
 
 interface Props {
   isOpen: boolean;
   toggleModal: () => void;
   onSubmit: () => void;
   user: MyProfileUser;
+  register: UseFormRegister<UpdateMeRequestBody>;
 }
 
-const EditPlayerModal = ({ isOpen, toggleModal, onSubmit, user }: Props) => {
+const EditPlayerModal = ({
+  isOpen,
+  toggleModal,
+  onSubmit,
+  user,
+  register,
+}: Props) => {
   return (
     <Modal
       className={s.editPlayerModal}
       isOpen={isOpen}
       toggleModal={toggleModal}
     >
-      <form className={s.editPlayerForm}>
+      <form className={s.editPlayerForm} onSubmit={onSubmit}>
         <h2 className={s.modalTitle}> Profile Settings </h2>
         <Avatar className={s.avatar} variant="profile" src={user.avatarUrl} />
 
         <FormField>
-          <EmailInput />
+          <EmailInput {...register("email")} />
         </FormField>
 
         <FormField>
-          <NameInput />
+          <NameInput {...register("username")} />
         </FormField>
 
         <FormField>
-          <PasswordInput />
+          <PasswordInput {...register("passwordOld")} />
         </FormField>
 
         <FormField>
-          <PasswordInput />
+          <PasswordInput {...register("passwordNew")} />
         </FormField>
 
-        <Button
-          className={s.editPlayerButton}
-          onSubmit={() => {
-            onSubmit();
-          }}
-        >
+        <Button className={s.editPlayerButton} type="submit">
           Update user
         </Button>
       </form>
