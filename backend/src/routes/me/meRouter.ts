@@ -6,11 +6,11 @@ import {
 } from "../../controllers/meController";
 
 import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
-import { asyncHandler } from "../../utils/asyncHandler";
+import { errorHandler } from "../../utils/errorHandler";
 
 export const meRouter = createAuthenticatedRouter();
 
-meRouter.patch("/", asyncHandler(updateMeController));
-meRouter.get("/", asyncHandler(getMeController));
+meRouter.patch("/", errorHandler(updateMeController));
+meRouter.get("/", errorHandler(getMeController));
 
 meRouter.use(errorMiddleware);
