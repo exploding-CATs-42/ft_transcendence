@@ -1,7 +1,11 @@
 // Local level
-import type { MyProfileUser } from "pages/ProfilePage/types/ProfileUser";
+import type {
+  MyProfileUser,
+  ProfileUser,
+} from "pages/ProfilePage/types/ProfileUser";
 import type { FriendItem } from "pages/ProfilePage/types";
 import { api } from "../axios";
+import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 
 const getMe = async (): Promise<MyProfileUser> => {
   const result = await api.get("/me");
@@ -13,7 +17,13 @@ const getMeFriends = async (): Promise<FriendItem[]> => {
   return result.data.friends;
 };
 
+const updateMe = async (body: UpdateMeRequestBody): Promise<ProfileUser> => {
+  const result = await api.patch("/me", body);
+  return result.data.user;
+};
+
 export default {
   getMe,
   getMeFriends,
+  updateMe,
 };
