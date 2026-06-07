@@ -6,12 +6,9 @@ import { ApiError } from "../errors";
 import { MyProfileUser } from "../types";
 import cloudinary from "../lib/cloudinary/cloudinary";
 
-export class MeServiceError extends Error {
-  public statusCode: number;
-
+export class MeServiceError extends ApiError {
   constructor(message: string, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
+    super(message, statusCode);
   }
 }
 
