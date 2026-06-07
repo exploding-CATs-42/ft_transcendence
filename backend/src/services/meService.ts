@@ -1,5 +1,5 @@
 import { prisma, selfProfileSelect } from "../lib/prisma";
-import { hashPassword } from "../utils/hash";
+import { comparePassword, hashPassword } from "../utils/hash";
 import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
 import { getFinishedGamesStats } from "./usersService";
 import { ApiError } from "../errors";
@@ -18,9 +18,45 @@ export class MeServiceError extends Error {
 type UpdateMeInput = {
   username?: string;
   email?: string;
-  password?: string;
+  passwordOld?: string;
+  passwordNew?: string;
   avatarFile?: Express.Multer.File;
 };
+
+async function validatePassword(currentUserId: string, input: UpdateMeInput) {
+  if (input.passwordNew !== undefined && input.passwordOld === undefined) {
+    throw new MeServiceError(
+      "Enter your current password to set a new password",
+      409,
+    );
+  }
+
+  if (input.passwordNew === undefined && input.passwordOld !== undefined) {
+    throw new MeServiceError("Enter your new password", 409);
+  }
+
+  if (input.passwordOld === undefined) {
+    return;
+  }
+
+  const currentUser = await prisma.user.findUnique({
+    where: { id: currentUserId },
+    select: { passwordHash: true },
+  });
+
+  if (!currentUser) {
+    throw new MeServiceError("User not found", 404);
+  }
+
+  const isPasswordValid = await comparePassword(
+    input.passwordOld,
+    currentUser.passwordHash,
+  );
+
+  if (!isPasswordValid) {
+    throw new MeServiceError("Please enter valid password", 401);
+  }
+}
 
 export async function updateMe(
   currentUserId: string,
@@ -57,6 +93,8 @@ export async function updateMe(
     }
   }
 
+  await validatePassword(currentUserId, input);
+
   const data: {
     username?: string;
     email?: string;
@@ -73,8 +111,8 @@ export async function updateMe(
     data.email = input.email;
   }
 
-  if (input.password !== undefined) {
-    data.passwordHash = await hashPassword(input.password);
+  if (input.passwordNew !== undefined) {
+    data.passwordHash = await hashPassword(input.passwordNew);
   }
 
   if (input.avatarFile) {

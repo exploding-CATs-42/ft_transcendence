@@ -14,9 +14,15 @@ export async function updateMeController(
     ...(parsedBody.username !== undefined
       ? { username: parsedBody.username }
       : {}),
+
     ...(parsedBody.email !== undefined ? { email: parsedBody.email } : {}),
-    ...(parsedBody.password !== undefined
-      ? { password: parsedBody.password }
+
+    ...(parsedBody.passwordNew !== undefined
+      ? { passwordNew: parsedBody.passwordNew }
+      : {}),
+
+    ...(parsedBody.passwordOld !== undefined
+      ? { passwordOld: parsedBody.passwordOld }
       : {}),
   });
   res.status(200).json(result);
