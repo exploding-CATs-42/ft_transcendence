@@ -7,7 +7,7 @@ import {
   joinGame,
   leaveGame,
 } from "../services/gameService";
-import { withErrorHandler } from "../utils/asyncHandler";
+import { withErrorHandler } from "../utils/errorHandler";
 import {
   CancelStartParams,
   cancelStartSchema,
