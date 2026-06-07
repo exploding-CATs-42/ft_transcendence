@@ -47,7 +47,7 @@ export const gameMachine = setup({
   }),
   states: {
     [GameStateType.WAITING]: {
-      initial: GameStatePath.WAITING_CONFIRMING,
+      initial: GameStateType.WAITING_CONFIRMING,
       states: {
         [GameStateType.WAITING_CONFIRMING]: {
           always: {
