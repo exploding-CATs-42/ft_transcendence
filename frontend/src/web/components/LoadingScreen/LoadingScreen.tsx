@@ -17,7 +17,7 @@ const LoadingScreen = () => {
       ) : (
         <span className={s.loader}></span>
       )}
-      <div className={s.loadingText}>Loading</div>
+      <p className={s.loadingText}>Loading</p>
     </div>
   );
 };
