@@ -16,7 +16,7 @@ import {
   GameEmitter,
   gameStarted,
 } from "./emitters";
-import { GAME_MACHINE_ID, GameStateType } from "./states";
+import { GAME_MACHINE_ID, GameStatePath, GameStateType } from "./states";
 
 export interface GameContext {
   players: Player[];
@@ -47,12 +47,12 @@ export const gameMachine = setup({
   }),
   states: {
     [GameStateType.WAITING]: {
-      initial: "confirming",
+      initial: GameStatePath.WAITING_CONFIRMING,
       states: {
         [GameStateType.WAITING_CONFIRMING]: {
           always: {
             guard: GameGuardType.HAS_ENOUGH_PLAYERS,
-            target: "starting",
+            target: GameStatePath.WAITING_STARTING,
           },
           on: {
             JOIN_GAME: {
@@ -73,26 +73,26 @@ export const gameMachine = setup({
           entry: emit(countdownStarted),
           after: {
             [START_GAME_COUNTDOWN_MS]: {
-              target: "#game.playing",
+              target: GameStatePath.PLAYING,
             },
           },
           on: {
             JOIN_GAME: {
-              target: "#game.waiting.confirming",
+              target: GameStatePath.WAITING_CONFIRMING,
               actions: [
                 GameActionType.ADD_PLAYER,
                 emit({ type: "COUNTDOWN_CANCELED" }),
               ],
             },
             LEAVE_GAME: {
-              target: "#game.waiting.confirming",
+              target: GameStatePath.WAITING_CONFIRMING,
               actions: [
                 GameActionType.REMOVE_PLAYER,
                 emit({ type: "COUNTDOWN_CANCELED" }),
               ],
             },
             CANCEL_START: {
-              target: "#game.waiting.confirming",
+              target: GameStatePath.WAITING_CONFIRMING,
               actions: [
                 GameActionType.REMOVE_PLAYER_CONFIRMATION,
                 emit(countdownCanceled),
