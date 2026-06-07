@@ -45,17 +45,6 @@ export async function updateMe(
     }
   }
 
-  if (input.username !== undefined) {
-    const existingByUsername = await prisma.user.findUnique({
-      where: { username: input.username },
-      select: { id: true },
-    });
-
-    if (existingByUsername && existingByUsername.id !== currentUserId) {
-      throw new MeServiceError("Username already in use", 409);
-    }
-  }
-
   const data: {
     username?: string;
     email?: string;
