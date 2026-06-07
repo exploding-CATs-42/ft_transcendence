@@ -1,5 +1,6 @@
 import { assign, emit, setup } from "xstate";
 import {
+  GameActionType,
   addPlayer,
   addPlayerConfirmation,
   removePlayer,
@@ -27,10 +28,12 @@ export const gameMachine = setup({
     emitted: {} as GameEmitter,
   },
   actions: {
-    addPlayer: assign(addPlayer),
-    removePlayer: assign(removePlayer),
-    addPlayerConfirmation: assign(addPlayerConfirmation),
-    removePlayerConfirmation: assign(removePlayerConfirmation),
+    [GameActionType.ADD_PLAYER]: assign(addPlayer),
+    [GameActionType.REMOVE_PLAYER]: assign(removePlayer),
+    [GameActionType.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
+    [GameActionType.REMOVE_PLAYER_CONFIRMATION]: assign(
+      removePlayerConfirmation,
+    ),
   },
   guards: {
     [GameGuardType.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -52,16 +55,16 @@ export const gameMachine = setup({
           },
           on: {
             JOIN_GAME: {
-              actions: "addPlayer",
+              actions: GameActionType.ADD_PLAYER,
             },
             LEAVE_GAME: {
-              actions: "removePlayer",
+              actions: GameActionType.REMOVE_PLAYER,
             },
             CONFIRM_START: {
-              actions: "addPlayerConfirmation",
+              actions: GameActionType.ADD_PLAYER_CONFIRMATION,
             },
             CANCEL_START: {
-              actions: "removePlayerConfirmation",
+              actions: GameActionType.REMOVE_PLAYER_CONFIRMATION,
             },
           },
         },
@@ -75,15 +78,24 @@ export const gameMachine = setup({
           on: {
             JOIN_GAME: {
               target: "#game.waiting.confirming",
-              actions: ["addPlayer", emit({ type: "COUNTDOWN_CANCELED" })],
+              actions: [
+                GameActionType.ADD_PLAYER,
+                emit({ type: "COUNTDOWN_CANCELED" }),
+              ],
             },
             LEAVE_GAME: {
               target: "#game.waiting.confirming",
-              actions: ["removePlayer", emit({ type: "COUNTDOWN_CANCELED" })],
+              actions: [
+                GameActionType.REMOVE_PLAYER,
+                emit({ type: "COUNTDOWN_CANCELED" }),
+              ],
             },
             CANCEL_START: {
               target: "#game.waiting.confirming",
-              actions: ["removePlayerConfirmation", emit(countdownCanceled)],
+              actions: [
+                GameActionType.REMOVE_PLAYER_CONFIRMATION,
+                emit(countdownCanceled),
+              ],
             },
           },
         },
