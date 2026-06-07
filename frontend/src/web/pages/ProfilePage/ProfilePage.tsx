@@ -77,7 +77,11 @@ const ProfilePage = () => {
     <div className={s.pageContainer}>
       <div className={s.flexContainer}>
         {isMyProfile ? (
-          <UserSection isMyProfile={true} user={user as MyProfileUser} />
+          <UserSection
+            isMyProfile={true}
+            user={user as MyProfileUser}
+            setUser={setUser}
+          />
         ) : (
           <UserSection isMyProfile={false} user={user as ProfileUser} />
         )}
