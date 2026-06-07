@@ -79,17 +79,11 @@ export const gameMachine = setup({
           on: {
             JOIN_GAME: {
               target: GameStatePath.WAITING_CONFIRMING,
-              actions: [
-                GameActionType.ADD_PLAYER,
-                emit({ type: "COUNTDOWN_CANCELED" }),
-              ],
+              actions: [GameActionType.ADD_PLAYER, emit(countdownCanceled)],
             },
             LEAVE_GAME: {
               target: GameStatePath.WAITING_CONFIRMING,
-              actions: [
-                GameActionType.REMOVE_PLAYER,
-                emit({ type: "COUNTDOWN_CANCELED" }),
-              ],
+              actions: [GameActionType.REMOVE_PLAYER, emit(countdownCanceled)],
             },
             CANCEL_START: {
               target: GameStatePath.WAITING_CONFIRMING,
