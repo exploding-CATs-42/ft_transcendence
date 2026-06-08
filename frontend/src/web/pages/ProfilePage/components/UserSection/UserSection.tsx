@@ -57,6 +57,43 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     avatarUrl: emptyToUndefined(data.avatarUrl),
   });
 
+  const processFieldErrors = (
+    fieldErrors: Record<string, string[]> | undefined,
+  ) => {
+    if (!fieldErrors) return;
+
+    Object.entries(fieldErrors).forEach(([field, messages]) => {
+      const message = messages[0];
+
+      if (!message) return;
+
+      setError(field as keyof UpdateMeRequestBody, { message });
+    });
+  };
+
+  const handleRequestErrors = (error: unknown) => {
+    const err = error as AxiosError<
+      BadRequestErrorResponse<keyof UpdateMeRequestBody>
+    >;
+
+    if (err.response?.status !== 400) {
+      toast.error(err.message);
+      return;
+    }
+
+    const formErrors = err.response.data.errors.formErrors;
+    if (formErrors && formErrors[0]) {
+      setError("root", {
+        type: "server",
+        message: formErrors[0],
+      });
+      return;
+    }
+
+    const fieldErrors = err.response.data.errors.fieldErrors;
+    processFieldErrors(fieldErrors);
+  };
+
   const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (data) => {
     try {
       const updates = valuesToUpdate(data);
@@ -65,34 +102,7 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
       if (setUser) setUser((p) => (p ? { ...p, ...updatedUser } : null));
       toast.success("Success");
     } catch (error) {
-      const err = error as AxiosError<
-        BadRequestErrorResponse<keyof UpdateMeRequestBody>
-      >;
-
-      if (err.response?.status !== 400) {
-        toast.error(err.message);
-        return;
-      }
-
-      console.log(err.response.data);
-      const formErrors = err.response.data.errors.formErrors;
-      if (formErrors && formErrors[0]) {
-        setError("root", {
-          type: "server",
-          message: formErrors[0],
-        });
-        return;
-      }
-
-      const fieldErrors = err.response.data.errors.fieldErrors;
-
-      Object.entries(fieldErrors).forEach(([field, messages]) => {
-        const message = messages[0];
-
-        if (!message) return;
-
-        setError(field as keyof UpdateMeRequestBody, { message });
-      });
+      handleRequestErrors(error);
     }
   };
 
