@@ -1,8 +1,7 @@
 // Libraries
 import { useEffect, useState } from "react";
 // Project level
-import { Icon } from "components";
-import { PlayIcon } from "assets";
+import { ColorfullIcon, Icon } from "components";
 // Local level
 import { Poster } from "./components";
 // CSS
@@ -65,7 +64,7 @@ const RulesPage = () => {
               title="Play video"
               onClick={() => setIsPlaying(true)}
             >
-              <PlayIcon width={64} height={64} />
+              <ColorfullIcon name="play" width={64} height={64} />
             </button>
           </div>
         )}
