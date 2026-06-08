@@ -1,5 +1,9 @@
 import { useState } from "react";
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
+import type {
+  FieldErrors,
+  UseFormClearErrors,
+  UseFormRegister,
+} from "react-hook-form";
 
 import {
   Avatar,
@@ -22,6 +26,7 @@ interface Props {
     disabled: boolean;
     errors: FieldErrors<UpdateMeRequestBody>;
     register: UseFormRegister<UpdateMeRequestBody>;
+    clearErrors: UseFormClearErrors<UpdateMeRequestBody>;
   };
 }
 
@@ -75,7 +80,17 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
           type="submit"
           disabled={disabled}
         >
-          Update user
+          Save
+        </Button>
+
+        <Button
+          className={s.changeFormButton}
+          type="button"
+          onClick={() => {
+            clearErrors();
+          }}
+        >
+          Or you can <span className={s.underline}>{redirectText}</span>
         </Button>
       </form>
     </Modal>
