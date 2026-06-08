@@ -31,7 +31,11 @@ interface Props {
 }
 
 const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
-  const { onSubmit, errors, register, disabled } = form;
+  const [isProfileUpdate, setIsProfileUpdate] = useState(true);
+  const { onSubmit, errors, register, disabled, clearErrors } = form;
+
+  const formTitle = isProfileUpdate ? "Profile Settings" : "Password Settings";
+  const redirectText = isProfileUpdate ? "change password" : "update profile";
 
   return (
     <Modal
@@ -40,39 +44,49 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
       toggleModal={toggleModal}
     >
       <form className={s.editPlayerForm} onSubmit={onSubmit}>
-        <h2 className={s.modalTitle}> Profile Settings </h2>
-        <Avatar className={s.avatar} variant="profile" src={user.avatarUrl} />
+        <h2 className={s.modalTitle}>{formTitle}</h2>
 
-        <FormField error={errors.email?.message}>
-          <EmailInput
-            {...register("email")}
-            status={errors.email ? "error" : "normal"}
-          />
-        </FormField>
+        {isProfileUpdate ? (
+          <>
+            <Avatar
+              className={s.avatar}
+              variant="profile"
+              src={user.avatarUrl ? user.avatarUrl : null}
+            />
 
-        <FormField error={errors.username?.message}>
-          <NameInput
-            {...register("username")}
-            status={errors.username ? "error" : "normal"}
-          />
-        </FormField>
+            <FormField error={errors.email?.message}>
+              <EmailInput
+                {...register("email")}
+                status={errors.email ? "error" : "normal"}
+              />
+            </FormField>
 
-        <FormField error={errors.passwordOld?.message}>
-          <PasswordInput
-            placeholder="Current password"
-            {...register("passwordOld")}
-            status={errors.passwordOld ? "error" : "normal"}
-          />
-        </FormField>
+            <FormField error={errors.username?.message}>
+              <NameInput
+                {...register("username")}
+                status={errors.username ? "error" : "normal"}
+              />
+            </FormField>
+          </>
+        ) : (
+          <>
+            <FormField error={errors.passwordOld?.message}>
+              <PasswordInput
+                placeholder="Current password"
+                {...register("passwordOld")}
+                status={errors.passwordOld ? "error" : "normal"}
+              />
+            </FormField>
 
-        <FormField error={errors.passwordNew?.message}>
-          <PasswordInput
-            placeholder="New password"
-            {...register("passwordNew")}
-            status={errors.passwordNew ? "error" : "normal"}
-          />
-        </FormField>
-
+            <FormField error={errors.passwordNew?.message}>
+              <PasswordInput
+                placeholder="New password"
+                {...register("passwordNew")}
+                status={errors.passwordNew ? "error" : "normal"}
+              />
+            </FormField>
+          </>
+        )}
         {errors.root && <p>{errors.root.message}</p>}
 
         <Button
@@ -87,6 +101,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
           className={s.changeFormButton}
           type="button"
           onClick={() => {
+            setIsProfileUpdate((prev) => !prev);
             clearErrors();
           }}
         >
