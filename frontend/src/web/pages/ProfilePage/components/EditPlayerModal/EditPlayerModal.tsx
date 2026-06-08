@@ -17,22 +17,18 @@ import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 interface Props {
   isOpen: boolean;
   toggleModal: () => void;
-  onSubmit: () => void;
   user: MyProfileUser;
-  disabled: boolean;
-  errors: FieldErrors<UpdateMeRequestBody>;
-  register: UseFormRegister<UpdateMeRequestBody>;
+  form: {
+    onSubmit: () => void;
+    disabled: boolean;
+    errors: FieldErrors<UpdateMeRequestBody>;
+    register: UseFormRegister<UpdateMeRequestBody>;
+  };
 }
 
-const EditPlayerModal = ({
-  isOpen,
-  toggleModal,
-  onSubmit,
-  user,
-  disabled,
-  errors,
-  register,
-}: Props) => {
+const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
+  const { onSubmit, errors, register, disabled } = form;
+
   return (
     <Modal
       className={s.editPlayerModal}
