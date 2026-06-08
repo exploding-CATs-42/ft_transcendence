@@ -22,3 +22,4 @@ export { default as Section } from "./Section/Section";
 export { default as PhaserGame } from "./PhaserGame/PhaserGame";
 export { default as FormField } from "./FormField/FormField";
 export { default as PdfViewer } from "./PdfViewer/PdfViewer";
+export { default as ColorfullIcon } from "./ColorfullIcon/ColorfullIcon";
