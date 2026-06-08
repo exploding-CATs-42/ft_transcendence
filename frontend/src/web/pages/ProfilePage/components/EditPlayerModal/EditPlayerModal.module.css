@@ -1,11 +1,11 @@
 .editPlayerModal {
   position: relative;
 
-  min-width: 300px;
-  min-height: 600px;
+  min-width: auto;
+  min-height: auto;
 
   margin: 20px;
-  padding: 20px;
+  padding: 40px;
 
   border: 1px solid rgba(var(--off-white-rgb), 0.4);
   border-radius: 24px;
@@ -40,6 +40,19 @@
 
   box-shadow: 0 4px 0 var(--throw-throw-burrito-hover);
 
+  cursor: pointer;
+}
+
+.changeFormButton {
+  width: 200px;
+  height: 28px;
+
+  color: var(--off-white);
+  font-size: 12px;
+}
+
+.underline {
+  text-decoration: underline;
   cursor: pointer;
 }
 
