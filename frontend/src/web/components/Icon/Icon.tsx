@@ -26,10 +26,6 @@ interface Props {
     | "user"
     | "burger-menu"
     | "puzzle"
-    | "percent"
-    | "medal"
-    | "bomb"
-    | "gamepad"
     | "download";
 }
 
