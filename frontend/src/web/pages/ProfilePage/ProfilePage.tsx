@@ -83,7 +83,7 @@ const ProfilePage = () => {
             setUser={setUser}
           />
         ) : (
-          <UserSection isMyProfile={false} user={user as ProfileUser} />
+          <UserSection isMyProfile={false} user={user} />
         )}
 
         <StatsSection stats={stats} />
