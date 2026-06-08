@@ -45,7 +45,9 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     formState: { isSubmitting, errors },
     setError,
     clearErrors,
-  } = useForm<UpdateMeRequestBody>();
+  } = useForm<UpdateMeRequestBody>({
+    defaultValues: user,
+  });
 
   const emptyToUndefined = (value: string | null | undefined) =>
     value === "" || value == null ? undefined : value;
@@ -132,7 +134,7 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
               disabled: isSubmitting,
               errors,
               register,
-			  clearErrors
+              clearErrors,
             }}
           />
         </>
