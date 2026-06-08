@@ -125,11 +125,13 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
           <EditPlayerModal
             isOpen={isOpenEditPlayerModal}
             toggleModal={() => toggleOpenEditPlayerModal(false)}
-            onSubmit={handleSubmit(onSubmit)}
             user={user}
-            disabled={isSubmitting}
-            errors={errors}
-            register={register}
+            form={{
+              onSubmit: handleSubmit(onSubmit),
+              disabled: isSubmitting,
+              errors,
+              register,
+            }}
           />
         </>
       )}
