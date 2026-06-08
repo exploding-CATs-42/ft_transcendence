@@ -11,13 +11,12 @@ import {
   PasswordInput,
 } from "components";
 import s from "./EditPlayerModal.module.css";
-import type { MyProfileUser } from "pages/ProfilePage/types";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 
 interface Props {
   isOpen: boolean;
   toggleModal: () => void;
-  user: MyProfileUser;
+  user: UpdateMeRequestBody;
   form: {
     onSubmit: () => void;
     disabled: boolean;
