@@ -1,3 +1,6 @@
+import { useState } from "react";
+import type { FieldErrors, UseFormRegister } from "react-hook-form";
+
 import {
   Avatar,
   Button,
@@ -10,7 +13,6 @@ import {
 import s from "./EditPlayerModal.module.css";
 import type { MyProfileUser } from "pages/ProfilePage/types";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
-import type { FieldErrors, UseFormRegister } from "react-hook-form";
 
 interface Props {
   isOpen: boolean;
