@@ -102,32 +102,32 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
       <span className={s.name}>{user.username}</span>
 
       {isMyProfile && (
-        <Button
-          className={s.editButton}
-          onClick={() => {
-            toggleOpenEditPlayerModal(true);
-          }}
-        >
-          <Icon name="pencil" className={s.editIcon} width={15} height={15} />
-        </Button>
+        <>
+          <Button
+            className={s.editButton}
+            onClick={() => {
+              toggleOpenEditPlayerModal(true);
+            }}
+          >
+            <Icon name="pencil" className={s.editIcon} width={15} height={15} />
+          </Button>
+
+          <EditPlayerModal
+            isOpen={isOpenEditPlayerModal}
+            toggleModal={() => toggleOpenEditPlayerModal(false)}
+            onSubmit={handleSubmit(onSubmit)}
+            user={user}
+            disabled={isSubmitting}
+            errors={errors}
+            register={register}
+          />
+        </>
       )}
 
       <Button className={s.logoutButton} onClick={logoutUser}>
         <Icon name="log-out" className={s.logoutIcon} width={15} height={15} />
         <span className={s.logoutText}>Sign out</span>
       </Button>
-
-      {isMyProfile && (
-        <EditPlayerModal
-          isOpen={isOpenEditPlayerModal}
-          toggleModal={() => toggleOpenEditPlayerModal(false)}
-          onSubmit={handleSubmit(onSubmit)}
-          user={user}
-          disabled={isSubmitting}
-          errors={errors}
-          register={register}
-        />
-      )}
     </Section>
   );
 };
