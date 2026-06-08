@@ -55,6 +55,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
 
         <FormField error={errors.passwordOld?.message}>
           <PasswordInput
+            placeholder="Current password"
             {...register("passwordOld")}
             status={errors.passwordOld ? "error" : "normal"}
           />
@@ -62,6 +63,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
 
         <FormField error={errors.passwordNew?.message}>
           <PasswordInput
+            placeholder="New password"
             {...register("passwordNew")}
             status={errors.passwordNew ? "error" : "normal"}
           />
