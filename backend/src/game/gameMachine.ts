@@ -8,7 +8,7 @@ import {
 } from "./actions";
 import { Player } from "./types/player";
 import { GameEvent, GameEvents } from "./events";
-import { GameGuardType, hasEnoughPlayers } from "./guards";
+import { GameGuards, hasEnoughPlayers } from "./guards";
 import { START_GAME_COUNTDOWN_MS } from "../constants/game";
 import {
   countdownCanceled,
@@ -37,7 +37,7 @@ export const gameMachine = setup({
     ),
   },
   guards: {
-    [GameGuardType.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
+    [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -51,7 +51,7 @@ export const gameMachine = setup({
       states: {
         [GameStateType.WAITING_CONFIRMING]: {
           always: {
-            guard: GameGuardType.HAS_ENOUGH_PLAYERS,
+            guard: GameGuards.HAS_ENOUGH_PLAYERS,
             target: GameStatePath.WAITING_STARTING,
           },
           on: {
