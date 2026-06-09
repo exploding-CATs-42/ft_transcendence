@@ -4,7 +4,6 @@ declare const styles: {
   readonly "inputContainer": string;
   readonly "normal": string;
   readonly "pdLeft": string;
-  readonly "pdRight": string;
   readonly "success": string;
   readonly "warning": string;
 };

@@ -37,10 +37,6 @@
   padding-left: 48px;
 }
 
-.pdRight {
-  padding-right: 48px;
-}
-
 .normal {
   border-color: rgba(var(--off-white-rgb), 0.3);
 
