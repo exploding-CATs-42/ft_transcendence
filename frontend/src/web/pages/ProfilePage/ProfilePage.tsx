@@ -48,7 +48,7 @@ const ProfilePage = () => {
         if (!userData) return;
         setUser(userData);
 
-        const friendsData = await api.me.getMeFriends();
+        const friendsData = await api.friends.getMeFriends();
         setFriends(friendsData);
 
         const matchesData = await api.users.getUserGames(userData.id);
