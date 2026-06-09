@@ -46,6 +46,7 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     setError,
     clearErrors,
     formState: { isDirty },
+    reset,
   } = useForm<UpdateMeRequestBody>({
     defaultValues: user,
   });
@@ -104,6 +105,7 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
       const updatedUser = await api.me.updateMe(updates);
 
       if (setUser) setUser((p) => (p ? { ...p, ...updatedUser } : null));
+      reset(updatedUser);
       toast.success("Success");
       clearErrors();
     } catch (error) {
