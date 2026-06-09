@@ -118,20 +118,11 @@ const CreateTableModal = ({ isOpen, toggleModal, onSubmit }: Props) => {
             setGameName(event.target.value);
             setSubmitError("");
           }}
-          pdLeft={true}
+          iconName="puzzle"
           placeholder="Table name"
           maxLength={30}
           disabled={isSubmitting}
-        >
-          <Icon
-            className={s["icon"]!}
-            name="puzzle"
-            id="puzzle"
-            stroke="currentColor"
-            width={18}
-            height={18}
-          />
-        </Input>
+        />
 
         <div
           className={s["selectField"]!}

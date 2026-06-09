@@ -1,5 +1,5 @@
 // Project level
-import { Icon, Input } from "components";
+import { Input } from "components";
 import type { InputStatus } from "types";
 // Local level
 import s from "./SearchInput.module.css";
@@ -17,12 +17,10 @@ const SearchInput = ({
     <Input
       status={status}
       type="text"
-      pdLeft={true}
+      iconName="user"
       placeholder={placeholder}
       className={s.input}
-    >
-      <Icon className={s.icon} name="user" width={24} height={24} />
-    </Input>
+    />
   );
 };
 

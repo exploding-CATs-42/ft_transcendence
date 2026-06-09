@@ -1,6 +1,6 @@
 declare const styles: {
   readonly "button": string;
-  readonly "leftIcon": string;
+  readonly "input": string;
   readonly "rightIcon": string;
 };
 export = styles;
