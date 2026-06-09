@@ -1,6 +1,7 @@
 declare const styles: {
   readonly "avatar": string;
   readonly "changeFormButton": string;
+  readonly "editFormButtonEnabled": string;
   readonly "editPlayerButton": string;
   readonly "editPlayerForm": string;
   readonly "editPlayerModal": string;
