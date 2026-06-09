@@ -6,7 +6,7 @@ const getStatePath = (...subPath: string[]) => {
   return path;
 };
 
-export const GameStateType = {
+export const GameStates = {
   WAITING: "waiting",
   WAITING_CONFIRMING: "confirming",
   WAITING_STARTING: "starting",
@@ -14,14 +14,14 @@ export const GameStateType = {
 } as const;
 
 export const GameStatePath = {
-  WAITING: getStatePath(GameStateType.WAITING),
+  WAITING: getStatePath(GameStates.WAITING),
   WAITING_CONFIRMING: getStatePath(
-    GameStateType.WAITING,
-    GameStateType.WAITING_CONFIRMING,
+    GameStates.WAITING,
+    GameStates.WAITING_CONFIRMING,
   ),
   WAITING_STARTING: getStatePath(
-    GameStateType.WAITING,
-    GameStateType.WAITING_STARTING,
+    GameStates.WAITING,
+    GameStates.WAITING_STARTING,
   ),
-  PLAYING: getStatePath(GameStateType.PLAYING),
+  PLAYING: getStatePath(GameStates.PLAYING),
 } as const;
