@@ -1,32 +1,34 @@
 import { Icons } from "assets";
 
+export type IconName =
+  | "alert"
+  | "checkmark"
+  | "chevron"
+  | "cross"
+  | "error"
+  | "eye"
+  | "eye-off"
+  | "lock"
+  | "log-out"
+  | "mail"
+  | "paw"
+  | "pencil"
+  | "plus"
+  | "settings"
+  | "trash-can"
+  | "user"
+  | "burger-menu"
+  | "puzzle"
+  | "download";
+
 interface Props {
   width?: number;
   height?: number;
   id?: string;
-  className?: string;
+  className?: string | undefined;
   stroke?: string;
   fill?: string;
-  name:
-    | "alert"
-    | "checkmark"
-    | "chevron"
-    | "cross"
-    | "error"
-    | "eye"
-    | "eye-off"
-    | "lock"
-    | "log-out"
-    | "mail"
-    | "paw"
-    | "pencil"
-    | "plus"
-    | "settings"
-    | "trash-can"
-    | "user"
-    | "burger-menu"
-    | "puzzle"
-    | "download";
+  name: IconName;
 }
 
 const Icon = ({ name, width, height, id, className, stroke, fill }: Props) => {
