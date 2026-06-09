@@ -1,6 +1,6 @@
 import { assign, emit, setup } from "xstate";
 import {
-  GameActionType,
+  GameActions,
   addPlayer,
   addPlayerConfirmation,
   removePlayer,
@@ -29,10 +29,10 @@ export const gameMachine = setup({
     emitted: {} as GameEmitter,
   },
   actions: {
-    [GameActionType.ADD_PLAYER]: assign(addPlayer),
-    [GameActionType.REMOVE_PLAYER]: assign(removePlayer),
-    [GameActionType.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
-    [GameActionType.REMOVE_PLAYER_CONFIRMATION]: assign(
+    [GameActions.ADD_PLAYER]: assign(addPlayer),
+    [GameActions.REMOVE_PLAYER]: assign(removePlayer),
+    [GameActions.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
+    [GameActions.REMOVE_PLAYER_CONFIRMATION]: assign(
       removePlayerConfirmation,
     ),
   },
@@ -56,16 +56,16 @@ export const gameMachine = setup({
           },
           on: {
             [GameEvents.JOIN_GAME]: {
-              actions: GameActionType.ADD_PLAYER,
+              actions: GameActions.ADD_PLAYER,
             },
             [GameEvents.LEAVE_GAME]: {
-              actions: GameActionType.REMOVE_PLAYER,
+              actions: GameActions.REMOVE_PLAYER,
             },
             [GameEvents.CONFIRM_START]: {
-              actions: GameActionType.ADD_PLAYER_CONFIRMATION,
+              actions: GameActions.ADD_PLAYER_CONFIRMATION,
             },
             [GameEvents.CANCEL_START]: {
-              actions: GameActionType.REMOVE_PLAYER_CONFIRMATION,
+              actions: GameActions.REMOVE_PLAYER_CONFIRMATION,
             },
           },
         },
@@ -79,16 +79,16 @@ export const gameMachine = setup({
           on: {
             [GameEvents.JOIN_GAME]: {
               target: GameStatePath.WAITING_CONFIRMING,
-              actions: [GameActionType.ADD_PLAYER, emit(countdownCanceled)],
+              actions: [GameActions.ADD_PLAYER, emit(countdownCanceled)],
             },
             [GameEvents.LEAVE_GAME]: {
               target: GameStatePath.WAITING_CONFIRMING,
-              actions: [GameActionType.REMOVE_PLAYER, emit(countdownCanceled)],
+              actions: [GameActions.REMOVE_PLAYER, emit(countdownCanceled)],
             },
             [GameEvents.CANCEL_START]: {
               target: GameStatePath.WAITING_CONFIRMING,
               actions: [
-                GameActionType.REMOVE_PLAYER_CONFIRMATION,
+                GameActions.REMOVE_PLAYER_CONFIRMATION,
                 emit(countdownCanceled),
               ],
             },
