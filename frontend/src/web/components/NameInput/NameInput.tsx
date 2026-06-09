@@ -1,8 +1,6 @@
 // Project level
-import { Icon, Input } from "components";
+import { Input } from "components";
 import type { InputStatus } from "types";
-// Local level
-import s from "./NameInput.module.css";
 
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;
@@ -13,12 +11,10 @@ const NameInput = ({ placeholder = "Name", status, ...rest }: Props) => {
     <Input
       {...rest}
       type="text"
-      pdLeft={true}
+      iconName="user"
       placeholder={placeholder}
       status={status}
-    >
-      <Icon className={s.icon} name="user" width={24} height={24} />
-    </Input>
+    />
   );
 };
 

@@ -24,13 +24,12 @@ const PasswordInput = ({
   return (
     <Input
       {...rest}
+      className={s.input}
       type={type}
-      pdLeft={true}
-      pdRight={true}
+      iconName="lock"
       placeholder={placeholder}
       status={status}
     >
-      <Icon className={s.leftIcon} name="lock" width={24} height={24} />
       <button className={s.button} type="button" onClick={toggleType}>
         <Icon
           className={s.rightIcon}
