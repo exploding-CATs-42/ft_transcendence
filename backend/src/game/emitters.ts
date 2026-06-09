@@ -6,8 +6,7 @@ export const GameEmitters = {
   COUNTDOWN_CANCELED: "COUNTDOWN_CANCELED",
 } as const;
 
-export type GameEmitters =
-  (typeof GameEmitters)[keyof typeof GameEmitters];
+export type GameEmitters = (typeof GameEmitters)[keyof typeof GameEmitters];
 
 export type GameEmitter =
   | { type: typeof GameEmitters.GAME_STARTED }
