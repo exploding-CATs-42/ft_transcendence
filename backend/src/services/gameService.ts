@@ -12,7 +12,7 @@ import {
 } from "../schemas/games";
 
 import { createActor } from "xstate";
-import { GameEventType } from "../game/events";
+import { GameEvents } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
 import { GameInstance, GameInfo } from "../game/instance";
 import { Player } from "../game/types/player";
@@ -109,7 +109,7 @@ export async function joinGame(
   };
 
   game.actor.send({
-    type: GameEventType.JOIN_GAME,
+    type: GameEvents.JOIN_GAME,
     player,
   });
 
@@ -141,7 +141,7 @@ export async function leaveGame(
   const isLastPlayer = playersBefore.length === 1;
 
   game.actor.send({
-    type: GameEventType.LEAVE_GAME,
+    type: GameEvents.LEAVE_GAME,
     playerId: player.id,
   });
 
@@ -171,7 +171,7 @@ export async function confirmStart(
   }
 
   game.actor.send({
-    type: GameEventType.CONFIRM_START,
+    type: GameEvents.CONFIRM_START,
     playerId: player.id,
   });
 
@@ -196,7 +196,7 @@ export async function cancelStart(
   }
 
   game.actor.send({
-    type: GameEventType.CANCEL_START,
+    type: GameEvents.CANCEL_START,
     playerId: player.id,
   });
 
