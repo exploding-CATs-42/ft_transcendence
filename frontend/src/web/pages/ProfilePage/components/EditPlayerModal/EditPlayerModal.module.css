@@ -76,6 +76,15 @@
   width: 100%;
 }
 
+.editFormButtonEnabled {
+  background-color: var(--zombie-kittens);
+  box-shadow: 0 4px 0 var(--zombie-kittens-hover);
+}
+
+.editFormButtonEnabled:hover {
+  background-color: var(--zombie-kittens-hover);
+}
+
 @media only screen and (min-width: 768px) {
   .editPlayerModal {
     min-width: 350px;
