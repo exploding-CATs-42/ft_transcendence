@@ -52,7 +52,11 @@ const logout = async () => {
   }
 };
 
-const refresh = async () => {
+export type RefreshResponse = {
+  accessToken: AccessToken;
+};
+
+const refresh = async (): Promise<RefreshResponse> => {
   const result = await api.post("/users/refresh");
   const { accessToken } = result.data;
 

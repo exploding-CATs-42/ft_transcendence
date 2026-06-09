@@ -9,8 +9,8 @@ import {
 // Project level
 import { useLocalStorage } from "hooks";
 import { AUTH_STORAGE_KEY } from "constants";
+import api from "api";
 import {
-  api,
   clearAccessTokenForRequests,
   saveAccessTokenForRequests,
   setAccessTokenRefreshHandler,
@@ -98,13 +98,11 @@ const AuthProvider = ({ children }: Props) => {
       }
 
       try {
-        const result = await api.post<{ accessToken: AccessToken }>(
-          "/users/refresh",
-        );
+        const result = await api.auth.refresh();
 
         if (!isActive) return;
 
-        setAccessToken(result.data.accessToken);
+        setAccessToken(result.accessToken);
       } catch (error) {
         if (!isActive) return;
 
