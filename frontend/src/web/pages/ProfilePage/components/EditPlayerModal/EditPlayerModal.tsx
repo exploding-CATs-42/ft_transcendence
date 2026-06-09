@@ -16,6 +16,7 @@ import {
 } from "components";
 import s from "./EditPlayerModal.module.css";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
+import clsx from "clsx";
 
 interface Props {
   isOpen: boolean;
@@ -91,7 +92,10 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
         {errors.root && <p>{errors.root.message}</p>}
 
         <Button
-          className={s.editPlayerButton}
+          className={clsx(
+            s.editPlayerButton,
+            isDirty && s.editFormButtonEnabled,
+          )}
           type="submit"
           disabled={disabled || !isDirty}
         >
