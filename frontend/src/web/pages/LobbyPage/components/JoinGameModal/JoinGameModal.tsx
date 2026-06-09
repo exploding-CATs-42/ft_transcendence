@@ -1,5 +1,5 @@
 // Project level
-import { Button, Icon, Input, Modal } from "components";
+import { Button, Input, Modal } from "components";
 
 // Local level
 import s from "./JoinGameModal.module.css";
@@ -33,18 +33,9 @@ const JoinGameModal = ({
           type="text"
           value={gameId}
           onChange={(event) => onGameIdChange(event.target.value)}
-          pdLeft={true}
+          iconName="puzzle"
           placeholder="Table id"
-        >
-          <Icon
-            className={s["icon"]!}
-            name="puzzle"
-            id="puzzle"
-            stroke="currentColor"
-            width={18}
-            height={18}
-          />
-        </Input>
+        />
 
         <Button className={s["joinButton"]!} onClick={onJoin}>
           Join
