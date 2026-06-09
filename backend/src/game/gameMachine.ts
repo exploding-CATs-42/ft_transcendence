@@ -16,7 +16,7 @@ import {
   GameEmitter,
   gameStarted,
 } from "./emitters";
-import { GAME_MACHINE_ID, GameStatePath, GameStateType } from "./states";
+import { GAME_MACHINE_ID, GameStatePath, GameStates } from "./states";
 
 export interface GameContext {
   players: Player[];
@@ -41,15 +41,15 @@ export const gameMachine = setup({
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
-  initial: GameStateType.WAITING,
+  initial: GameStates.WAITING,
   context: () => ({
     players: [],
   }),
   states: {
-    [GameStateType.WAITING]: {
-      initial: GameStateType.WAITING_CONFIRMING,
+    [GameStates.WAITING]: {
+      initial: GameStates.WAITING_CONFIRMING,
       states: {
-        [GameStateType.WAITING_CONFIRMING]: {
+        [GameStates.WAITING_CONFIRMING]: {
           always: {
             guard: GameGuards.HAS_ENOUGH_PLAYERS,
             target: GameStatePath.WAITING_STARTING,
@@ -69,7 +69,7 @@ export const gameMachine = setup({
             },
           },
         },
-        [GameStateType.WAITING_STARTING]: {
+        [GameStates.WAITING_STARTING]: {
           entry: emit(countdownStarted),
           after: {
             [START_GAME_COUNTDOWN_MS]: {
@@ -96,7 +96,7 @@ export const gameMachine = setup({
         },
       },
     },
-    [GameStateType.PLAYING]: {
+    [GameStates.PLAYING]: {
       entry: emit(gameStarted),
     },
   },
