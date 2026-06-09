@@ -13,7 +13,7 @@ export const GameStates = {
   PLAYING: "playing",
 } as const;
 
-export const GameStatePath = {
+export const GameTargets = {
   WAITING: getStatePath(GameStates.WAITING),
   WAITING_CONFIRMING: getStatePath(
     GameStates.WAITING,
