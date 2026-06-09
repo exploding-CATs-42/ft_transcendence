@@ -27,12 +27,13 @@ interface Props {
     errors: FieldErrors<UpdateMeRequestBody>;
     register: UseFormRegister<UpdateMeRequestBody>;
     clearErrors: UseFormClearErrors<UpdateMeRequestBody>;
+    isDirty: boolean;
   };
 }
 
 const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
   const [isProfileUpdate, setIsProfileUpdate] = useState(true);
-  const { onSubmit, errors, register, disabled, clearErrors } = form;
+  const { onSubmit, errors, register, disabled, clearErrors, isDirty } = form;
 
   const formTitle = isProfileUpdate ? "Profile Settings" : "Password Settings";
   const redirectText = isProfileUpdate ? "change password" : "update profile";
@@ -92,7 +93,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
         <Button
           className={s.editPlayerButton}
           type="submit"
-          disabled={disabled}
+          disabled={disabled || !isDirty}
         >
           Save
         </Button>
