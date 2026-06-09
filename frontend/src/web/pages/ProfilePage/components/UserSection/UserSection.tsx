@@ -45,6 +45,7 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     formState: { isSubmitting, errors },
     setError,
     clearErrors,
+    formState: { isDirty },
   } = useForm<UpdateMeRequestBody>({
     defaultValues: user,
   });
@@ -104,6 +105,7 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
 
       if (setUser) setUser((p) => (p ? { ...p, ...updatedUser } : null));
       toast.success("Success");
+      clearErrors();
     } catch (error) {
       handleRequestErrors(error);
     }
@@ -135,6 +137,7 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
               errors,
               register,
               clearErrors,
+              isDirty,
             }}
           />
         </>
