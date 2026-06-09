@@ -1,8 +1,8 @@
 # Auth Flow
 
-This document explains how authentication currently works in the project:
-login, logout, access tokens, refresh tokens, automatic token refresh, and the
-known frontend edge cases.
+This document explains how authentication currently works in the project: login,
+logout, access tokens, refresh tokens, automatic token refresh, and the known
+frontend edge cases.
 
 ## Token Types
 
@@ -143,22 +143,25 @@ res.cookie(
 );
 ```
 
-This means refresh tokens are rotated. After a successful refresh, the previous
-refresh token is no longer valid.
+This means refresh tokens are rotated by replacing the stored refresh token
+hash. After a successful refresh, a different previous refresh token no longer
+matches the session hash and is rejected.
+
+Implementation note: refresh tokens currently contain `sub`, `sessionId`,
+`type`, and standard JWT timestamps. There is no random `jti`/nonce yet, so two
+refresh tokens signed with the same payload and timestamp can be identical.
 
 If refresh fails with an auth error, the controller clears the refresh cookie
 before returning the error response:
 
 ```ts
-res.clearCookie(
-  REFRESH_TOKEN_COOKIE_NAME,
-  getRefreshTokenClearCookieOptions(),
-);
+res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, getRefreshTokenClearCookieOptions());
 ```
 
 This removes stale refresh token cookies when the token is expired, invalid, or
-points to a missing session. The frontend still receives a `401`, clears local
-access token state, and redirects protected pages to `/login`.
+points to a missing session. The frontend receives the backend error status,
+clears local access token state on `401`, and protected pages redirect to
+`/login`.
 
 Expired database sessions are also cleaned during refresh, but the cleanup is
 rate-limited so the endpoint does not run a delete query on every request:
@@ -183,10 +186,7 @@ Logout also uses the refresh token cookie. If the cookie is valid, the backend
 deletes the matching session from `user_sessions` and clears the cookie:
 
 ```ts
-res.clearCookie(
-  REFRESH_TOKEN_COOKIE_NAME,
-  getRefreshTokenClearCookieOptions(),
-);
+res.clearCookie(REFRESH_TOKEN_COOKIE_NAME, getRefreshTokenClearCookieOptions());
 ```
 
 The browser receives a cookie with an expiration date in the past:
@@ -242,7 +242,7 @@ req.user = {
 Protected controllers can then read:
 
 ```ts
-req.user.id
+req.user.id;
 ```
 
 Examples:
@@ -273,11 +273,10 @@ does not need a request body.
 The frontend stores auth state through `AuthProvider`:
 
 ```ts
-const [storedAccessToken, saveAccessToken] =
-  useLocalStorage<StoredAccessToken>(
-    AUTH_STORAGE_KEY,
-    null,
-  );
+const [storedAccessToken, saveAccessToken] = useLocalStorage<StoredAccessToken>(
+  AUTH_STORAGE_KEY,
+  null,
+);
 
 const accessToken = getStoredAccessToken(storedAccessToken);
 ```
@@ -317,6 +316,7 @@ const setAccessToken = useCallback(
   (accessToken: AccessToken) => {
     saveAccessTokenForRequests(accessToken);
     saveAccessToken({ accessToken });
+    setAuthStatus("authenticated");
   },
   [saveAccessToken],
 );
@@ -324,6 +324,7 @@ const setAccessToken = useCallback(
 const clearAccessToken = useCallback(() => {
   clearAccessTokenForRequests();
   saveAccessToken(null);
+  setAuthStatus("anonymous");
 }, [saveAccessToken]);
 ```
 
@@ -335,16 +336,24 @@ This keeps React auth state and the storage used by axios in sync.
 useEffect(() => {
   setAccessTokenRefreshHandler((accessToken) => {
     saveAccessToken({ accessToken });
+    setAuthStatus("authenticated");
+  });
+
+  setSessionExpiredHandler(() => {
+    saveAccessToken(null);
+    setAuthStatus("anonymous");
   });
 
   return () => {
     setAccessTokenRefreshHandler(null);
+    setSessionExpiredHandler(null);
   };
 }, [saveAccessToken]);
 ```
 
 This lets the axios interceptor update frontend auth storage after a successful
-refresh without importing React hooks into `axios.ts`.
+refresh, or mark the session as expired after a failed refresh, without
+importing React hooks into `axios.ts`.
 
 ## Frontend: Axios Setup
 
@@ -353,8 +362,8 @@ still `/users/...`:
 
 ```ts
 api.auth.register(); // POST /users/register
-api.auth.login();   // POST /users/login
-api.auth.logout();  // POST /users/logout
+api.auth.login(); // POST /users/login
+api.auth.logout(); // POST /users/logout
 api.auth.refresh(); // POST /users/refresh
 ```
 
@@ -385,7 +394,8 @@ clearStoredAccessToken();
 ```
 
 This module reads and writes the same local storage key used by `AuthProvider`.
-It exists because `axios.ts` is not a React component and cannot use React hooks.
+It exists because `axios.ts` is not a React component and cannot use React
+hooks.
 
 The access token is attached to axios requests by a request interceptor:
 
@@ -406,8 +416,8 @@ api.interceptors.request.use((config) => {
 ```
 
 This means axios reads the current access token for every request. After a page
-refresh, axios does not need an in-memory default header to be restored; it reads
-the persisted token before sending the request.
+refresh, axios does not need an in-memory default header to be restored; it
+reads the persisted token before sending the request.
 
 Logout clears request token storage:
 
@@ -525,10 +535,10 @@ If refresh fails because of a transient network error or a `5xx` backend error,
 axios keeps the existing auth state and propagates the error. The app should not
 log the user out unless the backend explicitly rejects the session.
 
-`authVersion` prevents stale refresh results from being applied after logout.
-A refresh request stores the current version before awaiting `/users/refresh`.
-If logout clears axios auth while refresh is pending, the version changes, so
-the returned access token is ignored and the original request is not retried.
+`authVersion` prevents stale refresh results from being applied after logout. A
+refresh request stores the current version before awaiting `/users/refresh`. If
+logout clears axios auth while refresh is pending, the version changes, so the
+returned access token is ignored and the original request is not retried.
 
 This prevents this race:
 
@@ -554,12 +564,13 @@ The interceptor intentionally skips:
 
 - `/users/refresh`, to avoid refreshing the refresh request itself;
 - `/users/logout`, because logout should not try to recover by refreshing;
-- `/users/login`, because invalid login credentials should not trigger a token refresh.
+- `/users/login`, because invalid login credentials should not trigger a token
+  refresh.
 
 ## Frontend: Logout Handling
 
-The profile logout handler clears frontend auth state even if the backend
-logout request fails:
+The profile logout handler clears frontend auth state even if the backend logout
+request fails:
 
 ```ts
 const logoutUser = async () => {
@@ -724,10 +735,10 @@ Expected:
 games status: 200
 ```
 
-After the refresh cookie expires, `/api/users/refresh` should return `401`.
-When the expired cookie is still sent, the response should include a
-`Set-Cookie` header that clears `refreshToken`. If the browser has already
-deleted the expired cookie, the message is:
+After the refresh cookie expires, `/api/users/refresh` should return `401`. When
+the expired cookie is still sent, the response should include a `Set-Cookie`
+header that clears `refreshToken`. If the browser has already deleted the
+expired cookie, the message is:
 
 ```json
 { "message": "Refresh token required" }
