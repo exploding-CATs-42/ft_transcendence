@@ -109,7 +109,7 @@ const AuthProvider = ({ children }: Props) => {
         if (getResponseStatus(error) === 401) {
           clearAccessToken();
         } else {
-          setAuthStatus("authenticated");
+          setAuthStatus("unavailable");
         }
       }
     };
