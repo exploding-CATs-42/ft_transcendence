@@ -1,10 +1,6 @@
 .inputContainer {
   position: relative;
   width: 100%;
-
-  svg {
-    fill: none;
-  }
 }
 
 .input {
@@ -23,14 +19,23 @@
     border-color: var(--throw-throw-burrito);
   }
 
-  &:hover + svg,
-  &:focus + svg {
+  &:hover + .icon,
+  &:focus + .icon {
     stroke: var(--throw-throw-burrito);
   }
 }
 
 .input::placeholder {
   color: rgba(var(--off-white-rgb), 0.6);
+}
+
+.icon {
+  position: absolute;
+  top: 50%;
+  left: 14px;
+  transform: translateY(-50%);
+
+  fill: none;
 }
 
 .pdLeft {
@@ -40,7 +45,7 @@
 .normal {
   border-color: rgba(var(--off-white-rgb), 0.3);
 
-  & > svg {
+  & > .icon {
     stroke: rgba(var(--off-white-rgb), 0.8);
   }
 }
@@ -48,7 +53,7 @@
 .success {
   border-color: var(--zombie-kittens);
 
-  & > svg {
+  & > .icon {
     stroke: var(--zombie-kittens);
   }
 }
@@ -56,7 +61,7 @@
 .error {
   border-color: var(--exploding-kittens);
 
-  & > svg {
+  & > .icon {
     stroke: var(--exploding-kittens);
   }
 }
@@ -64,7 +69,7 @@
 .warning {
   border-color: var(--throw-throw-burrito);
 
-  & > svg {
+  & > .icon {
     stroke: var(--throw-throw-burrito);
   }
 }
