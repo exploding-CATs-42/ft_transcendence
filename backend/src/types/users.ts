@@ -1,0 +1,44 @@
+export interface GameStats {
+  totalMatches: number;
+  wins: number;
+}
+
+export interface OnlineStatus {
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+}
+
+export type UserId = string;
+
+export interface User {
+  id: UserId;
+  email: string;
+  username: string;
+  avatarUrl: string | null;
+}
+
+export type PublicUser = Omit<User, "email">;
+
+export type ProfileUser = PublicUser & OnlineStatus;
+export type ProfileUserWithStats = ProfileUser & GameStats;
+
+export type MyProfileUser = User & OnlineStatus;
+export type MyProfileUserWithStats = MyProfileUser & GameStats;
+
+export type FriendUser = ProfileUser;
+
+export type FriendDirection = "incoming" | "outgoing" | "accepted";
+
+export interface FriendListItem {
+  user: FriendUser;
+  status: "PENDING" | "ACCEPTED" | "REJECTED";
+  direction: FriendDirection;
+}
+
+export interface UserGameHistoryItem {
+  gameId: string;
+  gameName: string;
+  endedAt: Date;
+  winnerId: string | null;
+  players: FriendUser[];
+}

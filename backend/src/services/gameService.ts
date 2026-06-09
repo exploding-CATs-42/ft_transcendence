@@ -14,24 +14,26 @@ import {
 import { createActor } from "xstate";
 import { GameEventType } from "../game/events";
 import { gameMachine } from "../game/gameMachine";
-import { Game, GameInfo, Player } from "../game/types";
-import { UserId, WaitingStateView } from "../types";
+import { GameInstance, GameInfo } from "../game/instance";
+import { Player } from "../game/types/player";
+import { JoinGameResult, PlayerIdPayload } from "../types";
 import GameStore from "../utils/gameStore";
-import { ensureUserExists } from "../utils/users";
 import { toWaitingPlayerView } from "../game/mappers";
 import { attachBroadcaster } from "../game/broadcaster";
+import { ensureUserExists } from "./usersService";
+import { UserId } from "../types/users";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);
 
   if (!game) {
-    throw new ApiError("Game not found", 404);
+    throw new ApiError("GameInstance not found", 404);
   }
 
   return game;
 }
 
-export async function getGames(userId: UserId): Promise<Game[]> {
+export async function getGames(userId: UserId): Promise<GameInstance[]> {
   await ensureUserExists(userId);
 
   return GameStore.getAllGames();
@@ -40,7 +42,7 @@ export async function getGames(userId: UserId): Promise<Game[]> {
 export async function getGameById(
   userId: UserId,
   input: GetGameByIdParams,
-): Promise<Game> {
+): Promise<GameInstance> {
   await ensureUserExists(userId);
 
   return ensureGameExists(input.gameId);
@@ -54,7 +56,7 @@ export async function createGame(
 
   const actor = createActor(gameMachine);
 
-  const game: Game = {
+  const game: GameInstance = {
     info: {
       id: crypto.randomUUID(),
       name: input.gameName,
@@ -79,14 +81,14 @@ export async function deleteGame(userId: UserId, input: DeleteGameParams) {
 export async function joinGame(
   input: JoinGameParams,
   userId: UserId,
-): Promise<WaitingStateView> {
+): Promise<JoinGameResult> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
   const playersBefore = game.actor.getSnapshot().context.players;
 
   if (playersBefore.length >= game.info.maxPlayers) {
-    throw new SocketError("Game is full");
+    throw new SocketError("GameInstance is full");
   }
 
   const alreadyJoined = playersBefore.some((p) => {
@@ -112,13 +114,17 @@ export async function joinGame(
   });
 
   const playersAfter = game.actor.getSnapshot().context.players;
-  return { players: playersAfter.map(toWaitingPlayerView) };
+
+  return {
+    player: toWaitingPlayerView(player),
+    waitingState: { players: playersAfter.map(toWaitingPlayerView) },
+  };
 }
 
 export async function leaveGame(
   input: LeaveGameParams,
   userId: UserId,
-): Promise<WaitingStateView> {
+): Promise<PlayerIdPayload> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
@@ -141,14 +147,16 @@ export async function leaveGame(
 
   if (isLastPlayer) {
     GameStore.deleteGameById(input.gameId);
-    return { players: [] };
+    return { playerId: "" };
   }
 
-  const playersAfter = game.actor.getSnapshot().context.players;
-  return { players: playersAfter.map(toWaitingPlayerView) };
+  return { playerId: player.id };
 }
 
-export async function confirmStart(input: ConfirmStartParams, userId: UserId) {
+export async function confirmStart(
+  input: ConfirmStartParams,
+  userId: UserId,
+): Promise<PlayerIdPayload> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
@@ -167,11 +175,13 @@ export async function confirmStart(input: ConfirmStartParams, userId: UserId) {
     playerId: player.id,
   });
 
-  const playersAfter = game.actor.getSnapshot().context.players;
-  return { players: playersAfter.map(toWaitingPlayerView) };
+  return { playerId: player.id };
 }
 
-export async function cancelStart(input: CancelStartParams, userId: UserId) {
+export async function cancelStart(
+  input: CancelStartParams,
+  userId: UserId,
+): Promise<PlayerIdPayload> {
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
@@ -190,6 +200,5 @@ export async function cancelStart(input: CancelStartParams, userId: UserId) {
     playerId: player.id,
   });
 
-  const playersAfter = game.actor.getSnapshot().context.players;
-  return { players: playersAfter.map(toWaitingPlayerView) };
+  return { playerId: player.id };
 }

@@ -1,11 +1,11 @@
 import { Server, Socket } from "socket.io";
 import { registerChatHandlers } from "./chat";
-import { authMiddleware } from "../middlewares/sockets/authMiddleware";
+import { socketAuthMiddleware } from "../middlewares";
 import { lobbyGameHandlers } from "./game";
 import { setIoForBroadcaster } from "../game/broadcaster";
 
 export const initSockets = (io: Server) => {
-  io.use(authMiddleware);
+  io.use(socketAuthMiddleware);
   setIoForBroadcaster(io);
 
   io.on("connection", (socket: Socket) => {

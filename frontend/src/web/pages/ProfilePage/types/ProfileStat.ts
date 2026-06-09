@@ -1,7 +1,6 @@
 export type ProfileStat = {
   id: number;
-  icon: string;
-  alt: string;
+  icon: "gamepad" | "medal" | "bomb" | "percent";
   name: string;
-  amount: string;
+  amount: number;
 };

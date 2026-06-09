@@ -7,7 +7,7 @@ import {
   joinGame,
   leaveGame,
 } from "../services/gameService";
-import { withErrorHandler } from "../utils/asyncHandler";
+import { withErrorHandler } from "../utils/errorHandler";
 import {
   CancelStartParams,
   cancelStartSchema,
@@ -33,11 +33,15 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
-        const waitingState = await joinGame(parsed, socket.data.sub);
+        const { waitingState, player } = await joinGame(
+          parsed,
+          socket.data.sub,
+        );
         const room = parsed.gameId;
         await socket.join(room);
 
-        io.to(room).emit(PublicEventType.PLAYER_JOINED, waitingState);
+        socket.emit(PrivateEventType.WAITING_STATE, { waitingState });
+        socket.to(room).emit(PublicEventType.PLAYER_JOINED, { player });
       },
     ),
   );
@@ -49,12 +53,12 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
-        const waitingState = await leaveGame(parsed, socket.data.sub);
+        const { playerId } = await leaveGame(parsed, socket.data.sub);
         const room = parsed.gameId;
         await socket.leave(room);
 
-        socket.emit(PrivateEventType.YOU_LEFT);
-        io.to(room).emit(PublicEventType.PLAYER_LEFT, waitingState);
+        socket.emit(PrivateEventType.LEFT_GAME);
+        io.to(room).emit(PublicEventType.PLAYER_LEFT, { playerId });
       },
     ),
   );
@@ -66,10 +70,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.CONFIRM_START_ERROR,
       async (parsed: ConfirmStartParams) => {
-        const waitingState = await confirmStart(parsed, socket.data.sub);
+        const { playerId } = await confirmStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(PublicEventType.PLAYER_CONFIRMED, waitingState);
+        io.to(room).emit(PublicEventType.PLAYER_CONFIRMED, { playerId });
       },
     ),
   );
@@ -81,10 +85,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ErrorEventType.CANCEL_START_ERROR,
       async (parsed: CancelStartParams) => {
-        const waitingState = await cancelStart(parsed, socket.data.sub);
+        const { playerId } = await cancelStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(PublicEventType.PLAYER_CANCELED, waitingState);
+        io.to(room).emit(PublicEventType.PLAYER_CANCELED, { playerId });
       },
     ),
   );

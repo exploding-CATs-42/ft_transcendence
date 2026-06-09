@@ -12,10 +12,10 @@ const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage.jsx"));
 const LobbyPage = lazy(() => import("./pages/LobbyPage/LobbyPage"));
 const GamePage = lazy(() => import("./pages/GamePage/GamePage.jsx"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage/NotFoundPage.js"));
-const LoginPage = lazy(() => import("./pages/LoginPage/LoginPage"));
-const RegisterPage = lazy(() => import("./pages/RegisterPage/RegisterPage"));
+const AuthPage = lazy(() => import("./pages/AuthPage/AuthPage"));
 const ChatPage = lazy(() => import("./pages/ChatPage/ChatPage"));
 const RulesPage = lazy(() => import("./pages/RulesPage/RulesPage"));
+const AboutPage = lazy(() => import("./pages/AboutPage/AboutPage"));
 
 function App() {
   return (
@@ -24,11 +24,12 @@ function App() {
         {/* Public routes */}
         <Route index element={<HomePage />} />
         <Route path="rules" element={<RulesPage />} />
+        <Route path="about" element={<AboutPage />} />
 
         {/* Login/Register routes */}
         <Route element={<AuthRoute />}>
-          <Route path="login" element={<LoginPage />} />
-          <Route path="register" element={<RegisterPage />} />
+          <Route path="login" element={<AuthPage />} />
+          <Route path="register" element={<AuthPage />} />
         </Route>
 
         {/* Private routes */}

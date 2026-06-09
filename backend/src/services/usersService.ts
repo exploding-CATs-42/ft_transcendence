@@ -1,11 +1,6 @@
-import { prisma } from "../lib/prisma";
-import type { Prisma } from "../generated/prisma/client";
-import type {
-  FriendUser,
-  PublicProfileUser,
-  SelfProfileUser,
-  UserGameHistoryItem,
-} from "../types/auth";
+import { prisma, publicProfileSelect } from "../lib/prisma";
+import { ProfileUserWithStats, UserGameHistoryItem } from "../types";
+import { toProfileUser, toProfileUserWithStats } from "../utils/users";
 
 export class UsersServiceError extends Error {
   public statusCode: number;
@@ -16,69 +11,7 @@ export class UsersServiceError extends Error {
   }
 }
 
-export const publicProfileSelect = {
-  id: true,
-  username: true,
-  avatarUrl: true,
-  isOnline: true,
-  lastSeenAt: true,
-} satisfies Prisma.UserSelect;
-
-export const selfProfileSelect = {
-  id: true,
-  email: true,
-  username: true,
-  avatarUrl: true,
-  isOnline: true,
-  lastSeenAt: true,
-} satisfies Prisma.UserSelect;
-
-export function toFriendUser(user: {
-  id: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
-}): FriendUser {
-  return {
-    id: user.id,
-    username: user.username,
-    avatarUrl: user.avatarUrl,
-    isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
-  };
-}
-
-export function toSelfProfileUser(user: {
-  id: string;
-  email: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
-}): SelfProfileUser {
-  return {
-    id: user.id,
-    email: user.email,
-    username: user.username,
-    avatarUrl: user.avatarUrl,
-    isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
-  };
-}
-
-async function ensureUserExists(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true },
-  });
-
-  if (!user) {
-    throw new UsersServiceError("User not found", 404);
-  }
-}
-
-async function getFinishedGamesStats(userId: string): Promise<{
+export async function getFinishedGamesStats(userId: string): Promise<{
   totalMatches: number;
   wins: number;
 }> {
@@ -109,29 +42,9 @@ async function getFinishedGamesStats(userId: string): Promise<{
   };
 }
 
-async function toPublicProfileUser(user: {
-  id: string;
-  username: string;
-  avatarUrl: string | null;
-  isOnline: boolean;
-  lastSeenAt: Date | null;
-}): Promise<PublicProfileUser> {
-  const stats = await getFinishedGamesStats(user.id);
-
-  return {
-    id: user.id,
-    username: user.username,
-    avatarUrl: user.avatarUrl,
-    isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
-    totalMatches: stats.totalMatches,
-    wins: stats.wins,
-  };
-}
-
 export async function getPublicUserById(
   userId: string,
-): Promise<PublicProfileUser> {
+): Promise<ProfileUserWithStats> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: publicProfileSelect,
@@ -141,12 +54,25 @@ export async function getPublicUserById(
     throw new UsersServiceError("User not found", 404);
   }
 
-  return toPublicProfileUser(user);
+  const stats = await getFinishedGamesStats(user.id);
+  return toProfileUserWithStats(user, stats);
+}
+
+export async function ensureUserExists(userId: string) {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { id: true, username: true },
+  });
+
+  if (!user) {
+    throw new UsersServiceError("User not found", 404);
+  }
+  return user;
 }
 
 export async function searchUsersByUsername(
   username: string,
-): Promise<PublicProfileUser[]> {
+): Promise<ProfileUserWithStats[]> {
   const users = await prisma.user.findMany({
     where: {
       username: {
@@ -160,7 +86,12 @@ export async function searchUsersByUsername(
     },
   });
 
-  return Promise.all(users.map(toPublicProfileUser));
+  return Promise.all(
+    users.map(async (user) => {
+      const stats = await getFinishedGamesStats(user.id);
+      return toProfileUserWithStats(user, stats);
+    }),
+  );
 }
 
 export async function getUserGames(
@@ -201,9 +132,9 @@ export async function getUserGames(
       gameId: membership.game.id,
       gameName: membership.game.gameName,
       endedAt: membership.game.endedAt as Date,
-      isWinner: membership.game.winnerUserId === userId,
+      winnerId: membership.game.winnerUserId,
       players: membership.game.memberships.map((gameMembership) =>
-        toFriendUser(gameMembership.user),
+        toProfileUser(gameMembership.user),
       ),
     }))
     .sort((left, right) => {

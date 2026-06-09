@@ -2,14 +2,14 @@ import express from "express";
 import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 import SwaggerParser from "@apidevtools/swagger-parser";
+import { getPublicUrl } from "../../utils/publicUrl";
 
 export const docsRouter = express.Router();
 
 docsRouter.get("/", (req, res) => {
-  const forwardedPrefix = req.get("x-forwarded-prefix") ?? "";
-  const publicBaseUrl = `${forwardedPrefix}${req.baseUrl}`;
+  const publicUrl = getPublicUrl(req, "/rest-api/");
 
-  res.redirect(`${publicBaseUrl}/rest-api/`);
+  res.redirect(publicUrl);
 });
 
 docsRouter.use("/rest-api", swaggerUi.serve);
@@ -30,20 +30,22 @@ docsRouter.get("/rest-api/", async (_, res, next) => {
   }
 });
 
-docsRouter.get("/sockets", (_, res) => {
-  res.send(`
+docsRouter.get("/sockets", (req, res) => {
+  const publicUrl = getPublicUrl(req, "/asyncapi.yaml");
+
+  res.type("html").send(`
     <!DOCTYPE html>
     <html>
       <head>
         <title>API Docs</title>
-        <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@latest/styles/default.min.css">
+        <link rel="stylesheet" href="https://unpkg.com/@asyncapi/react-component@3.1.3/styles/default.min.css">
       </head>
       <body>
         <div id="asyncapi"></div>
-        <script src="https://unpkg.com/@asyncapi/react-component@latest/browser/standalone/index.js"></script>
+        <script src="https://unpkg.com/@asyncapi/react-component@3.1.3/browser/standalone/index.js"></script>
         <script>
           AsyncApiStandalone.render({
-            schema: { url: './asyncapi.yaml' },
+            schema: { url: '${publicUrl}' },
             config: { show: { sidebar: true } },
           }, document.getElementById('asyncapi'));
         </script>
@@ -52,7 +54,10 @@ docsRouter.get("/sockets", (_, res) => {
   `);
 });
 
-docsRouter.get(
-  "/asyncapi.yaml",
-  express.static(path.join(__dirname, "../../../docs/sockets/asyncapi.yaml")),
-);
+docsRouter.get("/asyncapi.yaml", (_, res) => {
+  const rootPath = path.resolve(
+    __dirname,
+    "../../../docs/sockets/asyncapi.yaml",
+  );
+  res.type("text/yaml").sendFile(rootPath);
+});

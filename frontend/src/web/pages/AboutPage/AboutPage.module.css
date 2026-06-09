@@ -1,0 +1,71 @@
+.pageContainer {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  padding: 30px 10%;
+}
+
+.section {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}
+
+.sectionHeader {
+  font-size: 28px;
+  font-family: "Playpen sans";
+  text-align: center;
+
+  margin-bottom: 24px;
+}
+
+.description {
+  font-size: 20px;
+
+  & > a {
+    text-decoration: underline;
+  }
+}
+
+.contactsList {
+  display: flex;
+  justify-content: center;
+  gap: 32px;
+  flex-wrap: wrap;
+}
+
+.contactsList > li {
+  width: 100%;
+}
+
+@media only screen and (min-width: 480px) {
+  .sectionHeader {
+    font-size: 36px;
+  }
+
+  .description {
+    font-size: 24px;
+  }
+}
+
+@media only screen and (min-width: 768px) {
+  .description {
+    font-size: 30px;
+    text-align: center;
+  }
+
+  .contactsList > li {
+    width: calc((100% - 32px) / 2);
+  }
+}
+
+@media only screen and (min-width: 1024px) {
+  .contactsList > li {
+    width: calc((100% - 32px * 2) / 3);
+  }
+}
+
+@media only screen and (min-width: 1280px) {
+  .contactsList > li {
+    width: calc((100% - 32px * 4) / 5);
+  }
+}

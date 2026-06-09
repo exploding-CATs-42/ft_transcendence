@@ -1,14 +1,69 @@
-import { ApiError } from "../errors/apiError";
-import { prisma } from "../lib/prisma";
+import { MyProfileUser, ProfileUser } from "../types";
 
-export async function ensureUserExists(userId: string) {
-  const user = await prisma.user.findUnique({
-    where: { id: userId },
-    select: { id: true, username: true },
-  });
+export function toProfileUser(user: {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+}): ProfileUser {
+  return {
+    id: user.id,
+    username: user.username,
+    avatarUrl: user.avatarUrl,
+    isOnline: user.isOnline,
+    lastSeenAt: user.lastSeenAt,
+  };
+}
 
-  if (!user) {
-    throw new ApiError("User not found", 404);
-  }
-  return user;
+export function toSelfProfileUser(user: {
+  id: string;
+  email: string;
+  username: string;
+  avatarUrl: string | null;
+  isOnline: boolean;
+  lastSeenAt: Date | null;
+}): MyProfileUser {
+  return {
+    id: user.id,
+    email: user.email,
+    username: user.username,
+    avatarUrl: user.avatarUrl,
+    isOnline: user.isOnline,
+    lastSeenAt: user.lastSeenAt,
+  };
+}
+
+export function toProfileUserWithStats(
+  user: {
+    id: string;
+    username: string;
+    avatarUrl: string | null;
+    isOnline: boolean;
+    lastSeenAt: Date | null;
+  },
+  stats: {
+    totalMatches: number;
+    wins: number;
+  },
+) {
+  return {
+    ...user,
+    totalMatches: stats.totalMatches,
+    wins: stats.wins,
+  };
+}
+
+export function toMyProfileUser(
+  user: MyProfileUser,
+  stats: {
+    totalMatches: number;
+    wins: number;
+  },
+) {
+  return {
+    ...user,
+    totalMatches: stats.totalMatches,
+    wins: stats.wins,
+  };
 }

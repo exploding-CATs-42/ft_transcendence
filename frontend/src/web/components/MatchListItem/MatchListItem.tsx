@@ -15,9 +15,11 @@ const MatchListItem = ({ match }: Props) => {
   return (
     <ListItem>
       <div className={s.container}>
-        <span className={s.title}>{match.title}</span>
+        <span className={s.title}>{match.gameName}</span>
         <ul className={s.items}>
-          {slots.map((slot, index) => renderSlot(slot, `${match.id}_${index}`))}
+          {slots.map((slot, index) =>
+            renderSlot(slot, `${match.gameId}_${index}`),
+          )}
         </ul>
       </div>
     </ListItem>

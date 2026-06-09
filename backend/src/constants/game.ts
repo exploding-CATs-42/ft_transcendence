@@ -1,12 +1,5 @@
-import { Player } from "../game/types";
-import {
-  Deck,
-  GameId,
-  GameRules,
-  GameState,
-  GameStatus,
-  TurnState,
-} from "../types";
+import { Player } from "../game/types/player";
+import { Deck, GameId, GameRules, GameState, TurnState } from "../types";
 
 export const DEFAULT_GAME_RULES: GameRules = {
   dealtCardsPerPlayer: 7,
@@ -36,7 +29,6 @@ export const DEFAULT_PLAYER: Player = {
 
 export const DEFAULT_GAME_STATE: GameState = {
   gameId: "" as GameId,
-  status: "waiting" as GameStatus,
   name: "",
   maxPlayers: DEFAULT_GAME_RULES.maxPlayers,
   players: [],

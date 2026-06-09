@@ -1,84 +1,57 @@
+import type { ProfileUser } from "pages/ProfilePage/types";
 import type { LobbyMatch } from "types";
+
+const alice: ProfileUser = {
+  id: "u-1",
+  username: "Alice",
+  isOnline: true,
+  avatarUrl: null,
+  lastSeenAt: new Date(),
+};
+
+const bob: ProfileUser = {
+  id: "u-2",
+  username: "Bob",
+  isOnline: false,
+  avatarUrl: null,
+  lastSeenAt: new Date("2026-06-02T18:30:00Z"),
+};
+
+const charlie: ProfileUser = {
+  id: "u-3",
+  username: "Charlie",
+  isOnline: true,
+  avatarUrl: null,
+  lastSeenAt: new Date(),
+};
+
+const diana: ProfileUser = {
+  id: "u-4",
+  username: "Diana",
+  isOnline: true,
+  avatarUrl: null,
+  lastSeenAt: new Date(),
+};
 
 export const matchesMock: LobbyMatch[] = [
   {
-    id: "g-100",
-    title: "Table 1",
-    players: [
-      {
-        id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-3",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-4",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-5",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-    ],
+    gameId: "g-1",
+    gameName: "Table 1",
+    players: [alice, bob],
   },
   {
-    id: "g-101",
-    title: "Table 2",
-    players: [
-      {
-        id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-3",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-4",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-    ],
+    gameId: "g-2",
+    gameName: "Table 2",
+    players: [charlie, diana, charlie],
   },
   {
-    id: "g-102",
-    title: "Table 3",
-    players: [
-      {
-        id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-3",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-    ],
+    gameId: "g-3",
+    gameName: "Table 3",
+    players: [alice, bob, charlie, diana],
   },
   {
-    id: "g-103",
-    title: "Table 4",
-    players: [
-      {
-        id: "u-1",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-      {
-        id: "u-2",
-        avatarUrl: "/src/web/assets/images/avatar/avatar-193w.png",
-      },
-    ],
+    gameId: "g-4",
+    gameName: "Table 4",
+    players: [alice, diana],
   },
 ];

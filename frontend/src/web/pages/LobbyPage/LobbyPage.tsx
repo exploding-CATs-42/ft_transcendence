@@ -45,8 +45,8 @@ const LobbyPage = () => {
     });
 
     const newMatch: LobbyMatch = {
-      id: createdGame.gameId,
-      title: createdGame.name,
+      gameId: createdGame.gameId,
+      gameName: createdGame.name,
       players: [],
     };
 
@@ -58,12 +58,12 @@ const LobbyPage = () => {
       <Section className={s.listSection}>
         <List
           items={matches}
-          getKey={(match) => match.id}
+          getKey={(match) => match.gameId}
           renderItem={(match) => (
             <button
               type="button"
               className={s.matchButton}
-              onClick={() => handleOpenJoinModalWithGameId(match.id)}
+              onClick={() => handleOpenJoinModalWithGameId(match.gameId)}
             >
               <MatchListItem match={match} />
             </button>

@@ -3,7 +3,7 @@ import path from "path";
 import { GameId } from "../types";
 import { createActor, Snapshot } from "xstate";
 import { gameMachine } from "../game/gameMachine";
-import { Game, GameInfo } from "../game/types";
+import { GameInstance, GameInfo } from "../game/instance";
 import { attachBroadcaster } from "../game/broadcaster";
 
 interface PersistedGame {
@@ -32,7 +32,9 @@ export async function ensurePersistenceDir() {
   }
 }
 
-export async function loadGames(games: Map<GameId, Game>): Promise<void> {
+export async function loadGames(
+  games: Map<GameId, GameInstance>,
+): Promise<void> {
   try {
     await ensurePersistenceDir();
 
@@ -58,7 +60,9 @@ export async function loadGames(games: Map<GameId, Game>): Promise<void> {
   }
 }
 
-export async function saveGames(games: Map<GameId, Game>): Promise<void> {
+export async function saveGames(
+  games: Map<GameId, GameInstance>,
+): Promise<void> {
   try {
     if (!games) {
       throw new Error("saveGames called with undefined games");
@@ -80,7 +84,7 @@ export async function saveGames(games: Map<GameId, Game>): Promise<void> {
   }
 }
 
-export function createSaveLoop(games: Map<GameId, Game>) {
+export function createSaveLoop(games: Map<GameId, GameInstance>) {
   let timeout: ReturnType<typeof setTimeout>;
   let stopped = false;
 
@@ -108,7 +112,10 @@ export function setupSignalHandlers(handler: () => void): void {
   process.on("SIGTERM", handler);
 }
 
-export async function shutdown(games: Map<GameId, Game>, stop: () => void) {
+export async function shutdown(
+  games: Map<GameId, GameInstance>,
+  stop: () => void,
+) {
   console.log("Shutdown detected");
 
   stop();

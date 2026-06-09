@@ -2,14 +2,14 @@
 import { useState } from "react";
 //Project level
 import { Button, List, MatchListItem, SearchInput, Section } from "components";
-import type { LobbyMatch } from "types";
 // Local level
 import { FriendListItem, Tabs } from "../../components";
 import type { TabOption, FriendItem } from "../../types";
 import s from "./ListSection.module.css";
+import type { UserGameHistoryItem } from "components/MatchListItem/types";
 
 interface Props {
-  matches: LobbyMatch[];
+  matches: UserGameHistoryItem[];
   friends: FriendItem[];
 }
 
@@ -61,7 +61,7 @@ const ListSection = ({ matches, friends }: Props) => {
       ) : (
         <List
           items={matches}
-          getKey={(match) => match.id}
+          getKey={(match) => match.gameId}
           renderItem={(match) => <MatchListItem match={match} />}
           className={s.list}
           empty="No matches yet"

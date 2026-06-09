@@ -4,8 +4,8 @@ import {
   getGameByIdController,
   getGamesController,
 } from "../../controllers/gamesController";
-import { errorMiddleware } from "../../middlewares/games/ErrorRequestMiddleware";
-import { asyncHandler } from "../../utils/asyncHandler";
+import { errorMiddleware } from "../../middlewares";
+import { errorHandler } from "../../utils/errorHandler";
 import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
 
 export const gamesRouter = createAuthenticatedRouter();
@@ -25,10 +25,10 @@ export const gamesRouter = createAuthenticatedRouter();
  * For more info see authenticatedRouter.ts
  */
 
-gamesRouter.get("/", asyncHandler(getGamesController));
-gamesRouter.get("/:gameId", asyncHandler(getGameByIdController));
-gamesRouter.post("/", asyncHandler(createGameController));
-gamesRouter.delete("/:gameId", asyncHandler(deleteGameController));
+gamesRouter.get("/", errorHandler(getGamesController));
+gamesRouter.get("/:gameId", errorHandler(getGameByIdController));
+gamesRouter.post("/", errorHandler(createGameController));
+gamesRouter.delete("/:gameId", errorHandler(deleteGameController));
 
 /**
  * Error handling middleware for all game routes.

@@ -1,9 +1,19 @@
 // Libraries
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 // Project level
-import { PdfViewer } from "components";
+import { Icon } from "components";
+import { PlayIcon } from "assets";
+// Local level
+import { Poster } from "./components";
+// CSS
+import s from "./RulesPage.module.css";
 
 const RulesPage = () => {
+  const tutorialVideoLink =
+    "https://www.youtube.com/embed/rcVpTb-iPoQ?playsinline=1&amp;autoplay=1&amp;rel=0&amp;";
+
+  const [isPlaying, setIsPlaying] = useState(false);
+
   useEffect(() => {
     const html = document.documentElement;
     const body = document.body;
@@ -35,7 +45,40 @@ const RulesPage = () => {
     };
   }, []);
 
-  return <PdfViewer />;
+  return (
+    <div className={s.pageContainer}>
+      <p className={s.topText}>You can watch it</p>
+      <div className={s.videoWrapper}>
+        {isPlaying ? (
+          <iframe
+            className={s.video}
+            src={tutorialVideoLink}
+            allowFullScreen={true}
+            allow="autoplay"
+          />
+        ) : (
+          <div className={s.posterContainer}>
+            <Poster className={s.poster} />
+            <button
+              className={s.playButton}
+              type="button"
+              title="Play video"
+              onClick={() => setIsPlaying(true)}
+            >
+              <PlayIcon width={64} height={64} />
+            </button>
+          </div>
+        )}
+      </div>
+      <div className={s.pdfDownloadContainer}>
+        <p className={s.bottomText}>or download full rulebook as a PDF</p>
+        <a className={s.downloadLink} href="rules.pdf" target="_blank">
+          Download
+          <Icon name="download" width={20} height={20} />
+        </a>
+      </div>
+    </div>
+  );
 };
 
 export default RulesPage;

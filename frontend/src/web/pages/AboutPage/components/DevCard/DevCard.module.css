@@ -1,0 +1,60 @@
+* {
+  --white: rgb(255, 255, 255);
+  --white-grey: rgb(203, 212, 219);
+  --black: rgb(0, 0, 0);
+  --red: rgb(221, 67, 67);
+  --blue: rgb(0, 119, 181);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+
+  background-color: var(--white-grey);
+
+  border: 2px solid var(--white);
+  border-radius: 20px;
+  overflow: hidden;
+
+  padding-bottom: 10px;
+}
+
+.photo {
+  object-fit: contain;
+  width: 100%;
+}
+
+.socialsList {
+  display: flex;
+  width: 100%;
+
+  margin-bottom: 10px;
+
+  & > li {
+    width: 100%;
+  }
+}
+
+.socialLink {
+  display: block;
+  padding: 4px 10px;
+  text-align: center;
+}
+
+.linkedIn {
+  background-color: var(--blue);
+}
+
+.gitHub {
+  background-color: var(--black);
+}
+
+.email {
+  background-color: var(--red);
+}
+
+.name {
+  font-family: "Playpen sans";
+  text-align: center;
+  color: var(--black);
+}
