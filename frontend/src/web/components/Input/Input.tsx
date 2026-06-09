@@ -11,6 +11,7 @@ import s from "./Input.module.css";
 interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   type: InputType;
   iconName?: IconName;
+  iconClassName?: string;
   status?: InputStatus | undefined;
 }
 
@@ -18,6 +19,7 @@ const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
   const {
     type = "text",
     iconName,
+    iconClassName,
     status = "normal",
     placeholder,
     className,
@@ -37,7 +39,14 @@ const Input = forwardRef<HTMLInputElement, Props>((props, ref) => {
         placeholder={placeholder}
         autoComplete={type === "email" ? "email" : undefined}
       />
-      {iconName && <Icon name={iconName} width={24} height={24} />}
+      {iconName && (
+        <Icon
+          className={iconClassName || s.icon}
+          name={iconName}
+          width={24}
+          height={24}
+        />
+      )}
 
       {children}
     </div>
