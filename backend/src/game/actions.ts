@@ -1,7 +1,7 @@
 import { GameEvent, GameEvents } from "./events";
 import { GameContext } from "./gameMachine";
 
-export const GameActionType = {
+export const GameActions = {
   ADD_PLAYER: "addPlayer",
   REMOVE_PLAYER: "removePlayer",
   ADD_PLAYER_CONFIRMATION: "addPlayerConfirmation",
