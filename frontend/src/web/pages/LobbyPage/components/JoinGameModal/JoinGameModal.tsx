@@ -34,6 +34,7 @@ const JoinGameModal = ({
           value={gameId}
           onChange={(event) => onGameIdChange(event.target.value)}
           iconName="puzzle"
+          iconClassName={s.icon}
           placeholder="Table id"
         />
 

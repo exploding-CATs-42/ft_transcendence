@@ -119,6 +119,7 @@ const CreateTableModal = ({ isOpen, toggleModal, onSubmit }: Props) => {
             setSubmitError("");
           }}
           iconName="puzzle"
+          iconClassName={s.icon}
           placeholder="Table name"
           maxLength={30}
           disabled={isSubmitting}
