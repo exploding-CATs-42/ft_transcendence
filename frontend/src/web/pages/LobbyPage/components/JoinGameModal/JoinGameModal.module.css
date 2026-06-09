@@ -79,7 +79,11 @@
 
   transform: translateY(-50%);
 
-  color: var(--exploding-kittens-hover);
+  stroke: var(--exploding-kittens-hover);
+  fill: none;
+
+  width: 18px;
+  height: 18px;
 }
 
 .modalInput::placeholder {
