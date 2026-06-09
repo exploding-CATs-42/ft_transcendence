@@ -593,7 +593,7 @@ so the user is not stuck in a visually logged-in state.
 Auth state has an explicit status:
 
 ```ts
-type AuthStatus = "loading" | "authenticated" | "anonymous";
+type AuthStatus = "loading" | "authenticated" | "anonymous" | "unavailable";
 ```
 
 After a page refresh, browser storage survives but JavaScript memory is reset:
@@ -630,13 +630,15 @@ authStatus = anonymous
 ```
 
 If startup refresh fails because of a transient network error or a `5xx` backend
-error, `AuthProvider` keeps the user in `authenticated` state so the app can
-continue rendering and retry later.
+error, `AuthProvider` moves to `unavailable`. This means the app could not
+verify the backend session for a technical reason, so protected pages should not
+render authenticated content yet.
 
 `PrivateRoute` waits while auth is loading, then redirects anonymous users:
 
 ```txt
 loading -> render nothing
+unavailable -> render an auth service unavailable message
 anonymous -> redirect /login
 authenticated -> render protected page
 ```
