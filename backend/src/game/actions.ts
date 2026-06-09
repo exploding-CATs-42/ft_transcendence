@@ -1,5 +1,12 @@
-import { GameEvent, GameEventType } from "./events";
+import { GameEvent, GameEvents } from "./events";
 import { GameContext } from "./gameMachine";
+
+export const GameActions = {
+  ADD_PLAYER: "addPlayer",
+  REMOVE_PLAYER: "removePlayer",
+  ADD_PLAYER_CONFIRMATION: "addPlayerConfirmation",
+  REMOVE_PLAYER_CONFIRMATION: "removePlayerConfirmation",
+} as const;
 
 export interface GameActionArgs {
   context: GameContext;
@@ -7,7 +14,7 @@ export interface GameActionArgs {
 }
 
 export const addPlayer = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEventType.JOIN_GAME) return context;
+  if (event.type !== GameEvents.JOIN_GAME) return context;
 
   return {
     players: [...context.players, event.player],
@@ -15,7 +22,7 @@ export const addPlayer = ({ context, event }: GameActionArgs) => {
 };
 
 export const removePlayer = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEventType.LEAVE_GAME) return context;
+  if (event.type !== GameEvents.LEAVE_GAME) return context;
 
   return {
     players: context.players.filter((p) => p.id !== event.playerId),
@@ -23,7 +30,7 @@ export const removePlayer = ({ context, event }: GameActionArgs) => {
 };
 
 export const addPlayerConfirmation = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEventType.CONFIRM_START) return context;
+  if (event.type !== GameEvents.CONFIRM_START) return context;
 
   return {
     players: context.players.map((p) =>
@@ -36,7 +43,7 @@ export const removePlayerConfirmation = ({
   context,
   event,
 }: GameActionArgs) => {
-  if (event.type !== GameEventType.CANCEL_START) return context;
+  if (event.type !== GameEvents.CANCEL_START) return context;
 
   return {
     players: context.players.map((p) =>

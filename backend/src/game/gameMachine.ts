@@ -1,13 +1,14 @@
 import { assign, emit, setup } from "xstate";
 import {
+  GameActions,
   addPlayer,
   addPlayerConfirmation,
   removePlayer,
   removePlayerConfirmation,
 } from "./actions";
 import { Player } from "./types/player";
-import { GameEvent } from "./events";
-import { canEnterStarting } from "./guards";
+import { GameEvent, GameEvents } from "./events";
+import { GameGuards, hasEnoughPlayers } from "./guards";
 import { START_GAME_COUNTDOWN_MS } from "../constants/game";
 import {
   countdownCanceled,
@@ -15,6 +16,8 @@ import {
   GameEmitter,
   gameStarted,
 } from "./emitters";
+import { GAME_MACHINE_ID, GameStates } from "./states";
+import { GameTargets } from "./targets";
 
 export interface GameContext {
   players: Player[];
@@ -27,69 +30,72 @@ export const gameMachine = setup({
     emitted: {} as GameEmitter,
   },
   actions: {
-    addPlayer: assign(addPlayer),
-    removePlayer: assign(removePlayer),
-    addPlayerConfirmation: assign(addPlayerConfirmation),
-    removePlayerConfirmation: assign(removePlayerConfirmation),
+    [GameActions.ADD_PLAYER]: assign(addPlayer),
+    [GameActions.REMOVE_PLAYER]: assign(removePlayer),
+    [GameActions.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
+    [GameActions.REMOVE_PLAYER_CONFIRMATION]: assign(removePlayerConfirmation),
   },
   guards: {
-    canEnterStarting,
+    [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
   },
 }).createMachine({
-  id: "game",
-  initial: "waiting",
+  id: GAME_MACHINE_ID,
+  initial: GameStates.WAITING,
   context: () => ({
     players: [],
   }),
   states: {
-    waiting: {
-      initial: "confirming",
+    [GameStates.WAITING]: {
+      initial: GameStates.WAITING_CONFIRMING,
       states: {
-        confirming: {
+        [GameStates.WAITING_CONFIRMING]: {
           always: {
-            guard: "canEnterStarting",
-            target: "starting",
+            guard: GameGuards.HAS_ENOUGH_PLAYERS,
+            target: GameTargets.WAITING_STARTING,
           },
           on: {
-            JOIN_GAME: {
-              actions: "addPlayer",
+            [GameEvents.JOIN_GAME]: {
+              actions: GameActions.ADD_PLAYER,
             },
-            LEAVE_GAME: {
-              actions: "removePlayer",
+            [GameEvents.LEAVE_GAME]: {
+              actions: GameActions.REMOVE_PLAYER,
             },
-            CONFIRM_START: {
-              actions: "addPlayerConfirmation",
+            [GameEvents.CONFIRM_START]: {
+              actions: GameActions.ADD_PLAYER_CONFIRMATION,
             },
-            CANCEL_START: {
-              actions: "removePlayerConfirmation",
+            [GameEvents.CANCEL_START]: {
+              actions: GameActions.REMOVE_PLAYER_CONFIRMATION,
             },
           },
         },
-        starting: {
+        [GameStates.WAITING_STARTING]: {
           entry: emit(countdownStarted),
           after: {
             [START_GAME_COUNTDOWN_MS]: {
-              target: "#game.playing",
+              target: GameTargets.PLAYING,
             },
           },
           on: {
-            JOIN_GAME: {
-              target: "#game.waiting.confirming",
-              actions: ["addPlayer", emit({ type: "COUNTDOWN_CANCELED" })],
+            [GameEvents.JOIN_GAME]: {
+              target: GameTargets.WAITING_CONFIRMING,
+              actions: [GameActions.ADD_PLAYER, emit(countdownCanceled)],
             },
-            LEAVE_GAME: {
-              target: "#game.waiting.confirming",
-              actions: ["removePlayer", emit({ type: "COUNTDOWN_CANCELED" })],
+            [GameEvents.LEAVE_GAME]: {
+              target: GameTargets.WAITING_CONFIRMING,
+              actions: [GameActions.REMOVE_PLAYER, emit(countdownCanceled)],
             },
-            CANCEL_START: {
-              target: "#game.waiting.confirming",
-              actions: ["removePlayerConfirmation", emit(countdownCanceled)],
+            [GameEvents.CANCEL_START]: {
+              target: GameTargets.WAITING_CONFIRMING,
+              actions: [
+                GameActions.REMOVE_PLAYER_CONFIRMATION,
+                emit(countdownCanceled),
+              ],
             },
           },
         },
       },
     },
-    playing: {
+    [GameStates.PLAYING]: {
       entry: emit(gameStarted),
     },
   },
