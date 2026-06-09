@@ -3,18 +3,12 @@ import type {
   MyProfileUser,
   ProfileUser,
 } from "pages/ProfilePage/types/ProfileUser";
-import type { FriendItem } from "pages/ProfilePage/types";
 import { api } from "../axios";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 
 const getMe = async (): Promise<MyProfileUser> => {
   const result = await api.get("/me");
   return result.data.user;
-};
-
-const getMeFriends = async (): Promise<FriendItem[]> => {
-  const result = await api.get("/me/friends");
-  return result.data.friends;
 };
 
 const updateMe = async (body: UpdateMeRequestBody): Promise<ProfileUser> => {
@@ -24,6 +18,5 @@ const updateMe = async (body: UpdateMeRequestBody): Promise<ProfileUser> => {
 
 export default {
   getMe,
-  getMeFriends,
   updateMe,
 };
