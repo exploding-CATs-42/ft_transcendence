@@ -16,7 +16,8 @@ import {
   GameEmitter,
   gameStarted,
 } from "./emitters";
-import { GAME_MACHINE_ID, GameTargets, GameStates } from "./states";
+import { GAME_MACHINE_ID, GameStates } from "./states";
+import { GameTargets } from "./targets";
 
 export interface GameContext {
   players: Player[];
