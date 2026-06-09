@@ -17,6 +17,43 @@ The project uses two tokens:
 The refresh token is also stored in the database as a hash in `user_sessions`.
 The raw refresh token is never stored in the database.
 
+## How The Tokens Are Connected
+
+The access token and refresh token are created together during login, but they
+are used for different jobs:
+
+```txt
+accessToken  -> proves the user on normal protected requests
+refreshToken -> proves the browser still owns a valid backend session
+```
+
+Both tokens contain the same user id in `sub`. The refresh token also contains a
+`sessionId`, which points to the matching row in `user_sessions`.
+
+```ts
+const refreshToken = signRefreshToken({
+  sub: user.id,
+  sessionId,
+});
+
+const accessToken = signAccessToken({
+  sub: user.id,
+});
+```
+
+After login, the backend sends them through two different channels:
+
+```txt
+accessToken  -> response JSON -> frontend stores it -> Authorization header
+refreshToken -> Set-Cookie -> browser stores it -> Cookie header
+```
+
+Axios attaches the access token to every request as `Authorization: Bearer ...`.
+Because of that, `/users/refresh` can also show an `Authorization` header in
+DevTools. The backend refresh flow does not use that header. It reads the
+refresh token from the `refreshToken` cookie and validates it against the
+database session hash.
+
 ## Environment Variables
 
 Token lifetime is configured in `backend/.env`:
