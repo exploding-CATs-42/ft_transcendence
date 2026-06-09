@@ -16,6 +16,7 @@ const UserSection = ({ user }: Props) => {
   const logoutUser = async () => {
     try {
       await api.auth.logout();
+    } catch {
     } finally {
       clearAccessToken();
     }
