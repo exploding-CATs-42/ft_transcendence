@@ -1,5 +1,6 @@
 declare const styles: {
   readonly "error": string;
+  readonly "icon": string;
   readonly "input": string;
   readonly "inputContainer": string;
   readonly "normal": string;
