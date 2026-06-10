@@ -52,6 +52,17 @@ const ProfilePage = () => {
       return [];
     }
 
+    async function getUserGames(): Promise<UserGameHistoryItem[]> {
+      if (isMyProfile) {
+        return api.me.getMeGames();
+      }
+
+      if (userId) {
+        return api.users.getUserGames(userId);
+      }
+      return [];
+    }
+
     async function loadProfile() {
       try {
         const userData = await getUserData();
@@ -61,9 +72,9 @@ const ProfilePage = () => {
 
         const friendsData = await getUserFriends();
         setFriends(friendsData);
-
-        const matchesData = await api.users.getUserGames(userData.id);
+        const matchesData = await getUserGames();
         setMatches(matchesData);
+
         setStats(buildStats(userData.id, matchesData));
       } catch (error) {
         const errorMessage = getErrorMessage(error);
