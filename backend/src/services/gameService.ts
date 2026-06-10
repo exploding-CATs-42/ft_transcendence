@@ -48,11 +48,31 @@ export async function getGameById(
   return ensureGameExists(input.gameId);
 }
 
+export async function getCurrentGame(userId: UserId): Promise<GameInfo | null> {
+  await ensureUserExists(userId);
+
+  const currentGame = GameStore.findCurrentGameByUserId(userId);
+
+  if (!currentGame) {
+    return null;
+  }
+
+  return currentGame.info;
+}
+
 export async function createGame(
   userId: UserId,
   input: CreateGameRequestBody,
 ): Promise<GameInfo> {
-  await ensureUserExists(userId);
+  const user = await ensureUserExists(userId);
+
+  const currentGame = GameStore.findCurrentGameByUserId(userId);
+
+  if (currentGame) {
+    throw new ApiError("Player already has an active or waiting game", 409, {
+      existingGameId: currentGame.info.id,
+    });
+  }
 
   const actor = createActor(gameMachine);
 
@@ -65,8 +85,24 @@ export async function createGame(
     },
     actor,
   };
+
   attachBroadcaster(game.info.id, actor);
   actor.start();
+
+  const player: Player = {
+    id: user.id,
+    name: user.username,
+    hand: [],
+    isConfirmed: false,
+    isAlive: true,
+    turnOrder: 0,
+  };
+
+  game.actor.send({
+    type: GameEvents.JOIN_GAME,
+    player,
+  });
+
   GameStore.setGame(game);
   return game.info;
 }
@@ -87,16 +123,31 @@ export async function joinGame(
   const game = ensureGameExists(input.gameId);
   const playersBefore = game.actor.getSnapshot().context.players;
 
-  if (playersBefore.length >= game.info.maxPlayers) {
-    throw new SocketError("GameInstance is full");
-  }
-
   const alreadyJoined = playersBefore.some((p) => {
     return p.id === user.id;
   });
 
   if (alreadyJoined) {
-    throw new SocketError("Player is already in game");
+    const player = playersBefore.find((p) => {
+      return p.id === user.id;
+    });
+
+    return {
+      player: toWaitingPlayerView(player!),
+      waitingState: { players: playersBefore.map(toWaitingPlayerView) },
+    };
+  }
+
+  const currentGame = GameStore.findCurrentGameByUserId(userId);
+
+  if (currentGame && currentGame.info.id !== input.gameId) {
+    throw new SocketError("Player already has an active or waiting game", {
+      existingGameId: currentGame.info.id,
+    });
+  }
+
+  if (playersBefore.length >= game.info.maxPlayers) {
+    throw new SocketError("GameInstance is full");
   }
 
   const player: Player = {
