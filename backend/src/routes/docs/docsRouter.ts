@@ -16,10 +16,7 @@ docsRouter.use("/rest-api", swaggerUi.serve);
 
 docsRouter.get("/rest-api/", async (_, res, next) => {
   try {
-    const rootPath = path.resolve(
-      __dirname,
-      "../../../docs/rest_api/swagger.yaml",
-    );
+    const rootPath = path.resolve(process.cwd(), "docs/rest_api/swagger.yaml");
 
     const swaggerDocument = await SwaggerParser.dereference(rootPath);
 
@@ -55,9 +52,6 @@ docsRouter.get("/sockets", (req, res) => {
 });
 
 docsRouter.get("/asyncapi.yaml", (_, res) => {
-  const rootPath = path.resolve(
-    __dirname,
-    "../../../docs/sockets/asyncapi.yaml",
-  );
+  const rootPath = path.resolve(process.cwd(), "docs/sockets/asyncapi.yaml");
   res.type("text/yaml").sendFile(rootPath);
 });
