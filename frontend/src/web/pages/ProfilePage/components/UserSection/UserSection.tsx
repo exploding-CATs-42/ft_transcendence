@@ -50,15 +50,15 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     defaultValues: user,
   });
 
-  const emptyToUndefined = (value: string | null | undefined) =>
-    value === "" || value == null ? undefined : value;
+  const emptyStringToUndefined = (value: string | undefined) =>
+    value === "" ? undefined : value;
 
   const valuesToUpdate = (data: UpdateMeRequestBody) => ({
-    username: emptyToUndefined(data.username),
-    email: emptyToUndefined(data.email),
-    passwordNew: emptyToUndefined(data.passwordNew),
-    passwordOld: emptyToUndefined(data.passwordOld),
-    avatarUrl: emptyToUndefined(data.avatarUrl),
+    username: emptyStringToUndefined(data.username),
+    email: emptyStringToUndefined(data.email),
+    passwordNew: emptyStringToUndefined(data.passwordNew),
+    passwordOld: emptyStringToUndefined(data.passwordOld),
+    avatarUrl: data.avatarUrl === "" ? undefined : data.avatarUrl,
   });
 
   const processFieldErrors = (
