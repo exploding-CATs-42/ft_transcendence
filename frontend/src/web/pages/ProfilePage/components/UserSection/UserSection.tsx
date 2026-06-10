@@ -42,10 +42,9 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors },
+    formState: { isSubmitting, errors, isDirty },
     setError,
     clearErrors,
-    formState: { isDirty },
     reset,
   } = useForm<UpdateMeRequestBody>({
     defaultValues: user,
