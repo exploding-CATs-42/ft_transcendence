@@ -41,6 +41,17 @@ const ProfilePage = () => {
       return null;
     }
 
+    async function getUserFriends(): Promise<FriendItem[]> {
+      if (isMyProfile) {
+        return api.friends.getMeFriends();
+      }
+
+      if (userId) {
+        return api.friends.getUserFriends(userId);
+      }
+      return [];
+    }
+
     async function loadProfile() {
       try {
         const userData = await getUserData();
@@ -48,7 +59,7 @@ const ProfilePage = () => {
         if (!userData) return;
         setUser(userData);
 
-        const friendsData = await api.friends.getMeFriends();
+        const friendsData = await getUserFriends();
         setFriends(friendsData);
 
         const matchesData = await api.users.getUserGames(userData.id);
