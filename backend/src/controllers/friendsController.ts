@@ -13,6 +13,7 @@ import {
   sendFriendRequest,
   updateFriendship,
 } from "../services/friendsService";
+import { userIdParamsSchema } from "../schemas/friends/userIdParamsSchema";
 
 export async function listFriendsController(
   req: Request,
@@ -32,9 +33,12 @@ export async function listFriendsController(
     return res.status(401).json({ message: "Invalid token" });
   }
 
+  const params = userIdParamsSchema.safeParse(req.params);
+  const userId = params.success ? params.data.userId : req.user.id;
+
   try {
     const friends = await listFriends({
-      currentUserId: req.user.id,
+      currentUserId: userId,
       ...(parsed.data.status !== undefined
         ? { status: parsed.data.status }
         : {}),
