@@ -3,6 +3,7 @@ import { updateMeSchema } from "../schemas/me/updateMeSchema";
 import { AuthenticatedRequest } from "../types/auth";
 import { validate } from "../utils/validate";
 import { getMe, updateMe } from "../services/meService";
+import { getUserGames } from "../services/usersService";
 
 export async function updateMeController(
   req: AuthenticatedRequest,
@@ -34,4 +35,9 @@ export async function getMeController(
 ) {
   const user = await getMe(req.user.id);
   res.status(200).json(user);
+}
+
+export async function getMeGames(req: AuthenticatedRequest, res: Response) {
+  const games = await getUserGames(req.user.id);
+  res.status(200).json({ games });
 }

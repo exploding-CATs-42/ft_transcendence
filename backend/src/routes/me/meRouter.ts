@@ -1,5 +1,6 @@
 import {
   getMeController,
+  getMeGames,
   updateMeController,
 } from "../../controllers/meController";
 import photoUpload from "../../middlewares/cloudinary/upload";
@@ -15,3 +16,4 @@ meRouter.patch(
   errorHandler(updateMeController),
 );
 meRouter.get("/", errorHandler(getMeController));
+meRouter.get("/games", errorHandler(getMeGames));
