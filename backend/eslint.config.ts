@@ -10,7 +10,7 @@ export default defineConfig([
     languageOptions: {
       globals: globals.node,
       parserOptions: {
-        tsconfigRootDir: __dirname,
+        tsconfigRootDir: import.meta.dirname,
       },
     },
     rules: {
