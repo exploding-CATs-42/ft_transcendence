@@ -5,6 +5,7 @@ import type {
 } from "pages/ProfilePage/types/ProfileUser";
 import { api } from "../axios";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
+import type { UserGameHistoryItem } from "components/MatchListItem/types";
 
 const getMe = async (): Promise<MyProfileUser> => {
   const result = await api.get("/me");
@@ -16,7 +17,13 @@ const updateMe = async (body: UpdateMeRequestBody): Promise<ProfileUser> => {
   return result.data.user;
 };
 
+const getMeGames = async (): Promise<UserGameHistoryItem[]> => {
+  const result = await api.get(`/me/games`);
+  return result.data.games;
+};
+
 export default {
   getMe,
   updateMe,
+  getMeGames,
 };
