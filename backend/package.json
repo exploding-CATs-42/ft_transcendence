@@ -3,7 +3,7 @@
   "main": "main.js",
   "type": "module",
   "scripts": {
-    "dev": "ts-node-dev --respawn --transpile-only src/main.ts",
+    "dev": "tsx watch src/main.ts",
     "test": "vitest",
     "test:orm": "vitest run tests/orm",
     "build": "pnpm clean && pnpm prisma generate && tsdown",
