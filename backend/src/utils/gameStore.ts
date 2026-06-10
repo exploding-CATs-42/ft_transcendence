@@ -41,6 +41,20 @@ export function getAllGames(): GameInstance[] {
   return Array.from(games.values());
 }
 
+export function findCurrentGameByUserId(
+  userId: string,
+): GameInstance | undefined {
+  assertInitialized();
+
+  return Array.from(games.values()).find((game) => {
+    const snapshot = game.actor.getSnapshot();
+
+    return snapshot.context.players.some((player) => {
+      return player.id === userId;
+    });
+  });
+}
+
 export function setGame(game: GameInstance): void {
   assertInitialized();
   games.set(game.info.id, game);
@@ -54,6 +68,7 @@ export function deleteGameById(gameId: string): void {
 export default {
   getGame,
   getAllGames,
+  findCurrentGameByUserId,
   setGame,
   deleteGameById,
 };

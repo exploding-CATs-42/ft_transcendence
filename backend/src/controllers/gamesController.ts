@@ -3,6 +3,7 @@ import type { Response } from "express";
 import {
   createGame,
   deleteGame,
+  getCurrentGame,
   getGameById,
   getGames,
 } from "../services/gameService";
@@ -21,6 +22,14 @@ export async function getGamesController(
   res: Response,
 ) {
   const result = await getGames(req.user.id);
+  res.status(200).json(result);
+}
+
+export async function getCurrentGameController(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  const result = await getCurrentGame(req.user.id);
   res.status(200).json(result);
 }
 
