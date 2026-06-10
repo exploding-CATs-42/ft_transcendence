@@ -1,4 +1,4 @@
-// Local level
+// Project level
 import type {
   MyProfileUser,
   ProfileUser,
