@@ -65,19 +65,24 @@ const ProfilePage = () => {
 
     async function loadProfile() {
       try {
-        const userData = await getUserData();
+        const [userData, friendsData, matchesData] = await Promise.all([
+          getUserData(),
+          getUserFriends(),
+          getUserGames(),
+        ]);
 
-        if (!userData) return;
+        if (!userData || !friendsData || !matchesData) {
+          throw new Error("Invalid request");
+        }
+
         setUser(userData);
-
-        const friendsData = await getUserFriends();
         setFriends(friendsData);
-        const matchesData = await getUserGames();
         setMatches(matchesData);
 
         setStats(buildStats(userData.id, matchesData));
       } catch (error) {
         const errorMessage = getErrorMessage(error);
+        setUser(null);
         toast(errorMessage);
       } finally {
         setLoading(false);
