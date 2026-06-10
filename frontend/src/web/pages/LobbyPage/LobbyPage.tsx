@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import api from "api";
@@ -9,17 +9,72 @@ import {
   CreateTableModal,
   type CreateTableFormValues,
 } from "./components/CreateTableModal";
+import { ExistingGameModal } from "./components/ExistingGameModal";
 import { JoinGameModal } from "./components/JoinGameModal";
 import { matchesMock } from "./mocks";
 import s from "./LobbyPage.module.css";
+
+type ExistingGame = {
+  id: string;
+  name: string;
+};
+
+type GameConflictDetails = {
+  existingGameId?: string;
+};
+
+type ApiConflictError = {
+  response?: {
+    status?: number;
+    data?: {
+      details?: GameConflictDetails;
+    };
+  };
+};
+
+const getExistingGameIdFromError = (error: unknown) => {
+  const apiError = error as ApiConflictError;
+
+  if (apiError.response?.status !== 409) {
+    return null;
+  }
+
+  return apiError.response.data?.details?.existingGameId ?? null;
+};
 
 const LobbyPage = () => {
   const [matches, setMatches] = useState<LobbyMatch[]>(matchesMock);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
+  const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    let ignore = false;
+
+    const loadCurrentGame = async () => {
+      try {
+        const currentGame = await api.games.getCurrent();
+
+        if (ignore || !currentGame) return;
+
+        setExistingGame({
+          id: currentGame.id,
+          name: currentGame.name,
+        });
+      } catch (error) {
+        console.error("Failed to load current game:", error);
+      }
+    };
+
+    void loadCurrentGame();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
 
   const handleOpenJoinModalWithGameId = (selectedGameId: string) => {
     setGameId(selectedGameId);
@@ -35,22 +90,49 @@ const LobbyPage = () => {
     navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
   };
 
+  const handleReturnToExistingGame = () => {
+    if (!existingGame) return;
+
+    navigate(`/game?gameId=${encodeURIComponent(existingGame.id)}`);
+  };
+
+  const handleCloseExistingGameModal = () => {
+    setExistingGame(null);
+  };
+
   const handleCreateTable = async ({
     gameName,
     maxPlayers,
   }: CreateTableFormValues) => {
-    const createdGame = await api.games.create({
-      gameName,
-      maxPlayers,
-    });
+    try {
+      const createdGame = await api.games.create({
+        gameName,
+        maxPlayers,
+      });
 
-    const newMatch: LobbyMatch = {
-      gameId: createdGame.gameId,
-      gameName: createdGame.name,
-      players: [],
-    };
+      const newMatch: LobbyMatch = {
+        gameId: createdGame.id,
+        gameName: createdGame.name,
+        players: [],
+      };
 
-    setMatches((prevMatches) => [newMatch, ...prevMatches]);
+      setMatches((prevMatches) => [newMatch, ...prevMatches]);
+    } catch (error) {
+      const existingGameId = getExistingGameIdFromError(error);
+
+      if (!existingGameId) {
+        throw error;
+      }
+
+      const currentGame = await api.games.getCurrent();
+
+      setExistingGame({
+        id: existingGameId,
+        name: currentGame?.name ?? "your existing game",
+      });
+
+      toggleCreateModal(false);
+    }
   };
 
   return (
@@ -97,6 +179,13 @@ const LobbyPage = () => {
         toggleModal={toggleJoinModal}
         onGameIdChange={setGameId}
         onJoin={handleJoinGame}
+      />
+
+      <ExistingGameModal
+        isOpen={Boolean(existingGame)}
+        gameName={existingGame?.name}
+        onReturn={handleReturnToExistingGame}
+        onClose={handleCloseExistingGameModal}
       />
     </div>
   );
