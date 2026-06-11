@@ -98,7 +98,7 @@ volumes:
   monorepo_node_modules: # root node_modules
   backend_node_modules: # backend's own node_modules
   frontend_node_modules: # frontend's own node_modules
-  grafana_data: # 
+  grafana_data: # Grafana database, plugins, and local state
 
 networks:
   transcendence_net:
