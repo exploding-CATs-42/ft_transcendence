@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY frontend/package.json ./frontend/
+COPY packages/types/package.json ./packages/types/
+COPY packages/schemas/package.json ./packages/schemas/
 
 RUN pnpm install --frozen-lockfile
 
@@ -15,6 +17,7 @@ CMD ["pnpm", "--filter", "frontend", "dev"]
 ################## BUILD ##############################################
 FROM base AS build
 COPY frontend/ ./frontend/
+COPY packages/ ./packages/
 RUN pnpm --filter frontend build
 
 ################## PRODUCTION #########################################
