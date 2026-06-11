@@ -1,6 +1,9 @@
 // Project level
-import type { AccessToken } from "types";
-import type { RegisterResponse } from "@exploding-cats/shared-types";
+import type {
+  RegisterResponse,
+  LoginResponse,
+  AccessToken,
+} from "@exploding-cats/shared-types";
 import type { RegisterRequestBody } from "@exploding-cats/shared-schemas";
 // Local level
 import {
@@ -19,10 +22,6 @@ const register = async (
 export type UserCredentials = {
   email: string;
   password: string;
-};
-
-export type LoginResponse = RegisterResponse & {
-  accessToken: AccessToken;
 };
 
 const login = async (body: UserCredentials): Promise<LoginResponse> => {
