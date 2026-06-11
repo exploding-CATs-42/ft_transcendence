@@ -4,6 +4,8 @@ WORKDIR /app
 
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY backend/package.json ./backend/
+COPY packages/types/package.json ./packages/types/
+COPY packages/schemas/package.json ./packages/schemas/
 
 RUN pnpm install --frozen-lockfile
 
@@ -15,6 +17,7 @@ CMD ["sh", "-c", "pnpm --filter backend prisma:generate && pnpm --filter backend
 ################## BUILD ##############################################
 FROM base AS build
 COPY backend/ ./backend/
+COPY packages/ ./packages/
 RUN pnpm --filter backend build
 
 ################## PRODUCTION #########################################
