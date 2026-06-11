@@ -1,85 +1,167 @@
 # Monitoring
 
-Monitoring for the local `ft_transcendence` development environment.
+Local monitoring setup for `ft_transcendence`.
 
-Current status: this directory contains the monitoring specification only. There are no Prometheus configs, Grafana dashboards, exporters, or Docker Compose services in this directory yet.
+The stack is based on Prometheus and Grafana. Prometheus collects metrics. Grafana uses Prometheus as a datasource and displays dashboards.
 
-## Target Setup
+## Current Status
 
-The monitoring stack is intended to use:
-
-| Component | Purpose |
+| Area | Status |
 | --- | --- |
-| Prometheus | Scrape and store application and infrastructure metrics |
-| Grafana | Display dashboards and visualize alert states |
-| Backend `/metrics` endpoint | Expose application metrics from the Express API |
-| cAdvisor | Expose Docker container CPU, memory, and network metrics |
-| postgres-exporter | Expose PostgreSQL metrics |
+| Prometheus Docker service | Added |
+| Prometheus config | Added in `infra/monitoring/prometheus/prometheus.yml` |
+| Prometheus alert rules file | Added in `infra/monitoring/prometheus/alerts.yml` |
+| Grafana Docker service | Added |
+| Grafana Prometheus datasource provisioning | Added |
+| Grafana dashboard provisioning | Added |
+| Real Grafana dashboard JSON files | Not added yet |
+| Backend `/metrics` endpoint | Not implemented yet |
+| cAdvisor | Not added yet |
+| postgres-exporter | Not added yet |
 
-Prometheus should scrape services through the internal Docker network, not through public Nginx routes.
+## Services
 
-`Internal target` in this document means `service_name:container_port` inside the Docker network. It is not the same as a host port published with `ports`.
+| Service | Internal target | Host access | Purpose |
+| --- | --- | --- | --- |
+| `prometheus` | `prometheus:9090` | `localhost:${PROMETHEUS_PORT}` | Scrapes and stores metrics |
+| `grafana` | `grafana:3000` | `localhost:${GRAFANA_PORT}` | Displays dashboards |
+| `backend` | `backend:3000` | via Nginx | Future application metrics source |
+| `postgres` | `postgres:5432` | `localhost:${POSTGRES_PORT}` | Main database |
+| `nginx` | `nginx:80` | `localhost:${NGINX_PORT}` | Public local gateway |
 
-## Expected Services
+`Internal target` means `service_name:container_port` inside the Docker network. It is not the same as a host port published with `ports`.
 
-The monitoring implementation should add these services to Docker Compose:
-
-| Service | Internal target | Notes |
-| --- | --- | --- |
-| `prometheus` | `prometheus:9090` | Reads scrape config and alert rules |
-| `grafana` | `grafana:3000` | Uses credentials from environment variables |
-| `cadvisor` | `cadvisor:8080` | Reads Docker container metrics |
-| `postgres-exporter` | `postgres-exporter:9187` | Connects to the existing PostgreSQL service |
-
-Do not publish cAdvisor on host port `8080`. The project already uses `NGINX_PORT=8080`, which maps host `8080` to Nginx container port `80`.
-
-If cAdvisor needs to be opened from the host, use another host port, for example:
-
-```yaml
-ports:
-  - "8081:8080"
-```
-
-Prometheus does not need this host port mapping. It can scrape cAdvisor directly through the Docker network:
+Example:
 
 ```text
-http://cadvisor:8080/metrics
+prometheus:9090
+grafana:3000
+backend:3000
 ```
 
-The existing application services are:
+## Files
 
-| Service | Internal target | Monitoring role |
-| --- | --- | --- |
-| `backend` | `backend:3000` | Exposes HTTP, auth, game, socket, and custom metrics |
-| `postgres` | `postgres:5432` | Main database |
-| `nginx` | `nginx:80` | Public local gateway |
-| `frontend` | `frontend:5173` | Vite development server |
+```text
+infra/monitoring/
+  README.md
+  prometheus/
+    prometheus.yml
+    alerts.yml
+  grafana/
+    provisioning/
+      datasources/
+        prometheus.yml
+      dashboards/
+        dashboards.yml
+    dashboards/
+      README.md
+```
+
+`grafana/provisioning/dashboards/dashboards.yml` tells Grafana where dashboard JSON files are located.
+
+`grafana/dashboards/` is the directory where real dashboard JSON files should be added later.
+
+## Environment Variables
+
+Monitoring variables are stored in `infra/env/.env` and listed as placeholders in `infra/env/.env.example`.
+
+| Variable | Purpose |
+| --- | --- |
+| `PROMETHEUS_PORT` | Host port for Prometheus |
+| `GRAFANA_PORT` | Host port for Grafana |
+| `GRAFANA_ADMIN_USER` | Project-level Grafana admin username value |
+| `GRAFANA_ADMIN_PASSWORD` | Project-level Grafana admin password value |
+
+The official Grafana image reads admin credentials from:
+
+```text
+GF_SECURITY_ADMIN_USER
+GF_SECURITY_ADMIN_PASSWORD
+```
+
+If the project keeps `GRAFANA_ADMIN_USER` and `GRAFANA_ADMIN_PASSWORD` in `.env`, Docker Compose must map them to `GF_SECURITY_ADMIN_USER` and `GF_SECURITY_ADMIN_PASSWORD` for Grafana to use them.
+
+Real values belong only in local `.env` files. `.env.example` should contain placeholders only.
+
+## Prometheus
+
+Prometheus config:
+
+```text
+infra/monitoring/prometheus/prometheus.yml
+```
+
+Alert rules file:
+
+```text
+infra/monitoring/prometheus/alerts.yml
+```
+
+Prometheus scrape targets must use internal Docker targets with ports.
+
+Correct:
+
+```yaml
+targets: ["prometheus:9090"]
+```
+
+Wrong:
+
+```yaml
+targets: ["prometheus"]
+```
+
+Without the port, Prometheus tries to scrape port `80`.
+
+## Grafana
+
+Grafana provisioning files:
+
+```text
+infra/monitoring/grafana/provisioning/datasources/prometheus.yml
+infra/monitoring/grafana/provisioning/dashboards/dashboards.yml
+```
+
+The datasource config should point to Prometheus through the Docker network:
+
+```yaml
+url: http://prometheus:9090
+```
+
+The dashboard provider should point to the dashboard JSON directory inside the Grafana container:
+
+```yaml
+options:
+  path: /var/lib/grafana/dashboards
+```
 
 ## Backend Metrics
 
-The backend should expose a Prometheus endpoint at:
+The backend should eventually expose:
 
 ```text
 GET /metrics
 ```
 
-Nginx must not expose this endpoint publicly. Prometheus should scrape it directly:
+Prometheus should scrape it through the Docker network:
 
 ```text
 http://backend:3000/metrics
 ```
 
-Required application metrics:
+Nginx should not expose `/metrics` publicly.
+
+Planned application metrics:
 
 | Metric | Type | Labels | Description |
 | --- | --- | --- | --- |
-| `http_requests_total` | Counter | `method`, `route`, `status_code` | Total HTTP requests handled by the backend |
-| `http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | HTTP request duration |
-| `user_operation_total` | Counter | `operation`, `status` | Result count for auth/profile/friend operations |
-| `socket_connections_active` | Gauge | none | Current active Socket.IO connections |
+| `http_requests_total` | Counter | `method`, `route`, `status_code` | Backend HTTP request count |
+| `http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | Backend HTTP request duration |
+| `user_operation_total` | Counter | `operation`, `status` | Auth/profile/friend operation results |
+| `socket_connections_active` | Gauge | none | Active Socket.IO connections |
 | `socket_events_total` | Counter | `event`, `status` | Socket.IO event results |
 
-Routes must be normalized before they are used as labels.
+Routes used as labels must be normalized.
 
 Use:
 
@@ -89,7 +171,7 @@ Use:
 /games/:gameId
 ```
 
-Do not use raw request paths such as:
+Do not use raw paths with real IDs:
 
 ```text
 /me/friends/2e53e971-28ce-436b-ba89-062d
@@ -97,9 +179,9 @@ Do not use raw request paths such as:
 
 ## User Operation Metrics
 
-`user_operation_total` should cover operations that already exist in the backend:
+`user_operation_total` should cover existing backend operations:
 
-| Operation | Related route |
+| Operation | Route |
 | --- | --- |
 | `register` | `POST /users/register` |
 | `login` | `POST /users/login` |
@@ -114,7 +196,7 @@ Do not use raw request paths such as:
 
 `DELETE /me/friends` receives the target `userId` in the request body.
 
-Allowed `status` values:
+Allowed metric statuses:
 
 ```text
 success
@@ -130,8 +212,8 @@ Current socket modules:
 | Module | File |
 | --- | --- |
 | Socket setup | `backend/src/sockets/setup.ts` |
-| Game socket handlers | `backend/src/sockets/game.ts` |
-| Chat socket handlers | `backend/src/sockets/chat.ts` |
+| Game handlers | `backend/src/sockets/game.ts` |
+| Chat handlers | `backend/src/sockets/chat.ts` |
 
 Use stable event names as labels. Do not use socket IDs, user IDs, game IDs, room IDs, IP addresses, usernames, emails, tokens, or message text as labels.
 
@@ -139,7 +221,7 @@ Use stable event names as labels. Do not use socket IDs, user IDs, game IDs, roo
 
 Because the project runs locally, infrastructure metrics can differ between team members. CPU, memory, and network values depend on each developer's machine, Docker setup, and operating system.
 
-cAdvisor should provide container metrics:
+Planned cAdvisor metrics:
 
 | Metric | Description |
 | --- | --- |
@@ -148,20 +230,33 @@ cAdvisor should provide container metrics:
 | `container_network_receive_bytes_total` | Received network traffic |
 | `container_network_transmit_bytes_total` | Transmitted network traffic |
 
-postgres-exporter should provide PostgreSQL metrics:
+Planned PostgreSQL exporter metrics:
 
 | Metric group | Description |
 | --- | --- |
-| Database availability | Whether PostgreSQL is reachable |
+| Availability | Whether PostgreSQL is reachable |
 | Active connections | Current database connection count |
 | Transaction/query counters | Database activity |
 | Locks and deadlocks | Database contention indicators |
 
-Exact metric names depend on the exporter version and should be verified after implementation.
+cAdvisor uses container port `8080`, but the project already uses host port `8080` for Nginx.
+
+Do not publish cAdvisor on host port `8080`. If host access is needed, use another host port, for example:
+
+```yaml
+ports:
+  - "8081:8080"
+```
+
+Prometheus can scrape cAdvisor internally without a host port:
+
+```text
+http://cadvisor:8080/metrics
+```
 
 ## Dashboards
 
-Grafana should include these dashboards:
+Planned Grafana dashboards:
 
 | Dashboard | Panels |
 | --- | --- |
@@ -173,7 +268,7 @@ Grafana should include these dashboards:
 
 ## Alerts
 
-Initial alert rules:
+Initial planned alert rules:
 
 | Alert | Source |
 | --- | --- |
@@ -191,26 +286,10 @@ Metric labels must stay low-cardinality and must not contain sensitive data.
 
 Never use these values as labels:
 
-| Forbidden label value | Reason |
+| Forbidden value | Reason |
 | --- | --- |
 | User IDs, game IDs, room IDs, socket IDs | High cardinality |
 | Emails, usernames, tokens, IP addresses | Sensitive data |
 | Raw URLs or query strings | High cardinality and possible sensitive data |
 | Request bodies or chat messages | Sensitive data |
 | Session IDs or refresh tokens | Sensitive data |
-
-## Environment Variables
-
-The monitoring stack should use environment variables for local ports and Grafana credentials.
-
-Planned variables:
-
-| Variable | Purpose |
-| --- | --- |
-| `PROMETHEUS_PORT` | Local Prometheus port |
-| `GRAFANA_PORT` | Local Grafana port |
-| `GRAFANA_ADMIN_USER` | Grafana admin username |
-| `GRAFANA_ADMIN_PASSWORD` | Grafana admin password |
-
-Real values must be stored only in local `.env` files. Only placeholder values should be added to `.env.example`.
-
