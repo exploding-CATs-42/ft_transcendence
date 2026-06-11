@@ -17,7 +17,7 @@ type Props =
   | {
       isMyProfile: true;
       user: MyProfileUser;
-      setUser: Dispatch<SetStateAction<ProfileUser | null>>;
+      setUser: Dispatch<SetStateAction<ProfileUser | MyProfileUser | null>>;
     }
   | {
       isMyProfile: false;
