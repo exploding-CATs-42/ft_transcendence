@@ -1,3 +1,23 @@
 groups:
   - name: transcendence-alerts
-    rules: []
+    rules:
+      - alert: BackendMetricsDown
+        expr: up{job="backend"} == 0
+        for: 30s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backend metrics target is down"
+          description: "Prometheus cannot scrape backend metrics at backend:3000/metrics for more than 30 seconds."
+
+      - alert: Backend5xxErrors
+        expr: |
+          sum(
+            increase(http_requests_total{job="backend", status_code=~"5.."}[5m])
+          ) > 0
+        for: 10s
+        labels:
+          severity: warning
+        annotations:
+          summary: "Backend returned 5xx errors"
+          description: "At least one backend 5xx response was detected during the last 5 minutes."
