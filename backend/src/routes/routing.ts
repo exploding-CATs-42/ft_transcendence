@@ -3,6 +3,7 @@ import { errorMiddleware } from "../middlewares";
 import { docsRouter } from "./docs";
 import { usersRouter } from "./users";
 import { meRouter } from "./me";
+import { metricsRouter } from "./metrics";
 import { friendsRouter } from "./friends";
 import { gamesRouter } from "./games";
 
@@ -11,6 +12,7 @@ export const setupRouting = (app: Express) => {
     return res.json({ message: "Hello world!" });
   });
 
+  app.use("/metrics", metricsRouter);
   app.use("/docs", docsRouter);
   app.use("/users", usersRouter);
   app.use("/me", meRouter);
