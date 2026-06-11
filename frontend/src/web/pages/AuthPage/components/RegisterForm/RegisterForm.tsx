@@ -11,7 +11,7 @@ import {
   NameInput,
   PasswordInput,
 } from "components";
-import { registerSchema, type RegisterSchema } from "schemas";
+import { registerFormSchema, type RegisterFormSchema } from "schemas";
 import api from "api";
 
 const RegisterForm = () => {
@@ -20,11 +20,11 @@ const RegisterForm = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-  } = useForm<RegisterSchema>({
-    resolver: zodResolver(registerSchema),
+  } = useForm<RegisterFormSchema>({
+    resolver: zodResolver(registerFormSchema),
   });
 
-  const onSubmit: SubmitHandler<RegisterSchema> = async (data) => {
+  const onSubmit: SubmitHandler<RegisterFormSchema> = async (data) => {
     try {
       await api.auth.register(data);
       toast.success("Account created");
