@@ -13,7 +13,10 @@ import {
 } from "utils";
 import type { AuthSessionResponse, RefreshSessionResponse, User } from "types";
 import { RegisterResponse } from "@exploding-cats/shared-types";
-import type { RegisterRequestBody, LoginRequestBody } from "schemas";
+import type {
+  RegisterRequestBody,
+  LoginRequestBody,
+} from "@exploding-cats/shared-schemas";
 
 export class AuthServiceError extends Error {
   public statusCode: number;
