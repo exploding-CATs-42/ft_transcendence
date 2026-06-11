@@ -10,8 +10,8 @@ import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
 import type {
   AuthSessionResponse,
   RefreshSessionResponse,
-  RegisterResponse,
 } from "../types/auth";
+import { RegisterResponse } from "@exploding-cats/shared-types";
 import type { RegisterRequestBody } from "../schemas/users/registerSchema";
 import type { LoginRequestBody } from "../schemas/users/loginSchema";
 import { User } from "../types";
