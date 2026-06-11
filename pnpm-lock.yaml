@@ -152,6 +152,9 @@ importers:
 
   frontend:
     dependencies:
+      '@exploding-cats/shared-schemas':
+        specifier: workspace:*
+        version: link:../packages/schemas
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.74.0(react@19.2.5))
