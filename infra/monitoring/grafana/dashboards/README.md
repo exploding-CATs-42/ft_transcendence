@@ -1,6 +1,6 @@
 # Grafana Dashboards
 
-This directory is reserved for Grafana dashboard JSON files.
+This directory contains Grafana dashboard JSON files.
 
 Grafana reads this directory because it is referenced from:
 
@@ -16,7 +16,11 @@ Inside the Grafana container, this directory is mounted as:
 
 ## Current Status
 
-No real dashboard JSON files are added yet.
+The backend metrics dashboard is added:
+
+```text
+backend-api.json
+```
 
 Provisioning is already prepared:
 
@@ -25,11 +29,16 @@ Provisioning is already prepared:
 | `../provisioning/datasources/prometheus.yml` | Adds Prometheus as a Grafana datasource |
 | `../provisioning/dashboards/dashboards.yml` | Tells Grafana to load dashboards from this directory |
 
+## Dashboards
+
+| Dashboard | Purpose | File |
+| --- | --- | --- |
+| Backend Metrics | Request rate, status codes, response time, slow routes, user operations, 5xx rate | `backend-api.json` |
+
 ## Planned Dashboards
 
 | Dashboard | Purpose |
 | --- | --- |
-| Backend API | Request rate, status codes, response time, slow routes |
 | Auth and Users | Login/register/refresh/logout/profile/friend operation results |
 | Realtime | Socket.IO connections, events, and failures |
 | PostgreSQL | Availability, connections, query activity, locks |
