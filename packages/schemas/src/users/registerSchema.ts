@@ -17,4 +17,4 @@ export const registerSchema = z.object({
     .regex(/[^A-Za-z0-9]/, "It needs at least one special character"),
 });
 
-export type RegisterReqBody = z.infer<typeof registerSchema>;
+export type RegisterRequestBody = z.infer<typeof registerSchema>;
