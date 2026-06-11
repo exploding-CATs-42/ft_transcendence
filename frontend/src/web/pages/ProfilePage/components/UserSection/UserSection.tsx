@@ -8,7 +8,7 @@ import type { BadRequestErrorResponse } from "types";
 import { useAuth, useModal } from "hooks";
 import api from "api";
 // Local level
-import { EditPlayerModal } from "../../components";
+import EditPlayerModal from "../EditPlayerModal/EditPlayerModal";
 import type { MyProfileUser, ProfileUser } from "../../types";
 import s from "./UserSection.module.css";
 import type { Dispatch, SetStateAction } from "react";
