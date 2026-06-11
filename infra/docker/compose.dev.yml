@@ -65,6 +65,17 @@ services:
       retries: 10
     networks:
       - transcendence_net
+    
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: ft-prometheus
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    volumes:
+      - ../monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+    networks:
+      - transcendence_net
 
 volumes:
   postgres_data:
