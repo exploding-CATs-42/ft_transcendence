@@ -1,18 +1,13 @@
 // Project level
 import type { AccessToken } from "types";
 import type { RegisterResponse } from "@exploding-cats/shared-types";
+import type { RegisterReqBody } from "@exploding-cats/shared-schemas";
 // Local level
 import {
   api,
   clearAccessTokenForRequests,
   saveAccessTokenForRequests,
 } from "../axios";
-
-export type RegisterReqBody = {
-  username: string;
-  email: string;
-  password: string;
-};
 
 const register = async (body: RegisterReqBody): Promise<RegisterResponse> => {
   const result = await api.post("/users/register", body);
