@@ -4,10 +4,10 @@ import type { NextFunction, Request, Response } from "express";
 import {
   createFriendRequestSchema,
   deleteFriendshipSchema,
-  listFriendsQuerySchema,
   updateFriendshipBodySchema,
   updateFriendshipParamsSchema,
 } from "schemas";
+import { listFriendsQuerySchema } from "@exploding-cats/shared-schemas";
 import {
   deleteFriendship,
   FriendsServiceError,
