@@ -1,6 +1,8 @@
+// Libraries
 import { ErrorRequestHandler } from "express";
 import { HttpError } from "http-errors";
-import { ApiError } from "../errors";
+// Project level
+import { ApiError } from "errors";
 
 export const errorMiddleware: ErrorRequestHandler = (error, _, res, __) => {
   if (error instanceof HttpError)

@@ -1,8 +1,10 @@
+// Libraries
 import express from "express";
 import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 import SwaggerParser from "@apidevtools/swagger-parser";
-import { getPublicUrl } from "../../utils/publicUrl";
+// Project level
+import { getPublicUrl } from "utils";
 
 export const docsRouter = express.Router();
 

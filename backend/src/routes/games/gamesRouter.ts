@@ -1,12 +1,12 @@
+// Project level
 import {
   createGameController,
   deleteGameController,
   getGameByIdController,
   getGamesController,
   getCurrentGameController,
-} from "../../controllers/gamesController";
-import { errorHandler } from "../../utils/errorHandler";
-import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
+} from "controllers";
+import { createAuthenticatedRouter, errorHandler } from "utils";
 
 export const gamesRouter = createAuthenticatedRouter();
 

@@ -1,4 +1,6 @@
-import { CardInstance, PendingActionType } from "../../game/types";
+// Project level
+import { CardInstance, PendingActionType } from "game/types";
+// Local level
 import { WaitingPlayerView, WaitingStateView } from "./views";
 
 export interface JoinGameResult {

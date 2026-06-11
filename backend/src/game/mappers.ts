@@ -1,4 +1,6 @@
-import { WaitingPlayerView } from "../types";
+// Project level
+import { WaitingPlayerView } from "types";
+// Local level
 import { Player } from "./types/player";
 
 export const toWaitingPlayerView = (p: Player): WaitingPlayerView => ({

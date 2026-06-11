@@ -1,23 +1,25 @@
+// Libraries
 import type { Request, Response, NextFunction } from "express";
+// Project level
 import { registerSchema } from "@exploding-cats/shared-schemas";
-import { loginSchema } from "../schemas/users/loginSchema";
-import { getUserByIdParamsSchema } from "../schemas/users/getUserByIdSchema";
-import { searchUsersQuerySchema } from "../schemas/users/searchUsersSchema";
-import { getUserGamesParamsSchema } from "../schemas/users/getUserGamesSchema";
+import {
+  loginSchema,
+  getUserByIdParamsSchema,
+  searchUsersQuerySchema,
+  getUserGamesParamsSchema,
+} from "schemas";
 import {
   AuthServiceError,
   loginUser,
   logoutUser,
   refreshSession,
   registerUser,
-} from "../services/authService";
-import {
   getPublicUserById,
   getUserGames,
   searchUsersByUsername,
   UsersServiceError,
-} from "../services/usersService";
-import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
+} from "services";
+import { getRefreshTokenLifetimeMs } from "utils";
 
 const REFRESH_TOKEN_COOKIE_NAME = "refreshToken";
 const REFRESH_TOKEN_COOKIE_MAX_AGE_MS = getRefreshTokenLifetimeMs();

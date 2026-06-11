@@ -12,7 +12,31 @@
     "outDir": "./dist",
 
     /* Debugging */
-    "sourceMap": true
+    "sourceMap": true,
+
+    "paths": {
+      "types": ["./src/types/index"],
+      "types/*": ["./src/types/*"],
+      "lib": ["./src/lib/index"],
+      "lib/*": ["./src/lib/*"],
+      "schemas": ["./src/schemas/index"],
+      "schemas/*": ["./src/schemas/*"],
+      "services": ["./src/services/index"],
+      "services/*": ["./src/services/*"],
+      "utils": ["./src/utils/index"],
+      "utils/*": ["./src/utils/*"],
+      "errors": ["./src/errors/index"],
+      "errors/*": ["./src/errors/*"],
+      "game": ["./src/game/index"],
+      "game/*": ["./src/game/*"],
+      "constants": ["./src/constants/index"],
+      "constants/*": ["./src/constants/*"],
+      "middlewares": ["./src/middlewares/index"],
+      "middlewares/*": ["./src/middlewares/*"],
+      "controllers": ["./src/controllers/index"],
+      "controllers/*": ["./src/controllers/*"],
+      "generated/*": ["./src/generated/*"]
+    }
   },
   "include": ["src", "eslint.config.ts", "vitest.config.ts", "prisma.config.ts"]
 }

@@ -1,5 +1,7 @@
-import { verifyAccessToken } from "../../utils/jwt";
+// Libraries
 import { ExtendedError, Socket } from "socket.io";
+// Project level
+import { verifyAccessToken } from "utils";
 
 export function authMiddleware(
   socket: Socket,

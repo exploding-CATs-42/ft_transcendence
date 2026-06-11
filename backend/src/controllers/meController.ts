@@ -1,8 +1,10 @@
+// Libraries
 import type { Response } from "express";
-import { updateMeSchema } from "../schemas/me/updateMeSchema";
-import { AuthenticatedRequest } from "../types/auth";
-import { validate } from "../utils/validate";
-import { getMe, updateMe } from "../services/meService";
+// Project level
+import { updateMeSchema } from "schemas";
+import { AuthenticatedRequest } from "types";
+import { validate } from "utils";
+import { getMe, updateMe } from "services";
 
 export async function updateMeController(
   req: AuthenticatedRequest,

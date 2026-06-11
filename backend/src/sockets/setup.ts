@@ -1,8 +1,11 @@
+// Libraries
 import { Server, Socket } from "socket.io";
-import { registerChatHandlers } from "./chat";
-import { socketAuthMiddleware } from "../middlewares";
+// Project level
+import { socketAuthMiddleware } from "middlewares";
+import { setIoForBroadcaster } from "game";
+// Local level
 import { lobbyGameHandlers } from "./game";
-import { setIoForBroadcaster } from "../game/broadcaster";
+import { registerChatHandlers } from "./chat";
 
 export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);

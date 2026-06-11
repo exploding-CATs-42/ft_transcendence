@@ -1,10 +1,6 @@
-import {
-  getMeController,
-  updateMeController,
-} from "../../controllers/meController";
-
-import { createAuthenticatedRouter } from "../../utils/authenticatedRouter";
-import { errorHandler } from "../../utils/errorHandler";
+// Project level
+import { getMeController, updateMeController } from "controllers";
+import { createAuthenticatedRouter, errorHandler } from "utils";
 
 export const meRouter = createAuthenticatedRouter();
 
