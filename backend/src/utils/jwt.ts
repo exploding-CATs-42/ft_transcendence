@@ -1,5 +1,7 @@
+// Libraries
 import jwt, { type JwtPayload, type SignOptions } from "jsonwebtoken";
-import type { AccessTokenPayload, RefreshTokenPayload } from "../types/auth";
+// Project level
+import type { AccessTokenPayload, RefreshTokenPayload } from "types";
 
 function getEnv(name: string): string {
   const value = process.env[name];

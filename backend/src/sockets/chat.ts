@@ -1,5 +1,7 @@
+// Libraries
 import { Server, Socket } from "socket.io";
-import { handleSendMessage } from "../services/chatService";
+// Project level
+import { handleSendMessage } from "services";
 
 export const registerChatHandlers = (io: Server, socket: Socket) => {
   socket.on("send_message", async (data) => {

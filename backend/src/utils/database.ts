@@ -1,4 +1,5 @@
-import { prisma } from "../lib/prisma";
+// Project level
+import { prisma } from "lib/prisma";
 
 export async function ensureDatabaseConnection() {
   await prisma.$connect();

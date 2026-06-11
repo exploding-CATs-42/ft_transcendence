@@ -1,4 +1,6 @@
+// Libraries
 import express from "express";
+// Project level
 import {
   getUserByIdController,
   getUserGamesController,
@@ -7,7 +9,7 @@ import {
   refreshController,
   registerController,
   searchUsersController,
-} from "../../controllers/usersController";
+} from "controllers";
 
 export const usersRouter = express.Router();
 

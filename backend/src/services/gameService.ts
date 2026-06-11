@@ -1,6 +1,7 @@
-import { ApiError } from "../errors/apiError";
-import { SocketError } from "../errors/socketError";
-
+// Libraries
+import { createActor } from "xstate";
+// Project level
+import { ApiError, SocketError } from "errors";
 import {
   CancelStartParams,
   ConfirmStartParams,
@@ -9,19 +10,20 @@ import {
   GetGameByIdParams,
   JoinGameParams,
   LeaveGameParams,
-} from "../schemas/games";
-
-import { createActor } from "xstate";
-import { GameEvents } from "../game/events";
-import { gameMachine } from "../game/gameMachine";
-import { GameInstance, GameInfo } from "../game/instance";
-import { Player } from "../game/types/player";
-import { JoinGameResult, PlayerIdPayload } from "../types";
-import GameStore from "../utils/gameStore";
-import { toWaitingPlayerView } from "../game/mappers";
-import { attachBroadcaster } from "../game/broadcaster";
+} from "schemas";
+import {
+  GameEvents,
+  gameMachine,
+  GameInstance,
+  GameInfo,
+  toWaitingPlayerView,
+  attachBroadcaster,
+} from "game";
+import { Player } from "game/types";
+import { JoinGameResult, PlayerIdPayload, UserId } from "types";
+import { GameStore } from "utils";
+// Local level
 import { ensureUserExists } from "./usersService";
-import { UserId } from "../types/users";
 
 function ensureGameExists(gameId: string) {
   const game = GameStore.getGame(gameId);

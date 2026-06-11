@@ -1,4 +1,5 @@
-import { Prisma } from "../../generated/prisma/client";
+// Project level
+import { Prisma } from "generated/prisma/client";
 
 export const publicProfileSelect = {
   id: true,

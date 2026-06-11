@@ -1,13 +1,8 @@
 // Libraries
 import { Socket, Server } from "socket.io";
 // Project level
-import {
-  cancelStart,
-  confirmStart,
-  joinGame,
-  leaveGame,
-} from "../services/gameService";
-import { withErrorHandler } from "../utils/errorHandler";
+import { cancelStart, confirmStart, joinGame, leaveGame } from "services";
+import { withErrorHandler } from "utils";
 import {
   CancelStartParams,
   cancelStartSchema,
@@ -17,13 +12,13 @@ import {
   joinGameSchema,
   LeaveGameParams,
   leaveGameSchema,
-} from "../schemas/games";
+} from "schemas";
 import {
   ClientEventType,
   ErrorEventType,
   PrivateEventType,
   PublicEventType,
-} from "../types";
+} from "types";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(

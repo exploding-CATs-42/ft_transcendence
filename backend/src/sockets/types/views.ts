@@ -1,10 +1,11 @@
+// Project level
 import {
   CardInstance,
   FavorState,
   NopeChain,
   PendingAction,
   TurnPhase,
-} from "../../game/types";
+} from "game/types";
 
 export interface PublicGameView {
   gameId: string;

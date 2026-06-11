@@ -1,4 +1,8 @@
+// Libraries
 import { assign, emit, setup } from "xstate";
+// Project level
+import { START_GAME_COUNTDOWN_MS } from "constants/game";
+// Local level
 import {
   GameActions,
   addPlayer,
@@ -9,7 +13,6 @@ import {
 import { Player } from "./types/player";
 import { GameEvent, GameEvents } from "./events";
 import { GameGuards, hasEnoughPlayers } from "./guards";
-import { START_GAME_COUNTDOWN_MS } from "../constants/game";
 import {
   countdownCanceled,
   countdownStarted,

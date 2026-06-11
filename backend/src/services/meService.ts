@@ -1,9 +1,10 @@
-import { prisma, selfProfileSelect } from "../lib/prisma";
-import { hashPassword } from "../utils/hash";
-import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
+// Project level
+import { prisma, selfProfileSelect } from "lib/prisma";
+import { hashPassword, toMyProfileUser, toSelfProfileUser } from "utils";
+import { ApiError } from "errors";
+import { MyProfileUser } from "types";
+// Local level
 import { getFinishedGamesStats } from "./usersService";
-import { ApiError } from "../errors";
-import { MyProfileUser } from "../types";
 
 export class MeServiceError extends Error {
   public statusCode: number;

@@ -1,18 +1,20 @@
+// Libraries
 import type { NextFunction, Request, Response } from "express";
-import { createFriendRequestSchema } from "../schemas/friends/createFriendRequestSchema";
-import { deleteFriendshipSchema } from "../schemas/friends/deleteFriendshipSchema";
-import { listFriendsQuerySchema } from "../schemas/friends/listFriendsSchema";
+// Project level
 import {
+  createFriendRequestSchema,
+  deleteFriendshipSchema,
+  listFriendsQuerySchema,
   updateFriendshipBodySchema,
   updateFriendshipParamsSchema,
-} from "../schemas/friends/updateFriendshipSchema";
+} from "schemas";
 import {
   deleteFriendship,
   FriendsServiceError,
   listFriends,
   sendFriendRequest,
   updateFriendship,
-} from "../services/friendsService";
+} from "services";
 
 export async function listFriendsController(
   req: Request,

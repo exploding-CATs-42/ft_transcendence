@@ -1,5 +1,6 @@
-import { Player } from "../game/types/player";
-import { Deck, GameId, GameRules, GameState, TurnState } from "../types";
+// Project level
+import { Player } from "game/types";
+import { Deck, GameId, GameRules, GameState, TurnState } from "types";
 
 export const DEFAULT_GAME_RULES: GameRules = {
   dealtCardsPerPlayer: 7,

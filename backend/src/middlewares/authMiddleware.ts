@@ -1,5 +1,7 @@
+// Libraries
 import type { NextFunction, Request, Response } from "express";
-import { verifyAccessToken } from "../utils/jwt";
+// Project level
+import { verifyAccessToken } from "utils";
 
 export function authMiddleware(
   req: Request,

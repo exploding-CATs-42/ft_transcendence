@@ -1,5 +1,8 @@
+// Libraries
 import type { Express } from "express";
-import { errorMiddleware } from "../middlewares";
+// Project level
+import { errorMiddleware } from "middlewares";
+// Local level
 import { docsRouter } from "./docs";
 import { usersRouter } from "./users";
 import { meRouter } from "./me";

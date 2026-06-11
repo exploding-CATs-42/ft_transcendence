@@ -1,7 +1,7 @@
+// Libraries
 import { PrismaPg } from "@prisma/adapter-pg";
-// eslint-disable-next-line @typescript-eslint/ban-ts-comment
-// @ts-ignore
-import { PrismaClient } from "../../generated/prisma/client";
+// Project level
+import { PrismaClient } from "generated/prisma/client";
 
 const connectionString = process.env["DATABASE_URL"];
 

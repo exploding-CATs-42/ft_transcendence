@@ -1,10 +1,10 @@
+// Libraries
+import { createActor, Snapshot } from "xstate";
 import fs from "node:fs/promises";
 import path from "path";
-import { GameId } from "../types";
-import { createActor, Snapshot } from "xstate";
-import { gameMachine } from "../game/gameMachine";
-import { GameInstance, GameInfo } from "../game/instance";
-import { attachBroadcaster } from "../game/broadcaster";
+// Project level
+import { gameMachine, GameInstance, GameInfo, attachBroadcaster } from "game";
+import { GameId } from "game/types";
 
 interface PersistedGame {
   info: GameInfo;

@@ -1,10 +1,12 @@
+// Libraries
 import { NextFunction, Response } from "express";
-import { AuthenticatedRequest } from "../types/auth";
-import { ZodSchema } from "zod";
 import { Socket } from "socket.io";
+import { ZodSchema } from "zod";
+// Project level
+import { AuthenticatedRequest } from "types";
+import { SocketError, ValidationError } from "errors";
+// Local level
 import { validate } from "./validate";
-import { SocketError } from "../errors/socketError";
-import { ValidationError } from "../errors/validationError";
 
 export type AsyncController = (
   req: AuthenticatedRequest,

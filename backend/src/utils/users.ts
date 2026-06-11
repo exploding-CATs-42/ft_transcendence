@@ -1,4 +1,5 @@
-import { MyProfileUser, ProfileUser } from "../types";
+// Project level
+import { MyProfileUser, ProfileUser } from "types";
 
 export function toProfileUser(user: {
   id: string;

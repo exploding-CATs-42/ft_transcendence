@@ -1,11 +1,13 @@
+// Libraries
 import express from "express";
-import { authMiddleware } from "../../middlewares";
+// Project level
+import { authMiddleware } from "middlewares";
 import {
   createFriendRequestController,
   deleteFriendshipController,
   listFriendsController,
   updateFriendshipController,
-} from "../../controllers/friendsController";
+} from "controllers";
 
 export const friendsRouter = express.Router();
 

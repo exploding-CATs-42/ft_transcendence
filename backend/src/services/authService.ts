@@ -1,20 +1,19 @@
+// Libraries
 import { randomUUID } from "node:crypto";
-import { prisma } from "../lib/prisma";
-import { hashPassword, comparePassword, hashRefreshToken } from "../utils/hash";
+// Project level
+import { prisma } from "lib/prisma";
 import {
+  hashPassword,
+  comparePassword,
+  hashRefreshToken,
   signAccessToken,
   signRefreshToken,
   verifyRefreshToken,
-} from "../utils/jwt";
-import { getRefreshTokenLifetimeMs } from "../utils/tokenLifetime";
-import type {
-  AuthSessionResponse,
-  RefreshSessionResponse,
-} from "../types/auth";
+  getRefreshTokenLifetimeMs,
+} from "utils";
+import type { AuthSessionResponse, RefreshSessionResponse, User } from "types";
 import { RegisterResponse } from "@exploding-cats/shared-types";
-import type { RegisterRequestBody } from "../schemas/users/registerSchema";
-import type { LoginRequestBody } from "../schemas/users/loginSchema";
-import { User } from "../types";
+import type { RegisterRequestBody, LoginRequestBody } from "schemas";
 
 export class AuthServiceError extends Error {
   public statusCode: number;

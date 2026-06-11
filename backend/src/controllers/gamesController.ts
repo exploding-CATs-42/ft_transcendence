@@ -1,21 +1,20 @@
+// Libraries
 import type { Response } from "express";
-
+// Project level
 import {
   createGame,
   deleteGame,
   getCurrentGame,
   getGameById,
   getGames,
-} from "../services/gameService";
-
-import { AuthenticatedRequest } from "../types/auth";
-import { validate } from "../utils/validate";
-
+} from "services";
 import {
   createGameSchema,
   deleteGameParamsSchema,
   getGameByIdParamsSchema,
-} from "../schemas/games";
+} from "schemas";
+import { AuthenticatedRequest } from "types";
+import { validate } from "utils";
 
 export async function getGamesController(
   req: AuthenticatedRequest,
