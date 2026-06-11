@@ -1,5 +1,5 @@
 import type { Request, Response, NextFunction } from "express";
-import { registerSchema } from "../schemas/users/registerSchema";
+import { registerSchema } from "@exploding-cats/shared-schemas";
 import { loginSchema } from "../schemas/users/loginSchema";
 import { getUserByIdParamsSchema } from "../schemas/users/getUserByIdSchema";
 import { searchUsersQuerySchema } from "../schemas/users/searchUsersSchema";
