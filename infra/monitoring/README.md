@@ -14,8 +14,8 @@ The stack is based on Prometheus and Grafana. Prometheus collects metrics. Grafa
 | Grafana Docker service | Added |
 | Grafana Prometheus datasource provisioning | Added |
 | Grafana dashboard provisioning | Added |
-| Real Grafana dashboard JSON files | Not added yet |
-| Backend `/metrics` endpoint | Not implemented yet |
+| Backend Grafana dashboard JSON | Added in `infra/monitoring/grafana/dashboards/backend-api.json` |
+| Backend `/metrics` endpoint | Implemented |
 | cAdvisor | Not added yet |
 | postgres-exporter | Not added yet |
 
@@ -25,7 +25,7 @@ The stack is based on Prometheus and Grafana. Prometheus collects metrics. Grafa
 | --- | --- | --- | --- |
 | `prometheus` | `prometheus:9090` | `localhost:${PROMETHEUS_PORT}` | Scrapes and stores metrics |
 | `grafana` | `grafana:3000` | `localhost:${GRAFANA_PORT}` | Displays dashboards |
-| `backend` | `backend:3000` | via Nginx | Future application metrics source |
+| `backend` | `backend:3000` | via Nginx | Application metrics source |
 | `postgres` | `postgres:5432` | `localhost:${POSTGRES_PORT}` | Main database |
 | `nginx` | `nginx:80` | `localhost:${NGINX_PORT}` | Public local gateway |
 
@@ -55,11 +55,12 @@ infra/monitoring/
         dashboards.yml
     dashboards/
       README.md
+      backend-api.json
 ```
 
 `grafana/provisioning/dashboards/dashboards.yml` tells Grafana where dashboard JSON files are located.
 
-`grafana/dashboards/` is the directory where real dashboard JSON files should be added later.
+`grafana/dashboards/` contains provisioned dashboard JSON files.
 
 ## Environment Variables
 
@@ -103,6 +104,7 @@ Correct:
 
 ```yaml
 targets: ["prometheus:9090"]
+targets: ["backend:3000"]
 ```
 
 Wrong:
@@ -112,6 +114,8 @@ targets: ["prometheus"]
 ```
 
 Without the port, Prometheus tries to scrape port `80`.
+
+Prometheus stores local time-series data in the `prometheus_data` Docker volume.
 
 ## Grafana
 
@@ -125,6 +129,7 @@ infra/monitoring/grafana/provisioning/dashboards/dashboards.yml
 The datasource config should point to Prometheus through the Docker network:
 
 ```yaml
+uid: prometheus
 url: http://prometheus:9090
 ```
 
@@ -137,7 +142,7 @@ options:
 
 ## Backend Metrics
 
-The backend should eventually expose:
+The backend exposes:
 
 ```text
 GET /metrics
@@ -149,15 +154,20 @@ Prometheus should scrape it through the Docker network:
 http://backend:3000/metrics
 ```
 
-Nginx should not expose `/metrics` publicly.
+Nginx does not expose `/api/metrics` publicly. The public gateway returns `404` for that path.
 
-Planned application metrics:
+Implemented application metrics:
 
 | Metric | Type | Labels | Description |
 | --- | --- | --- | --- |
 | `http_requests_total` | Counter | `method`, `route`, `status_code` | Backend HTTP request count |
 | `http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | Backend HTTP request duration |
 | `user_operation_total` | Counter | `operation`, `status` | Auth/profile/friend operation results |
+
+Planned application metrics:
+
+| Metric | Type | Labels | Description |
+| --- | --- | --- | --- |
 | `socket_connections_active` | Gauge | none | Active Socket.IO connections |
 | `socket_events_total` | Counter | `event`, `status` | Socket.IO event results |
 
@@ -183,10 +193,10 @@ Do not use raw paths with real IDs:
 
 | Operation | Route |
 | --- | --- |
-| `register` | `POST /users/register` |
-| `login` | `POST /users/login` |
-| `refresh` | `POST /users/refresh` |
-| `logout` | `POST /users/logout` |
+| `register` | `POST /auth/register` |
+| `login` | `POST /auth/login` |
+| `refresh` | `POST /auth/refresh` |
+| `logout` | `POST /auth/logout` |
 | `get_profile` | `GET /me` |
 | `update_profile` | `PATCH /me` |
 | `list_friends` | `GET /me/friends` |
@@ -212,7 +222,7 @@ Current socket modules:
 | Module | File |
 | --- | --- |
 | Socket setup | `backend/src/sockets/setup.ts` |
-| Game handlers | `backend/src/sockets/game.ts` |
+| Game handlers | `backend/src/sockets/listeners/gameListeners.ts` |
 
 Use stable event names as labels. Do not use socket IDs, user IDs, game IDs, room IDs, IP addresses, usernames, emails, tokens, or message text as labels.
 
@@ -255,11 +265,16 @@ http://cadvisor:8080/metrics
 
 ## Dashboards
 
+Implemented Grafana dashboards:
+
+| Dashboard | Panels |
+| --- | --- |
+| Backend Metrics | User operations, request rate, status codes, response time, slow routes, 5xx rate |
+
 Planned Grafana dashboards:
 
 | Dashboard | Panels |
 | --- | --- |
-| Backend API | Request rate, status codes, response time, slow routes |
 | Auth and Users | Login/register/refresh/logout/profile/friend operation results |
 | Realtime | Active socket connections, socket events, socket failures |
 | PostgreSQL | Availability, connections, query activity, locks |
@@ -267,13 +282,18 @@ Planned Grafana dashboards:
 
 ## Alerts
 
-Initial planned alert rules:
+Implemented alert rules:
 
 | Alert | Source |
 | --- | --- |
 | Backend metrics target is down | `up{job="backend"} == 0` |
-| PostgreSQL exporter is down | `up{job="postgres-exporter"} == 0` |
 | High backend 5xx rate | `http_requests_total` |
+
+Planned alert rules:
+
+| Alert | Source |
+| --- | --- |
+| PostgreSQL exporter is down | `up{job="postgres-exporter"} == 0` |
 | High backend response time | `http_request_duration_seconds` |
 | Socket disconnect/error spike | `socket_events_total` |
 
@@ -289,5 +309,5 @@ Never use these values as labels:
 | --- | --- |
 | User IDs, game IDs, room IDs, socket IDs | High cardinality |
 | Emails, usernames, tokens, IP addresses | Sensitive data |
-| Raw URLs or query strings | High cardinality and possible sensitive data | Sensitive data |
+| Raw URLs or query strings | High cardinality and possible sensitive data |
 | Session IDs or refresh tokens | Sensitive data |
