@@ -92,7 +92,7 @@ services:
     image: grafana/grafana:11.3.1
     container_name: ft-grafana
     env_file:
-      ../env/.env
+     - ../env/.env
     ports:
       - "${GRAFANA_PORT}:3000"
     volumes:
