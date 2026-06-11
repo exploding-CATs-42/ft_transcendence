@@ -7,6 +7,7 @@ import { authRouter } from "./auth";
 import { docsRouter } from "./docs";
 import { usersRouter } from "./users";
 import { meRouter } from "./me";
+import { metricsRouter } from "./metrics";
 import { friendsRouter } from "./friends";
 import { gamesRouter } from "./games";
 
@@ -15,6 +16,7 @@ export const setupRouting = (app: Express) => {
     return res.json({ message: "Hello world!" });
   });
 
+  app.use("/metrics", metricsRouter);
   app.use("/docs", docsRouter);
   app.use("/auth", authRouter);
   app.use("/users", usersRouter);
