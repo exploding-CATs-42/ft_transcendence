@@ -1,11 +1,13 @@
 import { GameEvent, GameEvents } from "./events";
 import { GameContext } from "./gameMachine";
+import { createDeck, shuffleDeck } from "./utils/deck";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
   REMOVE_PLAYER: "removePlayer",
   ADD_PLAYER_CONFIRMATION: "addPlayerConfirmation",
   REMOVE_PLAYER_CONFIRMATION: "removePlayerConfirmation",
+  FILL_DECK: "fillDeck",
 } as const;
 
 export interface GameActionArgs {
@@ -50,4 +52,11 @@ export const removePlayerConfirmation = ({
       p.id === event.playerId ? { ...p, isConfirmed: false } : p,
     ),
   };
+};
+
+export const fillDeck = () => {
+  const deck = createDeck();
+  shuffleDeck(deck);
+
+  return { deck };
 };
