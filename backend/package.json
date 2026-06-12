@@ -21,7 +21,8 @@
     "lint:fix": "eslint --fix ./src",
     "lint:check": "eslint ./src",
     "format:fix": "prettier --write ./src",
-    "format:check": "prettier --check ./src"
+    "format:check": "prettier --check ./src",
+    "xstate-helper": "tsx scripts/xstate-helper.ts"
   },
   "dependencies": {
     "@apidevtools/swagger-parser": "^12.1.0",
