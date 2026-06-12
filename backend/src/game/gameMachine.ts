@@ -103,6 +103,10 @@ export const gameMachine = setup({
     },
     [GameStates.PLAYING]: {
       entry: emit(gameStarted),
+      initial: GameStates.DEALING_CARDS,
+      states: {
+        [GameStates.DEALING_CARDS]: {},
+      },
     },
   },
 });
