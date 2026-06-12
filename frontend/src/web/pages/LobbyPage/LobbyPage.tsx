@@ -114,7 +114,9 @@ const LobbyPage = () => {
     if (!trimmedGameId) return;
 
     toggleJoinModal(false);
-    navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
+    navigate("/game", {
+      state: { gameId: trimmedGameId },
+    });
   };
 
   const handleReturnToExistingGame = () => {
