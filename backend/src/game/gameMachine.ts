@@ -21,9 +21,11 @@ import {
 } from "./emitters";
 import { GAME_MACHINE_ID, GameStates } from "./states";
 import { GameTargets } from "./targets";
+import { Deck } from "./types";
 
 export interface GameContext {
   players: Player[];
+  deck: Deck;
 }
 
 export const gameMachine = setup({
@@ -46,6 +48,7 @@ export const gameMachine = setup({
   initial: GameStates.WAITING,
   context: () => ({
     players: [],
+    deck: [],
   }),
   states: {
     [GameStates.WAITING]: {
