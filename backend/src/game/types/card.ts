@@ -27,11 +27,11 @@ export interface CardDefinition {
   playableOutOfTurn: boolean;
 }
 
-export interface CardInstance {
-  instanceId: string;
-  definitionId: string;
-  type: CardType;
+interface CardInstance {
+  id: string;
 }
+
+export type Card = Omit<CardDefinition, "count"> & CardInstance;
 
 export interface Deck {
   drawPile: CardInstance[];
