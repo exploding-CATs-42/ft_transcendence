@@ -41,7 +41,9 @@
       "context": ["./src/web/context/index"],
       "context/*": ["./src/web/context/*"],
       "routes": ["./src/web/routes/index"],
-      "routes/*": ["./src/web/routes/*"]
+      "routes/*": ["./src/web/routes/*"],
+      "socket": ["./src/web/socket/index"],
+      "socket/*": ["./src/web/socket/*"],
     }
   },
   "include": ["src"]
