@@ -11,7 +11,7 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               $ref: "./me.schemas.yaml#/components/schemas/UpdateMeRequest"
       responses:

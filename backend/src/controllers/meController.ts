@@ -18,9 +18,6 @@ export async function updateMeController(
     ...(parsedBody.password !== undefined
       ? { password: parsedBody.password }
       : {}),
-    ...(parsedBody.avatarUrl !== undefined
-      ? { avatarUrl: parsedBody.avatarUrl }
-      : {}),
   });
   res.status(200).json(result);
 }

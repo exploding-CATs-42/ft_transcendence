@@ -4,6 +4,7 @@ import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
 import { getFinishedGamesStats } from "./usersService";
 import { ApiError } from "../errors";
 import { MyProfileUser } from "../types";
+import cloudinary from "../lib/cloudinary/cloudinary";
 
 export class MeServiceError extends Error {
   public statusCode: number;
@@ -14,12 +15,12 @@ export class MeServiceError extends Error {
   }
 }
 
-export interface UpdateMeInput {
+type UpdateMeInput = {
   username?: string;
   email?: string;
   password?: string;
-  avatarUrl?: string | null;
-}
+  avatarFile?: Express.Multer.File;
+};
 
 export async function updateMe(
   currentUserId: string,
@@ -61,6 +62,7 @@ export async function updateMe(
     email?: string;
     passwordHash?: string;
     avatarUrl?: string | null;
+    avatarPublicId?: string;
   } = {};
 
   if (input.username !== undefined) {
@@ -75,8 +77,12 @@ export async function updateMe(
     data.passwordHash = await hashPassword(input.password);
   }
 
-  if (input.avatarUrl !== undefined) {
-    data.avatarUrl = input.avatarUrl;
+  if (input.avatarFile) {
+    const result = await cloudinary.cloudinaryUploadImage(
+      input.avatarFile.path,
+    );
+    data.avatarUrl = result.secure_url;
+    data.avatarPublicId = result.public_id;
   }
 
   if (Object.keys(data).length === 0) {

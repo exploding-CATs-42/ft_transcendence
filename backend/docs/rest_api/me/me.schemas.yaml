@@ -20,7 +20,7 @@ components:
           example: NewPassword123!
         avatarUrl:
           type: string
-          format: uri
+          format: binary
           nullable: true
           example: https://example.com/avatar.png
 
