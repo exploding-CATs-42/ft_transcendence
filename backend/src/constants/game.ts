@@ -1,5 +1,5 @@
 import { Player } from "../game/types/player";
-import { Deck, GameId, GameRules, GameState, TurnState } from "../types";
+import { GameId, GameRules, GameState, TurnState } from "../types";
 
 export const DEFAULT_GAME_RULES: GameRules = {
   dealtCardsPerPlayer: 7,
@@ -11,11 +11,6 @@ export const DEFAULT_GAME_RULES: GameRules = {
   maxPlayers: 5,
   fasterVariantRemoveFraction: 0.3,
   nopeWindowMs: 5000,
-};
-
-export const DEFAULT_DECK: Deck = {
-  drawPile: [],
-  discardPile: [],
 };
 
 export const DEFAULT_PLAYER: Player = {
@@ -32,7 +27,7 @@ export const DEFAULT_GAME_STATE: GameState = {
   name: "",
   maxPlayers: DEFAULT_GAME_RULES.maxPlayers,
   players: [],
-  deck: DEFAULT_DECK,
+  deck: [],
   turn: {} as TurnState,
   winnerId: null,
   rules: DEFAULT_GAME_RULES,
