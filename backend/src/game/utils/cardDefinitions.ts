@@ -1,9 +1,9 @@
 // Libraries
 import { z } from "zod";
 // Project level
-import { CardDefinitionSchema } from "../game/types/cards/cardDefinition";
+import rawCards from "../../constants/cards.json";
 // Local level
-import rawCards from "./cards.json";
+import { CardDefinitionSchema } from "../types/cards/cardDefinition";
 
 const CardsSchema = z.array(CardDefinitionSchema);
 export const cardDefinitions = CardsSchema.parse(rawCards);
