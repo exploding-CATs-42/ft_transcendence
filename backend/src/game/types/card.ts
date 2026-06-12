@@ -33,7 +33,4 @@ interface CardInstance {
 
 export type Card = Omit<CardDefinition, "count"> & CardInstance;
 
-export interface Deck {
-  drawPile: CardInstance[];
-  discardPile: CardInstance[];
-}
+export type Deck = Card[];
