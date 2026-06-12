@@ -1,6 +1,9 @@
-import type { CardDefinition, Deck } from "../types";
-import rawCards from "../../constants/cards.json";
+// Libraries
 import { randomUUID } from "crypto";
+// Project level
+import rawCards from "../../constants/cards.json";
+// Local level
+import type { CardDefinition, Deck } from "../types";
 
 export const cardDefinitions = rawCards as CardDefinition[];
 
