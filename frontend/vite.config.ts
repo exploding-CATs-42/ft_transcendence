@@ -19,6 +19,7 @@ export default defineConfig({
       constants: resolve(__dirname, "src/web/constants"),
       context: resolve(__dirname, "src/web/context"),
       routes: resolve(__dirname, "src/web/routes"),
+      socket: resolve(__dirname, "src/web/socket"),
     },
   },
   server: {
