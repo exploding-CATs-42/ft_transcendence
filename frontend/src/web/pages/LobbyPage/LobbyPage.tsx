@@ -122,7 +122,9 @@ const LobbyPage = () => {
   const handleReturnToExistingGame = () => {
     if (!existingGame) return;
 
-    navigate(`/game?gameId=${encodeURIComponent(existingGame.id)}`);
+    navigate("/game", {
+      state: { gameId: existingGame.id },
+    });
   };
 
   const handleCloseExistingGameModal = () => {
