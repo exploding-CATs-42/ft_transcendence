@@ -17,7 +17,6 @@ type UpdateMeInput = {
   email?: string;
   passwordOld?: string;
   passwordNew?: string;
-  avatarFile?: Express.Multer.File;
 };
 
 async function validatePassword(currentUserId: string, input: UpdateMeInput) {
@@ -96,8 +95,6 @@ export async function updateMe(
     username?: string;
     email?: string;
     passwordHash?: string;
-    avatarUrl?: string | null;
-    avatarPublicId?: string;
   } = {};
 
   if (input.username !== undefined) {
@@ -110,14 +107,6 @@ export async function updateMe(
 
   if (input.passwordNew !== undefined) {
     data.passwordHash = await hashPassword(input.passwordNew);
-  }
-
-  if (input.avatarFile) {
-    const result = await cloudinary.cloudinaryUploadImage(
-      input.avatarFile.path,
-    );
-    data.avatarUrl = result.secure_url;
-    data.avatarPublicId = result.public_id;
   }
 
   if (Object.keys(data).length === 0) {
@@ -149,4 +138,38 @@ export async function getMe(userId: string): Promise<{ user: MyProfileUser }> {
   return {
     user: toMyProfileUser(user, stats),
   };
+}
+
+export async function updateMeAvatar(
+  userId: string,
+  file?: Express.Multer.File,
+): Promise<{ user: MyProfileUser }> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  if (!file) {
+    throw new ApiError("Invalid file", 404);
+  }
+
+  try {
+    const result = await cloudinary.cloudinaryUploadImage(file);
+
+    const updatedUser = await prisma.user.update({
+      where: { id: userId },
+      data: {
+        avatarUrl: result.secure_url,
+        avatarPublicId: result.public_id,
+      },
+    });
+    console.log(`!!!!!!!!!!!!!!!111 ${updatedUser}`);
+  } catch (e) {
+    console.log(`!!!!!!!!!!!!!!!111 ${e}`);
+  }
+
+  return { user: user };
 }

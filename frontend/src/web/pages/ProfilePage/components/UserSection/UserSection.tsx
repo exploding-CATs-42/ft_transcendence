@@ -3,7 +3,7 @@ import { useForm, type SubmitHandler } from "react-hook-form";
 import { toast } from "react-toastify";
 // Project level
 import { Avatar, Button, Icon, Section } from "components";
-import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
+import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
 import type { BadRequestErrorResponse } from "types";
 import { useAuth, useModal } from "hooks";
 import api from "api";
@@ -11,7 +11,7 @@ import api from "api";
 import EditPlayerModal from "../EditPlayerModal/EditPlayerModal";
 import type { MyProfileUser, ProfileUser } from "../../types";
 import s from "./UserSection.module.css";
-import type { Dispatch, SetStateAction } from "react";
+import { type Dispatch, type SetStateAction } from "react";
 
 type Props =
   | {
@@ -46,6 +46,8 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     setError,
     clearErrors,
     reset,
+    watch,
+    setValue,
   } = useForm<UpdateMeRequestBody>({
     defaultValues: user,
   });
@@ -58,7 +60,6 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     email: emptyStringToUndefined(data.email),
     passwordNew: emptyStringToUndefined(data.passwordNew),
     passwordOld: emptyStringToUndefined(data.passwordOld),
-    avatarUrl: data.avatarUrl === "" ? undefined : data.avatarUrl,
   });
 
   const processFieldErrors = (
@@ -98,12 +99,15 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
     processFieldErrors(fieldErrors);
   };
 
+  const updateUserAvatar = (avatarUrl: string) => {
+    if (setUser) setUser((p) => (p ? { ...p, avatarUrl: avatarUrl } : null));
+  };
+
   const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (data) => {
     try {
       const updates = valuesToUpdate(data);
       const updatedUser = await api.me.updateMe(updates);
 
-      if (setUser) setUser((p) => (p ? { ...p, ...updatedUser } : null));
       reset(updatedUser);
       toast.success("Success");
       clearErrors();
@@ -132,12 +136,15 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
             isOpen={isOpenEditPlayerModal}
             toggleModal={() => toggleOpenEditPlayerModal(false)}
             user={user}
+            updateUserAvatar={updateUserAvatar}
             form={{
               onSubmit: handleSubmit(onSubmit),
               disabled: isSubmitting,
               errors,
               register,
               clearErrors,
+              setValue,
+              watch,
               isDirty,
             }}
           />

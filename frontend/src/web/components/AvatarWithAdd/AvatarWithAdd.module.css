@@ -1,0 +1,45 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+/* avatar styling stays as-is */
+.avatar {
+  display: block;
+}
+
+/* plus button */
+.plusButton {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+
+  width: 26px;
+  height: 26px;
+
+  border-radius: 50%;
+  border: none;
+
+  background: var(--zombie-kittens);
+  color: white;
+
+  font-size: 18px;
+  font-weight: bold;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+
+  box-shadow: 0 2px 10px var(--shadow);
+
+  transition:
+    transform 0.15s ease,
+    background 0.15s ease;
+}
+
+.wrapper:hover .plusButton {
+  transform: scale(1.1);
+  background: var(--zombie-kittens-hover);
+}

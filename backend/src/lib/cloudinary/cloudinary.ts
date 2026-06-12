@@ -1,3 +1,6 @@
+import { Readable } from "node:stream";
+import { UploadApiResponse } from "cloudinary";
+
 const cloudinary = require("cloudinary");
 
 cloudinary.config({
@@ -6,17 +9,25 @@ cloudinary.config({
   api_secret: process.env["CLOUDINARY_API_SECRET"],
 });
 
-// Cloudinary Upload Image
-const cloudinaryUploadImage = async (fileToUpload: string) => {
-  try {
-    const data = await cloudinary.uploader.upload(fileToUpload, {
-      resource_type: "auto",
-    });
-    return data;
-  } catch (error) {
-    console.log(error);
-    throw new Error("Internal Server Error (cloudinary)");
-  }
+export const cloudinaryUploadImage = (
+  file: Express.Multer.File,
+): Promise<UploadApiResponse> => {
+  return new Promise((resolve, reject) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      {
+        resource_type: "image",
+      },
+      (error: any, result: any) => {
+        if (error || !result) {
+          return reject(error);
+        }
+        resolve(result);
+      },
+    );
+
+    const bufferStream = Readable.from(file.buffer);
+    bufferStream.pipe(uploadStream);
+  });
 };
 
 // Cloudinary Remove Image
