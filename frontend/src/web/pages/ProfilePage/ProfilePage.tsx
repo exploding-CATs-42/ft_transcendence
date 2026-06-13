@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Navigate } from "react-router-dom";
+import { useLocation, Navigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 
 import api from "api";
@@ -7,33 +7,83 @@ import { getErrorMessage } from "utils";
 
 import { ListSection, StatsSection, UserSection } from "./components";
 
-import type { ProfileUser, FriendItem, ProfileStat } from "./types";
+import type {
+  ProfileUser,
+  FriendItem,
+  ProfileStat,
+  MyProfileUser,
+} from "./types";
 import s from "./ProfilePage.module.css";
 import type { UserGameHistoryItem } from "components/MatchListItem/types";
 import { buildStats } from "./utils/buildStats";
+import LoadingScreen from "components/LoadingScreen/LoadingScreen";
 
 const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
-  const [user, setUser] = useState<ProfileUser | null>(null);
+  const [user, setUser] = useState<ProfileUser | MyProfileUser | null>(null);
   const [friends, setFriends] = useState<FriendItem[]>([]);
   const [matches, setMatches] = useState<UserGameHistoryItem[]>([]);
   const [stats, setStats] = useState<ProfileStat[]>([]);
 
+  const { userId } = useParams();
+  const { pathname } = useLocation();
+  const isMyProfile = pathname === "/profile";
+
   useEffect(() => {
+    async function getUserData(): Promise<ProfileUser | MyProfileUser | null> {
+      if (isMyProfile) {
+        return api.me.getMe();
+      }
+
+      if (userId) {
+        return api.users.getUserById(userId);
+      }
+      return null;
+    }
+
+    async function getUserFriends(): Promise<FriendItem[]> {
+      if (isMyProfile) {
+        return api.friends.getMeFriends();
+      }
+
+      if (userId) {
+        return api.friends.getUserFriends(userId);
+      }
+      return [];
+    }
+
+    async function getUserGames(): Promise<UserGameHistoryItem[]> {
+      if (isMyProfile) {
+        return api.me.getMeGames();
+      }
+
+      if (userId) {
+        return api.users.getUserGames(userId);
+      }
+      return [];
+    }
+
     async function loadProfile() {
       try {
-        const userData = await api.me.getMe();
+        const [userData, friendsData, matchesData] = await Promise.all([
+          getUserData(),
+          getUserFriends(),
+          getUserGames(),
+        ]);
+
+        if (!userData || !friendsData || !matchesData) {
+          throw new Error("Invalid request");
+        }
+
         setUser(userData);
-
-        const friendsData = await api.me.getMeFriends();
         setFriends(friendsData);
-
-        const matchesData = await api.users.getUserGames(userData.id);
         setMatches(matchesData);
+
         setStats(buildStats(userData.id, matchesData));
       } catch (error) {
         const errorMessage = getErrorMessage(error);
+        setUser(null);
         toast(errorMessage);
       } finally {
         setLoading(false);
@@ -41,22 +91,43 @@ const ProfilePage = () => {
     }
 
     loadProfile();
-  }, []);
+  }, [userId, isMyProfile]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (!user) {
     return <Navigate to="/" replace />;
   }
 
+  const updateUser = (updates: ProfileUser) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        ...updates,
+      };
+    });
+  };
+
   return (
     <div className={s.pageContainer}>
       <div className={s.flexContainer}>
-        <UserSection user={user} />
+        {isMyProfile ? (
+          <UserSection
+            isMyProfile={true}
+            user={user as MyProfileUser}
+            updateUser={updateUser}
+          />
+        ) : (
+          <UserSection isMyProfile={false} user={user} />
+        )}
+
         <StatsSection stats={stats} />
       </div>
+
       <ListSection matches={matches} friends={friends} />
     </div>
   );

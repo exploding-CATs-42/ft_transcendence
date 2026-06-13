@@ -1,0 +1,92 @@
+.editPlayerModal {
+  position: relative;
+
+  min-width: auto;
+  min-height: auto;
+
+  margin: 20px;
+  padding: 40px;
+
+  border: 1px solid rgba(var(--off-white-rgb), 0.4);
+  border-radius: 24px;
+
+  background-color: var(--modal-window-background);
+  color: var(--off-white);
+}
+
+.editPlayerForm {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+
+  gap: 15px;
+}
+
+.editPlayerButton {
+  width: 200px;
+  height: 38px;
+
+  margin-top: 14px;
+
+  border: 1px solid rgba(var(--off-white-rgb), 0.3);
+  border-radius: 20px;
+
+  background-color: var(--gray);
+  color: var(--off-white);
+
+  font-size: 18px;
+  line-height: 22px;
+
+  box-shadow: 0 4px 0 var(--shadow);
+
+  cursor: pointer;
+}
+
+.changeFormButton {
+  width: 200px;
+  height: 28px;
+
+  color: var(--off-white);
+  font-size: 12px;
+}
+
+.underline {
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.editPlayerButton:disabled {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.modalTitle {
+  font-family: "Shantell Sans", sans-serif;
+  font-size: 30px;
+  font-weight: 400;
+}
+
+.avatar {
+  width: 100px;
+  height: 100px;
+}
+
+.inputContainer {
+  width: 100%;
+}
+
+.editFormButtonEnabled {
+  background-color: var(--zombie-kittens);
+  box-shadow: 0 4px 0 var(--zombie-kittens-hover);
+}
+
+.editFormButtonEnabled:hover {
+  background-color: var(--zombie-kittens-hover);
+}
+
+@media only screen and (min-width: 768px) {
+  .editPlayerModal {
+    min-width: 350px;
+  }
+}

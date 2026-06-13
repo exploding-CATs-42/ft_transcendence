@@ -10,6 +10,8 @@ import {
   registerController,
   searchUsersController,
 } from "controllers";
+import { listFriendsController } from "../../controllers/friendsController";
+import { authMiddleware } from "../../middlewares";
 
 export const usersRouter = express.Router();
 
@@ -21,3 +23,4 @@ usersRouter.post("/refresh", refreshController);
 usersRouter.get("/", searchUsersController);
 usersRouter.get("/:userId", getUserByIdController);
 usersRouter.get("/:userId/games", getUserGamesController);
+usersRouter.get("/:userId/friends", authMiddleware, listFriendsController);
