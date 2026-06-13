@@ -15,6 +15,7 @@ import {
 } from "schemas";
 import {
   ClientEvents,
+  PlayerJoinedPayload,
   ServerErrorEvents,
   ServerPrivateEvents,
   ServerPublicEvents,
@@ -35,8 +36,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const room = parsed.gameId;
         await socket.join(room);
 
+        const publicPayload: PlayerJoinedPayload = { player };
+
         socket.emit(ServerPrivateEvents.WAITING_STATE, { waitingState });
-        socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, { player });
+        socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
       },
     ),
   );
