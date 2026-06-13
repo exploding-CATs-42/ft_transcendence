@@ -22,6 +22,7 @@ import s from "./EditPlayerModal.module.css";
 import { AvatarWithAdd } from "components";
 import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
 import { avatarSchema } from "schemas/me/updateMeAvatarSchema";
+import { Spinner } from "assets";
 
 interface Props {
   isOpen: boolean;
@@ -31,6 +32,7 @@ interface Props {
 }
 
 const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
+  const [loading, setLoading] = useState(false);
   const [isProfileUpdate, setIsProfileUpdate] = useState(true);
 
   const formTitle = isProfileUpdate ? "Profile Settings" : "Password Settings";
@@ -121,6 +123,8 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
     clearErrors();
     try {
+      setLoading(true);
+
       const result = avatarSchema.safeParse(file);
 
       if (!result.success) {
@@ -148,6 +152,8 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
       updateUser(updatedUser);
     } catch (error) {
       handleRequestErrors(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -163,7 +169,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
         {isProfileUpdate ? (
           <>
             <AvatarWithAdd
-              src={user.avatarUrl}
+              src={loading ? Spinner : user.avatarUrl}
               onClick={() => {
                 inputRef.current?.click();
               }}
