@@ -1,10 +1,11 @@
+// Libraries
 import { useState } from "react";
 import type {
   FieldErrors,
   UseFormClearErrors,
   UseFormRegister,
 } from "react-hook-form";
-
+// Project level
 import {
   Avatar,
   Button,
@@ -14,8 +15,9 @@ import {
   NameInput,
   PasswordInput,
 } from "components";
-import s from "./EditPlayerModal.module.css";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
+// Local level
+import s from "./EditPlayerModal.module.css";
 import clsx from "clsx";
 
 interface Props {
