@@ -18,7 +18,6 @@ export interface UpdateMeInput {
   email?: string;
   passwordOld?: string;
   passwordNew?: string;
-  avatarUrl?: string | null;
 }
 
 async function validatePassword(currentUserId: string, input: UpdateMeInput) {
@@ -99,10 +98,6 @@ export async function updateMe(
 
   if (input.passwordNew !== undefined) {
     data.passwordHash = await hashPassword(input.passwordNew);
-  }
-
-  if (input.avatarUrl !== undefined) {
-    data.avatarUrl = input.avatarUrl;
   }
 
   if (Object.keys(data).length === 0) {

@@ -13,14 +13,13 @@ export async function updateMeController(
 ) {
   const parsedBody = validate(updateMeSchema, req.body);
 
-  const { username, email, passwordNew, passwordOld, avatarUrl } = parsedBody;
+  const { username, email, passwordNew, passwordOld } = parsedBody;
 
   const updateData = {
     ...(username !== undefined && { username }),
     ...(email !== undefined && { email }),
     ...(passwordNew !== undefined && { passwordNew }),
     ...(passwordOld !== undefined && { passwordOld }),
-    ...(avatarUrl !== undefined && { avatarUrl }),
   };
 
   const result = await updateMe(req.user.id, updateData);
