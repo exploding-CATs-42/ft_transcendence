@@ -22,18 +22,18 @@ export interface UpdateMeInput {
 }
 
 async function validatePassword(currentUserId: string, input: UpdateMeInput) {
-  if (input.passwordNew !== undefined && input.passwordOld === undefined) {
+  if (input.passwordNew && !input.passwordOld) {
     throw new MeServiceError(
       "Enter your current password to set a new password",
       409,
     );
   }
 
-  if (input.passwordNew === undefined && input.passwordOld !== undefined) {
+  if (input.passwordOld && !input.passwordNew) {
     throw new MeServiceError("Enter your new password", 409);
   }
 
-  if (input.passwordOld === undefined) {
+  if (!input.passwordOld) {
     return;
   }
 
