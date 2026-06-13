@@ -47,6 +47,3 @@ export const ServerErrorEvents = {
   CONFIRM_START_ERROR: "confirm-start-error",
   CANCEL_START_ERROR: "cancel-start-error",
 } as const;
-
-export type ServerErrorEvents =
-  (typeof ServerErrorEvents)[keyof typeof ServerErrorEvents];
