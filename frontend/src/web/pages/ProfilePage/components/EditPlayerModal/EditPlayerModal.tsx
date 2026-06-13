@@ -1,25 +1,28 @@
 // Libraries
 import clsx from "clsx";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useForm, type SubmitHandler } from "react-hook-form";
 // Project level
 import {
-  Avatar,
   Button,
   EmailInput,
   FormField,
+  Input,
   Modal,
   NameInput,
   PasswordInput,
 } from "components";
 import type { MyProfileUser, ProfileUser } from "pages/ProfilePage/types";
-import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 import type { BadRequestErrorResponse } from "types";
 import type { AxiosError } from "axios";
 import api from "api";
 // Local level
 import s from "./EditPlayerModal.module.css";
+import { AvatarWithAdd } from "components";
+import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
+import { avatarSchema } from "schemas/me/updateMeAvatarSchema";
+import { Spinner } from "assets";
 
 interface Props {
   isOpen: boolean;
@@ -29,6 +32,7 @@ interface Props {
 }
 
 const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
+  const [loading, setLoading] = useState(false);
   const [isProfileUpdate, setIsProfileUpdate] = useState(true);
 
   const formTitle = isProfileUpdate ? "Profile Settings" : "Password Settings";
@@ -53,7 +57,6 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     email: emptyStringToUndefined(data.email),
     passwordNew: emptyStringToUndefined(data.passwordNew),
     passwordOld: emptyStringToUndefined(data.passwordOld),
-    avatarUrl: data.avatarUrl === "" ? undefined : data.avatarUrl,
   });
 
   const processFieldErrors = (
@@ -109,6 +112,51 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     }
   };
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+
+    const file = files[0];
+    if (!file) return;
+
+    clearErrors();
+    try {
+      setLoading(true);
+
+      const result = avatarSchema.safeParse(file);
+
+      if (!result.success) {
+        const { formErrors } = result.error.flatten();
+
+        if (formErrors.length) {
+          const message = formErrors?.[0];
+
+          if (!message) return;
+
+          setError("root", {
+            type: "validate",
+            message,
+          });
+        }
+
+        return;
+      }
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const newAvatarUrl = await api.me.updateMeAvatar(formData);
+      const updatedUser = { ...user, avatarUrl: newAvatarUrl };
+
+      updateUser(updatedUser);
+    } catch (error) {
+      handleRequestErrors(error);
+    } finally {
+      setLoading(false);
+    }
+  }
+
   return (
     <Modal
       className={s.editPlayerModal}
@@ -120,10 +168,18 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
         {isProfileUpdate ? (
           <>
-            <Avatar
-              className={s.avatar}
-              variant="profile"
-              src={user.avatarUrl ? user.avatarUrl : null}
+            <AvatarWithAdd
+              src={loading ? Spinner : user.avatarUrl}
+              onClick={() => {
+                inputRef.current?.click();
+              }}
+            />
+
+            <Input
+              ref={inputRef}
+              type="file"
+              hidden
+              onChange={handleFileUpload}
             />
 
             <FormField error={errors.email?.message}>

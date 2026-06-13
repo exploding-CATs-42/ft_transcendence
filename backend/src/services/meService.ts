@@ -1,10 +1,11 @@
 // Project level
 import { ApiError } from "errors";
 import { MyProfileUser } from "types";
-// Local level
+import cloudinary from "../lib/cloudinary/cloudinary";
 import { prisma, selfProfileSelect } from "../lib/prisma";
 import { comparePassword, hashPassword } from "../utils/hash";
 import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
+// Local level
 import { getFinishedGamesStats } from "./usersService";
 
 export class MeServiceError extends ApiError {
@@ -18,7 +19,6 @@ export interface UpdateMeInput {
   email?: string;
   passwordOld?: string;
   passwordNew?: string;
-  avatarUrl?: string | null;
 }
 
 async function validatePassword(currentUserId: string, input: UpdateMeInput) {
@@ -101,10 +101,6 @@ export async function updateMe(
     data.passwordHash = await hashPassword(input.passwordNew);
   }
 
-  if (input.avatarUrl !== undefined) {
-    data.avatarUrl = input.avatarUrl;
-  }
-
   if (Object.keys(data).length === 0) {
     throw new MeServiceError("At least one field must be provided", 400);
   }
@@ -134,4 +130,32 @@ export async function getMe(userId: string): Promise<{ user: MyProfileUser }> {
   return {
     user: toMyProfileUser(user, stats),
   };
+}
+
+export async function updateMeAvatar(
+  userId: string,
+  file?: Express.Multer.File,
+): Promise<string | null> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+  });
+
+  if (!user) {
+    throw new ApiError("User not found", 404);
+  }
+
+  if (!file) {
+    throw new ApiError("Invalid file", 404);
+  }
+
+  const result = await cloudinary.uploadImage(file.path);
+
+  const updatedUser = await prisma.user.update({
+    where: { id: userId },
+    data: {
+      avatarUrl: result.secure_url,
+      avatarPublicId: result.public_id,
+    },
+  });
+  return updatedUser.avatarUrl;
 }
