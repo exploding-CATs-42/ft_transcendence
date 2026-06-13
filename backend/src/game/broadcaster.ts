@@ -3,7 +3,10 @@ import { Actor } from "xstate";
 import { Server } from "socket.io";
 // Project level
 import { GameId } from "types";
-import { ServerPublicEvents } from "@exploding-cats/shared-types";
+import {
+  CountdownStartedPayload,
+  ServerPublicEvents,
+} from "@exploding-cats/shared-types";
 // Local level
 import { gameMachine } from "./gameMachine";
 import { GameEmitters } from "./emitters";
@@ -27,9 +30,9 @@ export function attachBroadcaster(
   });
 
   actor.on(GameEmitters.COUNTDOWN_STARTED, (event) => {
-    io!
-      .to(gameId)
-      .emit(ServerPublicEvents.COUNTDOWN_STARTED, { endsAt: event.endsAt });
+    const payload: CountdownStartedPayload = { endsAt: event.endsAt };
+
+    io!.to(gameId).emit(ServerPublicEvents.COUNTDOWN_STARTED, payload);
   });
 
   actor.on(GameEmitters.COUNTDOWN_CANCELED, () => {
