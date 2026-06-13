@@ -29,9 +29,6 @@ export const ServerPublicEvents = {
   GAME_OVER: "GAME_OVER",
 } as const;
 
-export type ServerPublicEvents =
-  (typeof ServerPublicEvents)[keyof typeof ServerPublicEvents];
-
 export const PrivateEventType = {
   LEFT_GAME: "left-game",
   WAITING_STATE: "waiting-state",
