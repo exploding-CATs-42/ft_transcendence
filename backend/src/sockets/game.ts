@@ -16,7 +16,7 @@ import {
 import {
   ClientEvents,
   ErrorEventType,
-  PrivateEventType,
+  ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/shared-types";
 
@@ -35,7 +35,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const room = parsed.gameId;
         await socket.join(room);
 
-        socket.emit(PrivateEventType.WAITING_STATE, { waitingState });
+        socket.emit(ServerPrivateEvents.WAITING_STATE, { waitingState });
         socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, { player });
       },
     ),
@@ -52,7 +52,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const room = parsed.gameId;
         await socket.leave(room);
 
-        socket.emit(PrivateEventType.LEFT_GAME);
+        socket.emit(ServerPrivateEvents.LEFT_GAME);
         io.to(room).emit(ServerPublicEvents.PLAYER_LEFT, { playerId });
       },
     ),
