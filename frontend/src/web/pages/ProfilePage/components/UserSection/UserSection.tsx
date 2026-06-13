@@ -1,31 +1,25 @@
-import type { AxiosError } from "axios";
-import { useForm, type SubmitHandler } from "react-hook-form";
-import { toast } from "react-toastify";
 // Project level
 import { Avatar, Button, Icon, Section } from "components";
-import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
-import type { BadRequestErrorResponse } from "types";
 import { useAuth, useModal } from "hooks";
 import api from "api";
 // Local level
 import EditPlayerModal from "../EditPlayerModal/EditPlayerModal";
 import type { MyProfileUser, ProfileUser } from "../../types";
 import s from "./UserSection.module.css";
-import type { Dispatch, SetStateAction } from "react";
 
 type Props =
   | {
       isMyProfile: true;
       user: MyProfileUser;
-      setUser: Dispatch<SetStateAction<ProfileUser | MyProfileUser | null>>;
+      updateUser: (updates: ProfileUser) => void;
     }
   | {
       isMyProfile: false;
       user: ProfileUser;
-      setUser?: undefined;
+      updateUser?: undefined;
     };
 
-const UserSection = ({ user, setUser, isMyProfile }: Props) => {
+const UserSection = ({ user, updateUser, isMyProfile }: Props) => {
   const { clearAccessToken } = useAuth();
   const [isOpenEditPlayerModal, toggleOpenEditPlayerModal] = useModal();
 
@@ -36,79 +30,6 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
       // Logout is best-effort because the backend session may already be gone.
     } finally {
       clearAccessToken();
-    }
-  };
-
-  const {
-    register,
-    handleSubmit,
-    formState: { isSubmitting, errors, isDirty },
-    setError,
-    clearErrors,
-    reset,
-  } = useForm<UpdateMeRequestBody>({
-    defaultValues: user,
-  });
-
-  const emptyStringToUndefined = (value: string | undefined) =>
-    value === "" ? undefined : value;
-
-  const valuesToUpdate = (data: UpdateMeRequestBody) => ({
-    username: emptyStringToUndefined(data.username),
-    email: emptyStringToUndefined(data.email),
-    passwordNew: emptyStringToUndefined(data.passwordNew),
-    passwordOld: emptyStringToUndefined(data.passwordOld),
-    avatarUrl: data.avatarUrl === "" ? undefined : data.avatarUrl,
-  });
-
-  const processFieldErrors = (
-    fieldErrors: Record<string, string[]> | undefined,
-  ) => {
-    if (!fieldErrors) return;
-
-    Object.entries(fieldErrors).forEach(([field, messages]) => {
-      const message = messages[0];
-
-      if (!message) return;
-
-      setError(field as keyof UpdateMeRequestBody, { message });
-    });
-  };
-
-  const handleRequestErrors = (error: unknown) => {
-    const err = error as AxiosError<
-      BadRequestErrorResponse<keyof UpdateMeRequestBody>
-    >;
-
-    if (err.response?.status !== 400) {
-      toast.error(err.message);
-      return;
-    }
-
-    const formErrors = err.response.data.errors.formErrors;
-    if (formErrors && formErrors[0]) {
-      setError("root", {
-        type: "server",
-        message: formErrors[0],
-      });
-      return;
-    }
-
-    const fieldErrors = err.response.data.errors.fieldErrors;
-    processFieldErrors(fieldErrors);
-  };
-
-  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (data) => {
-    try {
-      const updates = valuesToUpdate(data);
-      const updatedUser = await api.me.updateMe(updates);
-
-      if (setUser) setUser((p) => (p ? { ...p, ...updatedUser } : null));
-      reset(updatedUser);
-      toast.success("Success");
-      clearErrors();
-    } catch (error) {
-      handleRequestErrors(error);
     }
   };
 
@@ -131,15 +52,8 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
           <EditPlayerModal
             isOpen={isOpenEditPlayerModal}
             toggleModal={() => toggleOpenEditPlayerModal(false)}
+            updateUser={updateUser}
             user={user}
-            form={{
-              onSubmit: handleSubmit(onSubmit),
-              disabled: isSubmitting,
-              errors,
-              register,
-              clearErrors,
-              isDirty,
-            }}
           />
 
           <Button className={s.logoutButton} onClick={logoutUser}>
