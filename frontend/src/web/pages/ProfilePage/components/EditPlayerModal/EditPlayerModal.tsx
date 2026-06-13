@@ -20,6 +20,7 @@ import api from "api";
 import s from "./EditPlayerModal.module.css";
 import { AvatarWithAdd } from "components";
 import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
+import { avatarSchema } from "schemas/me/updateMeAvatarSchema";
 
 interface Props {
   isOpen: boolean;
@@ -135,6 +136,24 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
     clearErrors();
     try {
+      const result = avatarSchema.safeParse(file);
+
+      if (!result.success) {
+        const { formErrors } = result.error.flatten();
+
+        if (formErrors.length) {
+          const message = formErrors?.[0];
+
+          if (!message) return;
+
+          setError("root", {
+            type: "validate",
+            message,
+          });
+        }
+
+        return;
+      }
       const formData = new FormData();
       formData.append("avatar", file);
 
