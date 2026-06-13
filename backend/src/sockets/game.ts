@@ -91,7 +91,9 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await cancelStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(ServerPublicEvents.PLAYER_CANCELED, { playerId });
+        const publicPayload: PlayerIdPayload = { playerId };
+
+        io.to(room).emit(ServerPublicEvents.PLAYER_CANCELED, publicPayload);
       },
     ),
   );
