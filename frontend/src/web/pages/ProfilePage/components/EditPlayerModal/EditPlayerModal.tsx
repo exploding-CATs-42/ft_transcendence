@@ -1,10 +1,8 @@
 // Libraries
+import clsx from "clsx";
 import { useState } from "react";
-import type {
-  FieldErrors,
-  UseFormClearErrors,
-  UseFormRegister,
-} from "react-hook-form";
+import { toast } from "react-toastify";
+import { useForm, type SubmitHandler } from "react-hook-form";
 // Project level
 import {
   Avatar,
@@ -15,31 +13,101 @@ import {
   NameInput,
   PasswordInput,
 } from "components";
+import type { MyProfileUser, ProfileUser } from "pages/ProfilePage/types";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
+import type { BadRequestErrorResponse } from "types";
+import type { AxiosError } from "axios";
+import api from "api";
 // Local level
 import s from "./EditPlayerModal.module.css";
-import clsx from "clsx";
 
 interface Props {
   isOpen: boolean;
   toggleModal: () => void;
-  user: UpdateMeRequestBody;
-  form: {
-    onSubmit: () => void;
-    disabled: boolean;
-    errors: FieldErrors<UpdateMeRequestBody>;
-    register: UseFormRegister<UpdateMeRequestBody>;
-    clearErrors: UseFormClearErrors<UpdateMeRequestBody>;
-    isDirty: boolean;
-  };
+  user: MyProfileUser;
+  updateUser: (updates: ProfileUser) => void;
 }
 
-const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
+const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
   const [isProfileUpdate, setIsProfileUpdate] = useState(true);
-  const { onSubmit, errors, register, disabled, clearErrors, isDirty } = form;
 
   const formTitle = isProfileUpdate ? "Profile Settings" : "Password Settings";
   const redirectText = isProfileUpdate ? "change password" : "update profile";
+
+  const {
+    register,
+    handleSubmit,
+    formState: { isSubmitting, errors, isDirty },
+    setError,
+    clearErrors,
+    reset,
+  } = useForm<UpdateMeRequestBody>({
+    defaultValues: user,
+  });
+
+  const emptyStringToUndefined = (value: string | undefined) =>
+    value === "" ? undefined : value;
+
+  const valuesToUpdate = (data: UpdateMeRequestBody) => ({
+    username: emptyStringToUndefined(data.username),
+    email: emptyStringToUndefined(data.email),
+    passwordNew: emptyStringToUndefined(data.passwordNew),
+    passwordOld: emptyStringToUndefined(data.passwordOld),
+    avatarUrl: data.avatarUrl === "" ? undefined : data.avatarUrl,
+  });
+
+  const processFieldErrors = (
+    fieldErrors: Record<string, string[]> | undefined,
+  ) => {
+    if (!fieldErrors) return;
+
+    Object.entries(fieldErrors).forEach(([field, messages]) => {
+      const message = messages[0];
+
+      if (!message) return;
+
+      setError(field as keyof UpdateMeRequestBody, { message });
+    });
+  };
+
+  const handleRequestErrors = (error: unknown) => {
+    const err = error as AxiosError<
+      BadRequestErrorResponse<keyof UpdateMeRequestBody>
+    >;
+
+    if (err.response?.status !== 400) {
+      toast.error(err.message);
+      return;
+    }
+
+    const formErrors = err.response.data.errors.formErrors;
+    if (formErrors && formErrors[0]) {
+      setError("root", {
+        type: "server",
+        message: formErrors[0],
+      });
+      return;
+    }
+
+    const fieldErrors = err.response.data.errors.fieldErrors;
+    processFieldErrors(fieldErrors);
+  };
+
+  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (data) => {
+    try {
+      const updates = valuesToUpdate(data);
+      const updatedUser = await api.me.updateMe(updates);
+
+      updateUser(updatedUser);
+      reset(updatedUser);
+
+      clearErrors();
+
+      toast.success("Success");
+    } catch (error) {
+      handleRequestErrors(error);
+    }
+  };
 
   return (
     <Modal
@@ -47,7 +115,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
       isOpen={isOpen}
       toggleModal={toggleModal}
     >
-      <form className={s.editPlayerForm} onSubmit={onSubmit}>
+      <form className={s.editPlayerForm} onSubmit={handleSubmit(onSubmit)}>
         <h2 className={s.modalTitle}>{formTitle}</h2>
 
         {isProfileUpdate ? (
@@ -99,7 +167,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, form }: Props) => {
             isDirty && s.editFormButtonEnabled,
           )}
           type="submit"
-          disabled={disabled || !isDirty}
+          disabled={isSubmitting || !isDirty}
         >
           Save
         </Button>
