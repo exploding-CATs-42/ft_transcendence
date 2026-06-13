@@ -69,7 +69,6 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     email: emptyStringToUndefined(data.email),
     passwordNew: emptyStringToUndefined(data.passwordNew),
     passwordOld: emptyStringToUndefined(data.passwordOld),
-    avatarUrl: data.avatarUrl === "" ? undefined : data.avatarUrl,
   });
 
   const processFieldErrors = (
