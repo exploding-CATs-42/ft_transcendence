@@ -15,6 +15,7 @@ import {
 } from "schemas";
 import {
   ClientEvents,
+  PlayerIdPayload,
   PlayerJoinedPayload,
   ServerErrorEvents,
   ServerPrivateEvents,
@@ -55,8 +56,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const room = parsed.gameId;
         await socket.leave(room);
 
+        const publicPayload: PlayerIdPayload = { playerId };
+
         socket.emit(ServerPrivateEvents.LEFT_GAME);
-        io.to(room).emit(ServerPublicEvents.PLAYER_LEFT, { playerId });
+        io.to(room).emit(ServerPublicEvents.PLAYER_LEFT, publicPayload);
       },
     ),
   );
