@@ -5,10 +5,10 @@ import { toast } from "react-toastify";
 import { useForm, type SubmitHandler } from "react-hook-form";
 // Project level
 import {
-  Avatar,
   Button,
   EmailInput,
   FormField,
+  Input,
   Modal,
   NameInput,
   PasswordInput,
@@ -19,6 +19,7 @@ import type { AxiosError } from "axios";
 import api from "api";
 // Local level
 import s from "./EditPlayerModal.module.css";
+import { AvatarWithAdd } from "components";
 import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
 
 interface Props {
@@ -119,11 +120,8 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
         {isProfileUpdate ? (
           <>
-            <Avatar
-              className={s.avatar}
-              variant="profile"
-              src={user.avatarUrl ? user.avatarUrl : null}
-            />
+            <AvatarWithAdd src={user.avatarUrl} onClick={() => {}} />
+            <Input type="file" hidden onChange={() => {}} />
 
             <FormField error={errors.email?.message}>
               <EmailInput
