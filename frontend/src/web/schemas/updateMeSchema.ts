@@ -15,7 +15,7 @@ export const updateMeSchema = z
   })
   .refine(
     (data) =>
-      (!!data.passwordOld && !!data.passwordNew) ||
+      (data.passwordOld && data.passwordNew) ||
       (!data.passwordOld && !data.passwordNew),
     {
       message: "Both current and new password must be provided",
