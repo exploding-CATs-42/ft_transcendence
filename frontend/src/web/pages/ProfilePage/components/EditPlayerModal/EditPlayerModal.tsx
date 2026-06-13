@@ -134,6 +134,17 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     if (!file) return;
 
     clearErrors();
+    try {
+      const formData = new FormData();
+      formData.append("avatar", file);
+
+      const newAvatarUrl = await api.me.updateMeAvatar(formData);
+      const updatedUser = { ...user, avatarUrl: newAvatarUrl };
+
+      updateUser(updatedUser);
+    } catch (error) {
+      handleRequestErrors(error);
+    }
   }
 
   return (
