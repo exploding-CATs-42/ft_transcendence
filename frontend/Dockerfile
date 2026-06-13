@@ -1,7 +1,16 @@
 FROM node:24-alpine AS base
 RUN corepack enable
+RUN corepack prepare pnpm@10.33.0 --activate
 WORKDIR /app
 
+################## DEV ################################################
+FROM base AS dev
+# No COPY, no RUN pnpm install — everything comes via volumes.
+# The entrypoint just starts the dev server.
+CMD ["sh", "-c", "pnpm --filter frontend dev"]
+
+################## BUILD ##############################################
+FROM base AS build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY frontend/package.json ./frontend/
 COPY packages/types/package.json ./packages/types/
@@ -9,13 +18,6 @@ COPY packages/schemas/package.json ./packages/schemas/
 
 RUN pnpm install --frozen-lockfile
 
-################## DEV ################################################
-FROM base AS dev
-WORKDIR /app
-CMD ["pnpm", "--filter", "frontend", "dev"]
-
-################## BUILD ##############################################
-FROM base AS build
 COPY frontend/ ./frontend/
 COPY packages/ ./packages/
 RUN pnpm --filter frontend build
