@@ -12,10 +12,10 @@ type AuthenticatedHandler = (
 ) => unknown;
 
 type AuthenticatedRouter = Router & {
-  get(path: string, handler: AuthenticatedHandler): void;
-  post(path: string, handler: AuthenticatedHandler): void;
-  patch(path: string, handler: AuthenticatedHandler): void;
-  delete(path: string, handler: AuthenticatedHandler): void;
+  get: (path: string, ...handlers: AuthenticatedHandler[]) => void;
+  post: (path: string, ...handlers: AuthenticatedHandler[]) => void;
+  patch: (path: string, ...handlers: AuthenticatedHandler[]) => void;
+  delete: (path: string, ...handlers: AuthenticatedHandler[]) => void;
 };
 
 export function createAuthenticatedRouter(): AuthenticatedRouter {
