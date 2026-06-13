@@ -33,16 +33,6 @@ const Avatar = ({
   return (
     <img
       className={clsx(s.avatar, variantClass[variant], className)}
-      srcSet="
-        /src/web/assets/images/avatar/avatar-116w.png 116w,
-        /src/web/assets/images/avatar/avatar-193w.png 193w
-      "
-      sizes="
-      (min-width: 1920px) 193px,
-      (min-width: 1440px) 137px,
-      (min-width: 375px) 116px,
-      45px
-    "
       src={avatarSrc}
       alt={alt}
     />
