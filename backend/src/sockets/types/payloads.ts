@@ -1,15 +1,13 @@
 // Project level
+import {
+  WaitingPlayerView,
+  WaitingStateView,
+} from "@exploding-cats/shared-types";
 import { CardInstance, PendingActionType } from "game/types";
-// Local level
-import { WaitingPlayerView, WaitingStateView } from "./views";
 
 export interface JoinGameResult {
   player: WaitingPlayerView;
   waitingState: WaitingStateView;
-}
-
-export interface PlayerIdPayload {
-  playerId: string;
 }
 
 export interface CardPlayedPayload {

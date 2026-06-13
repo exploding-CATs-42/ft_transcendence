@@ -1,5 +1,5 @@
 // Project level
-import { WaitingPlayerView } from "types";
+import { WaitingPlayerView } from "@exploding-cats/shared-types";
 // Local level
 import { Player } from "./types/player";
 
