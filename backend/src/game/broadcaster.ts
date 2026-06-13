@@ -2,7 +2,8 @@
 import { Actor } from "xstate";
 import { Server } from "socket.io";
 // Project level
-import { GameId, PublicEventType } from "types";
+import { GameId } from "types";
+import { PublicEventType } from "@exploding-cats/shared-types";
 // Local level
 import { gameMachine } from "./gameMachine";
 import { GameEmitters } from "./emitters";
