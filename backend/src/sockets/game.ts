@@ -20,6 +20,7 @@ import {
   ServerErrorEvents,
   ServerPrivateEvents,
   ServerPublicEvents,
+  WaitingStatePayload,
 } from "@exploding-cats/shared-types";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
@@ -37,9 +38,10 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const room = parsed.gameId;
         await socket.join(room);
 
+        const privatePayload: WaitingStatePayload = { waitingState };
         const publicPayload: PlayerJoinedPayload = { player };
 
-        socket.emit(ServerPrivateEvents.WAITING_STATE, { waitingState });
+        socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
         socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
       },
     ),
