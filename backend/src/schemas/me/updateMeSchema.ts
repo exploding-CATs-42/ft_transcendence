@@ -6,9 +6,6 @@ export const updateMeSchema = z
     email: z.string().trim().toLowerCase().pipe(z.email()).optional(),
     passwordOld: z.string().min(8).max(100).optional(),
     passwordNew: z.string().min(8).max(100).optional(),
-    avatarUrl: z
-      .union([z.string().trim().url().max(2048), z.null()])
-      .optional(),
   })
   .refine((data) => Object.values(data).some((value) => value !== undefined), {
     message: "At least one field must be provided",
