@@ -41,9 +41,6 @@ export const ServerPrivateEvents = {
   FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE",
 } as const;
 
-export type ServerPrivateEvents =
-  (typeof ServerPrivateEvents)[keyof typeof ServerPrivateEvents];
-
 export const ErrorEventType = {
   JOIN_GAME_ERROR: "join-game-error",
   LEAVE_GAME_ERROR: "leave-game-error",
