@@ -16,6 +16,7 @@ import type {
 import s from "./ProfilePage.module.css";
 import type { UserGameHistoryItem } from "components/MatchListItem/types";
 import { buildStats } from "./utils/buildStats";
+import LoadingScreen from "components/LoadingScreen/LoadingScreen";
 
 const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
@@ -93,7 +94,7 @@ const ProfilePage = () => {
   }, [userId, isMyProfile]);
 
   if (loading) {
-    return <div>Loading...</div>;
+    return <LoadingScreen />;
   }
 
   if (!user) {
