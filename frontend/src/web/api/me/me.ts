@@ -14,6 +14,11 @@ const updateMe = async (body: UpdateMeRequestBody): Promise<MyProfileUser> => {
   return result.data.user;
 };
 
+const updateMeAvatar = async (body: FormData): Promise<string> => {
+  const result = await api.patch("/me/avatar", body);
+  return result.data.avatarUrl;
+};
+
 const getMeGames = async (): Promise<UserGameHistoryItem[]> => {
   const result = await api.get(`/me/games`);
   return result.data.games;
@@ -22,5 +27,6 @@ const getMeGames = async (): Promise<UserGameHistoryItem[]> => {
 export default {
   getMe,
   updateMe,
+  updateMeAvatar,
   getMeGames,
 };
