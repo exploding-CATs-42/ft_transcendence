@@ -4,7 +4,7 @@ import type { Response } from "express";
 import { updateMeSchema } from "schemas";
 import { AuthenticatedRequest } from "types";
 import { validate } from "utils";
-import { getMe, updateMe } from "services";
+import { getMe, updateMe, updateMeAvatar } from "services";
 import { getUserGames } from "../services/usersService";
 
 export async function updateMeController(
@@ -38,4 +38,12 @@ export async function getMeController(
 export async function getMeGames(req: AuthenticatedRequest, res: Response) {
   const games = await getUserGames(req.user.id);
   res.status(200).json({ games });
+}
+
+export async function updateMeAvatarController(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  const avatarUrl = await updateMeAvatar(req.user.id, req.file);
+  res.status(200).json({ avatarUrl });
 }
