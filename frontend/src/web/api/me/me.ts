@@ -1,8 +1,5 @@
 // Project level
-import type {
-  MyProfileUser,
-  ProfileUser,
-} from "pages/ProfilePage/types/ProfileUser";
+import type { MyProfileUser } from "pages/ProfilePage/types/ProfileUser";
 import { api } from "../axios";
 import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 import type { UserGameHistoryItem } from "components/MatchListItem/types";
@@ -12,7 +9,7 @@ const getMe = async (): Promise<MyProfileUser> => {
   return result.data.user;
 };
 
-const updateMe = async (body: UpdateMeRequestBody): Promise<ProfileUser> => {
+const updateMe = async (body: UpdateMeRequestBody): Promise<MyProfileUser> => {
   const result = await api.patch("/me", body);
   return result.data.user;
 };
