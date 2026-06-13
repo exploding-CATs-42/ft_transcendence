@@ -12,3 +12,12 @@ cloudinary.config({
   api_key: CLOUDINARY_API_KEY,
   api_secret: CLOUDINARY_API_SECRET,
 });
+
+const uploadImage = async (fileToUpload: string) => {
+  const data = await cloudinary.uploader.upload(fileToUpload, {
+    resource_type: "auto",
+  });
+  return data;
+};
+
+export default { uploadImage };
