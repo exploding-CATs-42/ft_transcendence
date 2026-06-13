@@ -65,12 +65,40 @@ services:
       retries: 10
     networks:
       - transcendence_net
+    
+  prometheus:
+    image: prom/prometheus:v2.55.1
+    container_name: ft-prometheus
+    ports:
+      - "${PROMETHEUS_PORT}:9090"
+    volumes:
+      - ../monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../monitoring/prometheus/alerts.yml:/etc/prometheus/alerts.yml:ro
+    networks:
+      - transcendence_net
+    
+  grafana:
+    image: grafana/grafana:11.3.1
+    container_name: ft-grafana
+    env_file:
+     - ../env/.env
+    ports:
+      - "${GRAFANA_PORT}:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ../monitoring/grafana/provisioning:/etc/grafana/provisioning:ro
+      - ../monitoring/grafana/dashboards:/var/lib/grafana/dashboards:ro
+    depends_on:
+      - prometheus
+    networks:
+      - transcendence_net
 
 volumes:
   postgres_data:
   monorepo_node_modules: # root node_modules
   backend_node_modules: # backend's own node_modules
   frontend_node_modules: # frontend's own node_modules
+  grafana_data: # Grafana database, plugins, and local state
 
 networks:
   transcendence_net:
