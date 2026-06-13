@@ -13,10 +13,10 @@ import {
   LeaveGameParams,
   leaveGameSchema,
 } from "schemas";
-import { PrivateEventType } from "types";
 import {
   ClientEventType,
   ErrorEventType,
+  PrivateEventType,
   PublicEventType,
 } from "@exploding-cats/shared-types";
 
