@@ -14,7 +14,7 @@ import {
   leaveGameSchema,
 } from "schemas";
 import {
-  ClientEventType,
+  ClientEvents,
   ErrorEventType,
   PrivateEventType,
   PublicEventType,
@@ -22,7 +22,7 @@ import {
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
-    ClientEventType.JOIN_GAME,
+    ClientEvents.JOIN_GAME,
     withErrorHandler(
       joinGameSchema,
       socket,
@@ -42,7 +42,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   );
 
   socket.on(
-    ClientEventType.LEAVE_GAME,
+    ClientEvents.LEAVE_GAME,
     withErrorHandler(
       leaveGameSchema,
       socket,
@@ -59,7 +59,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   );
 
   socket.on(
-    ClientEventType.CONFIRM_START,
+    ClientEvents.CONFIRM_START,
     withErrorHandler(
       confirmStartSchema,
       socket,
@@ -74,7 +74,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   );
 
   socket.on(
-    ClientEventType.CANCEL_START,
+    ClientEvents.CANCEL_START,
     withErrorHandler(
       cancelStartSchema,
       socket,
