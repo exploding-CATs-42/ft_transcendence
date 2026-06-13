@@ -14,12 +14,12 @@ import {
   PasswordInput,
 } from "components";
 import type { MyProfileUser, ProfileUser } from "pages/ProfilePage/types";
-import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 import type { BadRequestErrorResponse } from "types";
 import type { AxiosError } from "axios";
 import api from "api";
 // Local level
 import s from "./EditPlayerModal.module.css";
+import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
 
 interface Props {
   isOpen: boolean;
