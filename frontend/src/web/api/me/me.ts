@@ -1,8 +1,8 @@
 // Project level
 import type { MyProfileUser } from "pages/ProfilePage/types/ProfileUser";
 import { api } from "../axios";
-import type { UpdateMeRequestBody } from "schemas/updateMeSchema";
 import type { UserGameHistoryItem } from "components/MatchListItem/types";
+import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
 
 const getMe = async (): Promise<MyProfileUser> => {
   const result = await api.get("/me");
