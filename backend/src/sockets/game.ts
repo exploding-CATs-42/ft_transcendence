@@ -17,7 +17,7 @@ import {
   ClientEvents,
   ErrorEventType,
   PrivateEventType,
-  PublicEventType,
+  ServerPublicEvents,
 } from "@exploding-cats/shared-types";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
@@ -36,7 +36,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         await socket.join(room);
 
         socket.emit(PrivateEventType.WAITING_STATE, { waitingState });
-        socket.to(room).emit(PublicEventType.PLAYER_JOINED, { player });
+        socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, { player });
       },
     ),
   );
@@ -53,7 +53,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         await socket.leave(room);
 
         socket.emit(PrivateEventType.LEFT_GAME);
-        io.to(room).emit(PublicEventType.PLAYER_LEFT, { playerId });
+        io.to(room).emit(ServerPublicEvents.PLAYER_LEFT, { playerId });
       },
     ),
   );
@@ -68,7 +68,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await confirmStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(PublicEventType.PLAYER_CONFIRMED, { playerId });
+        io.to(room).emit(ServerPublicEvents.PLAYER_CONFIRMED, { playerId });
       },
     ),
   );
@@ -83,7 +83,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await cancelStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(PublicEventType.PLAYER_CANCELED, { playerId });
+        io.to(room).emit(ServerPublicEvents.PLAYER_CANCELED, { playerId });
       },
     ),
   );

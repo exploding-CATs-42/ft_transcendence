@@ -5,7 +5,7 @@ export const ClientEvents = {
   CANCEL_START: "cancel-start",
 } as const;
 
-export const PublicEventType = {
+export const ServerPublicEvents = {
   PLAYER_JOINED: "player-joined",
   PLAYER_LEFT: "player-left",
   PLAYER_CONFIRMED: "player-confirmed",
@@ -29,8 +29,8 @@ export const PublicEventType = {
   GAME_OVER: "GAME_OVER",
 } as const;
 
-export type PublicEventType =
-  (typeof PublicEventType)[keyof typeof PublicEventType];
+export type ServerPublicEvents =
+  (typeof ServerPublicEvents)[keyof typeof ServerPublicEvents];
 
 export const PrivateEventType = {
   LEFT_GAME: "left-game",
