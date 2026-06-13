@@ -29,7 +29,7 @@ export const ServerPublicEvents = {
   GAME_OVER: "GAME_OVER",
 } as const;
 
-export const PrivateEventType = {
+export const ServerPrivateEvents = {
   LEFT_GAME: "left-game",
   WAITING_STATE: "waiting-state",
   YOUR_HAND: "YOUR_HAND",
@@ -41,8 +41,8 @@ export const PrivateEventType = {
   FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE",
 } as const;
 
-export type PrivateEventType =
-  (typeof PrivateEventType)[keyof typeof PrivateEventType];
+export type ServerPrivateEvents =
+  (typeof ServerPrivateEvents)[keyof typeof ServerPrivateEvents];
 
 export const ErrorEventType = {
   JOIN_GAME_ERROR: "join-game-error",
