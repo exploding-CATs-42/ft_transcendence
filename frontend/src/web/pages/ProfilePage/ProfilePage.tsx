@@ -101,6 +101,17 @@ const ProfilePage = () => {
     return <Navigate to="/" replace />;
   }
 
+  const updateUser = (updates: ProfileUser) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        ...updates,
+      };
+    });
+  };
+
   return (
     <div className={s.pageContainer}>
       <div className={s.flexContainer}>
@@ -108,7 +119,7 @@ const ProfilePage = () => {
           <UserSection
             isMyProfile={true}
             user={user as MyProfileUser}
-            setUser={setUser}
+            updateUser={updateUser}
           />
         ) : (
           <UserSection isMyProfile={false} user={user} />
