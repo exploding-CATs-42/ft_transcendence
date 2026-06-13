@@ -7,13 +7,14 @@ BACKEND_WD = -w /app/backend
 ## Docker lifecycle
 ## -------------------------
 
-all: build ## Build and start all containers
+all: prisma-generate build
 
 up: ## Start containers in detached mode
 	$(COMPOSE) up -d --remove-orphans
 
 build: ## Build images and start containers
 	$(COMPOSE) up --build -d --remove-orphans
+	docker logs ft-backend -f
 
 down: ## Stop and remove containers
 	$(COMPOSE) down
@@ -86,7 +87,11 @@ prisma-validate: ## Validate Prisma schema
 	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma validate
 
 prisma-generate: ## Generate Prisma client
-	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma generate
+	@npx pnpm i
+	@if [ ! -d backend/src/generated ]; then \
+		echo "backend/src/generated not found, generating Prisma client..."; \
+		cd backend && npm run prisma:generate; \
+	fi
 
 prisma-migrate: ## Create and apply a new Prisma migration.
 	$(COMPOSE) exec $(BACKEND_WD) backend pnpm prisma migrate dev
