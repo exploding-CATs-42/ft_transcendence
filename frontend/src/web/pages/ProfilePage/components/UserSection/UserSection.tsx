@@ -141,13 +141,18 @@ const UserSection = ({ user, setUser, isMyProfile }: Props) => {
               isDirty,
             }}
           />
+
+          <Button className={s.logoutButton} onClick={logoutUser}>
+            <Icon
+              name="log-out"
+              className={s.logoutIcon}
+              width={15}
+              height={15}
+            />
+            <span className={s.logoutText}>Sign out</span>
+          </Button>
         </>
       )}
-
-      <Button className={s.logoutButton} onClick={logoutUser}>
-        <Icon name="log-out" className={s.logoutIcon} width={15} height={15} />
-        <span className={s.logoutText}>Sign out</span>
-      </Button>
     </Section>
   );
 };
