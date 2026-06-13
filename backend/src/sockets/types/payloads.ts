@@ -10,10 +10,6 @@ export interface JoinGameResult {
   waitingState: WaitingStateView;
 }
 
-export interface PlayerIdPayload {
-  playerId: string;
-}
-
 export interface CardPlayedPayload {
   playerId: string;
   cardType: string;
