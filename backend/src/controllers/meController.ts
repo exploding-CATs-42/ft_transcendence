@@ -13,25 +13,18 @@ export async function updateMeController(
 ) {
   const parsedBody = validate(updateMeSchema, req.body);
 
-  const result = await updateMe(req.user.id, {
-    ...(parsedBody.username !== undefined
-      ? { username: parsedBody.username }
-      : {}),
+  const { username, email, passwordNew, passwordOld, avatarUrl } = parsedBody;
 
-    ...(parsedBody.email !== undefined ? { email: parsedBody.email } : {}),
+  const updateData = {
+    ...(username !== undefined && { username }),
+    ...(email !== undefined && { email }),
+    ...(passwordNew !== undefined && { passwordNew }),
+    ...(passwordOld !== undefined && { passwordOld }),
+    ...(avatarUrl !== undefined && { avatarUrl }),
+  };
 
-    ...(parsedBody.passwordNew !== undefined
-      ? { passwordNew: parsedBody.passwordNew }
-      : {}),
+  const result = await updateMe(req.user.id, updateData);
 
-    ...(parsedBody.passwordOld !== undefined
-      ? { passwordOld: parsedBody.passwordOld }
-      : {}),
-
-    ...(parsedBody.avatarUrl !== undefined
-      ? { avatarUrl: parsedBody.avatarUrl }
-      : {}),
-  });
   res.status(200).json(result);
 }
 
