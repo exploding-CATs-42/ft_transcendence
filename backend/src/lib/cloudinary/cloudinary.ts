@@ -20,4 +20,9 @@ const uploadImage = async (fileToUpload: string) => {
   return data;
 };
 
-export default { uploadImage };
+const removeImage = async (imagePublicId: string) => {
+  const result = await cloudinary.uploader.destroy(imagePublicId);
+  return result;
+};
+
+export default { uploadImage, removeImage };
