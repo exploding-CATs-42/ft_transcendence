@@ -10,4 +10,13 @@ const photoStorage = multer.diskStorage({
   ) => {
     cb(null, path.join(process.cwd(), "/uploads"));
   },
+
+  filename: (
+    _: Request,
+    file: Express.Multer.File,
+    cb: (error: Error | null, filename: string) => void,
+  ) => {
+    const filename = `${new Date().toISOString().replace(/:/g, "-")}-${file.originalname}`;
+    cb(null, filename);
+  },
 });
