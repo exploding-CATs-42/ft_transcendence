@@ -36,6 +36,9 @@ export const photoUpload = multer({
 
     cb(new Error("Unsupported file format"));
   },
+  limits: {
+    fileSize: 2 * 1024 * 1024, // 2 MB
+  },
 });
 
 export default photoUpload;
