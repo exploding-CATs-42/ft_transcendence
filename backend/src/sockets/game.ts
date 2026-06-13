@@ -13,12 +13,8 @@ import {
   LeaveGameParams,
   leaveGameSchema,
 } from "schemas";
-import {
-  ClientEventType,
-  ErrorEventType,
-  PrivateEventType,
-  PublicEventType,
-} from "types";
+import { ErrorEventType, PrivateEventType, PublicEventType } from "types";
+import { ClientEventType } from "@exploding-cats/shared-types";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
