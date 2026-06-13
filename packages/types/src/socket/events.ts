@@ -41,12 +41,12 @@ export const ServerPrivateEvents = {
   FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE",
 } as const;
 
-export const ErrorEventType = {
+export const ServerErrorEvents = {
   JOIN_GAME_ERROR: "join-game-error",
   LEAVE_GAME_ERROR: "leave-game-error",
   CONFIRM_START_ERROR: "confirm-start-error",
   CANCEL_START_ERROR: "cancel-start-error",
 } as const;
 
-export type ErrorEventType =
-  (typeof ErrorEventType)[keyof typeof ErrorEventType];
+export type ServerErrorEvents =
+  (typeof ServerErrorEvents)[keyof typeof ServerErrorEvents];

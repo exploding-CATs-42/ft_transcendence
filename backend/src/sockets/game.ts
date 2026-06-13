@@ -15,7 +15,7 @@ import {
 } from "schemas";
 import {
   ClientEvents,
-  ErrorEventType,
+  ServerErrorEvents,
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/shared-types";
@@ -26,7 +26,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
     withErrorHandler(
       joinGameSchema,
       socket,
-      ErrorEventType.JOIN_GAME_ERROR,
+      ServerErrorEvents.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
         const { waitingState, player } = await joinGame(
           parsed,
@@ -46,7 +46,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
     withErrorHandler(
       leaveGameSchema,
       socket,
-      ErrorEventType.LEAVE_GAME_ERROR,
+      ServerErrorEvents.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
         const { playerId } = await leaveGame(parsed, socket.data.sub);
         const room = parsed.gameId;
@@ -63,7 +63,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
     withErrorHandler(
       confirmStartSchema,
       socket,
-      ErrorEventType.CONFIRM_START_ERROR,
+      ServerErrorEvents.CONFIRM_START_ERROR,
       async (parsed: ConfirmStartParams) => {
         const { playerId } = await confirmStart(parsed, socket.data.sub);
         const room = parsed.gameId;
@@ -78,7 +78,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
     withErrorHandler(
       cancelStartSchema,
       socket,
-      ErrorEventType.CANCEL_START_ERROR,
+      ServerErrorEvents.CANCEL_START_ERROR,
       async (parsed: CancelStartParams) => {
         const { playerId } = await cancelStart(parsed, socket.data.sub);
         const room = parsed.gameId;
