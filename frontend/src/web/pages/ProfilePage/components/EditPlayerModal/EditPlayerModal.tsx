@@ -21,6 +21,7 @@ import s from "./EditPlayerModal.module.css";
 import { AvatarWithAdd } from "components";
 import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
 import { avatarSchema } from "schemas/me/updateMeAvatarSchema";
+import { Spinner } from "assets";
 
 interface Props {
   isOpen: boolean;
@@ -37,6 +38,7 @@ const ModalView = {
 type ModalView = (typeof ModalView)[keyof typeof ModalView];
 
 const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
+  const [loading, setLoading] = useState(false);
   const [modalView, setModalView] = useState<ModalView>(ModalView.PROFILE);
 
   const formTitle =
@@ -136,6 +138,8 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
     clearErrors();
     try {
+      setLoading(true);
+
       const result = avatarSchema.safeParse(file);
 
       if (!result.success) {
@@ -163,6 +167,8 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
       updateUser(updatedUser);
     } catch (error) {
       handleRequestErrors(error);
+    } finally {
+      setLoading(false);
     }
   }
 
@@ -178,7 +184,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
         {modalView === ModalView.PROFILE ? (
           <>
             <AvatarWithAdd
-              src={user.avatarUrl}
+              src={loading ? Spinner : user.avatarUrl}
               onClick={() => {
                 inputRef.current?.click();
               }}
