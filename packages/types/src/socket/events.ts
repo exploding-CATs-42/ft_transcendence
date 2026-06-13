@@ -5,9 +5,6 @@ export const ClientEvents = {
   CANCEL_START: "cancel-start",
 } as const;
 
-export type ClientEvents =
-  (typeof ClientEvents)[keyof typeof ClientEvents];
-
 export const PublicEventType = {
   PLAYER_JOINED: "player-joined",
   PLAYER_LEFT: "player-left",
