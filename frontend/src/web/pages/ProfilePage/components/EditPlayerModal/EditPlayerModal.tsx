@@ -1,6 +1,6 @@
 // Libraries
 import clsx from "clsx";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "react-toastify";
 import { useForm, type SubmitHandler } from "react-hook-form";
 // Project level
@@ -124,6 +124,18 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     }
   };
 
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files) return;
+
+    const file = files[0];
+    if (!file) return;
+
+    clearErrors();
+  }
+
   return (
     <Modal
       className={s.editPlayerModal}
@@ -135,8 +147,19 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
         {modalView === ModalView.PROFILE ? (
           <>
-            <AvatarWithAdd src={user.avatarUrl} onClick={() => {}} />
-            <input type="file" hidden onChange={() => {}} />
+            <AvatarWithAdd
+              src={user.avatarUrl}
+              onClick={() => {
+                inputRef.current?.click();
+              }}
+            />
+
+            <input
+              ref={inputRef}
+              type="file"
+              hidden
+              onChange={handleFileUpload}
+            />
 
             <FormField error={errors.email?.message}>
               <EmailInput
