@@ -2,6 +2,10 @@ import path from "node:path";
 import multer, { FileFilterCallback } from "multer";
 import { Request } from "express";
 
+const generateFilename = (file: Express.Multer.File) => {
+  return `${new Date().toISOString().replace(/:/g, "-")}-${file.originalname}`;
+};
+
 const photoStorage = multer.diskStorage({
   destination: (
     _req: Request,
@@ -16,7 +20,7 @@ const photoStorage = multer.diskStorage({
     file: Express.Multer.File,
     cb: (error: Error | null, filename: string) => void,
   ) => {
-    const filename = `${new Date().toISOString().replace(/:/g, "-")}-${file.originalname}`;
+    const filename = generateFilename(file);
     cb(null, filename);
   },
 });
