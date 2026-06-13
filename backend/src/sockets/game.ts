@@ -74,7 +74,9 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await confirmStart(parsed, socket.data.sub);
         const room = parsed.gameId;
 
-        io.to(room).emit(ServerPublicEvents.PLAYER_CONFIRMED, { playerId });
+        const publicPayload: PlayerIdPayload = { playerId };
+
+        io.to(room).emit(ServerPublicEvents.PLAYER_CONFIRMED, publicPayload);
       },
     ),
   );
