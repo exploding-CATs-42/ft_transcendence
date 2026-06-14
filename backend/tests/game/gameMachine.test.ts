@@ -4,7 +4,7 @@ import { describe, it, expect, vi } from "vitest";
 // Project level
 import { gameMachine, GameStates, GameEvents } from "game";
 import { Player } from "game/types";
-import { START_GAME_COUNTDOWN_MS } from "game/constants";
+import { DEFAULT_GAME_RULES, START_GAME_COUNTDOWN_MS } from "game/constants";
 
 const PLAYERS: Player[] = [
   {
@@ -82,7 +82,7 @@ describe("game machine", () => {
     vi.useRealTimers();
   });
 
-  it("has a deck with 56 cards in it, after entering playing.dealingCards state", () => {
+  it("has a deck with 40 cards in it, after entering playing.dealingCards state", () => {
     vi.useFakeTimers();
 
     const actor = createActor(gameMachine);
@@ -95,6 +95,28 @@ describe("game machine", () => {
 
     const snapshot = actor.getSnapshot();
     const deck = snapshot.context.deck;
-    expect(deck.length).toBe(56);
+    const players = snapshot.context.players;
+
+    const { dealtCardsPerPlayer, defusesDealtPerPlayer } = DEFAULT_GAME_RULES;
+    const CARDS_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
+    expect(deck.length).toBe(56 - CARDS_PER_PLAYER * players.length);
+  });
+
+  it("deals 8 cards to each of the players, after entering playing.dealingCards state", () => {
+    vi.useFakeTimers();
+
+    const actor = createActor(gameMachine);
+
+    actor.start();
+    addPlayers(actor, PLAYERS);
+    markAsReady(actor, PLAYERS);
+
+    vi.advanceTimersByTime(START_GAME_COUNTDOWN_MS);
+
+    const snapshot = actor.getSnapshot();
+    const players = snapshot.context.players;
+    players.forEach((player) => {
+      expect(player.hand.length).toBe(8);
+    });
   });
 });
