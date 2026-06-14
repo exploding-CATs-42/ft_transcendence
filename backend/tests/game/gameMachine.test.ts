@@ -81,4 +81,20 @@ describe("game machine", () => {
 
     vi.useRealTimers();
   });
+
+  it("has a deck with 56 cards in it, after entering playing.dealingCards state", () => {
+    vi.useFakeTimers();
+
+    const actor = createActor(gameMachine);
+
+    actor.start();
+    addPlayers(actor, PLAYERS);
+    markAsReady(actor, PLAYERS);
+
+    vi.advanceTimersByTime(START_GAME_COUNTDOWN_MS);
+
+    const snapshot = actor.getSnapshot();
+    const deck = snapshot.context.deck;
+    expect(deck.length).toBe(56);
+  });
 });
