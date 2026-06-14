@@ -102,7 +102,8 @@ describe("game machine", () => {
     expect(deck.length).toBe(56 - CARDS_PER_PLAYER * players.length);
   });
 
-  it("deals 8 cards to each of the players, after entering playing.dealingCards state", () => {
+  it("deals 8 cards to each of the players, after entering playing.dealingCards state, \
+    one of which is a defuse", () => {
     vi.useFakeTimers();
 
     const actor = createActor(gameMachine);
@@ -117,6 +118,7 @@ describe("game machine", () => {
     const players = snapshot.context.players;
     players.forEach((player) => {
       expect(player.hand.length).toBe(8);
+      expect(player.hand.some((card) => card.type === "DEFUSE")).toBeTruthy();
     });
   });
 });
