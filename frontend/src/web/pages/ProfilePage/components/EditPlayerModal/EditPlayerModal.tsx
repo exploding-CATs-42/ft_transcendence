@@ -28,11 +28,27 @@ interface Props {
   updateUser: (updates: ProfileUser) => void;
 }
 
-const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
-  const [isProfileUpdate, setIsProfileUpdate] = useState(true);
+const ModalView = {
+  PROFILE: "profile",
+  PASSWORD: "password",
+} as const;
 
-  const formTitle = isProfileUpdate ? "Profile Settings" : "Password Settings";
-  const redirectText = isProfileUpdate ? "change password" : "update profile";
+type ModalView = (typeof ModalView)[keyof typeof ModalView];
+
+const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
+  const [modalView, setModalView] = useState<ModalView>(ModalView.PROFILE);
+
+  const formTitle =
+    modalView === ModalView.PROFILE ? "Profile Settings" : "Password Settings";
+  const redirectText =
+    modalView === ModalView.PROFILE ? "change password" : "update profile";
+
+  const getNextModalView = (view: ModalView): ModalView =>
+    view === ModalView.PROFILE ? ModalView.PASSWORD : ModalView.PROFILE;
+
+  const toggleModalView = () => {
+    setModalView(getNextModalView(modalView));
+  };
 
   const {
     register,
@@ -118,7 +134,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
       <form className={s.editPlayerForm} onSubmit={handleSubmit(onSubmit)}>
         <h2 className={s.modalTitle}>{formTitle}</h2>
 
-        {isProfileUpdate ? (
+        {modalView === ModalView.PROFILE ? (
           <>
             <Avatar
               className={s.avatar}
@@ -176,7 +192,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
           className={s.changeFormButton}
           type="button"
           onClick={() => {
-            setIsProfileUpdate((prev) => !prev);
+            toggleModalView();
             clearErrors();
           }}
         >
