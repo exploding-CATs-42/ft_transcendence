@@ -1,9 +1,10 @@
 // Libraries
 import { createActor } from "xstate";
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 // Project level
 import { gameMachine, GameStates, GameEvents } from "game";
 import { Player } from "game/types";
+import { START_GAME_COUNTDOWN_MS } from "game/constants";
 
 const PLAYERS: Player[] = [
   {
@@ -61,5 +62,23 @@ describe("game machine", () => {
     expect(actor.getSnapshot().value).toEqual({
       [GameStates.WAITING]: GameStates.WAITING_STARTING,
     });
+  });
+
+  it("transitions to playing.dealingCards state after 10 seconds from entering waiting.starting state", () => {
+    vi.useFakeTimers();
+
+    const actor = createActor(gameMachine);
+
+    actor.start();
+    addPlayers(actor, PLAYERS);
+    markAsReady(actor, PLAYERS);
+
+    vi.advanceTimersByTime(START_GAME_COUNTDOWN_MS);
+
+    expect(actor.getSnapshot().value).toEqual({
+      [GameStates.PLAYING]: GameStates.DEALING_CARDS,
+    });
+
+    vi.useRealTimers();
   });
 });
