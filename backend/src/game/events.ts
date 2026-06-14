@@ -1,4 +1,4 @@
-import { Player } from "./types/player";
+import { Player } from "game/types";
 
 export const GameEvents = {
   JOIN_GAME: "JOIN_GAME",

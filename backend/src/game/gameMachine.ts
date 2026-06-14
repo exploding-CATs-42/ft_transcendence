@@ -11,7 +11,7 @@ import {
   removePlayer,
   removePlayerConfirmation,
 } from "./actions";
-import { Player } from "./types/player";
+import { Player, Deck } from "./types";
 import { GameEvent, GameEvents } from "./events";
 import { GameGuards, hasEnoughPlayers } from "./guards";
 import {
@@ -22,7 +22,6 @@ import {
 } from "./emitters";
 import { GAME_MACHINE_ID, GameStates } from "./states";
 import { GameTargets } from "./targets";
-import { Deck } from "./types";
 
 export interface GameContext {
   players: Player[];
