@@ -1,4 +1,5 @@
-import { GAME_MACHINE_ID, GameStates } from "./states";
+import { GAME_MACHINE_ID } from "./constants";
+import { GameStates } from "./states";
 
 const getStatePath = (...subPath: string[]) => {
   const path = `#${[GAME_MACHINE_ID, ...subPath].join(".")}`;
