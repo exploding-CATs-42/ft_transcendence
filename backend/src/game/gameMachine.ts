@@ -1,7 +1,7 @@
 // Libraries
 import { assign, emit, setup } from "xstate";
 // Local level
-import { START_GAME_COUNTDOWN_MS } from "./constants";
+import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
 import {
   GameActions,
   addPlayer,
@@ -19,7 +19,7 @@ import {
   GameEmitter,
   gameStarted,
 } from "./emitters";
-import { GAME_MACHINE_ID, GameStates } from "./states";
+import { GameStates } from "./states";
 import { GameTargets } from "./targets";
 
 export interface GameContext {
