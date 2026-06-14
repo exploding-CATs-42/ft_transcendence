@@ -5,3 +5,5 @@ export { default as Tabs } from "./Tabs/Tabs";
 export { default as UserSection } from "./UserSection/UserSection";
 export { default as EditPlayerModal } from "./EditPlayerModal/EditPlayerModal";
 export { default as ProfileControls } from "./ProfileControls/ProfileControls";
+export { default as FriendsTab } from "./FriendsTab/FriendsTab";
+export { default as GamesTab } from "./GamesTab/GamesTab";
