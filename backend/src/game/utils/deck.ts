@@ -58,6 +58,8 @@ export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
   const kittensToInsert = draw(explodingKittens, players.length - 1)!;
   const finalDeck = [...mainDeck, ...defuses, ...kittensToInsert];
 
+  shuffleDeck(finalDeck);
+
   return finalDeck;
 };
 
