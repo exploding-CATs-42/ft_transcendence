@@ -6,6 +6,7 @@ import {
   GameActions,
   addPlayer,
   addPlayerConfirmation,
+  dealCards,
   fillDeck,
   removePlayer,
   removePlayerConfirmation,
@@ -39,6 +40,7 @@ export const gameMachine = setup({
     [GameActions.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
     [GameActions.REMOVE_PLAYER_CONFIRMATION]: assign(removePlayerConfirmation),
     [GameActions.FILL_DECK]: assign(fillDeck),
+    [GameActions.DEAL_CARDS]: assign(dealCards),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -106,7 +108,7 @@ export const gameMachine = setup({
       initial: GameStates.DEALING_CARDS,
       states: {
         [GameStates.DEALING_CARDS]: {
-          entry: GameActions.FILL_DECK,
+          entry: [GameActions.FILL_DECK, GameActions.DEAL_CARDS],
         },
       },
     },
