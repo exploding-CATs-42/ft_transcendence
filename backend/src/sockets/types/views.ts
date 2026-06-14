@@ -1,6 +1,6 @@
 // Project level
 import {
-  CardInstance,
+  Card,
   FavorState,
   NopeChain,
   PendingAction,
@@ -13,7 +13,7 @@ export interface PublicGameView {
   turn: PublicTurnView;
   players: PublicPlayerView[];
   deckSize: number;
-  discardPileTop: CardInstance | null;
+  discardPileTop: Card | null;
   winnerId: string | null;
 }
 
