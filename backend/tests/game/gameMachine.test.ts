@@ -82,7 +82,7 @@ describe("game machine", () => {
     vi.useRealTimers();
   });
 
-  it("has a deck with 40 cards in it, after entering playing.dealingCards state", () => {
+  it("has a deck with 37 cards in it, after entering playing.dealingCards state", () => {
     vi.useFakeTimers();
 
     const actor = createActor(gameMachine);
