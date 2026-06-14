@@ -1,5 +1,5 @@
 // Project level
-import { START_GAME_COUNTDOWN_MS } from "constants/game";
+import { START_GAME_COUNTDOWN_MS } from "game/constants";
 
 export const GameEmitters = {
   GAME_STARTED: "GAME_STARTED",

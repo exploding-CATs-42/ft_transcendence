@@ -1,5 +1,5 @@
 // Project level
-import { MIN_PLAYERS } from "constants/game";
+import { MIN_PLAYERS } from "game/constants";
 // Local level
 import { GameContext } from "./gameMachine";
 
