@@ -104,16 +104,17 @@ describe("game machine", () => {
 
   it("deals 8 cards to each of the players, after entering playing.dealingCards state, \
     one of which is a defuse", () => {
+    // Arrange
     vi.useFakeTimers();
-
     const actor = createActor(gameMachine);
 
+    // Act
     actor.start();
     addPlayers(actor, PLAYERS);
     markAsReady(actor, PLAYERS);
-
     vi.advanceTimersByTime(START_GAME_COUNTDOWN_MS);
 
+    // Assert
     const snapshot = actor.getSnapshot();
     const players = snapshot.context.players;
     players.forEach((player) => {
