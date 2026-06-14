@@ -4,13 +4,12 @@ import { toast } from "react-toastify";
 
 import api from "api";
 import { getErrorMessage } from "utils";
-import { useFriends } from "hooks";
+import { useFriends, useGames } from "hooks";
 
 import { ListSection, StatsSection, UserSection } from "./components";
 
 import type { ProfileUser, ProfileStat, MyProfileUser } from "./types";
 import s from "./ProfilePage.module.css";
-import type { UserGameHistoryItem } from "components/GameListItem/types";
 import { buildStats } from "./utils/buildStats";
 import LoadingScreen from "components/LoadingScreen/LoadingScreen";
 
@@ -18,7 +17,6 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState<ProfileUser | MyProfileUser | null>(null);
-  const [games, setGames] = useState<UserGameHistoryItem[]>([]);
   const [stats, setStats] = useState<ProfileStat[]>([]);
 
   const { userId } = useParams();
@@ -26,6 +24,7 @@ const ProfilePage = () => {
   const isMyProfile = pathname === "/profile";
 
   const { friends } = useFriends({ userId, isMyProfile });
+  const { games } = useGames({ userId, isMyProfile });
 
   useEffect(() => {
     async function getUserData(): Promise<ProfileUser | MyProfileUser | null> {
@@ -39,32 +38,17 @@ const ProfilePage = () => {
       return null;
     }
 
-    async function getUserGames(): Promise<UserGameHistoryItem[]> {
-      if (isMyProfile) {
-        return api.me.getMeGames();
-      }
-
-      if (userId) {
-        return api.users.getUserGames(userId);
-      }
-      return [];
-    }
-
     async function loadProfile() {
       try {
-        const [userData, gamesData] = await Promise.all([
-          getUserData(),
-          getUserGames(),
-        ]);
+        const [userData] = await Promise.all([getUserData()]);
 
-        if (!userData || !gamesData) {
+        if (!userData) {
           throw new Error("Invalid request");
         }
 
         setUser(userData);
-        setGames(gamesData);
 
-        setStats(buildStats(userData.id, gamesData));
+        setStats(buildStats(userData.id, games));
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         setUser(null);
@@ -75,7 +59,7 @@ const ProfilePage = () => {
     }
 
     loadProfile();
-  }, [userId, isMyProfile]);
+  }, [userId, isMyProfile, games]);
 
   if (loading) {
     return <LoadingScreen />;
