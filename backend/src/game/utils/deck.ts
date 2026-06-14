@@ -3,7 +3,7 @@ import { randomUUID } from "crypto";
 // Project level
 import rawCards from "../../constants/cards.json";
 // Local level
-import type { CardDefinition, Deck } from "game/types";
+import type { Card, CardDefinition, Deck } from "game/types";
 
 export const cardDefinitions = rawCards as CardDefinition[];
 
@@ -29,4 +29,7 @@ export const shuffleDeck = (deck: Deck): void => {
     const j = Math.floor(Math.random() * (i + 1));
     [deck[i], deck[j]] = [deck[j]!, deck[i]!];
   }
+};
+export const draw = (deck: Deck, amount: number): Card[] | undefined => {
+  return deck.splice(0, amount);
 };
