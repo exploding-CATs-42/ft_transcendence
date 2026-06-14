@@ -5,6 +5,7 @@ import rawCards from "../../constants/cards.json";
 // Local level
 import { CardType, Player, Card, CardDefinition, Deck } from "game/types";
 import { DEFAULT_GAME_RULES } from "game/constants";
+import { validateDeckSizes } from "./deckValidation";
 
 export const cardDefinitions = rawCards as CardDefinition[];
 
@@ -35,6 +36,13 @@ export const shuffleDeck = (deck: Deck): void => {
 export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
   // Split deck into 3 piles
   const { explodingKittens, defuses, mainDeck } = splitDeck(deck);
+  validateDeckSizes(
+    mainDeck,
+    defuses,
+    explodingKittens,
+    players.length,
+    DEFAULT_GAME_RULES,
+  );
 
   // Deal defuses and regular cards
   const DEFUSES_AMOUNT = DEFAULT_GAME_RULES.defusesDealtPerPlayer;
