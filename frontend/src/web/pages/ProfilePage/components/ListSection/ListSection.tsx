@@ -3,12 +3,10 @@ import { useState } from "react";
 //Project level
 import { Section } from "components";
 // Local level
-import { Tabs } from "../../components";
+import { Tabs, FriendsTab, GamesTab } from "../../components";
 import type { TabOption, FriendItem } from "../../types";
-import s from "./ListSection.module.css";
 import type { UserGameHistoryItem } from "components/GameListItem/types";
-import FriendsTab from "../FriendsTab/FriendsTab";
-import MatchesTab from "../MatchesTab/MatchesTab";
+import s from "./ListSection.module.css";
 
 interface Props {
   games: UserGameHistoryItem[];
@@ -36,7 +34,7 @@ const ListSection = ({ games, friends }: Props) => {
       {activeTab === "friends" ? (
         <FriendsTab friends={friends}></FriendsTab>
       ) : (
-        <MatchesTab matches={games}></MatchesTab>
+        <GamesTab games={games}></GamesTab>
       )}
     </Section>
   );
