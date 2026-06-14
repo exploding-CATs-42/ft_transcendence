@@ -33,3 +33,11 @@ export const shuffleDeck = (deck: Deck): void => {
 export const draw = (deck: Deck, amount: number): Card[] | undefined => {
   return deck.splice(0, amount);
 };
+
+export const drawOneCard = (deck: Deck): Card | undefined => {
+  const cards = draw(deck, 1);
+  if (!cards) return undefined;
+
+  const card = cards[0];
+  return card;
+};
