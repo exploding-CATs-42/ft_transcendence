@@ -3,6 +3,7 @@ import { describe, it, expect } from "vitest";
 // Project level
 import { createDeck, dealInitialCards } from "game/utils";
 import { CardType, Deck, Player } from "game/types";
+import { DEFAULT_GAME_RULES } from "game/constants";
 
 const PLAYERS: Player[] = [
   {
@@ -37,7 +38,9 @@ describe("dealInitialCards", () => {
 
     const newDeck = dealInitialCards(initialDeck, PLAYERS);
 
-    const CARDS_DEALT = players.length * 8;
+    const { dealtCardsPerPlayer, defusesDealtPerPlayer } = DEFAULT_GAME_RULES;
+    const CARDS_DEALT_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
+    const CARDS_DEALT = players.length * CARDS_DEALT_PER_PLAYER;
     const EXPLODING_KITTENS_INSERTED_BACK = players.length - 1;
     expect(newDeck.length).toBe(
       56 - CARDS_DEALT - 4 + EXPLODING_KITTENS_INSERTED_BACK,

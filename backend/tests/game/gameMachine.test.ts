@@ -98,8 +98,12 @@ describe("game machine", () => {
     const players = snapshot.context.players;
 
     const { dealtCardsPerPlayer, defusesDealtPerPlayer } = DEFAULT_GAME_RULES;
-    const CARDS_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
-    expect(deck.length).toBe(56 - CARDS_PER_PLAYER * players.length);
+    const CARDS_DEALT_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
+    const CARDS_DEALT = players.length * CARDS_DEALT_PER_PLAYER;
+    const EXPLODING_KITTENS_INSERTED_BACK = players.length - 1;
+    expect(deck.length).toBe(
+      56 - CARDS_DEALT - 4 + EXPLODING_KITTENS_INSERTED_BACK,
+    );
   });
 
   it("deals 8 cards to each of the players, after entering playing.dealingCards state, \
