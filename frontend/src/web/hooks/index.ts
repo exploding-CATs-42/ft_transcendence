@@ -5,3 +5,4 @@ export { useAuth } from "./auth/useAuth";
 export { useSocket } from "./sockets/useSocket";
 export { useGameSession } from "./sockets/useGameSession";
 export { useFriends } from "./friends/useFriends";
+export { useGames } from "./games/useGames";
