@@ -1,6 +1,5 @@
-// Project level
-import { Player } from "game/types";
-import { GameId, GameRules, GameState, TurnState } from "types";
+// Local level
+import { Player, GameId, GameRules, GameState, TurnState } from "game/types";
 
 export const DEFAULT_GAME_RULES: GameRules = {
   dealtCardsPerPlayer: 7,

@@ -2,12 +2,12 @@
 import { Actor } from "xstate";
 import { Server } from "socket.io";
 // Project level
-import { GameId } from "types";
 import {
   CountdownStartedPayload,
   ServerPublicEvents,
 } from "@exploding-cats/shared-types";
 // Local level
+import { GameId } from "game/types";
 import { gameMachine } from "./gameMachine";
 import { GameEmitters } from "./emitters";
 
