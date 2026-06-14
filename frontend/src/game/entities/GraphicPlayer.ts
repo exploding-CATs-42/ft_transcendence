@@ -1,4 +1,5 @@
 import type { Point, LabelConfig } from "game/@types";
+import { Textures } from "game/constants";
 import type { Player } from "game/entities";
 import { getRoundedAvatarTexture } from "game/utils";
 
@@ -10,6 +11,7 @@ export class GraphicPlayer implements Player {
   readonly container: Phaser.GameObjects.Container;
   private avatar: Phaser.GameObjects.Image;
   private label: Phaser.GameObjects.Text;
+  private confirmedIcon: Phaser.GameObjects.Image;
 
   constructor(
     scene: Phaser.Scene,
@@ -19,6 +21,7 @@ export class GraphicPlayer implements Player {
   ) {
     this.username = player.username;
     this.imageUrl = player.imageUrl;
+    this.confirmedIcon = this.addConfirmedIcon(scene);
 
     const { x, y } = position;
     this.container = scene.add.container(x, y);
@@ -26,7 +29,7 @@ export class GraphicPlayer implements Player {
     this.avatar = this.addAvatar(scene);
     this.label = this.addUsernameLabel(scene, player.username, labelConfig);
 
-    this.container.add([this.avatar, this.label]);
+    this.container.add([this.avatar, this.label, this.confirmedIcon]);
   }
 
   private addAvatar(scene: Phaser.Scene) {
@@ -55,6 +58,20 @@ export class GraphicPlayer implements Player {
       .setOrigin(0.5, 1);
 
     return label;
+  }
+
+  private addConfirmedIcon(scene: Phaser.Scene) {
+    const x = AVATAR_WIDTH - 20;
+    const y = AVATAR_WIDTH - 20;
+
+    return scene.add
+      .image(x, y, Textures.confirmedIcon)
+      .setVisible(false)
+      .setDisplaySize(80, 80);
+  }
+
+  setConfirmed(confirmed: boolean) {
+    this.confirmedIcon.setVisible(confirmed);
   }
 
   moveTo(x: number, y: number) {
