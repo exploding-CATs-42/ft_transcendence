@@ -3,7 +3,12 @@ import { randomUUID } from "crypto";
 // Project level
 import rawCards from "../../constants/cards.json";
 // Local level
-import type { Card, CardDefinition, Deck } from "game/types";
+import {
+  CardType,
+  type Card,
+  type CardDefinition,
+  type Deck,
+} from "game/types";
 
 export const cardDefinitions = rawCards as CardDefinition[];
 
@@ -30,6 +35,40 @@ export const shuffleDeck = (deck: Deck): void => {
     [deck[i], deck[j]] = [deck[j]!, deck[i]!];
   }
 };
+
+/**
+ * Splits a deck into 3 piles: exploding kittens, defuse cards, and all remaining cards.
+ *
+ * Iterates through the provided deck and categorizes each card based on its
+ * type. The original deck is not modified.
+ *
+ * @param deck The deck to split.
+ *
+ * @returns An object containing:
+ * - `explodingKittens`: All cards with type `EXPLODING_KITTEN`.
+ * - `defuses`: All cards with type `DEFUSE`.
+ * - `mainDeck`: All remaining cards.
+ */
+export const splitDeck = (deck: Deck) => {
+  const explodingKittens: Card[] = [];
+  const defuses: Card[] = [];
+  const mainDeck: Card[] = [];
+
+  for (const card of deck) {
+    if (card.type === CardType.EXPLODING_KITTEN) {
+      explodingKittens.push(card);
+    } else if (card.type === CardType.DEFUSE) {
+      defuses.push(card);
+    } else mainDeck.push(card);
+  }
+
+  return {
+    explodingKittens,
+    defuses,
+    mainDeck,
+  };
+};
+
 export const draw = (deck: Deck, amount: number): Card[] | undefined => {
   return deck.splice(0, amount);
 };
