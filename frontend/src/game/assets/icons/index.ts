@@ -6,3 +6,4 @@
 // and files inside public/ folder are not processed by Vite
 // so it works just fine
 export const fullScreenToggle = "/game_assets/fullscreen-toggle.svg";
+export const confirmedIcon = "/game_assets/confirmed-icon.svg";
