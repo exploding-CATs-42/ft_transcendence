@@ -1,3 +1,4 @@
+import { DEFAULT_GAME_RULES } from "./constants";
 import { GameEvent, GameEvents } from "./events";
 import { GameContext } from "./gameMachine";
 import { createDeck, shuffleDeck } from "./utils/deck";
@@ -8,6 +9,7 @@ export const GameActions = {
   ADD_PLAYER_CONFIRMATION: "addPlayerConfirmation",
   REMOVE_PLAYER_CONFIRMATION: "removePlayerConfirmation",
   FILL_DECK: "fillDeck",
+  DEAL_CARDS: "dealCards",
 } as const;
 
 export interface GameActionArgs {
@@ -59,4 +61,30 @@ export const fillDeck = () => {
   shuffleDeck(deck);
 
   return { deck };
+};
+
+export const dealCards = ({ context }: GameActionArgs) => {
+  const deck = [...context.deck];
+  const players = context.players.map((player) => ({
+    ...player,
+    hand: [...player.hand],
+  }));
+
+  const { dealtCardsPerPlayer, defusesDealtPerPlayer } = DEFAULT_GAME_RULES;
+  const CARDS_TO_DEAL = dealtCardsPerPlayer + defusesDealtPerPlayer;
+
+  if (players.length * CARDS_TO_DEAL > deck.length)
+    throw new Error("deck doesn't have enough cards");
+
+  for (let i = 0; i < CARDS_TO_DEAL; ++i) {
+    for (const player of players) {
+      const card = deck.shift()!;
+      player.hand.push(card);
+    }
+  }
+
+  return {
+    deck,
+    players,
+  };
 };
