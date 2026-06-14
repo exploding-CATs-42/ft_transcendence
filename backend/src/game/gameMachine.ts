@@ -1,8 +1,7 @@
 // Libraries
 import { assign, emit, setup } from "xstate";
-// Project level
-import { START_GAME_COUNTDOWN_MS } from "game/constants";
 // Local level
+import { START_GAME_COUNTDOWN_MS } from "./constants";
 import {
   GameActions,
   addPlayer,
