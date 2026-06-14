@@ -22,5 +22,6 @@ export default defineConfig([
         },
       ],
     },
+    ignores: ["**/**.visualized.ts"],
   },
 ]);
