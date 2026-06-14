@@ -96,3 +96,6 @@ backend/src/generated
 
 # games persistence file
 backend/data/games.json
+
+# xstate game machine visualization files
+backend/**/**.visualized.ts
