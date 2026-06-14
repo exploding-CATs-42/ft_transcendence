@@ -38,7 +38,13 @@
       "generated/*": ["./src/generated/*"]
     }
   },
-  "include": ["src", "eslint.config.ts", "vitest.config.ts", "prisma.config.ts"],
+  "include": [
+    "src",
+    "tests",
+    "eslint.config.ts",
+    "vitest.config.ts",
+    "prisma.config.ts"
+  ],
   "exclude": ["**/*.visualized.ts"]
 }
 //You can see the full documentation on https://www.typescriptlang.org/tsconfig
