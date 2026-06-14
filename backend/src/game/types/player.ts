@@ -1,9 +1,9 @@
-import { CardInstance } from "./card";
+import { Card } from "./card";
 
 export interface Player {
   id: string;
   name: string;
-  hand: CardInstance[];
+  hand: Card[];
   isConfirmed: boolean;
   isAlive: boolean;
   turnOrder: number;

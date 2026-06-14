@@ -1,4 +1,4 @@
-import { CardInstance, CardType } from "./card";
+import { Card, CardType } from "./card";
 
 export const TurnPhase = {
   ACTION: "ACTION",
@@ -38,7 +38,7 @@ export interface PendingAction {
   actionId: string;
   type: PendingActionType;
   playerId: string;
-  cards: CardInstance[];
+  cards: Card[];
   targetPlayerId?: string;
   namedCardType?: CardType;
   isNoped: boolean;

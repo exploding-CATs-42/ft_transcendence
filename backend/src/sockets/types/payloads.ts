@@ -3,7 +3,7 @@ import {
   WaitingPlayerView,
   WaitingStateView,
 } from "@exploding-cats/shared-types";
-import { CardInstance, PendingActionType } from "game/types";
+import { Card, PendingActionType } from "game/types";
 
 export interface JoinGameResult {
   player: WaitingPlayerView;
@@ -49,21 +49,21 @@ export type CardRemovalReason =
   (typeof CardRemovalReason)[keyof typeof CardRemovalReason];
 
 export interface YourHandPayload {
-  hand: CardInstance[];
+  hand: Card[];
 }
 
 export interface CardReceivedPayload {
-  card: CardInstance;
+  card: Card;
   fromId: string | null;
 }
 
 export interface CardRemovedPayload {
-  cardInstanceId: string;
+  cardId: string;
   reason: CardRemovalReason;
 }
 
 export interface SeeTheFuturePeekPayload {
-  cards: CardInstance[];
+  cards: Card[];
 }
 
 export interface InsertKittenPromptPayload {
