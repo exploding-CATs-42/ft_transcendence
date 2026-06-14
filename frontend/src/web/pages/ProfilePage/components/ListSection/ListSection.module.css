@@ -15,10 +15,6 @@
   flex-direction: column;
 }
 
-.list {
-  padding-right: var(--inner-right-padding);
-}
-
 @media only screen and (min-width: 768px) {
   .section {
     --list-left-padding: 50px;
