@@ -4,15 +4,11 @@ import { toast } from "react-toastify";
 
 import api from "api";
 import { getErrorMessage } from "utils";
+import { useFriends } from "hooks";
 
 import { ListSection, StatsSection, UserSection } from "./components";
 
-import type {
-  ProfileUser,
-  FriendItem,
-  ProfileStat,
-  MyProfileUser,
-} from "./types";
+import type { ProfileUser, ProfileStat, MyProfileUser } from "./types";
 import s from "./ProfilePage.module.css";
 import type { UserGameHistoryItem } from "components/GameListItem/types";
 import { buildStats } from "./utils/buildStats";
@@ -22,13 +18,14 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
 
   const [user, setUser] = useState<ProfileUser | MyProfileUser | null>(null);
-  const [friends, setFriends] = useState<FriendItem[]>([]);
   const [games, setGames] = useState<UserGameHistoryItem[]>([]);
   const [stats, setStats] = useState<ProfileStat[]>([]);
 
   const { userId } = useParams();
   const { pathname } = useLocation();
   const isMyProfile = pathname === "/profile";
+
+  const { friends } = useFriends({ userId, isMyProfile });
 
   useEffect(() => {
     async function getUserData(): Promise<ProfileUser | MyProfileUser | null> {
@@ -40,17 +37,6 @@ const ProfilePage = () => {
         return api.users.getUserById(userId);
       }
       return null;
-    }
-
-    async function getUserFriends(): Promise<FriendItem[]> {
-      if (isMyProfile) {
-        return api.friends.getMeFriends();
-      }
-
-      if (userId) {
-        return api.friends.getUserFriends(userId);
-      }
-      return [];
     }
 
     async function getUserGames(): Promise<UserGameHistoryItem[]> {
@@ -66,18 +52,16 @@ const ProfilePage = () => {
 
     async function loadProfile() {
       try {
-        const [userData, friendsData, gamesData] = await Promise.all([
+        const [userData, gamesData] = await Promise.all([
           getUserData(),
-          getUserFriends(),
           getUserGames(),
         ]);
 
-        if (!userData || !friendsData || !gamesData) {
+        if (!userData || !gamesData) {
           throw new Error("Invalid request");
         }
 
         setUser(userData);
-        setFriends(friendsData);
         setGames(gamesData);
 
         setStats(buildStats(userData.id, gamesData));
