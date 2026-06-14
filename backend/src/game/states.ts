@@ -1,5 +1,3 @@
-export const GAME_MACHINE_ID = "game";
-
 export const GameStates = {
   WAITING: "waiting",
   WAITING_CONFIRMING: "confirming",
