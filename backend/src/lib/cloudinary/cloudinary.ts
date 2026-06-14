@@ -1,4 +1,5 @@
 import { v2 as cloudinary } from "cloudinary";
+import streamifier from "streamifier";
 
 const { CLOUDINARY_CLOUD_NAME, CLOUDINARY_API_KEY, CLOUDINARY_API_SECRET } =
   process.env;
@@ -13,11 +14,21 @@ cloudinary.config({
   api_secret: CLOUDINARY_API_SECRET,
 });
 
-const uploadImage = async (fileToUpload: string) => {
-  const data = await cloudinary.uploader.upload(fileToUpload, {
-    resource_type: "auto",
+import { UploadApiResponse } from "cloudinary";
+
+const uploadImage = async (
+  file: Express.Multer.File,
+): Promise<UploadApiResponse> => {
+  return new Promise((resolve, reject) => {
+    const stream = cloudinary.uploader.upload_stream((error, result) => {
+      if (error) return reject(error);
+      if (!result) return reject(new Error("Upload failed"));
+
+      resolve(result);
+    });
+
+    streamifier.createReadStream(file.buffer).pipe(stream);
   });
-  return data;
 };
 
 const removeImage = async (imagePublicId: string) => {
