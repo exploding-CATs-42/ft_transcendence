@@ -33,6 +33,23 @@ export const shuffleDeck = (deck: Deck): void => {
   }
 };
 
+/**
+ * Deals the initial cards to all players
+ *
+ * @param deck The source deck used for dealing. This deck is not modified.
+ * @param players The players participating in the game.
+ *
+ * @returns A newly created shuffled deck containing all the cards
+ * remaining after the deal
+ *
+ * @note This function does not modify the provided `deck`.
+ *
+ * @warning This function mutates the provided `players` array by assigning
+ * cards to each player's `hand` property.
+ *
+ * @throws Error If the deck does not contain enough cards to satisfy the
+ * game setup requirements.
+ */
 export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
   // Split deck into 3 piles
   const { explodingKittens, defuses, mainDeck } = splitDeck(deck);
