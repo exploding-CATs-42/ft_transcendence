@@ -1,7 +1,7 @@
 // Libraries
 import { randomUUID } from "crypto";
 // Project level
-import rawCards from "../../constants/cards.json";
+import rawCards from "constants/cards.json";
 // Local level
 import { CardType, Player, Card, CardDefinition, Deck } from "game/types";
 import { DEFAULT_GAME_RULES } from "game/constants";
