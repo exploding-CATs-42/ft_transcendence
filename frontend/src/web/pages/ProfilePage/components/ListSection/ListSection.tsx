@@ -1,13 +1,14 @@
 // Libraries
 import { useState } from "react";
 //Project level
-import { List, GameListItem, Section } from "components";
+import { Section } from "components";
 // Local level
 import { Tabs } from "../../components";
 import type { TabOption, FriendItem } from "../../types";
 import s from "./ListSection.module.css";
 import type { UserGameHistoryItem } from "components/GameListItem/types";
 import FriendsTab from "../FriendsTab/FriendsTab";
+import MatchesTab from "../MatchesTab/MatchesTab";
 
 interface Props {
   games: UserGameHistoryItem[];
@@ -35,13 +36,7 @@ const ListSection = ({ games, friends }: Props) => {
       {activeTab === "friends" ? (
         <FriendsTab friends={friends}></FriendsTab>
       ) : (
-        <List
-          items={games}
-          getKey={(game) => game.gameId}
-          renderItem={(game) => <GameListItem game={game} />}
-          className={s.list}
-          empty="No games yet"
-        />
+        <MatchesTab matches={games}></MatchesTab>
       )}
     </Section>
   );
