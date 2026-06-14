@@ -1,12 +1,13 @@
 // Libraries
 import { useState } from "react";
 //Project level
-import { Button, List, GameListItem, SearchInput, Section } from "components";
+import { List, GameListItem, Section } from "components";
 // Local level
-import { FriendListItem, Tabs } from "../../components";
+import { Tabs } from "../../components";
 import type { TabOption, FriendItem } from "../../types";
 import s from "./ListSection.module.css";
 import type { UserGameHistoryItem } from "components/GameListItem/types";
+import FriendsTab from "../FriendsTab/FriendsTab";
 
 interface Props {
   games: UserGameHistoryItem[];
@@ -23,19 +24,6 @@ const tabs: TabOption[] = [
 const ListSection = ({ games, friends }: Props) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("games");
 
-  const sortedFriends = [...friends].sort((a, b) => {
-    const statusOrder = {
-      ACCEPTED: 0,
-      PENDING: 1,
-      REJECTED: 2,
-    };
-
-    if (statusOrder[a.status] !== statusOrder[b.status]) {
-      return statusOrder[b.status] - statusOrder[a.status];
-    }
-    return a.user.username.localeCompare(b.user.username);
-  });
-
   return (
     <Section className={s.section}>
       <Tabs
@@ -45,19 +33,7 @@ const ListSection = ({ games, friends }: Props) => {
       />
 
       {activeTab === "friends" ? (
-        <>
-          <List
-            items={sortedFriends}
-            getKey={(friend) => friend.user.id}
-            renderItem={(friend) => <FriendListItem friend={friend} />}
-            className={s.list}
-            empty="No friends yet"
-          />
-          <div className={s.footer}>
-            <SearchInput />
-            <Button className={s.button}>Add</Button>
-          </div>
-        </>
+        <FriendsTab friends={friends}></FriendsTab>
       ) : (
         <List
           items={games}
