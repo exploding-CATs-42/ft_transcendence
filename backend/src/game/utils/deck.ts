@@ -44,6 +44,8 @@ export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
     DEFAULT_GAME_RULES,
   );
 
+  shuffleDeck(mainDeck);
+
   // Deal defuses and regular cards
   const DEFUSES_AMOUNT = DEFAULT_GAME_RULES.defusesDealtPerPlayer;
   const REGULAR_CARDS_AMOUNT = DEFAULT_GAME_RULES.dealtCardsPerPlayer;

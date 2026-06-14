@@ -1,6 +1,6 @@
 import { GameEvent, GameEvents } from "./events";
 import { GameContext } from "./gameMachine";
-import { createDeck, dealInitialCards, shuffleDeck } from "./utils";
+import { createDeck, dealInitialCards } from "./utils";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -57,8 +57,6 @@ export const removePlayerConfirmation = ({
 
 export const fillDeck = () => {
   const deck = createDeck();
-  shuffleDeck(deck);
-
   return { deck };
 };
 
