@@ -3,12 +3,8 @@ import { randomUUID } from "crypto";
 // Project level
 import rawCards from "../../constants/cards.json";
 // Local level
-import {
-  CardType,
-  type Card,
-  type CardDefinition,
-  type Deck,
-} from "game/types";
+import { CardType, Player, Card, CardDefinition, Deck } from "game/types";
+import { DEFAULT_GAME_RULES } from "game/constants";
 
 export const cardDefinitions = rawCards as CardDefinition[];
 
@@ -36,6 +32,27 @@ export const shuffleDeck = (deck: Deck): void => {
   }
 };
 
+export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
+  // Split deck into 3 piles
+  const { explodingKittens, defuses, mainDeck } = splitDeck(deck);
+
+  // Deal defuses and regular cards
+  const DEFUSES_AMOUNT = DEFAULT_GAME_RULES.defusesDealtPerPlayer;
+  const REGULAR_CARDS_AMOUNT = DEFAULT_GAME_RULES.dealtCardsPerPlayer;
+  players.forEach((player) => {
+    const regularCards = draw(mainDeck, REGULAR_CARDS_AMOUNT)!;
+    const defuseCards = draw(defuses, DEFUSES_AMOUNT)!;
+
+    player.hand = [...regularCards, ...defuseCards];
+  });
+
+  // Insert enough exploding kittens and the rest of the defuses back to the deck
+  const kittensToInsert = draw(explodingKittens, players.length - 1)!;
+  const finalDeck = [...mainDeck, ...defuses, ...kittensToInsert];
+
+  return finalDeck;
+};
+
 /**
  * Splits a deck into 3 piles: exploding kittens, defuse cards, and all remaining cards.
  *
@@ -49,7 +66,7 @@ export const shuffleDeck = (deck: Deck): void => {
  * - `defuses`: All cards with type `DEFUSE`.
  * - `mainDeck`: All remaining cards.
  */
-export const splitDeck = (deck: Deck) => {
+const splitDeck = (deck: Deck) => {
   const explodingKittens: Card[] = [];
   const defuses: Card[] = [];
   const mainDeck: Card[] = [];
