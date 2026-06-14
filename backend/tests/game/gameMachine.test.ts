@@ -3,7 +3,7 @@ import { createActor } from "xstate";
 import { describe, it, expect, vi } from "vitest";
 // Project level
 import { gameMachine, GameStates, GameEvents } from "game";
-import { Player } from "game/types";
+import { CardType, Player } from "game/types";
 import { DEFAULT_GAME_RULES, START_GAME_COUNTDOWN_MS } from "game/constants";
 
 const PLAYERS: Player[] = [
@@ -118,8 +118,12 @@ describe("game machine", () => {
     const snapshot = actor.getSnapshot();
     const players = snapshot.context.players;
     players.forEach((player) => {
+      console.log(player.hand);
+
       expect(player.hand.length).toBe(8);
-      expect(player.hand.some((card) => card.type === "DEFUSE")).toBeTruthy();
+      expect(
+        player.hand.some((card) => card.type === CardType.DEFUSE),
+      ).toBeTruthy();
     });
   });
 });

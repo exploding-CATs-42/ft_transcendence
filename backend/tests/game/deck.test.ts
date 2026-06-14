@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 // Project level
 import { createDeck, dealInitialCards } from "game/utils";
-import type { Deck, Player } from "game/types";
+import { CardType, Deck, Player } from "game/types";
 
 const PLAYERS: Player[] = [
   {
@@ -44,7 +44,9 @@ describe("dealInitialCards", () => {
     );
     players.forEach((player) => {
       expect(player.hand.length).toBe(8);
-      expect(player.hand.some((card) => card.type === "DEFUSE")).toBeTruthy();
+      expect(
+        player.hand.some((card) => card.type === CardType.DEFUSE),
+      ).toBeTruthy();
     });
   });
 });
