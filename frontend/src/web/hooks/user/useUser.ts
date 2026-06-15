@@ -38,8 +38,20 @@ export const useUser = ({ userId, isMyProfile }: Props) => {
     fetchUser();
   }, [isMyProfile, userId]);
 
+  const updateUser = (updates: ProfileUser) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        ...updates,
+      };
+    });
+  };
+
   return {
     user,
     userLoading: loading,
+    updateUser,
   };
 };
