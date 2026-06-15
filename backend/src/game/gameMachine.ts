@@ -12,14 +12,9 @@ import {
   removePlayerConfirmation,
 } from "./actions";
 import { Player, Deck } from "./types";
-import { GameEvent, GameEvents } from "./events";
+import { GameEvent, GameEvents, GameOutEvent } from "./events";
 import { GameGuards, hasEnoughPlayers } from "./guards";
-import {
-  countdownCanceled,
-  countdownStarted,
-  GameEmitter,
-  gameStarted,
-} from "./emitters";
+import { countdownCanceled, countdownStarted, gameStarted } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
 
@@ -32,7 +27,7 @@ export const gameMachine = setup({
   types: {
     context: {} as GameContext,
     events: {} as GameEvent,
-    emitted: {} as GameEmitter,
+    emitted: {} as GameOutEvent,
   },
   actions: {
     [GameActions.ADD_PLAYER]: assign(addPlayer),
