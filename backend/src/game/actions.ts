@@ -1,5 +1,5 @@
-import { GameEvent, GameEvents } from "./events";
 import { GameContext } from "./gameMachine";
+import { GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards } from "./utils";
 
 export const GameActions = {

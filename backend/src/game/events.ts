@@ -1,4 +1,4 @@
-import { Player } from "game/types";
+import { Player } from "./types";
 
 // Events sent TO the machine
 export const GameEvents = {
