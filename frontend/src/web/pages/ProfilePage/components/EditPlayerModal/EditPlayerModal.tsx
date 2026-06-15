@@ -64,16 +64,6 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     defaultValues: user,
   });
 
-  const emptyStringToUndefined = (value: string | undefined) =>
-    value === "" ? undefined : value;
-
-  const valuesToUpdate = (data: UpdateMeRequestBody) => ({
-    username: emptyStringToUndefined(data.username),
-    email: emptyStringToUndefined(data.email),
-    passwordNew: emptyStringToUndefined(data.passwordNew),
-    passwordOld: emptyStringToUndefined(data.passwordOld),
-  });
-
   const processFieldErrors = (
     fieldErrors: Record<string, string[]> | undefined,
   ) => {
@@ -111,14 +101,26 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     processFieldErrors(fieldErrors);
   };
 
-  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (data) => {
+  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async ({
+    username,
+    email,
+    passwordOld,
+    passwordNew,
+    avatarUrl,
+  }) => {
     try {
-      const updates = valuesToUpdate(data);
-      const updatedUser = await api.me.updateMe(updates);
+      const updateData = {
+        ...(username !== undefined && { username }),
+        ...(email !== undefined && { email }),
+        ...(passwordNew !== undefined && { passwordNew }),
+        ...(passwordOld !== undefined && { passwordOld }),
+        ...(avatarUrl !== undefined && { avatarUrl }),
+      };
+
+      const updatedUser = await api.me.updateMe(updateData);
 
       updateUser(updatedUser);
-      reset(updatedUser);
-
+      reset(updateData);
       clearErrors();
 
       toggleModal();
