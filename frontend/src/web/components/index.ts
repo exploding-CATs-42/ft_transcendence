@@ -24,3 +24,4 @@ export { default as FormField } from "./FormField/FormField";
 export { default as PdfViewer } from "./PdfViewer/PdfViewer";
 export { default as ColorfullIcon } from "./ColorfullIcon/ColorfullIcon";
 export { default as AvatarWithAdd } from "./AvatarWithAdd/AvatarWithAdd";
+export { default as LoadingScreen } from "./LoadingScreen/LoadingScreen";
