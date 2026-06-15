@@ -7,12 +7,13 @@ BACKEND_WD = -w /app/backend
 ## Docker lifecycle
 ## -------------------------
 
-all: prisma-generate build
+all: build
 
 up: ## Start containers in detached mode
 	$(COMPOSE) up -d --remove-orphans
 
-build: ## Build images and start containers
+## Build images and start containers
+build: prisma-generate
 	$(COMPOSE) up --build -d --remove-orphans
 	docker logs ft-backend -f
 
