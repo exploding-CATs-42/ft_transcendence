@@ -6,6 +6,7 @@ export interface GameInfo {
   name: string;
   maxPlayers: number;
   createdAt: number;
+  ownerId: string;
 }
 
 export interface GameInstance {

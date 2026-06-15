@@ -10,6 +10,7 @@ export type GameInfo = {
   name: string;
   maxPlayers: number;
   createdAt: number;
+  ownerId: string;
 };
 
 const create = async (body: CreateGameReqBody): Promise<GameInfo> => {
