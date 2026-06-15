@@ -7,9 +7,13 @@ export function buildStats(
   games: UserGameHistoryItem[],
 ): ProfileStat[] {
   const totalGames = games.length;
+  let gamesWon = 0;
 
-  const gamesWon = games.filter((m) => m.winnerId === userId).length;
-
+  for (const m of games) {
+    if (m.winnerId === userId) {
+      gamesWon++;
+    }
+  }
   const explodedTimes = totalGames - gamesWon;
 
   const successRate =
