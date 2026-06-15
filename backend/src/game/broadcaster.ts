@@ -9,7 +9,7 @@ import {
 // Local level
 import { GameId } from "game/types";
 import { gameMachine } from "./gameMachine";
-import { GameEmitters } from "./emitters";
+import { GameOutEvents } from "./events";
 
 let io: Server | null = null;
 
@@ -25,17 +25,17 @@ export function attachBroadcaster(
     throw new Error("io for broadcaster wasn't initialized.");
   }
 
-  actor.on(GameEmitters.GAME_STARTED, () => {
+  actor.on(GameOutEvents.GAME_STARTED, () => {
     io!.to(gameId).emit(ServerPublicEvents.GAME_STARTED);
   });
 
-  actor.on(GameEmitters.COUNTDOWN_STARTED, (event) => {
+  actor.on(GameOutEvents.COUNTDOWN_STARTED, (event) => {
     const payload: CountdownStartedPayload = { endsAt: event.endsAt };
 
     io!.to(gameId).emit(ServerPublicEvents.COUNTDOWN_STARTED, payload);
   });
 
-  actor.on(GameEmitters.COUNTDOWN_CANCELED, () => {
+  actor.on(GameOutEvents.COUNTDOWN_CANCELED, () => {
     io!.to(gameId).emit(ServerPublicEvents.COUNTDOWN_CANCELED);
   });
 }
