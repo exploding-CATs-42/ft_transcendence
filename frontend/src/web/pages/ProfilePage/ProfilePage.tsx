@@ -5,13 +5,12 @@ import { toast } from "react-toastify";
 import api from "api";
 import { getErrorMessage } from "utils";
 import { useFriends, useGames } from "hooks";
-
-import { ListSection, StatsSection, UserSection } from "./components";
+import { LoadingScreen } from "components";
 
 import type { ProfileUser, ProfileStat, MyProfileUser } from "./types";
 import s from "./ProfilePage.module.css";
+import { ListSection, StatsSection, UserSection } from "./components";
 import { buildStats } from "./utils/buildStats";
-import LoadingScreen from "components/LoadingScreen/LoadingScreen";
 
 const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
