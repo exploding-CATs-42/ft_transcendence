@@ -1,7 +1,6 @@
-// Project level
-import { MIN_PLAYERS } from "game/constants";
 // Local level
 import { GameContext } from "./gameMachine";
+import { MIN_PLAYERS } from "./constants";
 
 export const GameGuards = {
   HAS_ENOUGH_PLAYERS: "hasEnoughPlayers",

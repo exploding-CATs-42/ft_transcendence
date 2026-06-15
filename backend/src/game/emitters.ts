@@ -1,6 +1,6 @@
-// Project level
-import { START_GAME_COUNTDOWN_MS } from "game/constants";
-import { GameOutEvent, GameOutEvents } from "game/events";
+// Local level
+import { START_GAME_COUNTDOWN_MS } from "./constants";
+import { GameOutEvent, GameOutEvents } from "./events";
 
 export const countdownStarted = (): GameOutEvent => ({
   type: GameOutEvents.COUNTDOWN_STARTED,

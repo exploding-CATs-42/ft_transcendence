@@ -7,8 +7,8 @@ import {
   ServerPublicEvents,
 } from "@exploding-cats/shared-types";
 // Local level
-import { GameId } from "game/types";
 import { gameMachine } from "./gameMachine";
+import { GameId } from "./types";
 import { GameOutEvents } from "./events";
 
 let io: Server | null = null;

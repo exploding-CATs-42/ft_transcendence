@@ -1,4 +1,6 @@
+// Libraries
 import { Actor } from "xstate";
+// Local level
 import { gameMachine } from "./gameMachine";
 
 export interface GameInfo {
