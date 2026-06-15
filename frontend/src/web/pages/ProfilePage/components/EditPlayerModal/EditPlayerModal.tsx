@@ -121,6 +121,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
       clearErrors();
 
+      toggleModal();
       toast.success("Success");
     } catch (error) {
       handleRequestErrors(error);
