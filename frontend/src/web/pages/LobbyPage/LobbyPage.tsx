@@ -16,6 +16,7 @@ import s from "./LobbyPage.module.css";
 type ExistingGame = {
   id: string;
   name: string;
+  ownerId: string;
 };
 
 type GameConflictDetails = {
@@ -45,8 +46,10 @@ const LobbyPage = () => {
   const [matches, setMatches] = useState<LobbyMatch[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
+  const [isOpenManageLobbyModal, toggleManageLobbyModal] = useModal();
   const [gameId, setGameId] = useState("");
   const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
@@ -81,6 +84,28 @@ const LobbyPage = () => {
   useEffect(() => {
     let ignore = false;
 
+    const loadCurrentUser = async () => {
+      try {
+        const currentUser = await api.me.getMe();
+
+        if (ignore) return;
+
+        setCurrentUserId(currentUser.id);
+      } catch (error) {
+        console.error("Failed to load current user:", error);
+      }
+    };
+
+    void loadCurrentUser();
+
+    return () => {
+      ignore = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    let ignore = false;
+
     const loadCurrentGame = async () => {
       try {
         const currentGame = await api.games.getCurrent();
@@ -90,6 +115,7 @@ const LobbyPage = () => {
         setExistingGame({
           id: currentGame.id,
           name: currentGame.name,
+          ownerId: currentGame.ownerId,
         });
       } catch (error) {
         console.error("Failed to load current game:", error);
@@ -127,8 +153,8 @@ const LobbyPage = () => {
     });
   };
 
-  const handleCloseExistingGameModal = () => {
-    setExistingGame(null);
+  const handleCloseManageLobbyModal = () => {
+    toggleManageLobbyModal(false);
   };
 
   const handleCreateTable = async ({
@@ -148,6 +174,12 @@ const LobbyPage = () => {
       };
 
       setMatches((prevMatches) => [newMatch, ...prevMatches]);
+
+      setExistingGame({
+        id: createdGame.id,
+        name: createdGame.name,
+        ownerId: createdGame.ownerId,
+      });
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);
 
@@ -160,11 +192,16 @@ const LobbyPage = () => {
       setExistingGame({
         id: existingGameId,
         name: currentGame?.name ?? "your existing game",
+        ownerId: currentGame?.ownerId ?? "",
       });
 
       toggleCreateModal(false);
+      toggleManageLobbyModal(true);
     }
   };
+
+  const isCurrentGameOwner =
+    existingGame !== null && currentUserId === existingGame.ownerId;
 
   return (
     <div className={s.pageContainer}>
@@ -178,7 +215,11 @@ const LobbyPage = () => {
               className={s.matchButton}
               onClick={() => handleOpenJoinModalWithGameId(match.gameId)}
             >
-              <MatchListItem match={match} />
+              <MatchListItem
+                match={match}
+                isCurrentLobby={existingGame?.id === match.gameId}
+                onManageCurrentLobby={() => toggleManageLobbyModal(true)}
+              />
             </button>
           )}
           className={s.list}
@@ -213,10 +254,11 @@ const LobbyPage = () => {
       />
 
       <ExistingGameModal
-        isOpen={Boolean(existingGame)}
+        isOpen={isOpenManageLobbyModal}
         gameName={existingGame?.name}
+        isOwner={isCurrentGameOwner}
         onReturn={handleReturnToExistingGame}
-        onClose={handleCloseExistingGameModal}
+        onClose={handleCloseManageLobbyModal}
       />
     </div>
   );

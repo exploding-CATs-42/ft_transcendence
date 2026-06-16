@@ -1,9 +1,13 @@
 declare const styles: {
-  readonly "avatar": string;
-  readonly "container": string;
-  readonly "item": string;
-  readonly "items": string;
-  readonly "title": string;
+  readonly actionsContainer: string;
+  readonly avatar: string;
+  readonly container: string;
+  readonly currentLobbyLabel: string;
+  readonly item: string;
+  readonly items: string;
+  readonly manageLobbyButton: string;
+  readonly title: string;
+  readonly titleContainer: string;
 };
-export = styles;
 
+export default styles;
