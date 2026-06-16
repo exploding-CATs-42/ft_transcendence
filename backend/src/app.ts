@@ -7,13 +7,15 @@ import { createServer } from "node:http";
 import { Server } from "socket.io";
 import { corsOptions, ioOptions } from "./config";
 import { setupRouting } from "./routes";
-import { initSockets } from "./sockets";
-import { initGamePersistence } from "./utils/gameStore";
+import { initSockets } from "./sockets/setup";
+import { initGamePersistence } from "./data";
+import { restoreGames } from "./startup";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, ioOptions);
+export const io = new Server(server, ioOptions);
 
+restoreGames();
 initGamePersistence();
 
 app.use(pino(prettyFormat()));

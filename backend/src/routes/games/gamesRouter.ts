@@ -1,9 +1,9 @@
 // Project level
 import {
   createGameController,
-  deleteGameController,
+  deleteGameByIdController,
   getGameByIdController,
-  getGamesController,
+  getAllGamesController,
   getCurrentGameController,
 } from "controllers";
 import { createAuthenticatedRouter, errorHandler } from "utils";
@@ -25,8 +25,8 @@ export const gamesRouter = createAuthenticatedRouter();
  * For more info see authenticatedRouter.ts
  */
 
-gamesRouter.get("/", errorHandler(getGamesController));
+gamesRouter.get("/", errorHandler(getAllGamesController));
 gamesRouter.get("/current", errorHandler(getCurrentGameController));
 gamesRouter.get("/:gameId", errorHandler(getGameByIdController));
 gamesRouter.post("/", errorHandler(createGameController));
-gamesRouter.delete("/:gameId", errorHandler(deleteGameController));
+gamesRouter.delete("/:gameId", errorHandler(deleteGameByIdController));

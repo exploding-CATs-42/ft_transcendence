@@ -1,8 +1,7 @@
-import { TurnState } from "./turn";
-import { Deck } from "./card";
-import { Player } from "./player";
-
-export type GameId = string;
+// Libraries
+import { Actor } from "xstate";
+// Local level
+import { gameMachine } from "../gameMachine";
 
 export interface GameRules {
   dealtCardsPerPlayer: number;
@@ -16,16 +15,4 @@ export interface GameRules {
   nopeWindowMs: number;
 }
 
-export interface GameState {
-  gameId: GameId;
-  name: string;
-  maxPlayers: number;
-  players: Player[];
-  deck: Deck;
-  turn: TurnState;
-  winnerId: string | null;
-  rules: GameRules;
-  createdAt: number;
-  startedAt: number | null;
-  finishedAt: number | null;
-}
+export type GameInstance = Actor<typeof gameMachine>;

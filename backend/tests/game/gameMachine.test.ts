@@ -8,7 +8,6 @@ import { DEFAULT_GAME_RULES, START_GAME_COUNTDOWN_MS } from "game/constants";
 
 const PLAYERS: Player[] = [
   {
-    name: "player 1",
     id: "1",
     hand: [],
     isAlive: true,
@@ -16,7 +15,6 @@ const PLAYERS: Player[] = [
     turnOrder: 0,
   },
   {
-    name: "player 2",
     id: "2",
     hand: [],
     isAlive: true,

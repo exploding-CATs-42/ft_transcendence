@@ -8,7 +8,6 @@ export interface PublicPlayerView {
 
 export interface WaitingPlayerView {
   id: string;
-  name: string;
   isConfirmed: boolean;
 }
 

@@ -23,7 +23,7 @@ import {
   WaitingStatePayload,
 } from "@exploding-cats/shared-types";
 
-export const lobbyGameHandlers = (io: Server, socket: Socket) => {
+export const registerGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
     ClientEvents.JOIN_GAME,
     withErrorHandler(
@@ -31,13 +31,19 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
-        const { waitingState, player } = await joinGame(
-          parsed,
-          socket.data.sub,
-        );
+        const userId = socket.data.sub;
+        const gameId = parsed.gameId;
+        const result = joinGame(userId, gameId);
+
+        if (!result.ok) {
+          socket.emit(ServerErrorEvents.JOIN_GAME_ERROR, result.error);
+          return;
+        }
+
         const room = parsed.gameId;
         await socket.join(room);
 
+        const { waitingState, player } = result.value;
         const privatePayload: WaitingStatePayload = { waitingState };
         const publicPayload: PlayerJoinedPayload = { player };
 
@@ -54,7 +60,17 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
-        const { playerId } = await leaveGame(parsed, socket.data.sub);
+        const userId = socket.data.sub;
+        const gameId = parsed.gameId;
+        const result = leaveGame(userId, gameId);
+
+        if (!result.ok) {
+          socket.emit(ServerErrorEvents.LEAVE_GAME_ERROR, result.error);
+          return;
+        }
+
+        const playerId = result.value.playerId;
+
         const room = parsed.gameId;
         await socket.leave(room);
 
@@ -73,9 +89,18 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.CONFIRM_START_ERROR,
       async (parsed: ConfirmStartParams) => {
-        const { playerId } = await confirmStart(parsed, socket.data.sub);
+        const userId = socket.data.sub;
+        const gameId = parsed.gameId;
+        const result = confirmStart(userId, gameId);
+
+        if (!result.ok) {
+          socket.emit(ServerErrorEvents.CONFIRM_START_ERROR, result.error);
+          return;
+        }
+
         const room = parsed.gameId;
 
+        const playerId = result.value.playerId;
         const publicPayload: PlayerIdPayload = { playerId };
 
         io.to(room).emit(ServerPublicEvents.PLAYER_CONFIRMED, publicPayload);
@@ -90,9 +115,18 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.CANCEL_START_ERROR,
       async (parsed: CancelStartParams) => {
-        const { playerId } = await cancelStart(parsed, socket.data.sub);
+        const userId = socket.data.sub;
+        const gameId = parsed.gameId;
+        const result = cancelStart(userId, gameId);
+
+        if (!result.ok) {
+          socket.emit(ServerErrorEvents.CANCEL_START_ERROR, result.error);
+          return;
+        }
+
         const room = parsed.gameId;
 
+        const playerId = result.value.playerId;
         const publicPayload: PlayerIdPayload = { playerId };
 
         io.to(room).emit(ServerPublicEvents.PLAYER_CANCELED, publicPayload);

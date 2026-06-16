@@ -3,10 +3,10 @@ import type { Response } from "express";
 // Project level
 import {
   createGame,
-  deleteGame,
+  deleteGameById,
   getCurrentGame,
   getGameById,
-  getGames,
+  getAllGames,
 } from "services";
 import {
   createGameSchema,
@@ -16,11 +16,11 @@ import {
 import { AuthenticatedRequest } from "types";
 import { validate } from "utils";
 
-export async function getGamesController(
-  req: AuthenticatedRequest,
+export async function getAllGamesController(
+  _req: AuthenticatedRequest,
   res: Response,
 ) {
-  const result = await getGames(req.user.id);
+  const result = await getAllGames();
   res.status(200).json(result);
 }
 
@@ -28,8 +28,13 @@ export async function getCurrentGameController(
   req: AuthenticatedRequest,
   res: Response,
 ) {
-  const result = await getCurrentGame(req.user.id);
-  res.status(200).json(result);
+  const result = getCurrentGame(req.user.id);
+  if (!result.ok) {
+    res.status(404).json(result.error);
+    return;
+  }
+
+  res.status(200).json(result.value);
 }
 
 export async function getGameByIdController(
@@ -38,8 +43,13 @@ export async function getGameByIdController(
 ) {
   const parsed = validate(getGameByIdParamsSchema, req.params);
 
-  const result = await getGameById(req.user.id, parsed);
-  res.status(200).json(result);
+  const result = getGameById(parsed.gameId);
+  if (!result.ok) {
+    res.status(404).json(result.error);
+    return;
+  }
+
+  res.status(200).json(result.value);
 }
 
 export async function createGameController(
@@ -48,16 +58,27 @@ export async function createGameController(
 ) {
   const parsed = validate(createGameSchema, req.body);
 
-  const result = await createGame(req.user.id, parsed);
-  res.status(201).json(result);
+  const result = createGame(req.user.id, {
+    name: parsed.gameName,
+    maxPlayers: parsed.maxPlayers,
+  });
+
+  if (!result.ok) {
+    res.status(409).json(result.error);
+    return;
+  }
+
+  res.status(201).json(result.value);
 }
 
-export async function deleteGameController(
+export async function deleteGameByIdController(
   req: AuthenticatedRequest,
   res: Response,
 ) {
   const parsed = validate(deleteGameParamsSchema, req.params);
 
-  const result = await deleteGame(req.user.id, parsed);
-  res.status(201).json(result);
+  const result = deleteGameById(parsed.gameId);
+  if (!result.ok) res.status(404).json(result.error);
+
+  res.status(201).send();
 }

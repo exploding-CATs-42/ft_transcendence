@@ -1,260 +1,196 @@
-// Libraries
-import { createActor } from "xstate";
 // Project level
-import { ApiError, SocketError } from "errors";
 import {
-  CancelStartParams,
-  ConfirmStartParams,
-  CreateGameRequestBody,
-  DeleteGameParams,
-  GetGameByIdParams,
-  JoinGameParams,
-  LeaveGameParams,
-} from "schemas";
-import {
-  GameEvents,
-  gameMachine,
-  GameInstance,
-  GameInfo,
-  toWaitingPlayerView,
-  attachBroadcaster,
-} from "game";
-import { Player } from "game/types";
+  Result,
+  success,
+  failure,
+  JoinGameError,
+  GameNotFoundError,
+  PlayerHasActiveGameError,
+  LeaveGameError,
+  ConfirmStartError,
+  CancelStartError,
+} from "errors";
+import { GameEvents, toWaitingPlayerView } from "game";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
-import { GameStore } from "utils";
-// Local level
-import { ensureUserExists } from "./usersService";
+import { getGameContext } from "game/utils";
+import { createPlayer } from "game/factories";
+import { attachBroadcasters } from "sockets";
+import { GameRepository, toGameRecord } from "data";
+import { Game, GameConfig, GameId, GameRecord } from "data/types";
 
-function ensureGameExists(gameId: string) {
-  const game = GameStore.getGame(gameId);
-
-  if (!game) {
-    throw new ApiError("GameInstance not found", 404);
-  }
-
-  return game;
+export async function getAllGames(): Promise<GameRecord[]> {
+  const games = GameRepository.getAllGames();
+  return games.map((game) => toGameRecord(game));
 }
 
-export async function getGames(userId: UserId): Promise<GameInfo[]> {
-  await ensureUserExists(userId);
+export function getGameById(gameId: GameId): Result<Game, GameNotFoundError> {
+  const game = GameRepository.getGame(gameId);
+  if (!game) return failure({ reason: "GAME_NOT_FOUND" });
 
-  return GameStore.getAllGames().map((game) => {
-    return game.info;
-  });
+  return success(game);
 }
 
-export async function getGameById(
+export function getCurrentGame(
   userId: UserId,
-  input: GetGameByIdParams,
-): Promise<GameInstance> {
-  await ensureUserExists(userId);
+): Result<GameRecord, GameNotFoundError> {
+  const game = GameRepository.findCurrentGameByUserId(userId);
+  if (!game) return failure({ reason: "GAME_NOT_FOUND" });
 
-  return ensureGameExists(input.gameId);
+  return success(toGameRecord(game));
 }
 
-export async function getCurrentGame(userId: UserId): Promise<GameInfo | null> {
-  await ensureUserExists(userId);
-
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
-
-  if (!currentGame) {
-    return null;
-  }
-
-  return currentGame.info;
-}
-
-export async function createGame(
+export function createGame(
   userId: UserId,
-  input: CreateGameRequestBody,
-): Promise<GameInfo> {
-  const user = await ensureUserExists(userId);
-
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
-
-  if (currentGame) {
-    throw new ApiError("Player already has an active or waiting game", 409, {
-      existingGameId: currentGame.info.id,
+  config: GameConfig,
+): Result<GameRecord, PlayerHasActiveGameError> {
+  const result = getCurrentGame(userId);
+  const alreadyInGame = result.ok;
+  if (alreadyInGame) {
+    const game = result.value;
+    return failure({
+      reason: "PLAYER_HAS_ACTIVE_GAME",
+      existingGameId: game.id,
     });
   }
 
-  const actor = createActor(gameMachine);
+  const game = GameRepository.createGame({
+    name: config.name,
+    maxPlayers: config.maxPlayers,
+  });
 
-  const game: GameInstance = {
-    info: {
-      id: crypto.randomUUID(),
-      name: input.gameName,
-      maxPlayers: input.maxPlayers,
-      createdAt: Date.now(),
-    },
-    actor,
-  };
+  attachBroadcasters(game);
+  game.instance.start();
 
-  attachBroadcaster(game.info.id, actor);
-  actor.start();
+  joinGame(userId, game.id);
 
-  const player: Player = {
-    id: user.id,
-    name: user.username,
-    hand: [],
-    isConfirmed: false,
-    isAlive: true,
-    turnOrder: 0,
-  };
+  return success(toGameRecord(game));
+}
 
-  game.actor.send({
+export function deleteGameById(
+  gameId: GameId,
+): Result<void, GameNotFoundError> {
+  const deleted = GameRepository.deleteGameById(gameId);
+
+  if (!deleted) {
+    return failure({ reason: "GAME_NOT_FOUND" });
+  }
+
+  return success();
+}
+
+export function joinGame(
+  userId: UserId,
+  gameId: GameId,
+): Result<JoinGameResult, JoinGameError> {
+  const curGameSearchResult = getCurrentGame(userId);
+
+  const alreadyInGame = curGameSearchResult.ok;
+  if (alreadyInGame) {
+    const game = curGameSearchResult.value;
+    if (game.id === gameId) {
+      return failure({ reason: "PLAYER_ALREADY_IN_GAME" });
+    }
+
+    return failure({
+      reason: "PLAYER_HAS_ACTIVE_GAME",
+      existingGameId: game.id,
+    });
+  }
+
+  const gameSeachResult = getGameById(gameId);
+  if (!gameSeachResult.ok) return gameSeachResult;
+
+  const game = gameSeachResult.value;
+
+  const players = getGameContext(game.instance).players;
+  if (players.length >= game.maxPlayers) {
+    return failure({ reason: "GAME_FULL", maxPlayers: game.maxPlayers });
+  }
+
+  const player = createPlayer(userId);
+  game.instance.send({
     type: GameEvents.JOIN_GAME,
     player,
   });
 
-  GameStore.setGame(game);
-  return game.info;
-}
-
-export async function deleteGame(userId: UserId, input: DeleteGameParams) {
-  await ensureUserExists(userId);
-  ensureGameExists(input.gameId);
-
-  GameStore.deleteGameById(input.gameId);
-}
-
-export async function joinGame(
-  input: JoinGameParams,
-  userId: UserId,
-): Promise<JoinGameResult> {
-  const user = await ensureUserExists(userId);
-
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
-
-  const alreadyJoined = playersBefore.some((p) => {
-    return p.id === user.id;
-  });
-
-  if (alreadyJoined) {
-    const player = playersBefore.find((p) => {
-      return p.id === user.id;
-    });
-
-    return {
-      player: toWaitingPlayerView(player!),
-      waitingState: { players: playersBefore.map(toWaitingPlayerView) },
-    };
-  }
-
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
-
-  if (currentGame && currentGame.info.id !== input.gameId) {
-    throw new SocketError("Player already has an active or waiting game", {
-      existingGameId: currentGame.info.id,
-    });
-  }
-
-  if (playersBefore.length >= game.info.maxPlayers) {
-    throw new SocketError("GameInstance is full");
-  }
-
-  const player: Player = {
-    id: user.id,
-    name: user.username,
-    hand: [],
-    isConfirmed: false,
-    isAlive: true,
-    turnOrder: 0,
-  };
-
-  game.actor.send({
-    type: GameEvents.JOIN_GAME,
-    player,
-  });
-
-  const playersAfter = game.actor.getSnapshot().context.players;
-
-  return {
+  return success({
     player: toWaitingPlayerView(player),
-    waitingState: { players: playersAfter.map(toWaitingPlayerView) },
-  };
+    waitingState: { players: players.map(toWaitingPlayerView) },
+  });
 }
 
-export async function leaveGame(
-  input: LeaveGameParams,
+export function leaveGame(
   userId: UserId,
-): Promise<PlayerIdPayload> {
-  const user = await ensureUserExists(userId);
+  gameId: GameId,
+): Result<PlayerIdPayload, LeaveGameError> {
+  const result = getGameById(gameId);
+  if (!result.ok) return result;
 
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
+  const game = result.value;
+  const players = getGameContext(game.instance).players;
 
-  const player = playersBefore.find((player) => {
-    return player.id === user.id;
+  const player = players.find((player) => {
+    return player.id === userId;
   });
 
-  if (!player) {
-    throw new SocketError("Player is not in the game");
-  }
+  if (!player) return failure({ reason: "PLAYER_IS_NOT_IN_GAME" });
 
-  const isLastPlayer = playersBefore.length === 1;
-
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.LEAVE_GAME,
     playerId: player.id,
   });
 
-  if (isLastPlayer) {
-    GameStore.deleteGameById(input.gameId);
-    return { playerId: "" };
-  }
+  const noPlayersLeft = getGameContext(game.instance).players.length === 0;
+  if (noPlayersLeft) GameRepository.deleteGameById(gameId);
 
-  return { playerId: player.id };
+  return success({ playerId: player.id });
 }
 
-export async function confirmStart(
-  input: ConfirmStartParams,
+export function confirmStart(
   userId: UserId,
-): Promise<PlayerIdPayload> {
-  const user = await ensureUserExists(userId);
+  gameId: GameId,
+): Result<PlayerIdPayload, ConfirmStartError> {
+  const result = getGameById(gameId);
+  if (!result.ok) return failure({ reason: "GAME_NOT_FOUND" });
 
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
+  const game = result.value;
+  const players = getGameContext(game.instance).players;
 
-  const player = playersBefore.find((player) => {
-    return player.id === user.id;
+  const player = players.find((player) => {
+    return player.id === userId;
   });
 
-  if (!player) {
-    throw new SocketError("Player is not in the game");
-  }
+  if (!player) return failure({ reason: "PLAYER_IS_NOT_IN_GAME" });
 
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.CONFIRM_START,
     playerId: player.id,
   });
 
-  return { playerId: player.id };
+  return success({ playerId: player.id });
 }
 
-export async function cancelStart(
-  input: CancelStartParams,
+export function cancelStart(
   userId: UserId,
-): Promise<PlayerIdPayload> {
-  const user = await ensureUserExists(userId);
+  gameId: GameId,
+): Result<PlayerIdPayload, CancelStartError> {
+  const result = getGameById(gameId);
+  if (!result.ok) return failure({ reason: "GAME_NOT_FOUND" });
 
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
+  const game = result.value;
+  const players = getGameContext(game.instance).players;
 
-  const player = playersBefore.find((player) => {
-    return player.id === user.id;
+  const player = players.find((player) => {
+    return player.id === userId;
   });
 
-  if (!player) {
-    throw new SocketError("Player is not in the game");
-  }
+  if (!player) return failure({ reason: "PLAYER_IS_NOT_IN_GAME" });
 
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.CANCEL_START,
     playerId: player.id,
   });
 
-  return { playerId: player.id };
+  return success({ playerId: player.id });
 }
