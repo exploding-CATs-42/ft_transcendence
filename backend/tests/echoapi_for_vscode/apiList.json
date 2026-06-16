@@ -2079,7 +2079,7 @@
             "description": "",
             "field_type": "String",
             "is_checked": 1,
-            "key": "join-table",
+            "key": "join-game",
             "value": "",
             "not_null": 1,
             "param_id": "9c0295fb99062"
@@ -2088,7 +2088,7 @@
             "description": "",
             "field_type": "String",
             "is_checked": 1,
-            "key": "join-table-response",
+            "key": "waiting-state",
             "value": "1",
             "not_null": 1,
             "param_id": "961551f39900a"
@@ -2097,7 +2097,7 @@
             "description": "",
             "field_type": "String",
             "is_checked": 1,
-            "key": "join-table-error",
+            "key": "join-game-error",
             "value": "1",
             "not_null": 1,
             "param_id": "961ae1839900e"
@@ -2106,22 +2106,50 @@
             "description": "",
             "field_type": "String",
             "is_checked": 1,
-            "key": "",
+            "key": "leave-game",
             "value": "",
             "not_null": 1,
-            "static": true,
             "param_id": "9c1c0e7399063"
+          },
+          {
+            "description": "",
+            "field_type": "String",
+            "is_checked": 1,
+            "key": "leave-game-error",
+            "value": "1",
+            "not_null": 1,
+            "param_id": "28b8ce11b99088"
           }
         ]
       }
     },
     "message": [
       {
-        "name": "join-table",
+        "name": "join-game",
         "param_id": "94dde5db99004",
         "request": {
           "mode": "json",
-          "raw": "{{gameId}}",
+          "raw": "{\n    \"gameId\": {{gameId}}\n}",
+          "raw_parameter": [],
+          "raw_schema": {
+            "type": "object"
+          }
+        },
+        "response": {
+          "mode": "text",
+          "raw": "",
+          "raw_parameter": [],
+          "raw_schema": {
+            "type": "object"
+          }
+        }
+      },
+      {
+        "name": "leave-game",
+        "param_id": "28b89181799084",
+        "request": {
+          "mode": "json",
+          "raw": "{\n    \"gameId\": {{gameId}}\n}",
           "raw_parameter": [],
           "raw_schema": {
             "type": "object"
@@ -2153,9 +2181,9 @@
     "is_deleted": -1,
     "is_conflicted": -1,
     "vscode_version": "1.7.13",
-    "active_id": "94dde5db99004",
+    "active_id": "28b89181799084",
     "ack": -1,
-    "msg_data": "join-table"
+    "msg_data": "leave-game"
   },
   {
     "project_id": "",
@@ -3397,7 +3425,7 @@
     "parent_id": "953d14a39900d",
     "target_type": "api",
     "name": "/me",
-    "sort": 1,
+    "sort": 2,
     "version": 0,
     "mark_id": "",
     "status": 1,
@@ -3617,7 +3645,7 @@
     "parent_id": "953d14a39900d",
     "target_type": "api",
     "name": "/me/friends",
-    "sort": 2,
+    "sort": 3,
     "version": 0,
     "mark_id": "",
     "status": 1,
@@ -3837,7 +3865,7 @@
     "parent_id": "953d14a39900d",
     "target_type": "api",
     "name": "/me/friends",
-    "sort": 3,
+    "sort": 4,
     "version": 0,
     "mark_id": "",
     "status": 1,
@@ -4057,7 +4085,7 @@
     "parent_id": "953d14a39900d",
     "target_type": "api",
     "name": "/me/friends",
-    "sort": 4,
+    "sort": 5,
     "version": 0,
     "mark_id": "",
     "status": 1,
@@ -4277,7 +4305,7 @@
     "parent_id": "953d14a39900d",
     "target_type": "api",
     "name": "/me/friends/{userId}",
-    "sort": 5,
+    "sort": 6,
     "version": 0,
     "mark_id": "",
     "status": 1,
@@ -4870,7 +4898,25 @@
         "binary": null
       },
       "pre_tasks": [],
-      "post_tasks": [],
+      "post_tasks": [
+        {
+          "type": "pickVars",
+          "id": "28adef0ff99006",
+          "name": "Extract Variables",
+          "enabled": 1,
+          "data": {
+            "source": "responseJson",
+            "variables": [
+              {
+                "param_id": "28adf0b5b99007",
+                "name": "accessToken",
+                "expression": "$.accessToken",
+                "type": "envVars"
+              }
+            ]
+          }
+        }
+      ],
       "header": {
         "parameter": []
       },
@@ -5573,6 +5619,226 @@
             "description": ""
           }
         ]
+      }
+    },
+    "response": {
+      "is_check_result": 1,
+      "example": [
+        {
+          "example_id": "1",
+          "raw": "",
+          "raw_parameter": [],
+          "expect": {
+            "name": "Success",
+            "is_default": 1,
+            "code": "200",
+            "content_type": "json",
+            "verify_type": "schema",
+            "mock": "",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        },
+        {
+          "example_id": "2",
+          "raw": "",
+          "raw_parameter": [],
+          "expect": {
+            "name": "Failure",
+            "is_default": -1,
+            "code": "404",
+            "content_type": "json",
+            "verify_type": "schema",
+            "mock": "",
+            "schema": {
+              "type": "object",
+              "properties": {}
+            }
+          }
+        }
+      ]
+    },
+    "description": "",
+    "tags": [],
+    "ai_expect_enable": -1,
+    "is_check_result": 1,
+    "is_socket": 1,
+    "is_locked": -1,
+    "is_force": -1,
+    "attribute_info": {},
+    "protocol": "http/1.1",
+    "ai_expect": {
+      "list": [],
+      "none_math_expect_id": ""
+    },
+    "is_deleted": -1,
+    "is_conflicted": -1,
+    "vscode_version": "1.7.13"
+  },
+  {
+    "project_id": "",
+    "target_id": "1cc828b8799005",
+    "parent_id": "953d14a39900d",
+    "target_type": "api",
+    "name": "/me",
+    "sort": 1,
+    "version": 0,
+    "mark_id": "",
+    "status": 1,
+    "is_changed": 1,
+    "is_create": -1,
+    "method": "GET",
+    "url": "http://localhost:8080/api/me",
+    "request": {
+      "auth": {
+        "type": "inherit",
+        "kv": {
+          "key": "",
+          "value": "",
+          "in": "header"
+        },
+        "bearer": {
+          "key": ""
+        },
+        "basic": {
+          "username": "",
+          "password": ""
+        },
+        "digest": {
+          "username": "",
+          "password": "",
+          "realm": "",
+          "nonce": "",
+          "algorithm": "MD5",
+          "qop": "",
+          "nc": "",
+          "cnonce": "",
+          "opaque": "",
+          "disableRetryRequest": false
+        },
+        "oauth1": {
+          "consumerKey": "",
+          "consumerSecret": "",
+          "signatureMethod": "HMAC-SHA1",
+          "addEmptyParamsToSign": true,
+          "includeBodyHash": true,
+          "addParamsToHeader": false,
+          "realm": "",
+          "version": "1.0",
+          "nonce": "",
+          "timestamp": "",
+          "verifier": "",
+          "callback": "",
+          "tokenSecret": "",
+          "token": "",
+          "disableHeaderEncoding": false
+        },
+        "oauth2": {
+          "addTokenTo": "header",
+          "headerPrefix": "Bearer",
+          "access_token": "",
+          "grant_type": "password_credentials",
+          "redirect_uri": "",
+          "authUrl": "",
+          "accessTokenUrl": "",
+          "clientId": "",
+          "clientSecret": "",
+          "username": "",
+          "password": "",
+          "challengeAlgorithm": "S256",
+          "code_verifier": "Bearer",
+          "scope": "",
+          "state": "",
+          "client_authentication": "header",
+          "refreshTokenUrl": "",
+          "authRequestParams": [],
+          "tokenRequestParams": [],
+          "refreshRequestParams": []
+        },
+        "hawk": {
+          "authId": "",
+          "authKey": "",
+          "algorithm": "",
+          "user": "",
+          "nonce": "",
+          "extraData": "",
+          "app": "",
+          "delegation": "",
+          "timestamp": "",
+          "includePayloadHash": false
+        },
+        "awsv4": {
+          "accessKey": "",
+          "secretKey": "",
+          "region": "",
+          "service": "",
+          "sessionToken": "",
+          "addAuthDataToQuery": false
+        },
+        "ntlm": {
+          "username": "",
+          "password": "",
+          "domain": "",
+          "workstation": "",
+          "disableRetryRequest": false
+        },
+        "edgegrid": {
+          "accessToken": "",
+          "clientToken": "",
+          "clientSecret": "",
+          "nonce": "",
+          "timestamp": "",
+          "baseURi": "",
+          "headersToSign": ""
+        },
+        "noauth": {},
+        "jwt": {
+          "addTokenTo": "header",
+          "algorithm": "HS256",
+          "secret": "",
+          "isSecretBase64Encoded": false,
+          "payload": "",
+          "headerPrefix": "Bearer",
+          "queryParamKey": "token",
+          "header": ""
+        },
+        "asap": {
+          "alg": "HS256",
+          "iss": "",
+          "aud": "",
+          "kid": "",
+          "privateKey": "",
+          "sub": "",
+          "claims": "",
+          "exp": ""
+        }
+      },
+      "body": {
+        "mode": "none",
+        "parameter": [],
+        "raw": "",
+        "raw_parameter": [],
+        "raw_schema": {
+          "type": "object"
+        },
+        "binary": null
+      },
+      "pre_tasks": [],
+      "post_tasks": [],
+      "header": {
+        "parameter": []
+      },
+      "query": {
+        "parameter": [],
+        "query_add_equal": 1
+      },
+      "cookie": {
+        "parameter": []
+      },
+      "restful": {
+        "parameter": []
       }
     },
     "response": {
