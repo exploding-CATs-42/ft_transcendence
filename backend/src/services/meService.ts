@@ -1,25 +1,59 @@
 // Project level
-import { prisma, selfProfileSelect } from "lib/prisma";
-import { hashPassword, toMyProfileUser, toSelfProfileUser } from "utils";
 import { ApiError } from "errors";
 import { MyProfileUser } from "types";
 // Local level
+import { prisma, selfProfileSelect } from "../lib/prisma";
+import { comparePassword, hashPassword } from "../utils/hash";
+import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
 import { getFinishedGamesStats } from "./usersService";
 
-export class MeServiceError extends Error {
-  public statusCode: number;
-
+export class MeServiceError extends ApiError {
   constructor(message: string, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
+    super(message, statusCode);
   }
 }
 
 export interface UpdateMeInput {
   username?: string;
   email?: string;
-  password?: string;
+  passwordOld?: string;
+  passwordNew?: string;
   avatarUrl?: string | null;
+}
+
+async function validatePassword(currentUserId: string, input: UpdateMeInput) {
+  if (input.passwordNew && !input.passwordOld) {
+    throw new MeServiceError(
+      "Enter your current password to set a new password",
+      409,
+    );
+  }
+
+  if (input.passwordOld && !input.passwordNew) {
+    throw new MeServiceError("Enter your new password", 409);
+  }
+
+  if (!input.passwordOld) {
+    return;
+  }
+
+  const currentUser = await prisma.user.findUnique({
+    where: { id: currentUserId },
+    select: { passwordHash: true },
+  });
+
+  if (!currentUser) {
+    throw new MeServiceError("User not found", 404);
+  }
+
+  const isPasswordValid = await comparePassword(
+    input.passwordOld,
+    currentUser.passwordHash,
+  );
+
+  if (!isPasswordValid) {
+    throw new MeServiceError("Please enter valid password", 401);
+  }
 }
 
 export async function updateMe(
@@ -46,6 +80,8 @@ export async function updateMe(
     }
   }
 
+  await validatePassword(currentUserId, input);
+
   const data: {
     username?: string;
     email?: string;
@@ -61,8 +97,8 @@ export async function updateMe(
     data.email = input.email;
   }
 
-  if (input.password !== undefined) {
-    data.passwordHash = await hashPassword(input.password);
+  if (input.passwordNew !== undefined) {
+    data.passwordHash = await hashPassword(input.passwordNew);
   }
 
   if (input.avatarUrl !== undefined) {

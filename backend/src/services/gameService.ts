@@ -20,7 +20,8 @@ import {
   attachBroadcaster,
 } from "game";
 import { Player } from "game/types";
-import { JoinGameResult, PlayerIdPayload, UserId } from "types";
+import { JoinGameResult, UserId } from "types";
+import { PlayerIdPayload } from "@exploding-cats/shared-types";
 import { GameStore } from "utils";
 // Local level
 import { ensureUserExists } from "./usersService";

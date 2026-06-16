@@ -19,34 +19,6 @@
   text-align: center;
 }
 
-.editButton {
-  margin-left: 8px;
-  grid-area: editButton;
-}
-
-.editIcon {
-  fill: var(--off-white);
-}
-
-.logoutButton {
-  border: 1px solid #fffdfdd4;
-  margin-left: auto;
-  grid-area: logoutButton;
-  padding-inline: 10px;
-  padding-block: 4px;
-  display: flex;
-  align-items: center;
-}
-
-.logoutIcon {
-  fill: transparent;
-  stroke: var(--off-white);
-}
-
-.logoutText {
-  display: none;
-}
-
 @media only screen and (min-width: 768px) {
   .section {
     grid-template-columns: auto auto;
@@ -63,26 +35,10 @@
     justify-self: center;
   }
 
-  .logoutButton {
-    padding-inline: 13px;
-    padding-block: 7px;
-    align-self: flex-start;
-  }
-
-  .logoutIcon {
-    width: 20px;
-    height: 20px;
-  }
-
   .name {
     font-size: 25px;
     line-height: 33px;
     margin-left: 0;
-  }
-
-  .editIcon {
-    width: 35px;
-    height: 35px;
   }
 }
 
@@ -112,29 +68,6 @@
     justify-self: flex-end;
     margin-left: 30px;
   }
-
-  .editButton {
-    justify-self: flex-start;
-  }
-
-  .logoutButton {
-    margin-left: 0;
-    margin-top: 35px;
-    padding-inline: 17.5px;
-    padding-block: 7px;
-    gap: 10px;
-  }
-
-  .logoutIcon {
-    width: 33px;
-    height: 33px;
-  }
-
-  .logoutText {
-    display: block;
-    font-size: 25px;
-    line-height: 33px;
-  }
 }
 
 @media only screen and (min-width: 1920px) {
@@ -144,9 +77,5 @@
 
   .avatar {
     top: calc((var(--top-padding) + 193px / 2) * -1);
-  }
-
-  .logoutButton {
-    margin-top: 25px;
   }
 }
