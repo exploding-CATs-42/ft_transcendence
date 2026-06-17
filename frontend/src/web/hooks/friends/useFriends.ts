@@ -22,7 +22,7 @@ export const useFriends = ({ userId, isMyProfile }: Props) => {
         if (isMyProfile) {
           data = await api.friends.getMeFriends();
         } else if (userId) {
-          data = await api.friends.getUserFriends(userId);
+          data = await api.friends.getUserFriends({ userId });
         }
 
         setFriends(data);
