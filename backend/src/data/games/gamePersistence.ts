@@ -3,9 +3,9 @@ import { createActor, Snapshot } from "xstate";
 import fs from "node:fs/promises";
 import path from "path";
 // Project level
-import { gameMachine, GameInstance, GameInfo, attachBroadcaster } from "game";
+import { gameMachine, GameInstance, attachBroadcaster } from "game";
 // Local level
-import { GameId } from "./types";
+import { GameId, GameInfo } from "./types";
 
 interface PersistedGame {
   info: GameInfo;

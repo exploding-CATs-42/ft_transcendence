@@ -15,10 +15,10 @@ import {
   GameEvents,
   gameMachine,
   GameInstance,
-  GameInfo,
   toWaitingPlayerView,
   attachBroadcaster,
 } from "game";
+import { GameInfo } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
