@@ -1,12 +1,6 @@
 import { Actor } from "xstate";
 import { gameMachine } from "./gameMachine";
-
-export interface GameInfo {
-  id: string;
-  name: string;
-  maxPlayers: number;
-  createdAt: number;
-}
+import { GameInfo } from "data/types";
 
 export interface GameInstance {
   info: GameInfo;
