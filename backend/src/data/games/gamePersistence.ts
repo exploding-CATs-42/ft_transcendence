@@ -1,9 +1,8 @@
 // Libraries
-import { createActor } from "xstate";
 import fs from "node:fs/promises";
 import path from "path";
 // Project level
-import { gameMachine } from "game";
+import { createGameInstance } from "game";
 import { attachGameBroadcaster } from "sockets";
 // Local level
 import { PersistedGame } from "./types";
@@ -66,11 +65,13 @@ export async function loadGames(): Promise<void> {
 
     const persistedGames: PersistedGame[] = JSON.parse(raw);
 
-    for (const { metadata, snapshot } of persistedGames) {
-      const actor = createActor(gameMachine, { snapshot });
-      attachGameBroadcaster({ instance: actor, ...metadata });
-      actor.start();
-      GameStore.addGame({ instance: actor, ...metadata });
+    for (const persistedGame of persistedGames) {
+      const { snapshot, metadata } = persistedGame;
+
+      const instance = createGameInstance(snapshot);
+      attachGameBroadcaster({ instance, ...metadata });
+      instance.start();
+      GameStore.addGame({ instance, ...metadata });
     }
 
     console.log(`Loaded ${persistedGames.length} games`);
