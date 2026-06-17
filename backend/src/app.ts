@@ -12,7 +12,7 @@ import { initGamePersistence } from "./data";
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server, ioOptions);
+export const io = new Server(server, ioOptions);
 
 initGamePersistence();
 
