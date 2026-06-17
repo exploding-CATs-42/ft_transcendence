@@ -1,6 +1,6 @@
 import { GameId } from "./GameId";
 
-export interface GameInfo {
+export interface GameRecord {
   id: GameId;
   name: string;
   maxPlayers: number;

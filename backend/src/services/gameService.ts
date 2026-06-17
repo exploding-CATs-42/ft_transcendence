@@ -18,7 +18,7 @@ import {
   toWaitingPlayerView,
   attachBroadcaster,
 } from "game";
-import { GameInfo } from "data/types";
+import { GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
@@ -36,7 +36,7 @@ function ensureGameExists(gameId: string) {
   return game;
 }
 
-export async function getGames(userId: UserId): Promise<GameInfo[]> {
+export async function getGames(userId: UserId): Promise<GameRecord[]> {
   await ensureUserExists(userId);
 
   return GameStore.getAllGames().map((game) => {
@@ -53,7 +53,9 @@ export async function getGameById(
   return ensureGameExists(input.gameId);
 }
 
-export async function getCurrentGame(userId: UserId): Promise<GameInfo | null> {
+export async function getCurrentGame(
+  userId: UserId,
+): Promise<GameRecord | null> {
   await ensureUserExists(userId);
 
   const currentGame = GameStore.findCurrentGameByUserId(userId);
@@ -68,7 +70,7 @@ export async function getCurrentGame(userId: UserId): Promise<GameInfo | null> {
 export async function createGame(
   userId: UserId,
   input: CreateGameRequestBody,
-): Promise<GameInfo> {
+): Promise<GameRecord> {
   const user = await ensureUserExists(userId);
 
   const currentGame = GameStore.findCurrentGameByUserId(userId);
