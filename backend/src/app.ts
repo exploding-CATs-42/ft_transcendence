@@ -8,7 +8,7 @@ import { Server } from "socket.io";
 import { corsOptions, ioOptions } from "./config";
 import { setupRouting } from "./routes";
 import { initSockets } from "./sockets";
-import { initGamePersistence } from "./utils/gameStore";
+import { initGamePersistence } from "./data";
 
 const app = express();
 const server = createServer(app);
