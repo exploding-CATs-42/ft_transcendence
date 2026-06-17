@@ -5,10 +5,10 @@ import path from "path";
 // Project level
 import { gameMachine, GameInstance, attachBroadcaster } from "game";
 // Local level
-import { GameId, GameInfo } from "./types";
+import { GameId, GameRecord } from "./types";
 
 interface PersistedGame {
-  info: GameInfo;
+  info: GameRecord;
   snapshot: Snapshot<unknown>;
 }
 

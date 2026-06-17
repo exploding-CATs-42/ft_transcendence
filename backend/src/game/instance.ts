@@ -1,8 +1,8 @@
 import { Actor } from "xstate";
 import { gameMachine } from "./gameMachine";
-import { GameInfo } from "data/types";
+import { GameRecord } from "data/types";
 
 export interface GameInstance {
-  info: GameInfo;
+  info: GameRecord;
   actor: Actor<typeof gameMachine>;
 }
