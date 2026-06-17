@@ -6,8 +6,9 @@ import path from "path";
 import { gameMachine } from "game";
 import { attachGameBroadcaster } from "sockets";
 // Local level
-import { Game, GameId, PersistedGame } from "./types";
+import { PersistedGame } from "./types";
 import { toPersistedGame } from "./mappers";
+import GameStore from "./gameStore";
 
 const persistencePath = process.env["GAME_PERSISTENCE_FILE_PATH"];
 
@@ -17,6 +18,28 @@ if (!persistencePath) {
 
 const FILE_PATH = path.resolve(persistencePath);
 const SAVE_INTERVAL_MS = 5000;
+
+let initialized = false;
+
+export function initGamePersistence() {
+  if (initialized) return;
+
+  loadGames();
+  const saver = createSaveLoop();
+  setupSignalHandlers(() => {
+    shutdown(saver.stop);
+  });
+
+  initialized = true;
+}
+
+export function assertInitialized() {
+  if (!initialized) {
+    throw new Error(
+      "Game store not initialized. Call initGamePersistence() first.",
+    );
+  }
+}
 
 export async function ensurePersistenceDir() {
   const dir = path.dirname(FILE_PATH);
@@ -30,7 +53,7 @@ export async function ensurePersistenceDir() {
   }
 }
 
-export async function loadGames(games: Map<GameId, Game>): Promise<void> {
+export async function loadGames(): Promise<void> {
   try {
     await ensurePersistenceDir();
 
@@ -47,7 +70,7 @@ export async function loadGames(games: Map<GameId, Game>): Promise<void> {
       const actor = createActor(gameMachine, { snapshot });
       attachGameBroadcaster({ instance: actor, ...metadata });
       actor.start();
-      games.set(metadata.id, { instance: actor, ...metadata });
+      GameStore.addGame({ instance: actor, ...metadata });
     }
 
     console.log(`Loaded ${persistedGames.length} games`);
@@ -56,11 +79,10 @@ export async function loadGames(games: Map<GameId, Game>): Promise<void> {
   }
 }
 
-export async function saveGames(games: Map<GameId, Game>): Promise<void> {
+export async function saveGames(): Promise<void> {
+  const games = GameStore.getAllGames();
+
   try {
-    if (!games) {
-      throw new Error("saveGames called with undefined games");
-    }
     await ensurePersistenceDir();
 
     const persistedGames: PersistedGame[] = [...games.values()].map((game) =>
@@ -77,14 +99,14 @@ export async function saveGames(games: Map<GameId, Game>): Promise<void> {
   }
 }
 
-export function createSaveLoop(games: Map<GameId, Game>) {
+export function createSaveLoop() {
   let timeout: ReturnType<typeof setTimeout>;
   let stopped = false;
 
   async function loop() {
     if (stopped) return;
 
-    await saveGames(games);
+    await saveGames();
 
     if (stopped) return;
 
@@ -105,11 +127,11 @@ export function setupSignalHandlers(handler: () => void): void {
   process.on("SIGTERM", handler);
 }
 
-export async function shutdown(games: Map<GameId, Game>, stop: () => void) {
+export async function shutdown(stop: () => void) {
   console.log("Shutdown detected");
 
   stop();
-  await saveGames(games);
+  await saveGames();
 
   process.exit(0);
 }

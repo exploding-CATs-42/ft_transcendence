@@ -1,35 +1,8 @@
 // Local level
 import { Game, GameId } from "./types";
-import {
-  createSaveLoop,
-  loadGames,
-  setupSignalHandlers,
-  shutdown,
-} from "./gamePersistence";
+import { assertInitialized } from "./gamePersistence";
 
 const games = new Map<GameId, Game>();
-
-let initialized = false;
-
-export function initGamePersistence() {
-  if (initialized) return;
-
-  loadGames(games);
-  const saver = createSaveLoop(games);
-  setupSignalHandlers(() => {
-    shutdown(games, saver.stop);
-  });
-
-  initialized = true;
-}
-
-function assertInitialized() {
-  if (!initialized) {
-    throw new Error(
-      "Game store not initialized. Call initGamePersistence() first.",
-    );
-  }
-}
 
 export function getGame(gameId: GameId): Game | undefined {
   assertInitialized();
