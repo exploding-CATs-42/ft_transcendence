@@ -86,7 +86,7 @@ export async function createGame(
     instance,
   };
 
-  attachGameBroadcaster(game.id, game.instance);
+  attachGameBroadcaster(game);
   game.instance.start();
 
   const player: Player = {
