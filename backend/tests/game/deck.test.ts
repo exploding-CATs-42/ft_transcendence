@@ -5,6 +5,7 @@ import { createDeck, dealInitialCards } from "game/utils";
 import { CardType, Deck, Player } from "game/types";
 import { DEFAULT_GAME_RULES } from "game/constants";
 
+const DECK_SIZE = 56;
 const PLAYERS: Player[] = [
   {
     name: "player 1",
@@ -27,7 +28,7 @@ const PLAYERS: Player[] = [
 describe("createDeck", () => {
   it("has to create a deck with 56 cards", () => {
     const deck: Deck = createDeck();
-    expect(deck.length).toBe(56);
+    expect(deck.length).toBe(DECK_SIZE);
   });
 });
 
@@ -42,11 +43,16 @@ describe("dealInitialCards", () => {
     const CARDS_DEALT_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
     const CARDS_DEALT = players.length * CARDS_DEALT_PER_PLAYER;
     const EXPLODING_KITTENS_INSERTED_BACK = players.length - 1;
-    expect(newDeck.length).toBe(
-      56 - CARDS_DEALT - 4 + EXPLODING_KITTENS_INSERTED_BACK,
-    );
+    const ALL_EXPLODING_KITTENS = 4;
+    const finalDeckSize =
+      DECK_SIZE -
+      CARDS_DEALT -
+      ALL_EXPLODING_KITTENS +
+      EXPLODING_KITTENS_INSERTED_BACK;
+
+    expect(newDeck.length).toBe(finalDeckSize);
     players.forEach((player) => {
-      expect(player.hand.length).toBe(8);
+      expect(player.hand.length).toBe(CARDS_DEALT_PER_PLAYER);
       expect(
         player.hand.some((card) => card.type === CardType.DEFUSE),
       ).toBeTruthy();
