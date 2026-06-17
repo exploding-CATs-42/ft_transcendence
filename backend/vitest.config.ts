@@ -17,6 +17,7 @@ export default defineConfig({
       constants: resolve(__dirname, "./src/constants"),
       middlewares: resolve(__dirname, "./src/middlewares"),
       controllers: resolve(__dirname, "./src/controllers"),
+      data: resolve(__dirname, "./src/data"),
       generated: resolve(__dirname, "./src/generated"),
     },
   },

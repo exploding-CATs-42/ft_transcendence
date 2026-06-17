@@ -22,7 +22,7 @@ import {
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
-import { GameStore } from "utils";
+import { GameStore } from "data";
 // Local level
 import { ensureUserExists } from "./usersService";
 

@@ -35,6 +35,8 @@
       "middlewares/*": ["./src/middlewares/*"],
       "controllers": ["./src/controllers/index"],
       "controllers/*": ["./src/controllers/*"],
+      "data": ["./src/data/index"],
+      "data/*": ["./src/data/*"],
       "generated/*": ["./src/generated/*"]
     }
   },
