@@ -85,9 +85,7 @@ export async function saveGames(): Promise<void> {
   try {
     await ensurePersistenceDir();
 
-    const persistedGames: PersistedGame[] = [...games.values()].map((game) =>
-      toPersistedGame(game),
-    );
+    const persistedGames = games.map((game) => toPersistedGame(game));
 
     const data = JSON.stringify(persistedGames, null, 2);
     const tempFilePath = `${FILE_PATH}.tmp`;
