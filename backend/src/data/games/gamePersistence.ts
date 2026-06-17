@@ -43,11 +43,11 @@ export async function loadGames(
 
     const persistedGames: PersistedGame[] = JSON.parse(raw);
 
-    for (const { info, snapshot } of persistedGames) {
+    for (const { metadata, snapshot } of persistedGames) {
       const actor = createActor(gameMachine, { snapshot });
-      attachBroadcaster(info.id, actor);
+      attachBroadcaster(metadata.id, actor);
       actor.start();
-      games.set(info.id, { info, actor });
+      games.set(metadata.id, { info: metadata, actor });
     }
 
     console.log(`Loaded ${persistedGames.length} games`);
@@ -66,7 +66,7 @@ export async function saveGames(
     await ensurePersistenceDir();
 
     const persistedGames: PersistedGame[] = [...games.values()].map((game) => ({
-      info: game.info,
+      metadata: game.info,
       snapshot: game.actor.getPersistedSnapshot(),
     }));
 

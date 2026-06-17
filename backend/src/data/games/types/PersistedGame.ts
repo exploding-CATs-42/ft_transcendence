@@ -4,6 +4,6 @@ import { Snapshot } from "xstate";
 import { GameRecord } from "./GameRecord";
 
 export interface PersistedGame {
-  info: GameRecord;
+  metadata: GameRecord;
   snapshot: Snapshot<unknown>;
 }
