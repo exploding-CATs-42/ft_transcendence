@@ -9,7 +9,7 @@ import {
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
-import { GameEvents, createGameInstance } from "game";
+import { GameEvents } from "game";
 import { Game, GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
@@ -75,16 +75,7 @@ export async function createGame(
     });
   }
 
-  const instance = createGameInstance();
-
-  const game: Game = {
-    id: crypto.randomUUID(),
-    name: input.gameName,
-    maxPlayers: input.maxPlayers,
-    createdAt: Date.now(),
-    instance,
-  };
-
+  const game = GameRepository.createGame(input.gameName, input.maxPlayers);
   attachGameBroadcaster(game);
   game.instance.start();
 
@@ -102,7 +93,6 @@ export async function createGame(
     player,
   });
 
-  GameRepository.addGame(game);
   return toGameRecord(game);
 }
 
