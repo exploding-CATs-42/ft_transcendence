@@ -2,12 +2,13 @@
 import type { NextFunction, Request, Response } from "express";
 // Project level
 import {
+  listFriendsQuerySchema,
   createFriendRequestSchema,
   deleteFriendshipSchema,
   updateFriendshipBodySchema,
   updateFriendshipParamsSchema,
-} from "schemas";
-import { listFriendsQuerySchema } from "@exploding-cats/shared-schemas";
+  userIdParamsSchema,
+} from "@exploding-cats/shared-schemas";
 import {
   deleteFriendship,
   FriendsServiceError,
@@ -15,7 +16,6 @@ import {
   sendFriendRequest,
   updateFriendship,
 } from "services";
-import { userIdParamsSchema } from "../schemas/friends/userIdParamsSchema";
 
 export async function listFriendsController(
   req: Request,
