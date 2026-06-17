@@ -13,6 +13,7 @@ export async function restoreGames() {
     const instance = createGameInstance(snapshot);
     const game: Game = { ...metadata, instance };
     attachGameBroadcaster(game);
+    game.instance.start();
 
     GameRepository.addGame(game);
   }
