@@ -11,17 +11,13 @@ import {
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
-import {
-  GameEvents,
-  gameMachine,
-  toWaitingPlayerView,
-  attachBroadcaster,
-} from "game";
+import { GameEvents, gameMachine, toWaitingPlayerView } from "game";
 import { Game, GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
 import { GameStore, toGameRecord } from "data";
+import { attachBroadcaster } from "sockets";
 // Local level
 import { ensureUserExists } from "./usersService";
 
