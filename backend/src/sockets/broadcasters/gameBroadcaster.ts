@@ -24,3 +24,15 @@ export function attachGameBroadcaster(game: Game) {
     io.to(gameId).emit(ServerPublicEvents.COUNTDOWN_CANCELED);
   });
 }
+
+/* broadcaster - is a function that just repeats/broadcasts events
+ * emitted by the machine to the outside world. it's as simple/stupid as a parrot
+ * it hears something - it repeats/broadcasts it
+ */
+
+// broadcaster example
+/*
+   broadcaster.on(GameOutEvents.PLAYER_ADDED, (event: GameOutEvent) => {
+       io.to(gameId).emit(ServerPublicEvents.PLAYER_ADDED, {playerId: event.playerId});
+   });
+*/
