@@ -1,3 +1,8 @@
+// Libraries
+import { Actor } from "xstate";
+// Local level
+import { gameMachine } from "../gameMachine";
+
 export interface GameRules {
   dealtCardsPerPlayer: number;
   defusesDealtPerPlayer: number;
@@ -9,3 +14,5 @@ export interface GameRules {
   fasterVariantRemoveFraction: number;
   nopeWindowMs: number;
 }
+
+export type GameInstance = Actor<typeof gameMachine>;
