@@ -103,7 +103,7 @@ export async function createGame(
     player,
   });
 
-  GameStore.setGame(game);
+  GameStore.addGame(game);
   return toGameRecord(game);
 }
 

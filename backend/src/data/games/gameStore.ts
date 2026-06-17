@@ -53,7 +53,7 @@ export function findCurrentGameByUserId(userId: string): Game | undefined {
   });
 }
 
-export function setGame(game: Game): void {
+export function addGame(game: Game): void {
   assertInitialized();
   games.set(game.id, game);
 }
@@ -67,6 +67,6 @@ export default {
   getGame,
   getAllGames,
   findCurrentGameByUserId,
-  setGame,
+  addGame,
   deleteGameById,
 };
