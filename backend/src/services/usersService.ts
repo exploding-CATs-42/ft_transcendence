@@ -1,7 +1,7 @@
 // Project level
 import { prisma, publicProfileSelect } from "lib/prisma";
 import { ProfileUserWithStats, UserGameHistoryItem } from "types";
-import { toProfileUser, toProfileUserWithStats } from "utils";
+import { toProfileUser, toProfileUserWithStats } from "mappers";
 
 export class UsersServiceError extends Error {
   public statusCode: number;

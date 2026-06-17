@@ -5,5 +5,4 @@ export * from "./hash";
 export * from "./jwt";
 export * from "./publicUrl";
 export * from "./tokenLifetime";
-export * from "./users";
 export * from "./validate";
