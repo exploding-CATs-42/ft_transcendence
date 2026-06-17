@@ -18,6 +18,7 @@ export default defineConfig({
       middlewares: resolve(__dirname, "./src/middlewares"),
       controllers: resolve(__dirname, "./src/controllers"),
       data: resolve(__dirname, "./src/data"),
+      sockets: resolve(__dirname, "./src/sockets"),
       generated: resolve(__dirname, "./src/generated"),
     },
   },

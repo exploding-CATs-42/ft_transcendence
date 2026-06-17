@@ -2,8 +2,8 @@
 import { Server, Socket } from "socket.io";
 // Project level
 import { socketAuthMiddleware } from "middlewares";
-import { setIoForBroadcaster } from "game";
 // Local level
+import { setIoForBroadcaster } from "./broadcasters";
 import { registerChatHandlers, lobbyGameHandlers } from "./listeners";
 
 export const initSockets = (io: Server) => {
