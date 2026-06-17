@@ -3,7 +3,6 @@ export * from "./emitters";
 export * from "./events";
 export * from "./gameMachine";
 export * from "./guards";
-export * from "./mappers";
 export * from "./states";
 export * from "./targets";
 export * from "./factories";
