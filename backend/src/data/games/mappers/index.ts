@@ -1,0 +1,1 @@
+export { toGameRecord } from "./toGameRecord";
