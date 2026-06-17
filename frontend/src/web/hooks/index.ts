@@ -3,3 +3,4 @@ export { useLocalStorage } from "./storage/useLocalStorage";
 export { useToastPosition } from "./toastify/useToastPosition";
 export { useAuth } from "./auth/useAuth";
 export { useSocket } from "./sockets/useSocket";
+export { useGameSession } from "./sockets/useGameSession";
