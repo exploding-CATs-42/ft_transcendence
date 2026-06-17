@@ -137,9 +137,11 @@ export async function joinGame(
       return p.id === user.id;
     });
 
+    const filteredPlayers = playersBefore.filter((p) => p.id !== player?.id);
+
     return {
       player: toWaitingPlayerView(player!),
-      waitingState: { players: playersBefore.map(toWaitingPlayerView) },
+      waitingState: { players: filteredPlayers.map(toWaitingPlayerView) },
     };
   }
 
@@ -169,11 +171,9 @@ export async function joinGame(
     player,
   });
 
-  const playersAfter = game.actor.getSnapshot().context.players;
-
   return {
     player: toWaitingPlayerView(player),
-    waitingState: { players: playersAfter.map(toWaitingPlayerView) },
+    waitingState: { players: playersBefore.map(toWaitingPlayerView) },
   };
 }
 
