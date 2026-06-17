@@ -6,6 +6,7 @@ import { gameMachine, GameStates, GameEvents } from "game";
 import { CardType, Player } from "game/types";
 import { DEFAULT_GAME_RULES, START_GAME_COUNTDOWN_MS } from "game/constants";
 
+const DECK_SIZE = 56;
 const PLAYERS: Player[] = [
   {
     name: "player 1",
@@ -101,9 +102,14 @@ describe("game machine", () => {
     const CARDS_DEALT_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
     const CARDS_DEALT = players.length * CARDS_DEALT_PER_PLAYER;
     const EXPLODING_KITTENS_INSERTED_BACK = players.length - 1;
-    expect(deck.length).toBe(
-      56 - CARDS_DEALT - 4 + EXPLODING_KITTENS_INSERTED_BACK,
-    );
+    const ALL_EXPLODING_KITTENS = 4;
+    const finalDeckSize =
+      DECK_SIZE -
+      CARDS_DEALT -
+      ALL_EXPLODING_KITTENS +
+      EXPLODING_KITTENS_INSERTED_BACK;
+
+    expect(deck.length).toBe(finalDeckSize);
   });
 
   it("deals 8 cards to each of the players, after entering playing.dealingCards state, \
@@ -121,10 +127,12 @@ describe("game machine", () => {
     // Assert
     const snapshot = actor.getSnapshot();
     const players = snapshot.context.players;
-    players.forEach((player) => {
-      console.log(player.hand);
 
-      expect(player.hand.length).toBe(8);
+    const { dealtCardsPerPlayer, defusesDealtPerPlayer } = DEFAULT_GAME_RULES;
+    const CARDS_DEALT_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
+
+    players.forEach((player) => {
+      expect(player.hand.length).toBe(CARDS_DEALT_PER_PLAYER);
       expect(
         player.hand.some((card) => card.type === CardType.DEFUSE),
       ).toBeTruthy();
