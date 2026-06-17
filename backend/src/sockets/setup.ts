@@ -3,12 +3,10 @@ import { Server, Socket } from "socket.io";
 // Project level
 import { socketAuthMiddleware } from "middlewares";
 // Local level
-import { setIoForBroadcaster } from "./broadcasters";
 import { registerChatHandlers, lobbyGameHandlers } from "./listeners";
 
 export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);
-  setIoForBroadcaster(io);
 
   io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
