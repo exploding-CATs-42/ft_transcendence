@@ -11,6 +11,7 @@ import {
 } from "./components/CreateTableModal";
 import { ExistingGameModal } from "./components/ExistingGameModal";
 import { JoinGameModal } from "./components/JoinGameModal";
+import { ManageLobbyModal } from "./components/ManageLobbyModal";
 import s from "./LobbyPage.module.css";
 
 type ExistingGame = {
@@ -46,6 +47,7 @@ const LobbyPage = () => {
   const [matches, setMatches] = useState<LobbyMatch[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
+  const [isOpenExistingGameModal, toggleExistingGameModal] = useModal();
   const [isOpenManageLobbyModal, toggleManageLobbyModal] = useModal();
   const [gameId, setGameId] = useState("");
   const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
@@ -117,6 +119,8 @@ const LobbyPage = () => {
           name: currentGame.name,
           ownerId: currentGame.ownerId,
         });
+
+        toggleExistingGameModal(true);
       } catch (error) {
         console.error("Failed to load current game:", error);
       }
@@ -148,12 +152,39 @@ const LobbyPage = () => {
   const handleReturnToExistingGame = () => {
     if (!existingGame) return;
 
+    toggleExistingGameModal(false);
+
     navigate("/game", {
       state: { gameId: existingGame.id },
     });
   };
 
+  const handleCloseExistingGameModal = () => {
+    toggleExistingGameModal(false);
+  };
+
   const handleCloseManageLobbyModal = () => {
+    toggleManageLobbyModal(false);
+  };
+
+  const handleDeleteLobby = async () => {
+    if (!existingGame) return;
+
+    try {
+      await api.games.deleteById(existingGame.id);
+
+      setMatches((prevMatches) =>
+        prevMatches.filter((match) => match.gameId !== existingGame.id),
+      );
+
+      setExistingGame(null);
+      toggleManageLobbyModal(false);
+    } catch (error) {
+      console.error("Failed to delete lobby:", error);
+    }
+  };
+
+  const handleLeaveLobby = () => {
     toggleManageLobbyModal(false);
   };
 
@@ -254,11 +285,19 @@ const LobbyPage = () => {
       />
 
       <ExistingGameModal
+        isOpen={isOpenExistingGameModal}
+        gameName={existingGame?.name}
+        onReturn={handleReturnToExistingGame}
+        onClose={handleCloseExistingGameModal}
+      />
+
+      <ManageLobbyModal
         isOpen={isOpenManageLobbyModal}
         gameName={existingGame?.name}
         isOwner={isCurrentGameOwner}
-        onReturn={handleReturnToExistingGame}
-        onClose={handleCloseManageLobbyModal}
+        onCancel={handleCloseManageLobbyModal}
+        onDeleteLobby={handleDeleteLobby}
+        onLeaveLobby={handleLeaveLobby}
       />
     </div>
   );

@@ -4,18 +4,11 @@ import s from "./ExistingGameModal.module.css";
 interface Props {
   isOpen: boolean;
   gameName?: string | undefined;
-  isOwner: boolean;
   onReturn: () => void;
   onClose: () => void;
 }
 
-const ExistingGameModal = ({
-  isOpen,
-  gameName,
-  isOwner,
-  onReturn,
-  onClose,
-}: Props) => {
+const ExistingGameModal = ({ isOpen, gameName, onReturn, onClose }: Props) => {
   return (
     <Modal
       className={s["existingGameModal"]!}
@@ -27,8 +20,7 @@ const ExistingGameModal = ({
 
         <p className={s["modalText"]!}>
           You already have an active or waiting game
-          {gameName ? ` "${gameName}"` : ""}. You are the{" "}
-          {isOwner ? "owner" : "player"} of this lobby.
+          {gameName ? ` "${gameName}"` : ""}. Do you want to return to it?
         </p>
 
         <div className={s["buttons"]!}>

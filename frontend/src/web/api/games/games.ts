@@ -28,8 +28,13 @@ const getAll = async (): Promise<GameInfo[]> => {
   return result.data;
 };
 
+const deleteById = async (gameId: string): Promise<void> => {
+  await api.delete(`/games/${gameId}`);
+};
+
 export default {
   create,
   getCurrent,
   getAll,
+  deleteById,
 };
