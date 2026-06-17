@@ -26,8 +26,8 @@ export function addGame(game: Game): void {
   games.set(game.id, game);
 }
 
-export function deleteGameById(gameId: string): void {
-  games.delete(gameId);
+export function deleteGameById(gameId: string): boolean {
+  return games.delete(gameId);
 }
 
 export default {
