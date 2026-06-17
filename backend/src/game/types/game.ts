@@ -1,5 +1,3 @@
-export type GameId = string;
-
 export interface GameRules {
   dealtCardsPerPlayer: number;
   defusesDealtPerPlayer: number;

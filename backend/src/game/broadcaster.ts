@@ -6,8 +6,8 @@ import {
   CountdownStartedPayload,
   ServerPublicEvents,
 } from "@exploding-cats/shared-types";
+import { GameId } from "data/types";
 // Local level
-import { GameId } from "game/types";
 import { gameMachine } from "./gameMachine";
 import { GameEmitters } from "./emitters";
 
