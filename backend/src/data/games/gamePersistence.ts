@@ -4,7 +4,7 @@ import fs from "node:fs/promises";
 import path from "path";
 // Project level
 import { gameMachine } from "game";
-import { attachBroadcaster } from "sockets";
+import { attachGameBroadcaster } from "sockets";
 // Local level
 import { Game, GameId, PersistedGame } from "./types";
 import { toPersistedGame } from "./mappers";
@@ -45,7 +45,7 @@ export async function loadGames(games: Map<GameId, Game>): Promise<void> {
 
     for (const { metadata, snapshot } of persistedGames) {
       const actor = createActor(gameMachine, { snapshot });
-      attachBroadcaster(metadata.id, actor);
+      attachGameBroadcaster(metadata.id, actor);
       actor.start();
       games.set(metadata.id, { instance: actor, ...metadata });
     }

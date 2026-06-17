@@ -17,7 +17,7 @@ import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
 import { GameStore, toGameRecord } from "data";
-import { attachBroadcaster } from "sockets";
+import { attachGameBroadcaster } from "sockets";
 // Local level
 import { ensureUserExists } from "./usersService";
 
@@ -86,7 +86,7 @@ export async function createGame(
     instance,
   };
 
-  attachBroadcaster(game.id, game.instance);
+  attachGameBroadcaster(game.id, game.instance);
   game.instance.start();
 
   const player: Player = {

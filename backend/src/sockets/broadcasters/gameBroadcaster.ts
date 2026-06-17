@@ -15,7 +15,7 @@ export function setIoForBroadcaster(server: Server) {
   io = server;
 }
 
-export function attachBroadcaster(
+export function attachGameBroadcaster(
   gameId: GameId,
   actor: Actor<typeof gameMachine>,
 ) {
