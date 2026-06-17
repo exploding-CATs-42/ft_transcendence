@@ -1,0 +1,359 @@
+channels:
+  # --- Client -> Server (waiting room) ---
+  joinGame:
+    address: join-game
+    title: Join game
+    description: Client asks to join a game's waiting room.
+    messages:
+      gameIdPayload:
+        name: JoinGameRequest
+        title: Join game request
+        summary: Identifies the game/room to join.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/GameIdPayload"
+        examples:
+          - name: example
+            payload:
+              gameId: "8f3b2c1a-9d4e-4f7a-bc12-1a2b3c4d5e6f"
+
+  leaveGame:
+    address: leave-game
+    title: Leave game
+    description: Client asks to leave a game's waiting room.
+    messages:
+      gameIdPayload:
+        name: LeaveGameRequest
+        title: Leave game request
+        summary: Identifies the game/room to leave.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/GameIdPayload"
+
+  confirmStart:
+    address: confirm-start
+    title: Confirm start
+    description: Client marks itself ready to start the game.
+    messages:
+      gameIdPayload:
+        name: ConfirmStartRequest
+        title: Confirm start request
+        summary: Identifies the game/room to confirm.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/GameIdPayload"
+
+  cancelStart:
+    address: cancel-start
+    title: Cancel start
+    description: Client withdraws its readiness to start the game.
+    messages:
+      gameIdPayload:
+        name: CancelStartRequest
+        title: Cancel start request
+        summary: Identifies the game/room to cancel.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/GameIdPayload"
+
+  # --- Server -> Client (waiting room, private to the acting socket) ---
+  waitingState:
+    address: waiting-state
+    title: Waiting state
+    description: Full snapshot of the waiting room, sent to the socket that just joined.
+    messages:
+      waitingState:
+        name: WaitingState
+        title: Waiting state
+        summary: Full snapshot of players in the waiting room.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/WaitingStatePayload"
+        examples:
+          - name: example
+            payload:
+              waitingState:
+                players:
+                  - id: "8f3b2c1a-9d4e-4f7a-bc12-1a2b3c4d5e6f"
+                    name: "Alice"
+                    isConfirmed: true
+                  - id: "2c4d6e8f-1a3b-4c5d-9e7f-0a1b2c3d4e5f"
+                    name: "Bob"
+                    isConfirmed: false
+
+  leftGame:
+    address: left-game
+    title: Left game
+    description: Acknowledges to the leaving socket that it has left the room. No payload.
+    messages:
+      empty:
+        name: LeftGame
+        title: Left game
+        summary: Event carries no payload.
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/EmptyPayload"
+
+  # --- Server -> Client (waiting room, room scope) ---
+  playerJoined:
+    address: player-joined
+    title: Player joined
+    description: A new player joined the waiting room. Sent to other room members.
+    messages:
+      playerJoined:
+        name: PlayerJoined
+        title: Player joined
+        summary: The player that just joined the waiting room.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/PlayerJoinedPayload"
+        examples:
+          - name: example
+            payload:
+              player:
+                id: "2c4d6e8f-1a3b-4c5d-9e7f-0a1b2c3d4e5f"
+                name: "Bob"
+                isConfirmed: false
+
+  playerLeft:
+    address: player-left
+    title: Player left
+    description: A player left the waiting room. Sent to the whole room.
+    messages:
+      playerId:
+        name: PlayerLeft
+        title: Player left
+        summary: Id of the player that left.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/PlayerIdPayload"
+        examples:
+          - name: example
+            payload:
+              playerId: "2c4d6e8f-1a3b-4c5d-9e7f-0a1b2c3d4e5f"
+
+  playerConfirmed:
+    address: player-confirmed
+    title: Player confirmed
+    description: A player marked itself ready. Sent to the whole room.
+    messages:
+      playerId:
+        name: PlayerConfirmed
+        title: Player confirmed
+        summary: Id of the player that confirmed.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  playerCanceled:
+    address: player-canceled
+    title: Player canceled
+    description: A player withdrew its readiness. Sent to the whole room.
+    messages:
+      playerId:
+        name: PlayerCanceled
+        title: Player canceled
+        summary: Id of the player that withdrew readiness.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  countdownStarted:
+    address: countdown-started
+    title: Countdown started
+    description: All players are ready; the start countdown has begun.
+    messages:
+      countdownStarted:
+        name: CountdownStarted
+        title: Countdown started
+        summary: When the start countdown ends.
+        contentType: application/json
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/CountdownStartedPayload"
+        examples:
+          - name: example
+            payload:
+              endsAt: 1781990400000
+
+  countdownCanceled:
+    address: countdown-canceled
+    title: Countdown canceled
+    description: A player canceled before the countdown finished; start is aborted. No payload.
+    messages:
+      empty:
+        name: CountdownCanceled
+        title: Countdown canceled
+        summary: Event carries no payload.
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/EmptyPayload"
+
+  gameStarted:
+    address: game-started
+    title: Game started
+    description: The countdown completed and the game has started. No payload.
+    messages:
+      empty:
+        name: GameStarted
+        title: Game started
+        summary: Event carries no payload.
+        payload:
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/EmptyPayload"
+
+operations:
+  # --- Waiting room: received by the server ---
+  onJoinGame:
+    action: receive
+    channel:
+      $ref: "#/channels/joinGame"
+    summary: Join a game's waiting room.
+    description: >
+      Validates `gameId`, joins the socket to the room, then replies to the
+      acting socket with `waiting-state` and notifies other room members with
+      `player-joined`. On failure emits `join-game-error` to the acting socket.
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/joinGame/messages/gameIdPayload"
+    reply:
+      channel:
+        $ref: "#/channels/waitingState"
+      messages:
+        - $ref: "#/channels/waitingState/messages/waitingState"
+
+  onLeaveGame:
+    action: receive
+    channel:
+      $ref: "#/channels/leaveGame"
+    summary: Leave a game's waiting room.
+    description: >
+      Validates `gameId`, removes the socket from the room, acknowledges with
+      `left-game` to the acting socket, and notifies the whole room with
+      `player-left`. On failure emits `leave-game-error`.
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/leaveGame/messages/gameIdPayload"
+    reply:
+      channel:
+        $ref: "#/channels/leftGame"
+      messages:
+        - $ref: "#/channels/leftGame/messages/empty"
+
+  onConfirmStart:
+    action: receive
+    channel:
+      $ref: "#/channels/confirmStart"
+    summary: Mark the acting player ready to start.
+    description: >
+      Validates `gameId`, marks the player confirmed, and notifies the whole
+      room with `player-confirmed`. When every player is confirmed the game
+      machine emits `countdown-started`. On failure emits `confirm-start-error`.
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/confirmStart/messages/gameIdPayload"
+
+  onCancelStart:
+    action: receive
+    channel:
+      $ref: "#/channels/cancelStart"
+    summary: Withdraw the acting player's readiness.
+    description: >
+      Validates `gameId`, clears the player's confirmation, and notifies the
+      whole room with `player-canceled`. If a countdown was running the game
+      machine emits `countdown-canceled`. On failure emits `cancel-start-error`.
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/cancelStart/messages/gameIdPayload"
+
+  # --- Waiting room: sent by the server ---
+  sendWaitingState:
+    action: send
+    channel:
+      $ref: "#/channels/waitingState"
+    summary: Send the waiting-room snapshot to the joining socket (acting socket).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/waitingState/messages/waitingState"
+
+  sendLeftGame:
+    action: send
+    channel:
+      $ref: "#/channels/leftGame"
+    summary: Acknowledge a leave to the leaving socket (acting socket).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/leftGame/messages/empty"
+
+  sendPlayerJoined:
+    action: send
+    channel:
+      $ref: "#/channels/playerJoined"
+    summary: Notify other room members that a player joined (room, others).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/playerJoined/messages/playerJoined"
+
+  sendPlayerLeft:
+    action: send
+    channel:
+      $ref: "#/channels/playerLeft"
+    summary: Notify the room that a player left (room, all).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/playerLeft/messages/playerId"
+
+  sendPlayerConfirmed:
+    action: send
+    channel:
+      $ref: "#/channels/playerConfirmed"
+    summary: Notify the room that a player is ready (room, all).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/playerConfirmed/messages/playerId"
+
+  sendPlayerCanceled:
+    action: send
+    channel:
+      $ref: "#/channels/playerCanceled"
+    summary: Notify the room that a player withdrew readiness (room, all).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/playerCanceled/messages/playerId"
+
+  sendCountdownStarted:
+    action: send
+    channel:
+      $ref: "#/channels/countdownStarted"
+    summary: Notify the room that the start countdown began (room, all).
+    description: Emitted by the game state machine once all players are confirmed. Countdown length is 10 seconds.
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/countdownStarted/messages/countdownStarted"
+
+  sendCountdownCanceled:
+    action: send
+    channel:
+      $ref: "#/channels/countdownCanceled"
+    summary: Notify the room that the countdown was aborted (room, all).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/countdownCanceled/messages/empty"
+
+  sendGameStarted:
+    action: send
+    channel:
+      $ref: "#/channels/gameStarted"
+    summary: Notify the room that the game has started (room, all).
+    tags:
+      - name: Waiting Room
+    messages:
+      - $ref: "#/channels/gameStarted/messages/empty"
