@@ -1,7 +1,3 @@
-import { TurnState } from "./turn";
-import { Deck } from "./card";
-import { Player } from "./player";
-
 export type GameId = string;
 
 export interface GameRules {
@@ -14,18 +10,4 @@ export interface GameRules {
   maxPlayers: number;
   fasterVariantRemoveFraction: number;
   nopeWindowMs: number;
-}
-
-export interface GameState {
-  gameId: GameId;
-  name: string;
-  maxPlayers: number;
-  players: Player[];
-  deck: Deck;
-  turn: TurnState;
-  winnerId: string | null;
-  rules: GameRules;
-  createdAt: number;
-  startedAt: number | null;
-  finishedAt: number | null;
 }
