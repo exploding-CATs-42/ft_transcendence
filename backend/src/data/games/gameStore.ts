@@ -1,7 +1,5 @@
-// Project level
-import { GameInstance } from "game";
 // Local level
-import { GameId } from "./types";
+import { Game, GameId } from "./types";
 import {
   createSaveLoop,
   loadGames,
@@ -9,7 +7,7 @@ import {
   shutdown,
 } from "./gamePersistence";
 
-const games = new Map<GameId, GameInstance>();
+const games = new Map<GameId, Game>();
 
 let initialized = false;
 
@@ -33,23 +31,21 @@ function assertInitialized() {
   }
 }
 
-export function getGame(gameId: GameId): GameInstance | undefined {
+export function getGame(gameId: GameId): Game | undefined {
   assertInitialized();
   return games.get(gameId);
 }
 
-export function getAllGames(): GameInstance[] {
+export function getAllGames(): Game[] {
   assertInitialized();
   return Array.from(games.values());
 }
 
-export function findCurrentGameByUserId(
-  userId: string,
-): GameInstance | undefined {
+export function findCurrentGameByUserId(userId: string): Game | undefined {
   assertInitialized();
 
   return Array.from(games.values()).find((game) => {
-    const snapshot = game.actor.getSnapshot();
+    const snapshot = game.instance.getSnapshot();
 
     return snapshot.context.players.some((player) => {
       return player.id === userId;
@@ -57,9 +53,9 @@ export function findCurrentGameByUserId(
   });
 }
 
-export function setGame(game: GameInstance): void {
+export function setGame(game: Game): void {
   assertInitialized();
-  games.set(game.info.id, game);
+  games.set(game.id, game);
 }
 
 export function deleteGameById(gameId: string): void {
