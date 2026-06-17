@@ -1,7 +1,7 @@
 // Project level
 import { GameInstance } from "game";
-import { GameId } from "game/types";
 // Local level
+import { GameId } from "./types";
 import {
   createSaveLoop,
   loadGames,
