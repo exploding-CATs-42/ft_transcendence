@@ -1,2 +1,2 @@
 export type { GameId } from "./GameId";
-export type { GameInfo } from "./GameInfo";
+export type { GameRecord } from "./GameRecord";
