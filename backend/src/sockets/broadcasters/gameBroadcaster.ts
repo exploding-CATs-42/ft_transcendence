@@ -1,18 +1,15 @@
-// Libraries
-import { Actor } from "xstate";
 // Project level
 import {
   CountdownStartedPayload,
   ServerPublicEvents,
 } from "@exploding-cats/shared-types";
-import { GameId } from "data/types";
-import { gameMachine, GameOutEvents } from "game";
+import { Game } from "data/types";
+import { GameOutEvents } from "game";
 import { io } from "../../app";
 
-export function attachGameBroadcaster(
-  gameId: GameId,
-  actor: Actor<typeof gameMachine>,
-) {
+export function attachGameBroadcaster(game: Game) {
+  const { instance: actor, id: gameId } = game;
+
   actor.on(GameOutEvents.GAME_STARTED, () => {
     io.to(gameId).emit(ServerPublicEvents.GAME_STARTED);
   });
