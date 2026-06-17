@@ -39,6 +39,8 @@
       "data/*": ["./src/data/*"],
       "sockets": ["./src/sockets/index"],
       "sockets/*": ["./src/sockets/*"],
+      "mappers": ["./src/mappers/index"],
+      "mappers/*": ["./src/mappers/*"],
       "generated/*": ["./src/generated/*"]
     }
   },
