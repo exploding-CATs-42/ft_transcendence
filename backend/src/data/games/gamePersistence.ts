@@ -1,16 +1,11 @@
 // Libraries
-import { createActor, Snapshot } from "xstate";
+import { createActor } from "xstate";
 import fs from "node:fs/promises";
 import path from "path";
 // Project level
 import { gameMachine, GameInstance, attachBroadcaster } from "game";
 // Local level
-import { GameId, GameRecord } from "./types";
-
-interface PersistedGame {
-  info: GameRecord;
-  snapshot: Snapshot<unknown>;
-}
+import { GameId, PersistedGame } from "./types";
 
 const persistencePath = process.env["GAME_PERSISTENCE_FILE_PATH"];
 
