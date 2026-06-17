@@ -4,7 +4,6 @@ export * from "./emitters";
 export * from "./events";
 export * from "./gameMachine";
 export * from "./guards";
-export * from "./instance";
 export * from "./mappers";
 export * from "./states";
 export * from "./targets";
