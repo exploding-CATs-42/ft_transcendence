@@ -1,9 +1,9 @@
 // Project level
 import { ApiError } from "errors";
 import { MyProfileUser } from "types";
-import cloudinary from "../lib/cloudinary/cloudinary";
-import { prisma, selfProfileSelect } from "../lib/prisma";
-import { comparePassword, hashPassword } from "../utils/hash";
+import cloudinary from "lib/cloudinary/cloudinary";
+import { prisma, selfProfileSelect } from "lib/prisma";
+import { comparePassword, hashPassword } from "utils";
 import { toMyProfileUser, toSelfProfileUser } from "mappers";
 // Local level
 import { getFinishedGamesStats } from "./usersService";
