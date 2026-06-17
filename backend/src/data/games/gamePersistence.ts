@@ -1,9 +1,6 @@
 // Libraries
 import fs from "node:fs/promises";
 import path from "path";
-// Project level
-import { createGameInstance } from "game";
-import { attachGameBroadcaster } from "sockets";
 // Local level
 import { PersistedGame } from "./types";
 import { toPersistedGame } from "./mappers";
@@ -23,7 +20,6 @@ let initialized = false;
 export function initGamePersistence() {
   if (initialized) return;
 
-  loadGames();
   const saver = createSaveLoop();
   setupSignalHandlers(() => {
     shutdown(saver.stop);
@@ -44,32 +40,25 @@ export async function ensurePersistenceDir() {
   }
 }
 
-export async function loadGames(): Promise<void> {
+export async function loadGames(): Promise<PersistedGame[]> {
+  let persistedGames: PersistedGame[];
   try {
     await ensurePersistenceDir();
 
     const raw = await fs.readFile(FILE_PATH, "utf8");
-
     if (!raw.trim()) {
       console.log("Persistence file is empty");
-      return;
+      return [];
     }
 
-    const persistedGames: PersistedGame[] = JSON.parse(raw);
-
-    for (const persistedGame of persistedGames) {
-      const { snapshot, metadata } = persistedGame;
-
-      const instance = createGameInstance(snapshot);
-      attachGameBroadcaster({ instance, ...metadata });
-      instance.start();
-      GameStore.addGame({ instance, ...metadata });
-    }
-
+    persistedGames = JSON.parse(raw);
     console.log(`Loaded ${persistedGames.length} games`);
   } catch (error) {
     console.error("Failed to load games", error);
+    persistedGames = [];
   }
+
+  return persistedGames;
 }
 
 export async function saveGames(): Promise<void> {
