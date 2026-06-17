@@ -19,6 +19,7 @@ export default defineConfig({
       controllers: resolve(__dirname, "./src/controllers"),
       data: resolve(__dirname, "./src/data"),
       sockets: resolve(__dirname, "./src/sockets"),
+      mappers: resolve(__dirname, "./src/mappers"),
       generated: resolve(__dirname, "./src/generated"),
     },
   },

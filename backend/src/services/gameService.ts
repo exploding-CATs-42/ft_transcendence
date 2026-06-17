@@ -9,13 +9,14 @@ import {
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
-import { GameEvents, toWaitingPlayerView, createGameInstance } from "game";
+import { GameEvents, createGameInstance } from "game";
 import { Game, GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
 import { GameRepository, toGameRecord } from "data";
 import { attachGameBroadcaster } from "sockets";
+import { toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
 
