@@ -3,9 +3,10 @@ import { createActor } from "xstate";
 import fs from "node:fs/promises";
 import path from "path";
 // Project level
-import { gameMachine, GameInstance, attachBroadcaster } from "game";
+import { gameMachine, attachBroadcaster } from "game";
 // Local level
-import { GameId, PersistedGame } from "./types";
+import { Game, GameId, PersistedGame } from "./types";
+import { toPersistedGame } from "./mappers";
 
 const persistencePath = process.env["GAME_PERSISTENCE_FILE_PATH"];
 
@@ -28,9 +29,7 @@ export async function ensurePersistenceDir() {
   }
 }
 
-export async function loadGames(
-  games: Map<GameId, GameInstance>,
-): Promise<void> {
+export async function loadGames(games: Map<GameId, Game>): Promise<void> {
   try {
     await ensurePersistenceDir();
 
@@ -47,7 +46,7 @@ export async function loadGames(
       const actor = createActor(gameMachine, { snapshot });
       attachBroadcaster(metadata.id, actor);
       actor.start();
-      games.set(metadata.id, { info: metadata, actor });
+      games.set(metadata.id, { instance: actor, ...metadata });
     }
 
     console.log(`Loaded ${persistedGames.length} games`);
@@ -56,19 +55,16 @@ export async function loadGames(
   }
 }
 
-export async function saveGames(
-  games: Map<GameId, GameInstance>,
-): Promise<void> {
+export async function saveGames(games: Map<GameId, Game>): Promise<void> {
   try {
     if (!games) {
       throw new Error("saveGames called with undefined games");
     }
     await ensurePersistenceDir();
 
-    const persistedGames: PersistedGame[] = [...games.values()].map((game) => ({
-      metadata: game.info,
-      snapshot: game.actor.getPersistedSnapshot(),
-    }));
+    const persistedGames: PersistedGame[] = [...games.values()].map((game) =>
+      toPersistedGame(game),
+    );
 
     const data = JSON.stringify(persistedGames, null, 2);
     const tempFilePath = `${FILE_PATH}.tmp`;
@@ -80,7 +76,7 @@ export async function saveGames(
   }
 }
 
-export function createSaveLoop(games: Map<GameId, GameInstance>) {
+export function createSaveLoop(games: Map<GameId, Game>) {
   let timeout: ReturnType<typeof setTimeout>;
   let stopped = false;
 
@@ -108,10 +104,7 @@ export function setupSignalHandlers(handler: () => void): void {
   process.on("SIGTERM", handler);
 }
 
-export async function shutdown(
-  games: Map<GameId, GameInstance>,
-  stop: () => void,
-) {
+export async function shutdown(games: Map<GameId, Game>, stop: () => void) {
   console.log("Shutdown detected");
 
   stop();
