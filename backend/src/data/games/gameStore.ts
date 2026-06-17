@@ -1,3 +1,5 @@
+// Project level
+import { getGameContext } from "game/utils";
 // Local level
 import { Game, GameId } from "./types";
 
@@ -12,10 +14,9 @@ export function getAllGames(): Game[] {
 }
 
 export function findCurrentGameByUserId(userId: string): Game | undefined {
-  return Array.from(games.values()).find((game) => {
-    const snapshot = game.instance.getSnapshot();
-
-    return snapshot.context.players.some((player) => {
+  return [...games.values()].find((game) => {
+    const players = getGameContext(game.instance).players;
+    return players.some((player) => {
       return player.id === userId;
     });
   });
