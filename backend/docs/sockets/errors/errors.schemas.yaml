@@ -1,0 +1,18 @@
+components:
+  schemas:
+    SocketErrorPayload:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          description: Human-readable error message.
+          example: "Game not found"
+        errors:
+          description: >
+            Optional structured details (e.g. Zod validation issues). Present
+            for validation errors, otherwise omitted.
+          example:
+            - path: "gameId"
+              message: "Invalid uuid"

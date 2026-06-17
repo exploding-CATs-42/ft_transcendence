@@ -1,0 +1,99 @@
+channels:
+  joinGameError:
+    address: join-game-error
+    title: Join game error
+    messages:
+      socketError:
+        name: JoinGameError
+        title: Join game error
+        summary: Sent to the acting socket when join-game fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+        examples:
+          - name: validationError
+            payload:
+              message: "Validation failed"
+              errors:
+                - path: "gameId"
+                  message: "Invalid uuid"
+          - name: genericError
+            payload:
+              message: "Game not found"
+
+  leaveGameError:
+    address: leave-game-error
+    title: Leave game error
+    messages:
+      socketError:
+        name: LeaveGameError
+        title: Leave game error
+        summary: Sent to the acting socket when leave-game fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  confirmStartError:
+    address: confirm-start-error
+    title: Confirm start error
+    messages:
+      socketError:
+        name: ConfirmStartError
+        title: Confirm start error
+        summary: Sent to the acting socket when confirm-start fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  cancelStartError:
+    address: cancel-start-error
+    title: Cancel start error
+    messages:
+      socketError:
+        name: CancelStartError
+        title: Cancel start error
+        summary: Sent to the acting socket when cancel-start fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+operations:
+  sendJoinGameError:
+    action: send
+    channel:
+      $ref: "#/channels/joinGameError"
+    summary: Emitted to the acting socket when join-game fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/joinGameError/messages/socketError"
+
+  sendLeaveGameError:
+    action: send
+    channel:
+      $ref: "#/channels/leaveGameError"
+    summary: Emitted to the acting socket when leave-game fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/leaveGameError/messages/socketError"
+
+  sendConfirmStartError:
+    action: send
+    channel:
+      $ref: "#/channels/confirmStartError"
+    summary: Emitted to the acting socket when confirm-start fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/confirmStartError/messages/socketError"
+
+  sendCancelStartError:
+    action: send
+    channel:
+      $ref: "#/channels/cancelStartError"
+    summary: Emitted to the acting socket when cancel-start fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/cancelStartError/messages/socketError"
