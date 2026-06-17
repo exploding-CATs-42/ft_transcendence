@@ -25,6 +25,7 @@
     "xstate-helper": "tsx scripts/xstate-helper.ts"
   },
   "dependencies": {
+    "@apidevtools/json-schema-ref-parser": "^14.0.1",
     "@apidevtools/swagger-parser": "^12.1.0",
     "@exploding-cats/shared-schemas": "workspace:*",
     "@exploding-cats/shared-types": "workspace:*",

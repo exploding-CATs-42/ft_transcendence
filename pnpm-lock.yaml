@@ -10,6 +10,9 @@ importers:
 
   backend:
     dependencies:
+      '@apidevtools/json-schema-ref-parser':
+        specifier: ^14.0.1
+        version: 14.0.1
       '@apidevtools/swagger-parser':
         specifier: ^12.1.0
         version: 12.1.0(openapi-types@12.1.3)
