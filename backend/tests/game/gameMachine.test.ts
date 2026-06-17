@@ -98,16 +98,20 @@ describe("game machine", () => {
     const deck = snapshot.context.deck;
     const players = snapshot.context.players;
 
-    const { dealtCardsPerPlayer, defusesDealtPerPlayer } = DEFAULT_GAME_RULES;
-    const CARDS_DEALT_PER_PLAYER = dealtCardsPerPlayer + defusesDealtPerPlayer;
-    const CARDS_DEALT = players.length * CARDS_DEALT_PER_PLAYER;
-    const EXPLODING_KITTENS_INSERTED_BACK = players.length - 1;
+    const { dealtCardsPerPlayer } = DEFAULT_GAME_RULES;
+    const REGULAR_CARDS_DEALT = players.length * dealtCardsPerPlayer;
     const ALL_EXPLODING_KITTENS = 4;
+    const ALL_DEFUSES = 6;
+    const EXPLODING_KITTENS_INSERTED_BACK = players.length - 1;
+    const DEFUSES_INSERTED_BACK = players.length < 5 ? 2 : 1;
+    // prettier-ignore
     const finalDeckSize =
-      DECK_SIZE -
-      CARDS_DEALT -
-      ALL_EXPLODING_KITTENS +
-      EXPLODING_KITTENS_INSERTED_BACK;
+      DECK_SIZE
+        - REGULAR_CARDS_DEALT
+        - ALL_EXPLODING_KITTENS
+        - ALL_DEFUSES
+        + EXPLODING_KITTENS_INSERTED_BACK
+        + DEFUSES_INSERTED_BACK;
 
     expect(deck.length).toBe(finalDeckSize);
   });

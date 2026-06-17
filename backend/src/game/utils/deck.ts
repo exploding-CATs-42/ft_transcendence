@@ -74,9 +74,10 @@ export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
     player.hand = [...regularCards, ...defuseCards];
   });
 
-  // Insert enough exploding kittens and the rest of the defuses back to the deck
+  // Insert enough exploding kittens and defuses back into the deck
   const kittensToInsert = draw(explodingKittens, players.length - 1)!;
-  const finalDeck = [...mainDeck, ...defuses, ...kittensToInsert];
+  const defusesToInsert = draw(defuses, Math.min(defuses.length, 2))!;
+  const finalDeck = [...mainDeck, ...defusesToInsert, ...kittensToInsert];
 
   // and shuffle it again to distribute the kittens inside the deck
   shuffleDeck(finalDeck);
