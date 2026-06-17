@@ -3,7 +3,8 @@ import { createActor } from "xstate";
 import fs from "node:fs/promises";
 import path from "path";
 // Project level
-import { gameMachine, attachBroadcaster } from "game";
+import { gameMachine } from "game";
+import { attachBroadcaster } from "sockets";
 // Local level
 import { Game, GameId, PersistedGame } from "./types";
 import { toPersistedGame } from "./mappers";

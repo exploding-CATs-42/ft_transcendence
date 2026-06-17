@@ -37,6 +37,8 @@
       "controllers/*": ["./src/controllers/*"],
       "data": ["./src/data/index"],
       "data/*": ["./src/data/*"],
+      "sockets": ["./src/sockets/index"],
+      "sockets/*": ["./src/sockets/*"],
       "generated/*": ["./src/generated/*"]
     }
   },
