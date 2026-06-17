@@ -14,13 +14,13 @@ import { Game, GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/shared-types";
-import { GameStore, toGameRecord } from "data";
+import { GameRepository, toGameRecord } from "data";
 import { attachGameBroadcaster } from "sockets";
 // Local level
 import { ensureUserExists } from "./usersService";
 
 function ensureGameExists(gameId: string) {
-  const game = GameStore.getGame(gameId);
+  const game = GameRepository.getGame(gameId);
 
   if (!game) {
     throw new ApiError("Game not found", 404);
@@ -32,7 +32,7 @@ function ensureGameExists(gameId: string) {
 export async function getGames(userId: UserId): Promise<GameRecord[]> {
   await ensureUserExists(userId);
 
-  return GameStore.getAllGames().map((game) => {
+  return GameRepository.getAllGames().map((game) => {
     return toGameRecord(game);
   });
 }
@@ -51,7 +51,7 @@ export async function getCurrentGame(
 ): Promise<GameRecord | null> {
   await ensureUserExists(userId);
 
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
+  const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
   if (!currentGame) {
     return null;
@@ -66,7 +66,7 @@ export async function createGame(
 ): Promise<GameRecord> {
   const user = await ensureUserExists(userId);
 
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
+  const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
   if (currentGame) {
     throw new ApiError("Player already has an active or waiting game", 409, {
@@ -101,7 +101,7 @@ export async function createGame(
     player,
   });
 
-  GameStore.addGame(game);
+  GameRepository.addGame(game);
   return toGameRecord(game);
 }
 
@@ -109,7 +109,7 @@ export async function deleteGame(userId: UserId, input: DeleteGameParams) {
   await ensureUserExists(userId);
   ensureGameExists(input.gameId);
 
-  GameStore.deleteGameById(input.gameId);
+  GameRepository.deleteGameById(input.gameId);
 }
 
 export async function joinGame(
@@ -138,7 +138,7 @@ export async function joinGame(
     };
   }
 
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
+  const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
   if (currentGame && currentGame.id !== input.gameId) {
     throw new SocketError("Player already has an active or waiting game", {
@@ -195,7 +195,7 @@ export async function leaveGame(
   });
 
   if (isLastPlayer) {
-    GameStore.deleteGameById(input.gameId);
+    GameRepository.deleteGameById(input.gameId);
     return { playerId: "" };
   }
 
