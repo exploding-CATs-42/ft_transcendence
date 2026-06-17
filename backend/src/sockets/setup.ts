@@ -4,8 +4,7 @@ import { Server, Socket } from "socket.io";
 import { socketAuthMiddleware } from "middlewares";
 import { setIoForBroadcaster } from "game";
 // Local level
-import { lobbyGameHandlers } from "./game";
-import { registerChatHandlers } from "./chat";
+import { registerChatHandlers, lobbyGameHandlers } from "./listeners";
 
 export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);
