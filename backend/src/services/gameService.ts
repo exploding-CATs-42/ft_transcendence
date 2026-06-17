@@ -1,5 +1,3 @@
-// Libraries
-import { createActor } from "xstate";
 // Project level
 import { ApiError, SocketError } from "errors";
 import {
@@ -11,7 +9,7 @@ import {
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
-import { GameEvents, gameMachine, toWaitingPlayerView } from "game";
+import { GameEvents, toWaitingPlayerView, createGameInstance } from "game";
 import { Game, GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
@@ -76,7 +74,7 @@ export async function createGame(
     });
   }
 
-  const instance = createActor(gameMachine);
+  const instance = createGameInstance();
 
   const game: Game = {
     id: crypto.randomUUID(),
