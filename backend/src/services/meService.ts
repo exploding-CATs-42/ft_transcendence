@@ -148,7 +148,7 @@ export async function updateMeAvatar(
     throw new ApiError("Invalid file", 404);
   }
 
-  const result = await cloudinary.uploadImage(file.path);
+  const result = await cloudinary.uploadImage(file);
 
   const updatedUser = await prisma.user.update({
     where: { id: userId },
