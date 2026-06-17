@@ -32,14 +32,6 @@ export function initGamePersistence() {
   initialized = true;
 }
 
-export function assertInitialized() {
-  if (!initialized) {
-    throw new Error(
-      "Game store not initialized. Call initGamePersistence() first.",
-    );
-  }
-}
-
 export async function ensurePersistenceDir() {
   const dir = path.dirname(FILE_PATH);
 

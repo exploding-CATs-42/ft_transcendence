@@ -1,22 +1,17 @@
 // Local level
 import { Game, GameId } from "./types";
-import { assertInitialized } from "./gamePersistence";
 
 const games = new Map<GameId, Game>();
 
 export function getGame(gameId: GameId): Game | undefined {
-  assertInitialized();
   return games.get(gameId);
 }
 
 export function getAllGames(): Game[] {
-  assertInitialized();
   return Array.from(games.values());
 }
 
 export function findCurrentGameByUserId(userId: string): Game | undefined {
-  assertInitialized();
-
   return Array.from(games.values()).find((game) => {
     const snapshot = game.instance.getSnapshot();
 
@@ -27,12 +22,10 @@ export function findCurrentGameByUserId(userId: string): Game | undefined {
 }
 
 export function addGame(game: Game): void {
-  assertInitialized();
   games.set(game.id, game);
 }
 
 export function deleteGameById(gameId: string): void {
-  assertInitialized();
   games.delete(gameId);
 }
 
