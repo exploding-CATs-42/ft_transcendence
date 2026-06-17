@@ -45,7 +45,7 @@ export async function loadGames(games: Map<GameId, Game>): Promise<void> {
 
     for (const { metadata, snapshot } of persistedGames) {
       const actor = createActor(gameMachine, { snapshot });
-      attachGameBroadcaster(metadata.id, actor);
+      attachGameBroadcaster({ instance: actor, ...metadata });
       actor.start();
       games.set(metadata.id, { instance: actor, ...metadata });
     }
