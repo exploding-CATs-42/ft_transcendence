@@ -4,7 +4,8 @@ import fs from "node:fs/promises";
 import path from "path";
 // Project level
 import { gameMachine, GameInstance, GameInfo, attachBroadcaster } from "game";
-import { GameId } from "game/types";
+// Local level
+import { GameId } from "./types";
 
 interface PersistedGame {
   info: GameInfo;
