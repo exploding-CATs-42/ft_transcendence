@@ -22,6 +22,8 @@ import {
   ServerPublicEvents,
   WaitingStatePayload,
 } from "@exploding-cats/shared-types";
+// Local level
+import { socketsMap } from "../socketsMap";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(
@@ -37,6 +39,7 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
         );
         const room = parsed.gameId;
         await socket.join(room);
+        socketsMap.set(player.id, socket);
 
         const privatePayload: WaitingStatePayload = { waitingState };
         const publicPayload: PlayerJoinedPayload = { player };
