@@ -14,7 +14,7 @@ import type {
   MyProfileUser,
 } from "./types";
 import s from "./ProfilePage.module.css";
-import type { UserGameHistoryItem } from "components/MatchListItem/types";
+import type { UserGameHistoryItem } from "components/GameListItem/types";
 import { buildStats } from "./utils/buildStats";
 import LoadingScreen from "components/LoadingScreen/LoadingScreen";
 
@@ -23,7 +23,7 @@ const ProfilePage = () => {
 
   const [user, setUser] = useState<ProfileUser | MyProfileUser | null>(null);
   const [friends, setFriends] = useState<FriendItem[]>([]);
-  const [matches, setMatches] = useState<UserGameHistoryItem[]>([]);
+  const [games, setGames] = useState<UserGameHistoryItem[]>([]);
   const [stats, setStats] = useState<ProfileStat[]>([]);
 
   const { userId } = useParams();
@@ -66,21 +66,21 @@ const ProfilePage = () => {
 
     async function loadProfile() {
       try {
-        const [userData, friendsData, matchesData] = await Promise.all([
+        const [userData, friendsData, gamesData] = await Promise.all([
           getUserData(),
           getUserFriends(),
           getUserGames(),
         ]);
 
-        if (!userData || !friendsData || !matchesData) {
+        if (!userData || !friendsData || !gamesData) {
           throw new Error("Invalid request");
         }
 
         setUser(userData);
         setFriends(friendsData);
-        setMatches(matchesData);
+        setGames(gamesData);
 
-        setStats(buildStats(userData.id, matchesData));
+        setStats(buildStats(userData.id, gamesData));
       } catch (error) {
         const errorMessage = getErrorMessage(error);
         setUser(null);
@@ -128,7 +128,7 @@ const ProfilePage = () => {
         <StatsSection stats={stats} />
       </div>
 
-      <ListSection matches={matches} friends={friends} />
+      <ListSection games={games} friends={friends} />
     </div>
   );
 };

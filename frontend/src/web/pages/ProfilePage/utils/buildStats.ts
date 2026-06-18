@@ -1,19 +1,19 @@
-import type { UserGameHistoryItem } from "components/MatchListItem/types";
+import type { UserGameHistoryItem } from "components/GameListItem/types";
 import type { ProfileStat } from "../types";
 import type { UserId } from "../types/ProfileUser";
 
 export function buildStats(
   userId: UserId,
-  matches: UserGameHistoryItem[],
+  games: UserGameHistoryItem[],
 ): ProfileStat[] {
-  const totalMatches = matches.length;
+  const totalGames = games.length;
 
-  const gamesWon = matches.filter((m) => m.winnerId === userId).length;
+  const gamesWon = games.filter((m) => m.winnerId === userId).length;
 
-  const explodedTimes = totalMatches - gamesWon;
+  const explodedTimes = totalGames - gamesWon;
 
   const successRate =
-    totalMatches === 0 ? 0 : Math.round((gamesWon / totalMatches) * 100);
+    totalGames === 0 ? 0 : Math.round((gamesWon / totalGames) * 100);
 
   return [
     {
@@ -32,7 +32,7 @@ export function buildStats(
       id: 2,
       icon: "gamepad",
       name: "Games played",
-      amount: totalMatches,
+      amount: totalGames,
     },
     {
       id: 3,

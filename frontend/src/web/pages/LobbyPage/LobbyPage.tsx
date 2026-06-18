@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import api from "api";
-import { Section, Button, List, MatchListItem } from "components";
+import { Section, Button, List, GameListItem } from "components";
 import { useModal } from "hooks";
-import type { LobbyMatch } from "types";
+import type { LobbyGame } from "types";
 import {
   CreateTableModal,
   type CreateTableFormValues,
@@ -42,7 +42,7 @@ const getExistingGameIdFromError = (error: unknown) => {
 };
 
 const LobbyPage = () => {
-  const [matches, setMatches] = useState<LobbyMatch[]>([]);
+  const [games, setGames] = useState<LobbyGame[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
@@ -59,7 +59,7 @@ const LobbyPage = () => {
 
         if (ignore) return;
 
-        setMatches(
+        setGames(
           games.map((game) => ({
             gameId: game.id,
             gameName: game.name,
@@ -141,13 +141,13 @@ const LobbyPage = () => {
         maxPlayers,
       });
 
-      const newMatch: LobbyMatch = {
+      const newGame: LobbyGame = {
         gameId: createdGame.id,
         gameName: createdGame.name,
         players: [],
       };
 
-      setMatches((prevMatches) => [newMatch, ...prevMatches]);
+      setGames((prevGames) => [newGame, ...prevGames]);
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);
 
@@ -170,15 +170,15 @@ const LobbyPage = () => {
     <div className={s.pageContainer}>
       <Section className={s.listSection}>
         <List
-          items={matches}
-          getKey={(match) => match.gameId}
-          renderItem={(match) => (
+          items={games}
+          getKey={(game) => game.gameId}
+          renderItem={(game) => (
             <button
               type="button"
-              className={s.matchButton}
-              onClick={() => handleOpenJoinModalWithGameId(match.gameId)}
+              className={s.gameButton}
+              onClick={() => handleOpenJoinModalWithGameId(game.gameId)}
             >
-              <MatchListItem match={match} />
+              <GameListItem game={game} />
             </button>
           )}
           className={s.list}

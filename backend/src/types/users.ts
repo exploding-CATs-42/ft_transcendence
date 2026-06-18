@@ -1,5 +1,5 @@
 export interface GameStats {
-  totalMatches: number;
+  totalGames: number;
   wins: number;
 }
 

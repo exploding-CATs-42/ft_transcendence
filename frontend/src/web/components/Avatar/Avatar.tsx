@@ -5,14 +5,14 @@ import { Avatar as placeholder } from "assets";
 // Local level
 import s from "./Avatar.module.css";
 
-type Variant = "profile" | "settings" | "badge" | "friend" | "match";
+type Variant = "profile" | "settings" | "badge" | "friend" | "game";
 
 const variantClass: Record<Variant, string> = {
   profile: s.avatarProfile,
   settings: s.avatarSettings,
   badge: s.avatarBadge,
   friend: s.avatarFriend,
-  match: s.avatarMatch,
+  game: s.avatarGame,
 };
 
 interface Props {

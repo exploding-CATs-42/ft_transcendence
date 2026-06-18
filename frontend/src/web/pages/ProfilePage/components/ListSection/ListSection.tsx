@@ -1,27 +1,27 @@
 // Libraries
 import { useState } from "react";
 //Project level
-import { Button, List, MatchListItem, SearchInput, Section } from "components";
+import { Button, List, GameListItem, SearchInput, Section } from "components";
 // Local level
 import { FriendListItem, Tabs } from "../../components";
 import type { TabOption, FriendItem } from "../../types";
 import s from "./ListSection.module.css";
-import type { UserGameHistoryItem } from "components/MatchListItem/types";
+import type { UserGameHistoryItem } from "components/GameListItem/types";
 
 interface Props {
-  matches: UserGameHistoryItem[];
+  games: UserGameHistoryItem[];
   friends: FriendItem[];
 }
 
-export type ActiveTab = "matches" | "friends";
+export type ActiveTab = "games" | "friends";
 
 const tabs: TabOption[] = [
-  { key: "matches", label: "Last matches" },
+  { key: "games", label: "Last games" },
   { key: "friends", label: "Friends" },
 ];
 
-const ListSection = ({ matches, friends }: Props) => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("matches");
+const ListSection = ({ games, friends }: Props) => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>("games");
 
   const sortedFriends = [...friends].sort((a, b) => {
     const statusOrder = {
@@ -60,11 +60,11 @@ const ListSection = ({ matches, friends }: Props) => {
         </>
       ) : (
         <List
-          items={matches}
-          getKey={(match) => match.gameId}
-          renderItem={(match) => <MatchListItem match={match} />}
+          items={games}
+          getKey={(game) => game.gameId}
+          renderItem={(game) => <GameListItem game={game} />}
           className={s.list}
-          empty="No matches yet"
+          empty="No games yet"
         />
       )}
     </Section>
