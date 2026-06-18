@@ -52,8 +52,8 @@
 }
 
 .manageLobbyButton {
-  width: 34px;
-  height: 34px;
+  width: 38px;
+  height: 38px;
 
   flex-shrink: 0;
 
@@ -61,17 +61,36 @@
   align-items: center;
   justify-content: center;
 
-  border: none;
+  border: 1px solid rgba(var(--off-white-rgb), 0.45);
   border-radius: 50%;
 
   background-color: var(--exploding-kittens);
 
+  box-shadow:
+    0 3px 0 var(--exploding-kittens-hover),
+    0 4px 8px rgba(var(--black-rgb), 0.35);
+
   cursor: pointer;
+
+  transition:
+    background-color 0.15s ease,
+    transform 0.15s ease,
+    box-shadow 0.15s ease;
 }
 
 .manageLobbyButton:hover,
 .manageLobbyButton:focus {
-  filter: brightness(0.9);
+  background-color: var(--exploding-kittens-hover);
+  transform: translateY(1px);
+
+  box-shadow:
+    0 2px 0 var(--exploding-kittens-hover),
+    0 3px 6px rgba(var(--black-rgb), 0.4);
+}
+
+.manageLobbyButton:active {
+  transform: translateY(3px);
+  box-shadow: none;
 }
 
 .trashIcon {
@@ -116,8 +135,8 @@
   }
 
   .manageLobbyButton {
-    width: 44px;
-    height: 44px;
+    width: 46px;
+    height: 46px;
   }
 
   .item[data-placeholder="true"] {
