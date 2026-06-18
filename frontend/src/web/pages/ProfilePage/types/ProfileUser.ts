@@ -1,7 +1,7 @@
 export type UserId = string;
 
 export interface GameStats {
-  totalMatches: number;
+  totalGames: number;
   wins: number;
 }
 

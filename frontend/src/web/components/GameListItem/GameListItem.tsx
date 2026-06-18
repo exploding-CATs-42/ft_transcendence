@@ -1,24 +1,24 @@
 // Project level
 import { Avatar, LinkButton, ListItem } from "components";
 // Local level
-import { createMatchSlots, isPlaceholderSlot } from "./slots";
-import type { LobbyMatch, MatchSlot } from "./types";
-import s from "./MatchListItem.module.css";
+import { createGameSlots, isPlaceholderSlot } from "./slots";
+import type { LobbyGame, GameSlot } from "./types";
+import s from "./GameListItem.module.css";
 
 interface Props {
-  match: LobbyMatch;
+  game: LobbyGame;
 }
 
-const MatchListItem = ({ match }: Props) => {
-  const slots: MatchSlot[] = createMatchSlots(match.players);
+const GameListItem = ({ game }: Props) => {
+  const slots: GameSlot[] = createGameSlots(game.players);
 
   return (
     <ListItem>
       <div className={s.container}>
-        <span className={s.title}>{match.gameName}</span>
+        <span className={s.title}>{game.gameName}</span>
         <ul className={s.items}>
           {slots.map((slot, index) =>
-            renderSlot(slot, `${match.gameId}_${index}`),
+            renderSlot(slot, `${game.gameId}_${index}`),
           )}
         </ul>
       </div>
@@ -26,7 +26,7 @@ const MatchListItem = ({ match }: Props) => {
   );
 };
 
-const renderSlot = (slot: MatchSlot, key: string) => {
+const renderSlot = (slot: GameSlot, key: string) => {
   const isPlaceholder = isPlaceholderSlot(slot);
 
   const item = (
@@ -34,7 +34,7 @@ const renderSlot = (slot: MatchSlot, key: string) => {
       {!isPlaceholder && (
         <Avatar
           className={s.avatar}
-          variant="match"
+          variant="game"
           src={slot.player.avatarUrl}
         />
       )}
@@ -50,4 +50,4 @@ const renderSlot = (slot: MatchSlot, key: string) => {
   );
 };
 
-export default MatchListItem;
+export default GameListItem;

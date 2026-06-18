@@ -44,13 +44,13 @@ export function toProfileUserWithStats(
     lastSeenAt: Date | null;
   },
   stats: {
-    totalMatches: number;
+    totalGames: number;
     wins: number;
   },
 ) {
   return {
     ...user,
-    totalMatches: stats.totalMatches,
+    totalGames: stats.totalGames,
     wins: stats.wins,
   };
 }
@@ -58,13 +58,13 @@ export function toProfileUserWithStats(
 export function toMyProfileUser(
   user: MyProfileUser,
   stats: {
-    totalMatches: number;
+    totalGames: number;
     wins: number;
   },
 ) {
   return {
     ...user,
-    totalMatches: stats.totalMatches,
+    totalGames: stats.totalGames,
     wins: stats.wins,
   };
 }

@@ -1,5 +1,5 @@
 import { api } from "../axios";
-import type { UserGameHistoryItem } from "components/MatchListItem/types";
+import type { UserGameHistoryItem } from "components/GameListItem/types";
 import type { ProfileUser, UserId } from "pages/ProfilePage/types/ProfileUser";
 
 const getUserGames = async (userId: UserId): Promise<UserGameHistoryItem[]> => {

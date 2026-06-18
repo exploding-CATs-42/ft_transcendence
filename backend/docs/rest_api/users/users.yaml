@@ -247,7 +247,7 @@ paths:
       tags:
         - Users
       summary: Get public user profile
-      description: Returns public profile information for a user together with basic finished-match statistics.
+      description: Returns public profile information for a user together with basic finished-game statistics.
       operationId: getUserById
       parameters:
         - name: userId
@@ -292,7 +292,7 @@ paths:
       tags:
         - Users
       summary: Get user game history
-      description: Returns finished matches for a user.
+      description: Returns finished games for a user.
       operationId: getUserGames
       parameters:
         - name: userId

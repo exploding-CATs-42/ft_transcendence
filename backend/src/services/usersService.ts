@@ -13,10 +13,10 @@ export class UsersServiceError extends Error {
 }
 
 export async function getFinishedGamesStats(userId: string): Promise<{
-  totalMatches: number;
+  totalGames: number;
   wins: number;
 }> {
-  const [totalMatches, wins] = await Promise.all([
+  const [totalGames, wins] = await Promise.all([
     prisma.userGame.count({
       where: {
         userId,
@@ -38,7 +38,7 @@ export async function getFinishedGamesStats(userId: string): Promise<{
   ]);
 
   return {
-    totalMatches,
+    totalGames,
     wins,
   };
 }
