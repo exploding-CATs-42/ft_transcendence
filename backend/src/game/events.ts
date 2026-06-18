@@ -1,4 +1,5 @@
 import { Player } from "./types";
+import { Hand } from "./eventPayloads";
 
 // Events sent TO the machine
 export const GameEvents = {
@@ -21,6 +22,7 @@ export const GameOutEvents = {
   GAME_STARTED: "GAME_STARTED",
   COUNTDOWN_STARTED: "COUNTDOWN_STARTED",
   COUNTDOWN_CANCELED: "COUNTDOWN_CANCELED",
+  CARDS_DEALT: "CARDS_DEALT",
 } as const;
 
 export type GameOutEvents = (typeof GameOutEvents)[keyof typeof GameOutEvents];
@@ -28,4 +30,5 @@ export type GameOutEvents = (typeof GameOutEvents)[keyof typeof GameOutEvents];
 export type GameOutEvent =
   | { type: typeof GameOutEvents.GAME_STARTED }
   | { type: typeof GameOutEvents.COUNTDOWN_STARTED; endsAt: number }
-  | { type: typeof GameOutEvents.COUNTDOWN_CANCELED };
+  | { type: typeof GameOutEvents.COUNTDOWN_CANCELED }
+  | { type: typeof GameOutEvents.CARDS_DEALT; payload: Hand[] };
