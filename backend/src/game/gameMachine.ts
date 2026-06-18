@@ -14,7 +14,12 @@ import {
 import { Player, Deck } from "./types";
 import { GameEvent, GameEvents, GameOutEvent } from "./events";
 import { GameGuards, hasEnoughPlayers } from "./guards";
-import { countdownCanceled, countdownStarted, gameStarted } from "./emitters";
+import {
+  cardsDealt,
+  countdownCanceled,
+  countdownStarted,
+  gameStarted,
+} from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
 
@@ -103,7 +108,11 @@ export const gameMachine = setup({
       initial: GameStates.DEALING_CARDS,
       states: {
         [GameStates.DEALING_CARDS]: {
-          entry: [GameActions.FILL_DECK, GameActions.DEAL_CARDS],
+          entry: [
+            GameActions.FILL_DECK,
+            GameActions.DEAL_CARDS,
+            emit(cardsDealt),
+          ],
         },
       },
     },
