@@ -62,7 +62,7 @@ export async function getPublicUserById(
 export async function ensureUserExists(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, username: true },
+    select: { id: true, username: true, avatarUrl: true },
   });
 
   if (!user) {
