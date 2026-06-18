@@ -1,6 +1,13 @@
 // Local level
 import { START_GAME_COUNTDOWN_MS } from "./constants";
-import { GameOutEvent, GameOutEvents } from "./events";
+import { GameEvent, GameOutEvent, GameOutEvents } from "./events";
+import { Hand } from "./eventPayloads";
+import { GameContext } from "./gameMachine";
+
+type GameEmitterArgs = {
+  context: GameContext;
+  event: GameEvent;
+};
 
 export const countdownStarted = (): GameOutEvent => ({
   type: GameOutEvents.COUNTDOWN_STARTED,
@@ -14,6 +21,15 @@ export const countdownCanceled = (): GameOutEvent => ({
 export const gameStarted = (): GameOutEvent => ({
   type: GameOutEvents.GAME_STARTED,
 });
+
+export const cardsDealt = ({ context }: GameEmitterArgs): GameOutEvent => {
+  const payload: Hand[] = context.players.map((player) => ({
+    playerId: player.id,
+    cards: player.hand,
+  }));
+
+  return { type: GameOutEvents.CARDS_DEALT, payload };
+};
 
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
