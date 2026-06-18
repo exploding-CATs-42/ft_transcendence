@@ -1,5 +1,5 @@
 import type { WaitingPlayerView, WaitingStateView } from "./views";
-import { Card } from "../game";
+import type { Card } from "../game";
 
 export interface PlayerIdPayload {
   playerId: string;

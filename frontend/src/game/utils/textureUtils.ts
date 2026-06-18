@@ -107,3 +107,9 @@ export const getRoundedAvatarTexture = (scene: Phaser.Scene) => {
 
   return textureKey;
 };
+
+export const getCardFrame = (scene: Phaser.Scene, frameIndex: number) => {
+  const cardSpreadsheet = scene.textures.get(Textures.cards);
+  const frame = cardSpreadsheet.get(frameIndex);
+  return frame;
+};

@@ -7,12 +7,14 @@ import {
   SCREEN_WIDTH,
   GAME_ROOM_SEATS,
   Textures,
+  CARD_TYPE_TO_FRAME as CARD_TYPE_TO_FRAME_INDEX,
 } from "game/constants";
 import {
   EventBus,
   addBackgroundImage,
   addCardVisual,
   addFullscreenToggle,
+  getCardFrame,
 } from "game/utils";
 import {
   GraphicPlayer,
@@ -227,7 +229,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         // then destroy it
         faceDownCard.destroy();
         // and spawn the real card into player's hand
-        this.#myHand.addCard(insertIndex);
+        const frame = getCardFrame(this, 0);
+        this.#myHand.addCard(frame, insertIndex);
       },
     });
   };
@@ -244,7 +247,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onCardsDealt(hand: Hand): void {
     hand.cards.forEach((card) => {
-      const graphicCard = this.#myHand.addCard(card);
+      console.log(card);
+      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
+      const frame = getCardFrame(this, frameIndex);
+      this.#myHand.addCard(frame);
     });
   }
 

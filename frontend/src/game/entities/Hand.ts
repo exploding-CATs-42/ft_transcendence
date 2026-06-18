@@ -1,5 +1,5 @@
 import type { CardConfig, Point, SpacingConfig } from "game/@types";
-import { SCREEN_HEIGHT, Textures } from "game/constants";
+import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
 
 const CARD_WIDTH = 186;
@@ -33,21 +33,16 @@ export class Hand {
     this.#scene = scene;
     this.#position = position;
     this.#onCardDropCallback = onCardDropCallback;
-
-    for (let i = 0; i < 8; ++i) {
-      this.addCard();
-    }
   }
 
   // -------------- Public API --------------
 
-  addCard(insertIndex = -1) {
+  addCard(frame: Phaser.Textures.Frame, insertIndex = -1) {
     if (insertIndex === -1)
       insertIndex = Phaser.Math.Between(0, this.#cards.length);
 
     this.adjustDepthsForInsertion(insertIndex);
 
-    const frame = this.getRandomCardFrame();
     const x = this.getInsertPositionX(insertIndex);
     const y = SCREEN_HEIGHT;
     const newCard = this.addInteractiveCard(x, y, frame);
@@ -267,14 +262,6 @@ export class Hand {
   }
 
   // -------------- Utils --------------
-
-  private getRandomCardFrame() {
-    const cardSpreadsheet = this.#scene.textures.get(Textures.cards);
-    const frameNumber = Phaser.Math.Between(4, 40);
-    const frame = cardSpreadsheet.get(frameNumber);
-
-    return frame;
-  }
 
   private getInsertPositionX(insertIndex: number) {
     const { spacing, startX } = this.getLayout();
