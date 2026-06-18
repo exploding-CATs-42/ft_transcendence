@@ -7,11 +7,13 @@ import {
   getCurrentGame,
   getGameById,
   getGames,
+  joinGame,
 } from "services";
 import {
   createGameSchema,
   deleteGameParamsSchema,
   getGameByIdParamsSchema,
+  joinGameSchema,
 } from "schemas";
 import { AuthenticatedRequest } from "types";
 import { validate } from "utils";
@@ -50,6 +52,16 @@ export async function createGameController(
 
   const result = await createGame(req.user.id, parsed);
   res.status(201).json(result);
+}
+
+export async function joinGameController(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  const parsed = validate(joinGameSchema, req.params);
+
+  const result = await joinGame(parsed, req.user.id);
+  res.status(200).json(result);
 }
 
 export async function deleteGameController(

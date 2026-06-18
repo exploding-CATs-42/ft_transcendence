@@ -108,15 +108,21 @@ const LobbyPage = () => {
     toggleJoinModal(true);
   };
 
-  const handleJoinGame = () => {
+  const handleJoinGame = async () => {
     const trimmedGameId = gameId.trim();
 
     if (!trimmedGameId) return;
 
-    toggleJoinModal(false);
-    navigate("/game", {
-      state: { gameId: trimmedGameId },
-    });
+    try {
+      await api.games.joinById(trimmedGameId);
+
+      toggleJoinModal(false);
+      navigate("/game", {
+        state: { gameId: trimmedGameId },
+      });
+    } catch (error) {
+      console.error("Failed to join game:", error);
+    }
   };
 
   const handleReturnToExistingGame = () => {
