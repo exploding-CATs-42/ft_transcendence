@@ -1,4 +1,8 @@
-import type { ListFriendsQuery, UserIdParams } from "@exploding-cats/contracts";
+import type {
+  ListFriendsQuery,
+  UserIdBody,
+  UserIdParams,
+} from "@exploding-cats/contracts";
 import { api } from "../axios";
 import type { FriendItem } from "pages/ProfilePage/types";
 
@@ -18,7 +22,14 @@ const getUserFriends = async (
   return result.data.friends;
 };
 
+const deleteFriendship = async (body: UserIdBody) => {
+  await api.delete(`/me/friends`, {
+    data: body,
+  });
+};
+
 export default {
   getMeFriends,
   getUserFriends,
+  deleteFriendship,
 };
