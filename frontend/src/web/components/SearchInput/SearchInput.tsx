@@ -7,11 +7,15 @@ import s from "./SearchInput.module.css";
 interface Props {
   placeholder?: string;
   status?: InputStatus;
+  value?: string;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SearchInput = ({
   placeholder = "Player ID",
   status = "normal",
+  value = "",
+  onChange = () => {},
 }: Props) => {
   return (
     <Input
@@ -20,6 +24,8 @@ const SearchInput = ({
       iconName="user"
       placeholder={placeholder}
       className={s.input}
+      value={value}
+      onChange={onChange}
     />
   );
 };
