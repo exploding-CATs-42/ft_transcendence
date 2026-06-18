@@ -21,6 +21,10 @@ const ManageLobbyModal = ({
   const actionLabel = isOwner ? "Delete lobby" : "Leave lobby";
   const actionHandler = isOwner ? onDeleteLobby : onLeaveLobby;
 
+  const modalText = isOwner
+    ? `Do you want to delete${gameName ? ` "${gameName}"` : " this lobby"}?`
+    : `Do you want to leave${gameName ? ` "${gameName}"` : " this lobby"}?`;
+
   return (
     <Modal
       className={s["manageLobbyModal"]!}
@@ -30,11 +34,7 @@ const ManageLobbyModal = ({
       <div className={s["manageLobbyModalContent"]!}>
         <h2 className={s["modalTitle"]!}>Manage lobby</h2>
 
-        <p className={s["modalText"]!}>
-          {isOwner
-            ? `Do you want to delete${gameName ? ` "${gameName}"` : " this lobby"}?`
-            : `Do you want to leave${gameName ? ` "${gameName}"` : " this lobby"}?`}
-        </p>
+        <p className={s["modalText"]!}>{modalText}</p>
 
         <div className={s["buttons"]!}>
           <Button className={s["cancelButton"]!} onClick={onCancel}>

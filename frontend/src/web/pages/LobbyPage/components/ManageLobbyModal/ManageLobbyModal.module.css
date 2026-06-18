@@ -1,43 +1,243 @@
 .manageLobbyModal {
-  width: min(90vw, 420px);
+  width: min(360px, calc(100vw - 32px));
+  height: 360px;
+  box-sizing: border-box;
+
+  border: 1px solid rgba(var(--off-white-rgb), 0.4);
+  border-radius: 24px;
+
+  color: var(--off-white);
+  overflow: hidden;
+
+  display: flex;
+  justify-content: center;
+
+  background-color: var(--modal-window-background);
+  position: relative;
+}
+
+.manageLobbyModal::before {
+  content: "";
+  display: block;
+
+  position: absolute;
+  left: 12px;
+  top: 10px;
+
+  width: calc(100% - 24px);
+  height: calc(100% - 20px);
+
+  opacity: 0.45;
+  pointer-events: none;
+
+  background-image: url("../../../../assets/images/fire-cat/fire-cat.png");
+  background-repeat: no-repeat;
+  background-position: center bottom;
+  background-size: 115%;
 }
 
 .manageLobbyModalContent {
+  position: relative;
+  z-index: 1;
+
+  width: 100%;
+  max-width: 280px;
+
   display: flex;
   flex-direction: column;
-
-  gap: 24px;
+  align-items: center;
+  justify-content: center;
 }
 
 .modalTitle {
-  margin: 0;
+  margin: 0 0 18px;
 
-  color: var(--black);
+  color: var(--off-white);
 
-  font-size: 28px;
+  font-size: 30px;
   line-height: 36px;
+  text-align: center;
+
+  font-family: "Shantell Sans", sans-serif;
+  text-shadow: 3px 3px 0 var(--throw-throw-burrito-hover);
+
+  letter-spacing: 1px;
 }
 
 .modalText {
   margin: 0;
 
-  color: var(--black);
+  color: var(--off-white);
 
-  font-size: 18px;
-  line-height: 24px;
+  font-size: 16px;
+  line-height: 22px;
+  text-align: center;
+
+  text-shadow: 0 2px 4px rgba(var(--black-rgb), 0.8);
 }
 
 .buttons {
   display: flex;
-  justify-content: flex-end;
-
+  flex-direction: column;
   gap: 12px;
+
+  margin-top: 24px;
+}
+
+.cancelButton,
+.actionButton {
+  width: 200px;
+  height: 38px;
+
+  border: 1px solid rgba(var(--off-white-rgb), 0.3);
+  border-radius: 20px;
+
+  color: var(--off-white);
+
+  font-size: 18px;
+  line-height: 22px;
+
+  cursor: pointer;
 }
 
 .cancelButton {
-  background-color: var(--zombie-kittens);
+  background-color: rgba(var(--black-rgb), 0.35);
+  box-shadow: 0 4px 0 rgba(var(--black-rgb), 0.45);
+}
+
+.cancelButton:hover,
+.cancelButton:focus {
+  background-color: rgba(var(--black-rgb), 0.5);
 }
 
 .actionButton {
-  background-color: var(--imploding-kittens);
+  background-color: var(--exploding-kittens);
+  box-shadow: 0 4px 0 var(--exploding-kittens-hover);
+}
+
+.actionButton:hover,
+.actionButton:focus {
+  background-color: var(--exploding-kittens-hover);
+}
+
+@media only screen and (min-width: 768px) {
+  .manageLobbyModal {
+    width: 560px;
+    height: 420px;
+
+    border-radius: 28px;
+  }
+
+  .manageLobbyModal::before {
+    left: 15px;
+    top: 12px;
+
+    width: calc(100% - 30px);
+    height: calc(100% - 24px);
+
+    background-size: 105%;
+  }
+
+  .manageLobbyModalContent {
+    max-width: 380px;
+  }
+
+  .modalTitle {
+    margin-bottom: 22px;
+
+    font-size: 40px;
+    line-height: 48px;
+  }
+
+  .modalText {
+    font-size: 18px;
+    line-height: 24px;
+  }
+
+  .buttons {
+    flex-direction: row;
+    gap: 16px;
+
+    margin-top: 28px;
+  }
+
+  .cancelButton,
+  .actionButton {
+    width: 170px;
+    height: 40px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .manageLobbyModal {
+    width: 720px;
+    height: 526px;
+
+    border-radius: 34px;
+  }
+
+  .manageLobbyModal::before {
+    left: 20px;
+    top: 16px;
+
+    width: calc(100% - 40px);
+    height: calc(100% - 32px);
+
+    background-size: 100%;
+  }
+
+  .manageLobbyModalContent {
+    max-width: 470px;
+  }
+
+  .modalTitle {
+    margin-bottom: 26px;
+
+    font-size: 52px;
+    line-height: 60px;
+  }
+
+  .modalText {
+    font-size: 20px;
+    line-height: 28px;
+  }
+
+  .buttons {
+    margin-top: 34px;
+  }
+
+  .cancelButton,
+  .actionButton {
+    width: 200px;
+    height: 44px;
+
+    font-size: 20px;
+    line-height: 24px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .manageLobbyModal {
+    width: 800px;
+    height: 584px;
+  }
+
+  .modalTitle {
+    font-size: 60px;
+    line-height: 68px;
+  }
+
+  .modalText {
+    font-size: 22px;
+    line-height: 30px;
+  }
+
+  .cancelButton,
+  .actionButton {
+    width: 220px;
+    height: 50px;
+
+    font-size: 22px;
+    line-height: 28px;
+  }
 }
