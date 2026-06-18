@@ -1,0 +1,46 @@
+.manageLobbyModal {
+  width: min(90vw, 420px);
+  background-color: var(--modal-window-background);
+  border-radius: 20px;
+}
+
+.manageLobbyModalContent {
+  display: flex;
+  flex-direction: column;
+
+  gap: 24px;
+
+  padding: 20px 40px;
+}
+
+.modalTitle {
+  margin: 0;
+
+  font-size: 28px;
+  line-height: 36px;
+  font-family: "Chewy";
+}
+
+.modalText {
+  margin: 0;
+
+  font-size: 18px;
+  line-height: 24px;
+}
+
+.buttons {
+  display: flex;
+  justify-content: flex-end;
+
+  gap: 12px;
+}
+
+.cancelButton {
+  background-color: var(--zombie-kittens);
+  padding: 6px 10px;
+}
+
+.actionButton {
+  background-color: var(--exploding-kittens);
+  padding: 6px 10px;
+}

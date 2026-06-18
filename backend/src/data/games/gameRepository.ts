@@ -4,10 +4,11 @@ import { createGameInstance } from "game";
 import { Game, GameId } from "./types";
 import GameStore from "./gameStore";
 
-const createGame = (name: string, maxPlayers: number) => {
+const createGame = (name: string, maxPlayers: number, ownerId: string) => {
   const game: Game = {
     id: crypto.randomUUID(),
     name,
+    ownerId,
     maxPlayers,
     createdAt: Date.now(),
     instance: createGameInstance(),

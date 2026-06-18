@@ -1,5 +1,5 @@
 // Project level
-import { Avatar, LinkButton, ListItem } from "components";
+import { Avatar, Icon, LinkButton, ListItem } from "components";
 // Local level
 import { createGameSlots, isPlaceholderSlot } from "./slots";
 import type { LobbyGame, GameSlot } from "./types";
@@ -7,20 +7,60 @@ import s from "./GameListItem.module.css";
 
 interface Props {
   game: LobbyGame;
+  isCurrentLobby?: boolean;
+  onManageCurrentLobby?: () => void;
 }
 
-const GameListItem = ({ game }: Props) => {
+const GameListItem = ({
+  game,
+  isCurrentLobby = false,
+  onManageCurrentLobby,
+}: Props) => {
   const slots: GameSlot[] = createGameSlots(game.players);
+
+  const handleManageCurrentLobbyClick = (
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) => {
+    event.preventDefault();
+    event.stopPropagation();
+
+    onManageCurrentLobby?.();
+  };
 
   return (
     <ListItem>
       <div className={s.container}>
-        <span className={s.title}>{game.gameName}</span>
-        <ul className={s.items}>
-          {slots.map((slot, index) =>
-            renderSlot(slot, `${game.gameId}_${index}`),
+        <div className={s.titleContainer}>
+          <span className={s.title}>{game.gameName}</span>
+
+          {isCurrentLobby && (
+            <span className={s.currentLobbyLabel}>current lobby</span>
           )}
-        </ul>
+        </div>
+
+        <div className={s.actionsContainer}>
+          <ul className={s.items}>
+            {slots.map((slot, index) =>
+              renderSlot(slot, `${game.gameId}_${index}`),
+            )}
+          </ul>
+
+          {isCurrentLobby && (
+            <button
+              type="button"
+              className={s.manageLobbyButton}
+              onClick={handleManageCurrentLobbyClick}
+              aria-label="Manage current lobby"
+            >
+              <Icon
+                className={s.trashIcon}
+                name="trash-can"
+                width={18}
+                height={18}
+              />
+            </button>
+          )}
+        </div>
       </div>
     </ListItem>
   );

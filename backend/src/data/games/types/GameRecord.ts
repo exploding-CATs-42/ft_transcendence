@@ -3,6 +3,7 @@ import { GameId } from "./GameId";
 export interface GameRecord {
   id: GameId;
   name: string;
+  ownerId: string;
   maxPlayers: number;
   createdAt: number;
 }

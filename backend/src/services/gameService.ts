@@ -75,7 +75,11 @@ export async function createGame(
     });
   }
 
-  const game = GameRepository.createGame(input.gameName, input.maxPlayers);
+  const game = GameRepository.createGame(
+    input.gameName,
+    input.maxPlayers,
+    user.id,
+  );
   attachGameBroadcaster(game);
   game.instance.start();
 
