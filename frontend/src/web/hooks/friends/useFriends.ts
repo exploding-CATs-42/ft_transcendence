@@ -40,5 +40,6 @@ export const useFriends = ({ userId, isMyProfile }: Props) => {
   return {
     friends,
     friendsLoading: loading,
+    setFriends,
   };
 };
