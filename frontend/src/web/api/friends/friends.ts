@@ -1,5 +1,6 @@
 import type {
   ListFriendsQuery,
+  UserIdBody,
   UserIdParams,
 } from "@exploding-cats/shared-schemas";
 import { api } from "../axios";
@@ -21,7 +22,14 @@ const getUserFriends = async (
   return result.data.friends;
 };
 
+const deleteFriendship = async (body: UserIdBody) => {
+  await api.delete(`/me/friends`, {
+    data: body,
+  });
+};
+
 export default {
   getMeFriends,
   getUserFriends,
+  deleteFriendship,
 };
