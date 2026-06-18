@@ -17,6 +17,7 @@ interface Props {
 const FriendsTab = ({ friends }: Props) => {
   const [isOpenModal, toggleModal] = useModal();
   const [selectedFriend, setSelectedFriend] = useState<FriendItem | null>(null);
+  const [searchQuery, setSearchQuery] = useState<string>("");
 
   const sortedFriends = [...friends].sort((a, b) => {
     const statusOrder = {
@@ -65,8 +66,13 @@ const FriendsTab = ({ friends }: Props) => {
         empty="No friends yet"
       />
       <div className={s.footer}>
-        <SearchInput />
-        <Button className={s.button}>Add</Button>
+        <SearchInput
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+        />
+        <Button className={s.button} onClick={async () => {}}>
+          Add
+        </Button>
       </div>
 
       <ConfirmPopup
