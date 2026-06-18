@@ -1,4 +1,5 @@
 import type { WaitingPlayerView, WaitingStateView } from "./views";
+import { Card } from "../game";
 
 export interface PlayerIdPayload {
   playerId: string;
@@ -14,4 +15,9 @@ export interface CountdownStartedPayload {
 
 export interface WaitingStatePayload {
   waitingState: WaitingStateView;
+}
+
+export interface Hand {
+  playerId: string;
+  cards: Card[];
 }

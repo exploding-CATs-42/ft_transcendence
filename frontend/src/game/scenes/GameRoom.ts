@@ -16,12 +16,18 @@ import {
 } from "game/utils";
 import {
   GraphicPlayer,
-  Hand,
+  Hand as GraphicHand,
   OpponentHand,
   PlayerSeat,
   type Player,
 } from "game/entities";
 import type { Point, LabelConfig, CardConfig } from "game/@types";
+import {
+  attachGameRoomSockets,
+  type CleanupFunction,
+  type GameRoomHandlers,
+} from "game/sockets";
+import type { Hand } from "@exploding-cats/shared-types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -71,10 +77,11 @@ const HAND_POSITION: Point = {
   y: 940,
 };
 
-export class GameRoom extends Scene {
+export class GameRoom extends Scene implements GameRoomHandlers {
   #seats: PlayerSeat[] = [];
   #opponentHands: OpponentHand[] = [];
-  #myHand!: Hand;
+  #myHand!: GraphicHand;
+  #detachSockets: CleanupFunction;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -100,6 +107,10 @@ export class GameRoom extends Scene {
       this.#opponentHands[3]?.addCard();
       clearInterval(intervalId);
     }, 500 * 15);
+
+    this.#detachSockets = attachGameRoomSockets(this);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
     EventBus.emit("scene-ready", this);
   }
@@ -136,7 +147,7 @@ export class GameRoom extends Scene {
       });
     };
 
-    this.#myHand = new Hand(this, HAND_POSITION, onCardDrop);
+    this.#myHand = new GraphicHand(this, HAND_POSITION, onCardDrop);
   }
 
   private createOpponentHands(players: GraphicPlayer[]) {
@@ -230,4 +241,18 @@ export class GameRoom extends Scene {
       },
     };
   }
+
+  onCardsDealt(hand: Hand): void {
+    hand.cards.forEach((card) => {
+      const graphicCard = this.#myHand.addCard(card);
+    });
+  }
+
+  private cleanup = () => {
+    this.#detachSockets();
+
+    // Remove whichever event didn't fire
+    this.events.off(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
+    this.events.off(Phaser.Scenes.Events.DESTROY, this.cleanup);
+  };
 }
