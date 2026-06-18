@@ -1,0 +1,78 @@
+import type { UserId } from "@exploding-cats/contracts";
+import api from "api";
+import type { FriendItem } from "pages/ProfilePage/types";
+import type { Dispatch, SetStateAction } from "react";
+import { toast } from "react-toastify";
+import { FriendshipStatus, type FriendshipRequestAction } from "types";
+import { getErrorMessage } from "utils";
+
+interface Props {
+  setFriends: Dispatch<SetStateAction<FriendItem[]>>;
+  toggleModal: () => void;
+}
+
+export const useFriendsActions = ({ setFriends, toggleModal }: Props) => {
+  const handleCreateFriendship = async (searchQuery: string) => {
+    try {
+      await api.friends.createFriendRequest({ userId: searchQuery });
+
+      toast.success("Success");
+    } catch (error) {
+      const errmsg = getErrorMessage(error);
+      toast.error(errmsg);
+    }
+  };
+
+  const updateFriendship = async (
+    action: FriendshipRequestAction,
+    friendId: UserId,
+  ) => {
+    try {
+      await api.friends.updateFriendship({ action }, { userId: friendId });
+
+      setFriends((prev) =>
+        prev.map((friend) =>
+          friend.user.id === friendId
+            ? { ...friend, status: FriendshipStatus.ACCEPTED }
+            : friend,
+        ),
+      );
+
+      toast.success("Success");
+    } catch (error) {
+      const errmsg = getErrorMessage(error);
+      toast.error(errmsg);
+    }
+  };
+
+  const acceptFriendship = async (friendId: UserId) => {
+    await updateFriendship("accept", friendId);
+  };
+
+  const rejectFriendship = async (friendId: UserId) => {
+    await updateFriendship("reject", friendId);
+  };
+
+  const handleDeleteFriendship = async (friendId: UserId) => {
+    try {
+      await api.friends.deleteFriendship({ userId: friendId });
+      toggleModal();
+
+      setFriends((prev) =>
+        prev.filter((friend) => friend.user.id !== friendId),
+      );
+
+      toast.success("Success");
+    } catch (error) {
+      const errmsg = getErrorMessage(error);
+      toast.error(errmsg);
+    }
+  };
+
+  return {
+    handleDeleteFriendship,
+    handleCreateFriendship,
+    acceptFriendship,
+    rejectFriendship,
+  };
+};
