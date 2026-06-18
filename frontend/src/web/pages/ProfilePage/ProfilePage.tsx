@@ -15,7 +15,10 @@ const ProfilePage = () => {
   const { pathname } = useLocation();
   const isMyProfile = pathname === "/profile";
 
-  const { friends, friendsLoading } = useFriends({ userId, isMyProfile });
+  const { friends, friendsLoading, setFriends } = useFriends({
+    userId,
+    isMyProfile,
+  });
   const { games, gamesLoading } = useGames({ userId, isMyProfile });
   const { user, updateUser, userLoading } = useUser({ userId, isMyProfile });
 
@@ -49,7 +52,7 @@ const ProfilePage = () => {
         <StatsSection stats={stats} />
       </div>
 
-      <ListSection games={games} friends={friends} />
+      <ListSection games={games} friends={friends} setFriends={setFriends} />
     </div>
   );
 };

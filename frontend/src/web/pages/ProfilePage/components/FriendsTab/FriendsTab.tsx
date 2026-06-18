@@ -1,5 +1,5 @@
 import { useModal } from "hooks";
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "react-toastify";
 
 import api from "api";
@@ -12,9 +12,10 @@ import s from "./FriendsTab.module.css";
 
 interface Props {
   friends: FriendItem[];
+  setFriends: Dispatch<SetStateAction<FriendItem[]>>;
 }
 
-const FriendsTab = ({ friends }: Props) => {
+const FriendsTab = ({ friends, setFriends }: Props) => {
   const [isOpenModal, toggleModal] = useModal();
   const [selectedFriend, setSelectedFriend] = useState<FriendItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -43,6 +44,10 @@ const FriendsTab = ({ friends }: Props) => {
     try {
       await api.friends.deleteFriendship({ userId: friendId });
       toggleModal();
+
+      setFriends((prev) =>
+        prev.filter((friend) => friend.user.id !== friendId),
+      );
 
       toast.success("Success");
     } catch (error) {
