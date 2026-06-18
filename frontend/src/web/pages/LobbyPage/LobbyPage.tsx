@@ -184,8 +184,17 @@ const LobbyPage = () => {
     }
   };
 
-  const handleLeaveLobby = () => {
-    toggleManageLobbyModal(false);
+  const handleLeaveLobby = async () => {
+    if (!existingGame) return;
+
+    try {
+      await api.games.leaveById(existingGame.id);
+
+      setExistingGame(null);
+      toggleManageLobbyModal(false);
+    } catch (error) {
+      console.error("Failed to leave lobby:", error);
+    }
   };
 
   const handleCreateTable = async ({

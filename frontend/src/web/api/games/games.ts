@@ -32,9 +32,14 @@ const deleteById = async (gameId: string): Promise<void> => {
   await api.delete(`/games/${gameId}`);
 };
 
+const leaveById = async (gameId: string): Promise<void> => {
+  await api.post(`/games/${gameId}/leave`);
+};
+
 export default {
   create,
   getCurrent,
   getAll,
   deleteById,
+  leaveById,
 };

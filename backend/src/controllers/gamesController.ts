@@ -7,11 +7,13 @@ import {
   getCurrentGame,
   getGameById,
   getGames,
+  leaveGame,
 } from "services";
 import {
   createGameSchema,
   deleteGameParamsSchema,
   getGameByIdParamsSchema,
+  leaveGameSchema,
 } from "schemas";
 import { AuthenticatedRequest } from "types";
 import { validate } from "utils";
@@ -60,4 +62,14 @@ export async function deleteGameController(
 
   const result = await deleteGame(req.user.id, parsed);
   res.status(201).json(result);
+}
+
+export async function leaveGameController(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  const parsed = validate(leaveGameSchema, req.params);
+
+  const result = await leaveGame(parsed, req.user.id);
+  res.status(200).json(result);
 }
