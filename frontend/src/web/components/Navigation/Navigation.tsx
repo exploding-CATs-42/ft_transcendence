@@ -73,7 +73,7 @@ const Navigation = ({ onLinkClick }: Props) => {
           onClick={() => onLinkClick?.()}
         >
           <span className={s.username}>{user?.username}</span>
-          <Avatar variant="badge" />
+          <Avatar variant="badge" src={user?.avatarUrl ?? null} />
         </LinkButton>
       ) : (
         <LinkButton
