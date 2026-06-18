@@ -1,5 +1,5 @@
 // Libraries
-import { useState } from "react";
+import { useState, type Dispatch, type SetStateAction } from "react";
 //Project level
 import { Section } from "components";
 // Local level
@@ -11,6 +11,7 @@ import s from "./ListSection.module.css";
 interface Props {
   games: UserGameHistoryItem[];
   friends: FriendItem[];
+  setFriends: Dispatch<SetStateAction<FriendItem[]>>;
 }
 
 export type ActiveTab = "games" | "friends";
@@ -20,7 +21,7 @@ const tabs: TabOption[] = [
   { key: "friends", label: "Friends" },
 ];
 
-const ListSection = ({ games, friends }: Props) => {
+const ListSection = ({ games, friends, setFriends }: Props) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("games");
 
   return (
@@ -32,7 +33,7 @@ const ListSection = ({ games, friends }: Props) => {
       />
 
       {activeTab === "friends" ? (
-        <FriendsTab friends={friends}></FriendsTab>
+        <FriendsTab friends={friends} setFriends={setFriends}></FriendsTab>
       ) : (
         <GamesTab games={games}></GamesTab>
       )}
