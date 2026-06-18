@@ -27,8 +27,13 @@ const getAll = async (): Promise<GameInfo[]> => {
   return result.data;
 };
 
+const joinById = async (gameId: string): Promise<void> => {
+  await api.post(`/games/${gameId}/join`);
+};
+
 export default {
   create,
   getCurrent,
   getAll,
+  joinById,
 };
