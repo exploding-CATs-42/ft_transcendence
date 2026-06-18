@@ -1,23 +1,15 @@
 // Project level
-import { Avatar, Button, ConfirmPopup, Icon, ListItem } from "components";
+import { Avatar, Button, Icon, ListItem } from "components";
 //Local level
 import s from "./FriendListItem.module.css";
-import { useModal } from "hooks";
 import type { FriendItem } from "pages/ProfilePage/types";
 
 interface Props {
   friend: FriendItem;
+  handleRemoveClick: (friend: FriendItem) => void;
 }
 
-const FriendListItem = ({ friend }: Props) => {
-  const [isOpenModal, toggleModal] = useModal();
-
-  const handleRemoveFriend = (friend: FriendItem) => {
-    console.log("remove friend", friend.user.id);
-
-    toggleModal();
-  };
-
+const FriendListItem = ({ friend, handleRemoveClick }: Props) => {
   return (
     <ListItem>
       <div className={s.container}>
@@ -39,7 +31,12 @@ const FriendListItem = ({ friend }: Props) => {
 
         <div className={s.rightContent}>
           {friend.status === "ACCEPTED" ? (
-            <Button className={s.closeButton} onClick={() => toggleModal()}>
+            <Button
+              className={s.closeButton}
+              onClick={() => {
+                handleRemoveClick(friend);
+              }}
+            >
               <Icon name="cross" stroke="black" width={20} height={20} />
             </Button>
           ) : (
@@ -50,14 +47,6 @@ const FriendListItem = ({ friend }: Props) => {
           )}
         </div>
       </div>
-      <ConfirmPopup
-        toggleModal={toggleModal}
-        isOpenModal={isOpenModal}
-        msg="Are you sure you want to remove your friend?"
-        onConfirm={() => {
-          handleRemoveFriend(friend);
-        }}
-      />
     </ListItem>
   );
 };
