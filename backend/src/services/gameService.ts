@@ -87,6 +87,7 @@ export async function createGame(
       name: input.gameName,
       maxPlayers: input.maxPlayers,
       createdAt: Date.now(),
+      ownerId: user.id,
     },
     actor,
   };

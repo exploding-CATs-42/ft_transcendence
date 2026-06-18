@@ -10,6 +10,7 @@ export type GameInfo = {
   name: string;
   maxPlayers: number;
   createdAt: number;
+  ownerId: string;
 };
 
 const create = async (body: CreateGameReqBody): Promise<GameInfo> => {
@@ -31,9 +32,19 @@ const joinById = async (gameId: string): Promise<void> => {
   await api.post(`/games/${gameId}/join`);
 };
 
+const deleteById = async (gameId: string): Promise<void> => {
+  await api.delete(`/games/${gameId}`);
+};
+
+const leaveById = async (gameId: string): Promise<void> => {
+  await api.post(`/games/${gameId}/leave`);
+};
+
 export default {
   create,
   getCurrent,
   getAll,
   joinById,
+  deleteById,
+  leaveById,
 };

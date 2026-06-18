@@ -6,6 +6,7 @@ import {
   getGamesController,
   getCurrentGameController,
   joinGameController,
+  leaveGameController,
 } from "controllers";
 import { createAuthenticatedRouter, errorHandler } from "utils";
 
@@ -31,4 +32,5 @@ gamesRouter.get("/current", errorHandler(getCurrentGameController));
 gamesRouter.get("/:gameId", errorHandler(getGameByIdController));
 gamesRouter.post("/", errorHandler(createGameController));
 gamesRouter.post("/:gameId/join", errorHandler(joinGameController));
+gamesRouter.post("/:gameId/leave", errorHandler(leaveGameController));
 gamesRouter.delete("/:gameId", errorHandler(deleteGameController));
