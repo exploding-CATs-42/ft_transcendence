@@ -28,8 +28,13 @@ const deleteFriendship = async (body: UserIdBody) => {
   });
 };
 
+const createFriendRequest = async (body: UserIdBody) => {
+  await api.post(`/me/friends`, body);
+};
+
 export default {
   getMeFriends,
   getUserFriends,
   deleteFriendship,
+  createFriendRequest,
 };
