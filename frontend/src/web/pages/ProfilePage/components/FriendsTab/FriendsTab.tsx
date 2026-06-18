@@ -56,6 +56,17 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
     }
   };
 
+  const handleCreateFriendship = async () => {
+    try {
+      await api.friends.createFriendRequest({ userId: searchQuery });
+
+      toast.success("Success");
+    } catch (error) {
+      const errmsg = getErrorMessage(error);
+      toast.error(errmsg);
+    }
+  };
+
   return (
     <>
       <List
@@ -75,7 +86,7 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
         />
-        <Button className={s.button} onClick={async () => {}}>
+        <Button className={s.button} onClick={handleCreateFriendship}>
           Add
         </Button>
       </div>
