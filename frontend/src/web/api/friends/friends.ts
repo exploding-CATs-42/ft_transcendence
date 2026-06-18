@@ -1,5 +1,7 @@
 import type {
   ListFriendsQuery,
+  UpdateFriendshipBody,
+  UpdateFriendshipParams,
   UserIdBody,
   UserIdParams,
 } from "@exploding-cats/contracts";
@@ -32,9 +34,17 @@ const createFriendRequest = async (body: UserIdBody) => {
   await api.post(`/me/friends`, body);
 };
 
+const updateFriendship = async (
+  body: UpdateFriendshipBody,
+  params: UpdateFriendshipParams,
+) => {
+  await api.patch(`/me/friends/${params.userId}`, body);
+};
+
 export default {
   getMeFriends,
   getUserFriends,
   deleteFriendship,
   createFriendRequest,
+  updateFriendship,
 };
