@@ -4,7 +4,7 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/contracts";
-import { GameOutEvents, Hand } from "@exploding-cats/game-core";
+import { GameOutEvents, HandPayload } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
@@ -27,7 +27,7 @@ export function attachGameBroadcaster(game: Game) {
   });
 
   broadcaster.on(GameOutEvents.CARDS_DEALT, (event) => {
-    const hands: Hand[] = event.payload;
+    const hands: HandPayload[] = event.payload;
     hands.forEach((hand) => {
       const socket = socketsMap.get(hand.playerId)!;
       socket.emit(ServerPrivateEvents.YOUR_HAND, hand);
