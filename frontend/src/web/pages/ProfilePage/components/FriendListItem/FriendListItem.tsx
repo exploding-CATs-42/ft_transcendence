@@ -7,9 +7,14 @@ import type { FriendItem } from "pages/ProfilePage/types";
 interface Props {
   friend: FriendItem;
   handleRemoveClick: (friend: FriendItem) => void;
+  acceptFriendship: (friend: FriendItem) => Promise<void>;
 }
 
-const FriendListItem = ({ friend, handleRemoveClick }: Props) => {
+const FriendListItem = ({
+  friend,
+  handleRemoveClick,
+  acceptFriendship,
+}: Props) => {
   return (
     <ListItem>
       <div className={s.container}>
@@ -41,7 +46,14 @@ const FriendListItem = ({ friend, handleRemoveClick }: Props) => {
             </Button>
           ) : (
             <>
-              <Button className={s.button}>Accept</Button>
+              <Button
+                className={s.button}
+                onClick={() => {
+                  acceptFriendship(friend);
+                }}
+              >
+                Accept
+              </Button>
               <Button className={s.button}>Ignore</Button>
             </>
           )}
