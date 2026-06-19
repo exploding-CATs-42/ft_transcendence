@@ -114,17 +114,13 @@ const LobbyPage = () => {
     if (!trimmedGameId) return;
 
     toggleJoinModal(false);
-    navigate("/game", {
-      state: { gameId: trimmedGameId },
-    });
+    navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
   };
 
   const handleReturnToExistingGame = () => {
     if (!existingGame) return;
 
-    navigate("/game", {
-      state: { gameId: existingGame.id },
-    });
+    navigate(`/game?gameId=${encodeURIComponent(existingGame.id)}`);
   };
 
   const handleCloseExistingGameModal = () => {
