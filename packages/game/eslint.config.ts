@@ -1,0 +1,16 @@
+import { defineConfig } from "eslint/config";
+import js from "@eslint/js";
+import ts from "typescript-eslint";
+
+export default defineConfig([
+  {
+    files: ["**/*.ts"],
+    extends: [js.configs.recommended, ts.configs.recommended],
+    languageOptions: {
+      parserOptions: {
+        project: "./tsconfig.eslint.json",
+        tsconfigRootDir: import.meta.dirname,
+      },
+    },
+  },
+]);

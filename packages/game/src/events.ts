@@ -1,5 +1,5 @@
-import { Player } from "./types";
-import { Hand } from "./eventPayloads";
+import type { Player } from "./types";
+import type { Hand } from "./eventPayloads";
 
 // Events sent TO the machine
 export const GameEvents = {

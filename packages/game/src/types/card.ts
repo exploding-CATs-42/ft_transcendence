@@ -28,7 +28,7 @@ export interface CardDefinition {
 }
 
 interface CardInstance {
-  id: string;
+  id: number;
 }
 
 export type Card = Omit<CardDefinition, "count"> & CardInstance;

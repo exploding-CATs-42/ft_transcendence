@@ -1,9 +1,8 @@
 // Libraries
 import { describe, it, expect } from "vitest";
-// Project level
-import { createDeck, dealInitialCards } from "game/utils";
-import { CardType, Deck, Player } from "game/types";
-import { DEFAULT_GAME_RULES } from "game/constants";
+// Package level
+import { createDeck, dealInitialCards, DEFAULT_GAME_RULES } from "../src";
+import { CardType, Deck, Player } from "../src/types";
 
 const DECK_SIZE = 56;
 const PLAYERS: Player[] = [

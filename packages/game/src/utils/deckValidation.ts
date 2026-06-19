@@ -1,5 +1,5 @@
-import { Deck, GameRules } from "game/types";
-import { InsufficientCardsError } from "game/errors";
+import type { Deck, GameRules } from "../types";
+import { InsufficientCardsError } from "../errors";
 
 export const validateDeckSizes = (
   mainDeck: Deck,

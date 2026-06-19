@@ -11,8 +11,8 @@ import {
   removePlayer,
   removePlayerConfirmation,
 } from "./actions";
-import { Player, Deck } from "./types";
-import { GameEvent, GameEvents, GameOutEvent } from "./events";
+import type { Player, Deck } from "./types";
+import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import { GameGuards, hasEnoughPlayers } from "./guards";
 import {
   cardsDealt,

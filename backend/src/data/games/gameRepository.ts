@@ -1,5 +1,5 @@
 // Project level
-import { createGameInstance } from "game";
+import { createGameInstance } from "@exploding-cats/game-core";
 // Local level
 import { Game, GameId } from "./types";
 import GameStore from "./gameStore";
