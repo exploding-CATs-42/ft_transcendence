@@ -16,7 +16,7 @@ import {
 } from "../utils";
 import {
   GraphicPlayer,
-  Hand,
+  GraphicHand,
   OpponentHand,
   PlayerSeat,
   type Player,
@@ -74,7 +74,7 @@ const HAND_POSITION: Point = {
 export class GameRoom extends Scene {
   #seats: PlayerSeat[] = [];
   #opponentHands: OpponentHand[] = [];
-  #myHand!: Hand;
+  #myHand!: GraphicHand;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -138,7 +138,7 @@ export class GameRoom extends Scene {
       });
     };
 
-    this.#myHand = new Hand(this, HAND_POSITION, onCardDrop);
+    this.#myHand = new GraphicHand(this, HAND_POSITION, onCardDrop);
   }
 
   private createOpponentHands(players: GraphicPlayer[]) {
