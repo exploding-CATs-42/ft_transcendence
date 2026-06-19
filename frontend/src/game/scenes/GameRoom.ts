@@ -10,6 +10,7 @@ import {
   SCREEN_WIDTH,
   GAME_ROOM_SEATS,
   Textures,
+  CARD_TYPE_TO_FRAME as CARD_TYPE_TO_FRAME_INDEX,
 } from "../constants";
 import {
   EventBus,
@@ -113,6 +114,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.#opponentHands[3]?.addCard();
       clearInterval(intervalId);
     }, 500 * 15);
+
+    this.#tempCardStorage.forEach((card) => {
+      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
+      const frame = getCardFrame(this, frameIndex);
+      this.#myHand.addCard(frame);
+    });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
