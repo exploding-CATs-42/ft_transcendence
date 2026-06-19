@@ -1,13 +1,13 @@
 // Libraries
 import { useEffect, useState } from "react";
-import { useLocation } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 // Project level
 import { PhaserGame } from "components";
 import { useGameSession } from "hooks";
 
 const GamePage = () => {
-  const { state } = useLocation();
-  const gameId = state?.gameId ?? "";
+  const [searchParams] = useSearchParams();
+  const gameId = searchParams.get("gameId") ?? "";
   const [ready, setReady] = useState(false);
 
   useGameSession(gameId);
