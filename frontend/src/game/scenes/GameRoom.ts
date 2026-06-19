@@ -44,8 +44,8 @@ const OPPONENT_HAND_X_OFFSET = 96;
 const OPPONENT_HAND_Y_OFFSET = 180;
 
 // Draw and discard piles
-const CARD_WIDTH = 186;
-const CARD_HEIGHT = 260;
+const CARD_WIDTH = 186 * 1.5;
+const CARD_HEIGHT = 260 * 1.5;
 const CARD_BORDER_RADIUS = 20;
 
 const PILES_Y = 470;
