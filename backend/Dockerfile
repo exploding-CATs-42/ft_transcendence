@@ -14,6 +14,7 @@ FROM base AS build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY backend/package.json ./backend/
 COPY packages/contracts/package.json ./packages/contracts/
+COPY packages/game/package.json ./packages/game/
 
 RUN pnpm install --frozen-lockfile
 
