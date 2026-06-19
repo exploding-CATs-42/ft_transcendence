@@ -11,3 +11,21 @@ export interface UpdateFriendshipBody {
 export interface UserIdBody {
   userId: UserId;
 }
+
+export const FriendshipDirection = {
+  OUTGOING: "outgoing",
+  INCOMING: "incoming",
+  ACCEPTED: "accepted",
+} as const;
+
+export type FriendshipDirection =
+  (typeof FriendshipDirection)[keyof typeof FriendshipDirection];
+
+export const FriendshipStatus = {
+  PENDING: "PENDING",
+  ACCEPTED: "ACCEPTED",
+  REJECTED: "REJECTED",
+} as const;
+
+export type FriendshipStatus =
+  (typeof FriendshipStatus)[keyof typeof FriendshipStatus];
