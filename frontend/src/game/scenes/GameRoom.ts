@@ -126,11 +126,13 @@ export class GameRoom extends Scene {
 
   private createMyHand() {
     const onCardDrop = (card: Phaser.GameObjects.Image) => {
-      // move it to the discard pile
+      // move it to the discard pile and shrink it down to pile size
       this.tweens.add({
         targets: card,
         x: DISCARD_PILE_POSITION.x,
         y: DISCARD_PILE_POSITION.y,
+        displayWidth: CARD_WIDTH,
+        displayHeight: CARD_HEIGHT,
         duration: 300,
         ease: "Back.Out",
       });
