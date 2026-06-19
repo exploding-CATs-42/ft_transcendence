@@ -1,27 +1,27 @@
 // Libraries
 import { Scene } from "phaser";
-// Project level
+// Local level
 import {
   Scenes,
   SCREEN_HEIGHT,
   SCREEN_WIDTH,
   GAME_ROOM_SEATS,
   Textures,
-} from "game/constants";
+} from "../constants";
 import {
   EventBus,
   addBackgroundImage,
   addCardVisual,
   addFullscreenToggle,
-} from "game/utils";
+} from "../utils";
 import {
   GraphicPlayer,
   Hand,
   OpponentHand,
   PlayerSeat,
   type Player,
-} from "game/entities";
-import type { Point, LabelConfig, CardConfig } from "game/@types";
+} from "../entities";
+import type { Point, LabelConfig, CardConfig } from "../@types";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
