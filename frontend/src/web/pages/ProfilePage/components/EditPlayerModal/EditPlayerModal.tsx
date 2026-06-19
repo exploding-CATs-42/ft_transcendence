@@ -11,17 +11,24 @@ import {
   Modal,
   NameInput,
   PasswordInput,
+  AvatarWithAdd,
 } from "components";
+
 import type { MyProfileUser, ProfileUser } from "pages/ProfilePage/types";
 import type { BadRequestErrorResponse } from "types";
 import type { AxiosError } from "axios";
+
 import api from "api";
+
+import {
+  avatarSchema,
+  type UpdateMeRequestBody,
+} from "@exploding-cats/shared-schemas";
+
+import { Spinner } from "assets";
+
 // Local level
 import s from "./EditPlayerModal.module.css";
-import { AvatarWithAdd } from "components";
-import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
-import { avatarSchema } from "schemas/me/updateMeAvatarSchema";
-import { Spinner } from "assets";
 
 interface Props {
   isOpen: boolean;
