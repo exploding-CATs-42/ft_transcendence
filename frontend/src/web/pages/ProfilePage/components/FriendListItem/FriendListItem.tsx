@@ -8,12 +8,14 @@ interface Props {
   friend: FriendItem;
   handleRemoveClick: (friend: FriendItem) => void;
   acceptFriendship: (friend: FriendItem) => Promise<void>;
+  rejectFriendship: (friend: FriendItem) => Promise<void>;
 }
 
 const FriendListItem = ({
   friend,
   handleRemoveClick,
   acceptFriendship,
+  rejectFriendship,
 }: Props) => {
   return (
     <ListItem>
@@ -54,7 +56,14 @@ const FriendListItem = ({
               >
                 Accept
               </Button>
-              <Button className={s.button}>Ignore</Button>
+              <Button
+                className={s.button}
+                onClick={() => {
+                  rejectFriendship(friend);
+                }}
+              >
+                Ignore
+              </Button>
             </>
           )}
         </div>
