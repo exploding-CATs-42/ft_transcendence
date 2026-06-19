@@ -4,11 +4,10 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/contracts";
+import { GameOutEvents, Hand } from "@exploding-cats/game-core";
 import { Game } from "data/types";
-import { GameOutEvents } from "game";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
-import { Hand } from "game/eventPayloads";
 
 export function attachGameBroadcaster(game: Game) {
   const { instance: broadcaster, id: gameId } = game;

@@ -1,9 +1,9 @@
 // Libraries
-import { Snapshot } from "xstate";
+import { GameSnapshot } from "@exploding-cats/game-core";
 // Local level
 import { GameRecord } from "./GameRecord";
 
 export interface PersistedGame {
   metadata: GameRecord;
-  snapshot: Snapshot<unknown>;
+  snapshot: GameSnapshot;
 }

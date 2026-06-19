@@ -1,5 +1,5 @@
 // Local level
-import { GameRules } from "game/types";
+import type { GameRules } from "../types";
 
 export const MIN_PLAYERS = 2;
 export const MAX_PLAYERS = 5;

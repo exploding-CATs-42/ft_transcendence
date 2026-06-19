@@ -1,12 +1,10 @@
 // Libraries
-import { createActor, Snapshot } from "xstate";
+import { createActor } from "xstate";
 // Local level
-import { GameInstance } from "./types";
+import type { GameInstance, GameSnapshot } from "./types";
 import { gameMachine } from "./gameMachine";
 
-export const createGameInstance = (
-  snapshot?: Snapshot<unknown>,
-): GameInstance => {
+export const createGameInstance = (snapshot?: GameSnapshot): GameInstance => {
   if (snapshot) {
     return createActor(gameMachine, { snapshot });
   }

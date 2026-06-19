@@ -5,7 +5,7 @@ import {
   NopeChain,
   PendingAction,
   TurnPhase,
-} from "game/types";
+} from "@exploding-cats/game-core";
 import { PublicPlayerView } from "@exploding-cats/contracts";
 
 export interface PublicGameView {

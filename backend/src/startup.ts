@@ -1,7 +1,7 @@
 // Project level
 import type { Game, PersistedGame } from "data/types";
 import { loadGames, GameRepository } from "data";
-import { createGameInstance } from "game";
+import { createGameInstance } from "@exploding-cats/game-core";
 import { attachGameBroadcaster } from "sockets";
 
 export async function restoreGames() {

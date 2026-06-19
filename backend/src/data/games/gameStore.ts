@@ -1,5 +1,5 @@
 // Project level
-import { getGameContext } from "game/utils";
+import { getGameContext } from "@exploding-cats/game-core";
 // Local level
 import { Game, GameId } from "./types";
 

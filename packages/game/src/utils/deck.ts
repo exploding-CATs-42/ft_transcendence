@@ -1,11 +1,13 @@
-// Libraries
-import { randomUUID } from "crypto";
-// Project level
-import rawCards from "constants/cards.json";
-// Local level
-import { CardType, Player, Card, CardDefinition, Deck } from "game/types";
-import { DEFAULT_GAME_RULES } from "game/constants";
+import {
+  CardType,
+  type Player,
+  type Card,
+  type CardDefinition,
+  type Deck,
+} from "../types";
 import { validateDeckSizes } from "./deckValidation";
+import { DEFAULT_GAME_RULES } from "../constants";
+import rawCards from "../constants/cards.json";
 
 export const cardDefinitions = rawCards as CardDefinition[];
 
@@ -16,7 +18,7 @@ export const createDeck = (): Deck => {
     const { count, ...cardData } = definition;
     for (let i = 0; i < count; i++) {
       deck.push({
-        id: randomUUID(),
+        id: i,
         ...cardData,
       });
     }
