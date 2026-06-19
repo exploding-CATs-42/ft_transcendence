@@ -13,6 +13,7 @@ import {
   addBackgroundImage,
   addCardVisual,
   addFullscreenToggle,
+  getCardFrame,
 } from "../utils";
 import {
   GraphicPlayer,
@@ -218,7 +219,8 @@ export class GameRoom extends Scene {
         // then destroy it
         faceDownCard.destroy();
         // and spawn the real card into player's hand
-        this.#myHand.addCard(insertIndex);
+        const frame = getCardFrame(this, 0);
+        this.#myHand.addCard(frame, insertIndex);
       },
     });
   };

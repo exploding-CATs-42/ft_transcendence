@@ -35,19 +35,19 @@ export class GraphicHand {
     this.#onCardDropCallback = onCardDropCallback;
 
     for (let i = 0; i < 8; ++i) {
-      this.addCard();
+      const frame = this.getRandomCardFrame();
+      this.addCard(frame);
     }
   }
 
   // -------------- Public API --------------
 
-  addCard(insertIndex = -1) {
+  addCard(frame: Phaser.Textures.Frame, insertIndex = -1) {
     if (insertIndex === -1)
       insertIndex = Phaser.Math.Between(0, this.#cards.length);
 
     this.adjustDepthsForInsertion(insertIndex);
 
-    const frame = this.getRandomCardFrame();
     const x = this.getInsertPositionX(insertIndex);
     const y = SCREEN_HEIGHT;
     const newCard = this.addInteractiveCard(x, y, frame);
