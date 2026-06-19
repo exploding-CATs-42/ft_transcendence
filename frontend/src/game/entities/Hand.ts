@@ -19,7 +19,7 @@ const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to th
 
 type onCardDropCallback = (card: Phaser.GameObjects.Image) => void;
 
-export class Hand {
+export class GraphicHand {
   #scene: Phaser.Scene;
   #position: Point;
   #cards: Phaser.GameObjects.Image[] = [];
