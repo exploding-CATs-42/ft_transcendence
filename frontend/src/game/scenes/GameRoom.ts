@@ -1,5 +1,8 @@
 // Libraries
 import { Scene } from "phaser";
+// Project level
+import type { Card } from "@exploding-cats/game-core";
+import type { HandPayload } from "@exploding-cats/contracts";
 // Local level
 import {
   Scenes,
@@ -23,6 +26,11 @@ import {
   type Player,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig } from "../@types";
+import {
+  attachGameRoomSockets,
+  type CleanupFunction,
+  type GameRoomHandlers,
+} from "../sockets";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -72,13 +80,17 @@ const HAND_POSITION: Point = {
   y: 940,
 };
 
-export class GameRoom extends Scene {
+export class GameRoom extends Scene implements GameRoomHandlers {
   #seats: PlayerSeat[] = [];
   #opponentHands: OpponentHand[] = [];
   #myHand!: GraphicHand;
+  #detachSockets: CleanupFunction;
+  #tempCardStorage: Card[] = [];
 
   constructor() {
     super(Scenes.GameRoom);
+
+    this.#detachSockets = attachGameRoomSockets(this);
   }
 
   create() {
@@ -101,6 +113,9 @@ export class GameRoom extends Scene {
       this.#opponentHands[3]?.addCard();
       clearInterval(intervalId);
     }, 500 * 15);
+
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
     EventBus.emit("scene-ready", this);
   }
@@ -234,4 +249,16 @@ export class GameRoom extends Scene {
       },
     };
   }
+
+  onCardsDealt = (hand: HandPayload): void => {
+    this.#tempCardStorage = hand.cards;
+  };
+
+  private cleanup = () => {
+    this.#detachSockets();
+
+    // Remove whichever event didn't fire
+    this.events.off(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
+    this.events.off(Phaser.Scenes.Events.DESTROY, this.cleanup);
+  };
 }
