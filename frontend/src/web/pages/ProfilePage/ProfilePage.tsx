@@ -1,13 +1,14 @@
+//Libraries
 import { useMemo } from "react";
 import { useLocation, Navigate, useParams } from "react-router-dom";
-
+//Project level
 import { useFriends, useGames, useUser } from "hooks";
-import { LoadingScreen } from "components";
-
+import { LoadingScreen } from "../../components";
 import type { MyProfileUser } from "./types";
-import s from "./ProfilePage.module.css";
+//Local level
 import { ListSection, StatsSection, UserSection } from "./components";
-import { buildStats } from "./utils/buildStats";
+import { buildStats } from "./utils";
+import s from "./ProfilePage.module.css";
 
 const ProfilePage = () => {
   const { userId } = useParams();
