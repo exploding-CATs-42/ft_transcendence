@@ -82,6 +82,7 @@ export async function createGame(
   const player: Player = {
     id: user.id,
     name: user.username,
+    avatarUrl: user.avatarUrl,
     hand: [],
     isConfirmed: false,
     isAlive: true,
@@ -144,6 +145,7 @@ export async function joinGame(
   const player: Player = {
     id: user.id,
     name: user.username,
+    avatarUrl: user.avatarUrl,
     hand: [],
     isConfirmed: false,
     isAlive: true,
