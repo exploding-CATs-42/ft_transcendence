@@ -1,3 +1,5 @@
+import type { FriendshipDirection, FriendshipStatus } from "types";
+
 export type FriendItem = {
   user: {
     id: string;
@@ -6,6 +8,6 @@ export type FriendItem = {
     isOnline: boolean;
     lastSeenAt: Date;
   };
-  status: "PENDING" | "ACCEPTED" | "REJECTED";
-  direction: "outgoing" | "incoming" | "accepted";
+  status: FriendshipStatus;
+  direction: FriendshipDirection;
 };
