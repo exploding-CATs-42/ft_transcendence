@@ -48,13 +48,13 @@ const CARD_WIDTH = 186 * 1.5;
 const CARD_HEIGHT = 260 * 1.5;
 const CARD_BORDER_RADIUS = 20;
 
-const PILES_Y = 470;
+const PILES_Y = 410;
 const DRAW_PILE_POSITION: Point = {
-  x: 610,
+  x: 560,
   y: PILES_Y,
 };
 const DISCARD_PILE_POSITION: Point = {
-  x: 1100,
+  x: 1050,
   y: PILES_Y,
 };
 
