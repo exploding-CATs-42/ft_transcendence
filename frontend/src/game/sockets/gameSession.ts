@@ -2,7 +2,7 @@
 import type { Socket } from "socket.io-client";
 // Project level
 import { socket } from "socket";
-import { ClientEvents } from "@exploding-cats/shared-types";
+import { ClientEvents } from "@exploding-cats/contracts";
 
 let gameId = "";
 

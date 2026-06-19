@@ -7,7 +7,7 @@ import {
   updateFriendshipBodySchema,
   updateFriendshipParamsSchema,
 } from "schemas";
-import { listFriendsQuerySchema } from "@exploding-cats/shared-schemas";
+import { listFriendsQuerySchema } from "@exploding-cats/contracts";
 import {
   deleteFriendship,
   FriendsServiceError,

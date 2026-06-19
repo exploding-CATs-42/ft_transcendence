@@ -12,11 +12,11 @@ import {
   getRefreshTokenLifetimeMs,
 } from "utils";
 import type { AuthSessionResponse, RefreshSessionResponse, User } from "types";
-import { RegisterResponse } from "@exploding-cats/shared-types";
 import type {
+  RegisterResponse,
   RegisterRequestBody,
   LoginRequestBody,
-} from "@exploding-cats/shared-schemas";
+} from "@exploding-cats/contracts";
 
 export class AuthServiceError extends Error {
   public statusCode: number;

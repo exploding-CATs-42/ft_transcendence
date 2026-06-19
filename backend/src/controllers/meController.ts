@@ -1,7 +1,7 @@
 // Libraries
 import type { Response } from "express";
 // Project level
-import { updateMeSchema } from "@exploding-cats/shared-schemas";
+import { updateMeSchema } from "@exploding-cats/contracts";
 import { AuthenticatedRequest } from "types";
 import { validate } from "utils";
 import { getMe, updateMe, updateMeAvatar } from "services";

@@ -1,4 +1,4 @@
-import type { PublicUser } from "../../shared";
+import type { PublicUser } from "../../../shared";
 
 export interface RegisterResponse {
   user: PublicUser;

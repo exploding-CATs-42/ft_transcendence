@@ -13,7 +13,7 @@ import { GameEvents } from "game";
 import { Game, GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
-import { PlayerIdPayload } from "@exploding-cats/shared-types";
+import { PlayerIdPayload } from "@exploding-cats/contracts";
 import { GameRepository, toGameRecord } from "data";
 import { attachGameBroadcaster } from "sockets";
 import { toWaitingPlayerView } from "mappers";

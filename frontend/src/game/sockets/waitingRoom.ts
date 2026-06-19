@@ -7,7 +7,7 @@ import {
   type PlayerJoinedPayload,
   type WaitingPlayerView,
   type WaitingStatePayload,
-} from "@exploding-cats/shared-types";
+} from "@exploding-cats/contracts";
 import { socket } from "socket";
 import { emit } from "./gameSession";
 
