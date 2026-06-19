@@ -106,7 +106,6 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     email,
     passwordOld,
     passwordNew,
-    avatarUrl,
   }) => {
     try {
       const updateData = {
@@ -114,7 +113,6 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
         ...(email !== undefined && { email }),
         ...(passwordNew !== undefined && { passwordNew }),
         ...(passwordOld !== undefined && { passwordOld }),
-        ...(avatarUrl !== undefined && { avatarUrl }),
       };
 
       const updatedUser = await api.me.updateMe(updateData);
