@@ -5,6 +5,7 @@ import { toast } from "react-toastify";
 import api from "api";
 import { getErrorMessage } from "utils";
 import { Button, ConfirmPopup, List, SearchInput } from "components";
+import { type FriendshipRequestAction } from "types";
 
 import type { FriendItem } from "../../types";
 import { FriendListItem } from "../../components";
@@ -67,6 +68,33 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
     }
   };
 
+  const updateFriendship = async (
+    action: FriendshipRequestAction,
+    selectedFriend: FriendItem,
+  ) => {
+    try {
+      const friendId = selectedFriend.user.id;
+      await api.friends.updateFriendship({ action }, { userId: friendId });
+
+      setFriends((prev) =>
+        prev.map((friend) =>
+          friend.user.id === friendId
+            ? { ...friend, status: "ACCEPTED" }
+            : friend,
+        ),
+      );
+
+      toast.success("Success");
+    } catch (error) {
+      const errmsg = getErrorMessage(error);
+      toast.error(errmsg);
+    }
+  };
+
+  const acceptFriendship = async (friend: FriendItem) => {
+    await updateFriendship("accept", friend);
+  };
+
   return (
     <>
       <List
@@ -76,6 +104,7 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
           <FriendListItem
             friend={friend}
             handleRemoveClick={handleRemoveClick}
+            acceptFriendship={acceptFriendship}
           />
         )}
         className={s.list}
