@@ -2,7 +2,7 @@
 import {
   CountdownStartedPayload,
   ServerPublicEvents,
-} from "@exploding-cats/shared-types";
+} from "@exploding-cats/contracts";
 import { Game } from "data/types";
 import { GameOutEvents } from "game";
 import { io } from "../../app";

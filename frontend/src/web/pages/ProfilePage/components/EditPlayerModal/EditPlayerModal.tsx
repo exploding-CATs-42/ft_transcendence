@@ -22,7 +22,7 @@ import api from "api";
 import {
   avatarSchema,
   type UpdateMeRequestBody,
-} from "@exploding-cats/shared-schemas";
+} from "@exploding-cats/contracts";
 
 import { Spinner } from "assets";
 

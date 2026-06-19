@@ -4,7 +4,7 @@ import { toast } from "react-toastify";
 import type { AxiosError } from "axios";
 // Project level
 import { AuthForm, EmailInput, FormField, PasswordInput } from "components";
-import type { LoginSchema } from "@exploding-cats/shared-schemas";
+import type { LoginSchema } from "@exploding-cats/contracts";
 import api from "api";
 import type { BadRequestErrorResponse } from "types";
 import { useAuth } from "hooks";

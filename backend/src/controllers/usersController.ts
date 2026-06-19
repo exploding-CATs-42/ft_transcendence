@@ -1,7 +1,7 @@
 // Libraries
 import type { Request, Response, NextFunction } from "express";
 // Project level
-import { registerSchema, loginSchema } from "@exploding-cats/shared-schemas";
+import { registerSchema, loginSchema } from "@exploding-cats/contracts";
 import {
   getUserByIdParamsSchema,
   searchUsersQuerySchema,

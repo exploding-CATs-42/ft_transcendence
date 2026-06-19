@@ -1,8 +1,5 @@
 // Project level
-import {
-  WaitingPlayerView,
-  WaitingStateView,
-} from "@exploding-cats/shared-types";
+import { WaitingPlayerView, WaitingStateView } from "@exploding-cats/contracts";
 import { Card, PendingActionType } from "game/types";
 
 export interface JoinGameResult {

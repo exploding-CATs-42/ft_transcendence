@@ -5,7 +5,7 @@ import type {
 } from "pages/ProfilePage/types/ProfileUser";
 import { api } from "../axios";
 import type { UserGameHistoryItem } from "components/GameListItem/types";
-import type { UpdateMeRequestBody } from "@exploding-cats/shared-schemas";
+import type { UpdateMeRequestBody } from "@exploding-cats/contracts";
 
 const getMe = async (): Promise<MyProfileUserWithStats> => {
   const result = await api.get("/me");

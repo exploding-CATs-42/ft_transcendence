@@ -11,7 +11,7 @@ import {
 import { addBackgroundImage, addFullscreenToggle } from "game/utils";
 import { Button, GraphicPlayer, PlayerSeat } from "game/entities";
 import type { LabelConfig, Size } from "game/@types";
-import { type WaitingPlayerView } from "@exploding-cats/shared-types";
+import { type WaitingPlayerView } from "@exploding-cats/contracts";
 import {
   cancelStart,
   confirmStart,

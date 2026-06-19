@@ -1,5 +1,5 @@
 {
-  "name": "@exploding-cats/shared-schemas",
+  "name": "@exploding-cats/contracts",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"

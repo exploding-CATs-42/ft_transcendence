@@ -21,7 +21,7 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
   WaitingStatePayload,
-} from "@exploding-cats/shared-types";
+} from "@exploding-cats/contracts";
 
 export const lobbyGameHandlers = (io: Server, socket: Socket) => {
   socket.on(

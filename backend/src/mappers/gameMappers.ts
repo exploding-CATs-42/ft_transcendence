@@ -1,5 +1,5 @@
 // Project level
-import { WaitingPlayerView } from "@exploding-cats/shared-types";
+import { WaitingPlayerView } from "@exploding-cats/contracts";
 import { Player } from "game/types";
 
 export const toWaitingPlayerView = (p: Player): WaitingPlayerView => ({
