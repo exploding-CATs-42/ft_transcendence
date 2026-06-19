@@ -1,10 +1,15 @@
 // Libraries
 import { createActor } from "xstate";
 import { describe, it, expect, vi } from "vitest";
-// Project level
-import { gameMachine, GameStates, GameEvents } from "game";
-import { CardType, Player } from "game/types";
-import { DEFAULT_GAME_RULES, START_GAME_COUNTDOWN_MS } from "game/constants";
+// Package level
+import {
+  gameMachine,
+  GameStates,
+  GameEvents,
+  DEFAULT_GAME_RULES,
+  START_GAME_COUNTDOWN_MS,
+} from "../src";
+import { CardType, Player } from "../src/types";
 
 const DECK_SIZE = 56;
 const PLAYERS: Player[] = [

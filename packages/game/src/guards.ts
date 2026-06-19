@@ -1,5 +1,5 @@
 // Local level
-import { GameContext } from "./gameMachine";
+import type { GameContext } from "./gameMachine";
 import { MIN_PLAYERS } from "./constants";
 
 export const GameGuards = {

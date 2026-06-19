@@ -1,5 +1,5 @@
 // Project level
-import { CardType } from "game/types";
+import { CardType } from "@exploding-cats/game-core";
 
 export const ClientActionType = {
   PLAY_CARD: "PLAY_CARD",

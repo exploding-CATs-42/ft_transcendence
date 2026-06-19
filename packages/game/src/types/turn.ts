@@ -1,4 +1,4 @@
-import { Card, CardType } from "./card";
+import { type Card, CardType } from "./card";
 
 export const TurnPhase = {
   ACTION: "ACTION",

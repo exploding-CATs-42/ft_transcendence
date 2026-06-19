@@ -1,19 +1,18 @@
 {
-  "name": "@exploding-cats/contracts",
+  "name": "@exploding-cats/game-core",
   "type": "module",
   "exports": {
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.package.json",
+    "typecheck": "tsc --noEmit -p tsconfig.json",
     "lint:fix": "eslint --fix ./src",
     "lint:check": "eslint ./src",
     "format:fix": "prettier --write ./src",
     "format:check": "prettier --check ./src"
   },
   "dependencies": {
-    "@exploding-cats/game-core": "workspace:*",
-    "zod": "^4.3.6"
+    "xstate": "^5.31.1"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
@@ -21,6 +20,7 @@
     "eslint": "^9.39.4",
     "prettier": "^3.8.1",
     "typescript": "5.9.3",
-    "typescript-eslint": "^8.57.2"
+    "typescript-eslint": "^8.57.2",
+    "vitest": "^4.1.2"
   }
 }

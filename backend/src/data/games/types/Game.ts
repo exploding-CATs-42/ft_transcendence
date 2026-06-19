@@ -1,5 +1,5 @@
 // Project level
-import { GameInstance } from "game/types";
+import { GameInstance } from "@exploding-cats/game-core";
 // Local level
 import { GameRecord } from "./GameRecord";
 
