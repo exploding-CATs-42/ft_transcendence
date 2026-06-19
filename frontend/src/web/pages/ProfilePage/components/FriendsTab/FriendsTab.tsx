@@ -95,6 +95,10 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
     await updateFriendship("accept", friend);
   };
 
+  const rejectFriendship = async (friend: FriendItem) => {
+    await updateFriendship("reject", friend);
+  };
+
   return (
     <>
       <List
@@ -105,6 +109,7 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
             friend={friend}
             handleRemoveClick={handleRemoveClick}
             acceptFriendship={acceptFriendship}
+            rejectFriendship={rejectFriendship}
           />
         )}
         className={s.list}
