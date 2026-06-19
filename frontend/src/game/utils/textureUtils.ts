@@ -71,14 +71,17 @@ const applyRoundedClip = (
   ctx.clip();
 };
 
-export const getRoundedAvatarTexture = (scene: Phaser.Scene) => {
-  const textureKey = `rounded_${Textures.avatar}`;
+export const getRoundedAvatarTexture = (
+  scene: Phaser.Scene,
+  sourceKey: string = Textures.avatar,
+) => {
+  const textureKey = `rounded_${sourceKey}`;
   // Avoid recreating texture
   if (scene.textures.exists(textureKey)) return textureKey;
 
   // Get original image source
   const sourceImage = scene.textures
-    .get(Textures.avatar)
+    .get(sourceKey)
     .getSourceImage() as HTMLImageElement;
 
   const size = Math.min(sourceImage.width, sourceImage.height);
