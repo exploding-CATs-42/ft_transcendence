@@ -158,6 +158,9 @@ importers:
       '@exploding-cats/contracts':
         specifier: workspace:*
         version: link:../packages/contracts
+      '@exploding-cats/game-core':
+        specifier: workspace:*
+        version: link:../packages/game
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.2.2(react-hook-form@7.74.0(react@19.2.5))
