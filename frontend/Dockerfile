@@ -13,13 +13,13 @@ CMD ["sh", "-c", "pnpm --filter frontend dev"]
 FROM base AS build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY frontend/package.json ./frontend/
-COPY packages/types/package.json ./packages/types/
-COPY packages/schemas/package.json ./packages/schemas/
+COPY packages/contracts/package.json ./packages/contracts/
 
 RUN pnpm install --frozen-lockfile
 
 COPY frontend/ ./frontend/
 COPY packages/ ./packages/
+
 RUN pnpm --filter frontend build
 
 ################## PRODUCTION #########################################

@@ -13,6 +13,7 @@ CMD ["sh", "-c", "pnpm --filter backend dev"]
 FROM base AS build
 COPY package.json pnpm-lock.yaml pnpm-workspace.yaml tsconfig.base.json ./
 COPY backend/package.json ./backend/
+COPY packages/contracts/package.json ./packages/contracts/
 
 RUN pnpm install --frozen-lockfile
 
