@@ -41,9 +41,7 @@ export async function listFriendsController(
   try {
     const friends = await listFriends({
       currentUserId: userId,
-      ...(parsed.data.status !== undefined
-        ? { status: parsed.data.status }
-        : {}),
+      ...(parsed.data.view !== undefined && { view: parsed.data.view }),
     });
 
     return res.status(200).json({ friends });
