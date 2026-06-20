@@ -20,9 +20,14 @@ export const useFriends = ({ userId, isMyProfile }: Props) => {
         let data: FriendItem[] = [];
 
         if (isMyProfile) {
-          data = await api.friends.getMeFriends();
+          data = await api.friends.getMeFriends({
+            view: "friends_and_requests",
+          });
         } else if (userId) {
-          data = await api.friends.getUserFriends({ userId });
+          data = await api.friends.getUserFriends(
+            { userId },
+            { view: "accepted" },
+          );
         }
 
         setFriends(data);
