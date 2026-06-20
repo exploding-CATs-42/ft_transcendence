@@ -14,9 +14,10 @@ import s from "./FriendsTab.module.css";
 interface Props {
   friends: FriendItem[];
   setFriends: Dispatch<SetStateAction<FriendItem[]>>;
+  isMyProfile: boolean;
 }
 
-const FriendsTab = ({ friends, setFriends }: Props) => {
+const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
   const [isOpenModal, toggleModal] = useModal();
   const [selectedFriend, setSelectedFriend] = useState<FriendItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
@@ -102,6 +103,12 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
     await updateFriendship("reject", friend);
   };
 
+  const friendActions = {
+    remove: handleRemoveClick,
+    accept: acceptFriendship,
+    reject: rejectFriendship,
+  };
+
   return (
     <>
       <List
@@ -110,9 +117,7 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
         renderItem={(friend) => (
           <FriendListItem
             friend={friend}
-            handleRemoveClick={handleRemoveClick}
-            acceptFriendship={acceptFriendship}
-            rejectFriendship={rejectFriendship}
+            friendActions={isMyProfile ? friendActions : undefined}
           />
         )}
         className={s.list}

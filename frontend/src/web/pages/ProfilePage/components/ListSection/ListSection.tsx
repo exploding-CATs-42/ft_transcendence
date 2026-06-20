@@ -12,6 +12,7 @@ interface Props {
   games: UserGameHistoryItem[];
   friends: FriendItem[];
   setFriends: Dispatch<SetStateAction<FriendItem[]>>;
+  isMyProfile: boolean;
 }
 
 export type ActiveTab = "games" | "friends";
@@ -21,7 +22,7 @@ const tabs: TabOption[] = [
   { key: "friends", label: "Friends" },
 ];
 
-const ListSection = ({ games, friends, setFriends }: Props) => {
+const ListSection = ({ games, friends, setFriends, isMyProfile }: Props) => {
   const [activeTab, setActiveTab] = useState<ActiveTab>("games");
 
   return (
@@ -33,7 +34,11 @@ const ListSection = ({ games, friends, setFriends }: Props) => {
       />
 
       {activeTab === "friends" ? (
-        <FriendsTab friends={friends} setFriends={setFriends}></FriendsTab>
+        <FriendsTab
+          friends={friends}
+          setFriends={setFriends}
+          isMyProfile={isMyProfile}
+        ></FriendsTab>
       ) : (
         <GamesTab games={games}></GamesTab>
       )}
