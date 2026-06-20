@@ -62,6 +62,7 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
       await api.friends.createFriendRequest({ userId: searchQuery });
 
       toast.success("Success");
+      setSearchQuery("");
     } catch (error) {
       const errmsg = getErrorMessage(error);
       toast.error(errmsg);
