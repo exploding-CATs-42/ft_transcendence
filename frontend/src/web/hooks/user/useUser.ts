@@ -4,7 +4,11 @@ import { toast } from "react-toastify";
 import api from "api";
 import { getErrorMessage } from "utils";
 
-import type { MyProfileUser, ProfileUser } from "pages/ProfilePage/types";
+import type {
+  MyProfileUserWithStats,
+  ProfileUser,
+  ProfileUserWithStats,
+} from "pages/ProfilePage/types";
 
 interface Props {
   userId: string | undefined;
@@ -12,13 +16,15 @@ interface Props {
 }
 
 export const useUser = ({ userId, isMyProfile }: Props) => {
-  const [user, setUser] = useState<ProfileUser | MyProfileUser | null>(null);
+  const [user, setUser] = useState<
+    ProfileUserWithStats | MyProfileUserWithStats | null
+  >(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        let data: ProfileUser | MyProfileUser | null = null;
+        let data: ProfileUserWithStats | MyProfileUserWithStats | null = null;
 
         if (isMyProfile) {
           data = await api.me.getMe();
