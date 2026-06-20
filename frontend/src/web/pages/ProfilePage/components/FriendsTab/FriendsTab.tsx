@@ -1,9 +1,10 @@
+// Libraries
 import { useFriendsActions, useModal } from "hooks";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
-
+// Project level
 import { Button, ConfirmPopup, List, SearchInput } from "components";
 import type { UserId } from "@exploding-cats/contracts";
-
+// Local level
 import type { FriendItem } from "../../types";
 import { FriendListItem } from "../../components";
 import { sortFriends } from "../../utils";
