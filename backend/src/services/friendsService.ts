@@ -3,6 +3,7 @@ import { FriendshipStatus } from "generated/prisma/client";
 import { publicProfileSelect, prisma } from "lib/prisma";
 import { FriendDirection, FriendListItem } from "types";
 import { toProfileUser } from "mappers";
+import { FriendshipView } from "@exploding-cats/shared-types";
 
 export class FriendsServiceError extends Error {
   public statusCode: number;
@@ -33,9 +34,32 @@ function getDirection(params: {
     : "incoming";
 }
 
+function filter(friendships: FriendListItem[], view?: FriendshipView) {
+  switch (view) {
+    case FriendshipView.ACCEPTED:
+      return friendships.filter((f) => f.status === FriendshipStatus.ACCEPTED);
+
+    case FriendshipView.INCOMING:
+      return friendships.filter(
+        (f) =>
+          f.status === FriendshipStatus.PENDING && f.direction === "incoming",
+      );
+
+    case FriendshipView.FRIENDS_AND_REQUESTS:
+      return friendships.filter(
+        (f) =>
+          f.status === FriendshipStatus.ACCEPTED ||
+          (f.status === FriendshipStatus.PENDING && f.direction === "incoming"),
+      );
+
+    default:
+      return friendships;
+  }
+}
+
 export async function listFriends(params: {
   currentUserId: string;
-  status?: "incoming";
+  view?: FriendshipView;
 }): Promise<FriendListItem[]> {
   const friendships = await prisma.friendship.findMany({
     where: {
@@ -43,14 +67,6 @@ export async function listFriends(params: {
         { userLowId: params.currentUserId },
         { userHighId: params.currentUserId },
       ],
-      ...(params.status === "incoming"
-        ? {
-            status: FriendshipStatus.PENDING,
-            requestedById: {
-              not: params.currentUserId,
-            },
-          }
-        : {}),
     },
     include: {
       userLow: {
@@ -62,7 +78,7 @@ export async function listFriends(params: {
     },
   });
 
-  return friendships.map((friendship) => {
+  const items = friendships.map((friendship) => {
     const otherUser =
       friendship.userLowId === params.currentUserId
         ? friendship.userHigh
@@ -70,7 +86,7 @@ export async function listFriends(params: {
 
     return {
       user: toProfileUser(otherUser),
-      status: friendship.status as "PENDING" | "ACCEPTED" | "REJECTED",
+      status: friendship.status,
       direction: getDirection({
         currentUserId: params.currentUserId,
         requestedById: friendship.requestedById,
@@ -78,6 +94,8 @@ export async function listFriends(params: {
       }),
     };
   });
+
+  return filter(items, params.view);
 }
 
 export async function sendFriendRequest(params: {
