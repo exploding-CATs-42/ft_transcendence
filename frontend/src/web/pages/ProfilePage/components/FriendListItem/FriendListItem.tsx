@@ -1,5 +1,6 @@
 // Project level
 import { Avatar, Button, Icon, ListItem } from "components";
+import type { UserId } from "@exploding-cats/shared-types";
 //Local level
 import s from "./FriendListItem.module.css";
 import type { FriendItem } from "pages/ProfilePage/types";
@@ -8,9 +9,9 @@ interface Props {
   friend: FriendItem;
   friendActions:
     | {
-        remove: (friend: FriendItem) => void;
-        accept: (friend: FriendItem) => Promise<void>;
-        reject: (friend: FriendItem) => Promise<void>;
+        remove: (friendId: UserId) => void;
+        accept: (friendId: UserId) => Promise<void>;
+        reject: (friendId: UserId) => Promise<void>;
       }
     | undefined;
 }
@@ -40,7 +41,7 @@ const FriendListItem = ({ friend, friendActions }: Props) => {
             <Button
               className={s.closeButton}
               onClick={() => {
-                friendActions?.remove(friend);
+                friendActions?.remove(friend.user.id);
               }}
             >
               <Icon name="cross" stroke="black" width={20} height={20} />
@@ -50,7 +51,7 @@ const FriendListItem = ({ friend, friendActions }: Props) => {
               <Button
                 className={s.button}
                 onClick={() => {
-                  friendActions?.accept(friend);
+                  friendActions?.accept(friend.user.id);
                 }}
               >
                 Accept
@@ -58,7 +59,7 @@ const FriendListItem = ({ friend, friendActions }: Props) => {
               <Button
                 className={s.button}
                 onClick={() => {
-                  friendActions?.reject(friend);
+                  friendActions?.reject(friend.user.id);
                 }}
               >
                 Ignore

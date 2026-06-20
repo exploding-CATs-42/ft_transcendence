@@ -2,6 +2,7 @@ import { useFriendsActions, useModal } from "hooks";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 
 import { Button, ConfirmPopup, List, SearchInput } from "components";
+import type { UserId } from "@exploding-cats/shared-types";
 
 import type { FriendItem } from "../../types";
 import { FriendListItem } from "../../components";
@@ -16,7 +17,7 @@ interface Props {
 
 const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
   const [isOpenModal, toggleModal] = useModal();
-  const [selectedFriend, setSelectedFriend] = useState<FriendItem | null>(null);
+  const [selectedFriendId, setSelectedFriendId] = useState<UserId | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
   const {
     handleDeleteFriendship,
@@ -27,8 +28,8 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
 
   const sortedFriends = useMemo(() => sortFriends(friends), [friends]);
 
-  const handleRemoveClick = (friend: FriendItem) => {
-    setSelectedFriend(friend);
+  const handleRemoveClick = (friendId: UserId) => {
+    setSelectedFriendId(friendId);
     toggleModal();
   };
 
@@ -72,8 +73,8 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
         isOpenModal={isOpenModal}
         msg="Are you sure you want to remove your friend?"
         onConfirm={() => {
-          if (selectedFriend) {
-            handleDeleteFriendship(selectedFriend);
+          if (selectedFriendId) {
+            handleDeleteFriendship(selectedFriendId);
           }
         }}
       />

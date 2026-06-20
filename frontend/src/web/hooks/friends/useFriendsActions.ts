@@ -1,3 +1,4 @@
+import type { UserId } from "@exploding-cats/shared-types";
 import api from "api";
 import type { FriendItem } from "pages/ProfilePage/types";
 import type { Dispatch, SetStateAction } from "react";
@@ -24,10 +25,9 @@ export const useFriendsActions = ({ setFriends, toggleModal }: Props) => {
 
   const updateFriendship = async (
     action: FriendshipRequestAction,
-    selectedFriend: FriendItem,
+    friendId: UserId,
   ) => {
     try {
-      const friendId = selectedFriend.user.id;
       await api.friends.updateFriendship({ action }, { userId: friendId });
 
       setFriends((prev) =>
@@ -45,17 +45,15 @@ export const useFriendsActions = ({ setFriends, toggleModal }: Props) => {
     }
   };
 
-  const acceptFriendship = async (friend: FriendItem) => {
-    await updateFriendship("accept", friend);
+  const acceptFriendship = async (friendId: UserId) => {
+    await updateFriendship("accept", friendId);
   };
 
-  const rejectFriendship = async (friend: FriendItem) => {
-    await updateFriendship("reject", friend);
+  const rejectFriendship = async (friendId: UserId) => {
+    await updateFriendship("reject", friendId);
   };
 
-  const handleDeleteFriendship = async (selectedFriend: FriendItem) => {
-    const friendId = selectedFriend.user.id;
-
+  const handleDeleteFriendship = async (friendId: UserId) => {
     try {
       await api.friends.deleteFriendship({ userId: friendId });
       toggleModal();
