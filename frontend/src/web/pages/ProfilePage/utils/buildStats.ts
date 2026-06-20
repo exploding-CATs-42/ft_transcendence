@@ -1,19 +1,10 @@
-import type { UserGameHistoryItem } from "components/GameListItem/types";
 import type { ProfileStat } from "../types";
-import type { UserId } from "../types/ProfileUser";
+import type { ProfileUserWithStats } from "../types/ProfileUser";
 
-export function buildStats(
-  userId: UserId,
-  games: UserGameHistoryItem[],
-): ProfileStat[] {
-  const totalGames = games.length;
-  let gamesWon = 0;
+export function buildStats(user: ProfileUserWithStats): ProfileStat[] {
+  const totalGames = user.totalGames;
+  const gamesWon = user.wins;
 
-  for (const m of games) {
-    if (m.winnerId === userId) {
-      gamesWon++;
-    }
-  }
   const explodedTimes = totalGames - gamesWon;
 
   const successRate =
