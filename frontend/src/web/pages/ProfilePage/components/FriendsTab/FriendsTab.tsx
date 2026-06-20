@@ -52,31 +52,35 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
         className={s.list}
         empty="No friends yet"
       />
-      <div className={s.footer}>
-        <SearchInput
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
-        <Button
-          className={s.button}
-          onClick={() => {
-            handleCreateFriendship(searchQuery);
-          }}
-        >
-          Add
-        </Button>
-      </div>
+      {isMyProfile && (
+        <>
+          <div className={s.footer}>
+            <SearchInput
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+            <Button
+              className={s.button}
+              onClick={() => {
+                handleCreateFriendship(searchQuery);
+              }}
+            >
+              Add
+            </Button>
+          </div>
 
-      <ConfirmPopup
-        toggleModal={toggleModal}
-        isOpenModal={isOpenModal}
-        msg="Are you sure you want to remove your friend?"
-        onConfirm={() => {
-          if (selectedFriendId) {
-            handleDeleteFriendship(selectedFriendId);
-          }
-        }}
-      />
+          <ConfirmPopup
+            toggleModal={toggleModal}
+            isOpenModal={isOpenModal}
+            msg="Are you sure you want to remove your friend?"
+            onConfirm={() => {
+              if (selectedFriendId) {
+                handleDeleteFriendship(selectedFriendId);
+              }
+            }}
+          />
+        </>
+      )}
     </>
   );
 };
