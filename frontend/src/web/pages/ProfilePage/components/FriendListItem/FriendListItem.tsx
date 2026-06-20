@@ -6,17 +6,16 @@ import type { FriendItem } from "pages/ProfilePage/types";
 
 interface Props {
   friend: FriendItem;
-  handleRemoveClick: (friend: FriendItem) => void;
-  acceptFriendship: (friend: FriendItem) => Promise<void>;
-  rejectFriendship: (friend: FriendItem) => Promise<void>;
+  friendActions:
+    | {
+        remove: (friend: FriendItem) => void;
+        accept: (friend: FriendItem) => Promise<void>;
+        reject: (friend: FriendItem) => Promise<void>;
+      }
+    | undefined;
 }
 
-const FriendListItem = ({
-  friend,
-  handleRemoveClick,
-  acceptFriendship,
-  rejectFriendship,
-}: Props) => {
+const FriendListItem = ({ friend, friendActions }: Props) => {
   return (
     <ListItem>
       <div className={s.container}>
@@ -41,7 +40,7 @@ const FriendListItem = ({
             <Button
               className={s.closeButton}
               onClick={() => {
-                handleRemoveClick(friend);
+                friendActions?.remove(friend);
               }}
             >
               <Icon name="cross" stroke="black" width={20} height={20} />
@@ -51,7 +50,7 @@ const FriendListItem = ({
               <Button
                 className={s.button}
                 onClick={() => {
-                  acceptFriendship(friend);
+                  friendActions?.accept(friend);
                 }}
               >
                 Accept
@@ -59,7 +58,7 @@ const FriendListItem = ({
               <Button
                 className={s.button}
                 onClick={() => {
-                  rejectFriendship(friend);
+                  friendActions?.reject(friend);
                 }}
               >
                 Ignore
