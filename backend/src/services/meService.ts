@@ -1,6 +1,6 @@
 // Project level
 import { ApiError } from "errors";
-import { MyProfileUser } from "types";
+import { MyProfileUser, MyProfileUserWithStats } from "types";
 import cloudinary from "lib/cloudinary/cloudinary";
 import { prisma, selfProfileSelect } from "lib/prisma";
 import { comparePassword, hashPassword } from "utils";
@@ -116,7 +116,9 @@ export async function updateMe(
   };
 }
 
-export async function getMe(userId: string): Promise<{ user: MyProfileUser }> {
+export async function getMe(
+  userId: string,
+): Promise<{ user: MyProfileUserWithStats }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: selfProfileSelect,
