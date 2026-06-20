@@ -22,8 +22,8 @@ const ProfilePage = () => {
   const loading = friendsLoading || gamesLoading || userLoading;
 
   const stats = useMemo(() => {
-    return user ? buildStats(user.id, games) : [];
-  }, [user, games]);
+    return user ? buildStats(user) : [];
+  }, [user]);
 
   if (loading) {
     return <LoadingScreen />;
