@@ -8,8 +8,12 @@ import type {
 import { api } from "../axios";
 import type { FriendItem } from "pages/ProfilePage/types";
 
-const getMeFriends = async (): Promise<FriendItem[]> => {
-  const result = await api.get("/me/friends");
+const getMeFriends = async (
+  query?: ListFriendsQuery,
+): Promise<FriendItem[]> => {
+  const result = await api.get("/me/friends", {
+    params: query,
+  });
   return result.data.friends;
 };
 
