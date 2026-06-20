@@ -9,6 +9,7 @@ import { FriendshipStatus, type FriendshipRequestAction } from "types";
 
 import type { FriendItem } from "../../types";
 import { FriendListItem } from "../../components";
+import { sortFriends } from "../../utils";
 import s from "./FriendsTab.module.css";
 
 interface Props {
@@ -22,20 +23,7 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
   const [selectedFriend, setSelectedFriend] = useState<FriendItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const sortedFriends = useMemo(() => {
-    const statusOrder = {
-      ACCEPTED: 0,
-      PENDING: 1,
-      REJECTED: 2,
-    };
-
-    return [...friends].sort((a, b) => {
-      if (statusOrder[a.status] !== statusOrder[b.status]) {
-        return statusOrder[b.status] - statusOrder[a.status];
-      }
-      return a.user.username.localeCompare(b.user.username);
-    });
-  }, [friends]);
+  const sortedFriends = useMemo(() => sortFriends(friends), [friends]);
 
   const handleRemoveClick = (friend: FriendItem) => {
     setSelectedFriend(friend);
