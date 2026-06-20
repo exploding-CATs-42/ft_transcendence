@@ -33,11 +33,13 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
     toggleModal();
   };
 
-  const friendActions = {
-    remove: handleRemoveClick,
-    accept: acceptFriendship,
-    reject: rejectFriendship,
-  };
+  const friendActions = isMyProfile
+    ? {
+        remove: handleRemoveClick,
+        accept: acceptFriendship,
+        reject: rejectFriendship,
+      }
+    : undefined;
 
   return (
     <>
@@ -45,10 +47,7 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
         items={sortedFriends}
         getKey={(friend) => friend.user.id}
         renderItem={(friend) => (
-          <FriendListItem
-            friend={friend}
-            friendActions={isMyProfile ? friendActions : undefined}
-          />
+          <FriendListItem friend={friend} friendActions={friendActions} />
         )}
         className={s.list}
         empty="No friends yet"
