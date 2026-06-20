@@ -1,9 +1,10 @@
 // Project level
-import { Avatar, Button, Icon, ListItem } from "components";
+import { Avatar, ListItem } from "components";
 import type { UserId } from "@exploding-cats/contracts";
 //Local level
 import s from "./FriendListItem.module.css";
 import type { FriendItem } from "pages/ProfilePage/types";
+import FriendControl from "../FriendControl/FriendControl";
 
 interface Props {
   friend: FriendItem;
@@ -36,37 +37,9 @@ const FriendListItem = ({ friend, friendActions }: Props) => {
           </div>
         </div>
 
-        <div className={s.rightContent}>
-          {friend.status === "ACCEPTED" ? (
-            <Button
-              className={s.closeButton}
-              onClick={() => {
-                friendActions?.remove(friend.user.id);
-              }}
-            >
-              <Icon name="cross" stroke="black" width={20} height={20} />
-            </Button>
-          ) : (
-            <>
-              <Button
-                className={s.button}
-                onClick={() => {
-                  friendActions?.accept(friend.user.id);
-                }}
-              >
-                Accept
-              </Button>
-              <Button
-                className={s.button}
-                onClick={() => {
-                  friendActions?.reject(friend.user.id);
-                }}
-              >
-                Ignore
-              </Button>
-            </>
-          )}
-        </div>
+        {friendActions && (
+          <FriendControl friend={friend} friendActions={friendActions} />
+        )}
       </div>
     </ListItem>
   );
