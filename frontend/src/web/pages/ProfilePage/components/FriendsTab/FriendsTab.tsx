@@ -5,7 +5,7 @@ import { toast } from "react-toastify";
 import api from "api";
 import { getErrorMessage } from "utils";
 import { Button, ConfirmPopup, List, SearchInput } from "components";
-import { type FriendshipRequestAction } from "types";
+import { FriendshipStatus, type FriendshipRequestAction } from "types";
 
 import type { FriendItem } from "../../types";
 import { FriendListItem } from "../../components";
@@ -82,7 +82,7 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
       setFriends((prev) =>
         prev.map((friend) =>
           friend.user.id === friendId
-            ? { ...friend, status: "ACCEPTED" }
+            ? { ...friend, status: FriendshipStatus.ACCEPTED }
             : friend,
         ),
       );
