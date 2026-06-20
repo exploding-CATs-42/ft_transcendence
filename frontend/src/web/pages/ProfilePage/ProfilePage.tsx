@@ -52,7 +52,12 @@ const ProfilePage = () => {
         <StatsSection stats={stats} />
       </div>
 
-      <ListSection games={games} friends={friends} setFriends={setFriends} />
+      <ListSection
+        games={games}
+        friends={friends}
+        setFriends={setFriends}
+        isMyProfile={isMyProfile}
+      />
     </div>
   );
 };
