@@ -14,7 +14,6 @@ import {
   AvatarWithAdd,
 } from "components";
 
-import type { MyProfileUser, ProfileUser } from "pages/ProfilePage/types";
 import type { BadRequestErrorResponse } from "types";
 import type { AxiosError } from "axios";
 
@@ -28,6 +27,7 @@ import {
 import { Spinner } from "assets";
 
 // Local level
+import type { MyProfileUser, ProfileUser } from "../../types";
 import s from "./EditPlayerModal.module.css";
 
 interface Props {
