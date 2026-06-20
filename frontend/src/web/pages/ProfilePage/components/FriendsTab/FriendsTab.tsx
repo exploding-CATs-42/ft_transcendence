@@ -1,5 +1,5 @@
 import { useModal } from "hooks";
-import { useState, type Dispatch, type SetStateAction } from "react";
+import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "react-toastify";
 
 import api from "api";
@@ -21,18 +21,20 @@ const FriendsTab = ({ friends, setFriends }: Props) => {
   const [selectedFriend, setSelectedFriend] = useState<FriendItem | null>(null);
   const [searchQuery, setSearchQuery] = useState<string>("");
 
-  const sortedFriends = [...friends].sort((a, b) => {
+  const sortedFriends = useMemo(() => {
     const statusOrder = {
       ACCEPTED: 0,
       PENDING: 1,
       REJECTED: 2,
     };
 
-    if (statusOrder[a.status] !== statusOrder[b.status]) {
-      return statusOrder[b.status] - statusOrder[a.status];
-    }
-    return a.user.username.localeCompare(b.user.username);
-  });
+    return [...friends].sort((a, b) => {
+      if (statusOrder[a.status] !== statusOrder[b.status]) {
+        return statusOrder[b.status] - statusOrder[a.status];
+      }
+      return a.user.username.localeCompare(b.user.username);
+    });
+  }, [friends]);
 
   const handleRemoveClick = (friend: FriendItem) => {
     setSelectedFriend(friend);
