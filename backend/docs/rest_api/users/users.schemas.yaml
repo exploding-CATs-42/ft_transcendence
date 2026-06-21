@@ -1,5 +1,33 @@
 components:
   schemas:
+    GameStats:
+      type: object
+      required:
+        - totalGames
+        - wins
+      properties:
+        totalGames:
+          type: integer
+          example: 10
+        wins:
+          type: integer
+          example: 6
+
+    OnlineStatus:
+      type: object
+      required:
+        - isOnline
+        - lastSeenAt
+      properties:
+        isOnline:
+          type: boolean
+          example: false
+        lastSeenAt:
+          type: string
+          format: date-time
+          nullable: true
+          example: "2026-04-28T10:00:00.000Z"
+
     User:
       type: object
       required:
@@ -21,108 +49,38 @@ components:
           example: alexfox
         avatarUrl:
           type: string
+          format: uri
           nullable: true
-          example: null
 
-    PublicProfileUser:
-      type: object
-      required:
-        - id
-        - username
-        - avatarUrl
-        - isOnline
-        - lastSeenAt
-        - totalGames
-        - wins
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
-        username:
-          type: string
-          example: alex
-        avatarUrl:
-          type: string
-          nullable: true
-          example: null
-        isOnline:
-          type: boolean
-          example: false
-        lastSeenAt:
-          type: string
-          format: date-time
-          nullable: true
-          example: "2026-04-28T10:00:00.000Z"
-        totalGames:
-          type: integer
-          example: 10
-        wins:
-          type: integer
-          example: 6
+    PublicUser:
+        type: object
+        required:
+          - id
+          - username
+          - avatarUrl
+        properties:
+          id:
+            type: string
+            format: uuid
+          username:
+            type: string
+          avatarUrl:
+            type: string
+            format: uri
+            nullable: true
+
+    ProfileUser:
+      allOf:
+        - $ref: "#/components/schemas/PublicUser"
+        - $ref: "#/components/schemas/OnlineStatus"
+
+    ProfileUserWithStats:
+      allOf:
+      - $ref: "#/components/schemas/ProfileUser"
+      - $ref: "#/components/schemas/GameStats"
 
     FriendUser:
-      type: object
-      required:
-        - id
-        - username
-        - avatarUrl
-        - isOnline
-        - lastSeenAt
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
-        username:
-          type: string
-          example: alex
-        avatarUrl:
-          type: string
-          nullable: true
-          example: null
-        isOnline:
-          type: boolean
-          example: false
-        lastSeenAt:
-          type: string
-          format: date-time
-          nullable: true
-          example: "2026-04-28T10:00:00.000Z"
-
-    SelfProfileUser:
-      type: object
-      required:
-        - id
-        - email
-        - username
-        - avatarUrl
-        - isOnline
-        - lastSeenAt
-      properties:
-        id:
-          type: string
-          format: uuid
-          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
-        email:
-          type: string
-          format: email
-          example: alex@example.com
-        username:
-          type: string
-          example: alexfox
-        avatarUrl:
-          type: string
-          nullable: true
-          example: null
-        isOnline:
-          type: boolean
-          example: true
-        lastSeenAt:
-          type: string
-          format: date-time
-          nullable: true
-          example: "2026-04-28T10:00:00.000Z"
+        $ref: "#/components/schemas/ProfileUser"
 
     UserResponse:
       type: object
@@ -130,7 +88,7 @@ components:
         - user
       properties:
         user:
-          $ref: "#/components/schemas/PublicProfileUser"
+          $ref: "#/components/schemas/ProfileUserWithStats"
 
     UserSearchResponse:
       type: object
@@ -140,7 +98,7 @@ components:
         users:
           type: array
           items:
-            $ref: "#/components/schemas/PublicProfileUser"
+            $ref: "#/components/schemas/ProfileUserWithStats"
 
     UserGameHistoryItem:
       type: object
@@ -148,7 +106,7 @@ components:
         - gameId
         - gameName
         - endedAt
-        - isWinner
+        - winnerId
         - players
       properties:
         gameId:
@@ -162,9 +120,11 @@ components:
           type: string
           format: date-time
           example: "2026-04-28T09:52:56.910Z"
-        isWinner:
-          type: boolean
-          example: true
+        winnerId:
+          type: string
+          format: uuid
+          nullable: true
+          example: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
         players:
           type: array
           items:
