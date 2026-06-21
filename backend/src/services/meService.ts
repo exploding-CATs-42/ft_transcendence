@@ -147,7 +147,7 @@ export async function updateMeAvatar(
   }
 
   if (!file) {
-    throw new ApiError("Invalid file", 404);
+    throw new ApiError("Invalid file", 400);
   }
 
   const result = await cloudinary.uploadImage(file);
