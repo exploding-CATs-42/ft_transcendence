@@ -40,6 +40,8 @@
       "sockets/*": ["./src/sockets/*"],
       "mappers": ["./src/mappers/index"],
       "mappers/*": ["./src/mappers/*"],
+      "config": ["./src/config/index"],
+      "config/*": ["./src/config/*"],
       "generated/*": ["./src/generated/*"]
     }
   },
