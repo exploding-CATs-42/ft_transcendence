@@ -27,7 +27,7 @@ export class AuthServiceError extends Error {
   }
 }
 
-function toPublicUser(user: User): User {
+function toUser(user: User): User {
   return {
     id: user.id,
     email: user.email,
@@ -90,7 +90,7 @@ export async function registerUser(
   });
 
   return {
-    user: toPublicUser(user),
+    user: toUser(user),
   };
 }
 
@@ -136,7 +136,7 @@ export async function loginUser(
   });
 
   return {
-    user: toPublicUser(user),
+    user: toUser(user),
     accessToken,
     refreshToken,
   };
