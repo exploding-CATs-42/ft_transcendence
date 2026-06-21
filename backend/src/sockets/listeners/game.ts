@@ -22,8 +22,9 @@ import {
   ServerPublicEvents,
   WaitingStatePayload,
 } from "@exploding-cats/shared-types";
+import { TypedSocket } from "types";
 
-export const lobbyGameHandlers = (io: Server, socket: Socket) => {
+export const lobbyGameHandlers = (io: Server, socket: TypedSocket) => {
   socket.on(
     ClientEvents.JOIN_GAME,
     withErrorHandler(
@@ -54,7 +55,8 @@ export const lobbyGameHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
-        const { playerId } = await leaveGame(parsed, socket.data.sub);
+        const userId = socket;
+        const { playerId } = await leaveGame(parsed, userId);
         const room = parsed.gameId;
         await socket.leave(room);
 

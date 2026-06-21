@@ -1,10 +1,11 @@
 // Libraries
-import { ExtendedError, Socket } from "socket.io";
+import { ExtendedError } from "socket.io";
 // Project level
 import { verifyAccessToken } from "utils";
+import { TypedSocket } from "types";
 
 export function authMiddleware(
-  socket: Socket,
+  socket: TypedSocket,
   next: (err?: ExtendedError | undefined) => void,
 ) {
   try {
@@ -16,7 +17,9 @@ export function authMiddleware(
 
     const payload = verifyAccessToken(token);
 
-    socket.data = payload;
+    socket.data = {
+      user: { id: payload.sub },
+    };
 
     next();
   } catch (_) {
