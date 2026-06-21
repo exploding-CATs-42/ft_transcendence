@@ -1,7 +1,7 @@
 // Libraries
 import type { Express } from "express";
 // Project level
-import { errorMiddleware } from "middlewares";
+import { apiRateLimiter, errorMiddleware } from "middlewares";
 // Local level
 import { docsRouter } from "./docs";
 import { usersRouter } from "./users";
@@ -10,6 +10,8 @@ import { friendsRouter } from "./friends";
 import { gamesRouter } from "./games";
 
 export const setupRouting = (app: Express) => {
+  app.use(apiRateLimiter);
+
   app.get("/", (_, res) => {
     return res.json({ message: "Hello world!" });
   });
