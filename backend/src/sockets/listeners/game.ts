@@ -23,7 +23,7 @@ import {
   WaitingStatePayload,
 } from "@exploding-cats/contracts";
 
-export const lobbyGameHandlers = (io: Server, socket: Socket) => {
+export const registerGameEventHandlers = (io: Server, socket: Socket) => {
   socket.on(
     ClientEvents.JOIN_GAME,
     withErrorHandler(
