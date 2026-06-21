@@ -144,6 +144,7 @@ const LobbyPage = () => {
       };
 
       setGames((prevGames) => [newGame, ...prevGames]);
+      navigate(`/game?gameId=${encodeURIComponent(createdGame.id)}`);
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);
 
