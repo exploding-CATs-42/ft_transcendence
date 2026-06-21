@@ -13,7 +13,6 @@ const LobbyPage = lazy(() => import("./pages/LobbyPage/LobbyPage"));
 const GamePage = lazy(() => import("./pages/GamePage/GamePage.jsx"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage/NotFoundPage.js"));
 const AuthPage = lazy(() => import("./pages/AuthPage/AuthPage"));
-const ChatPage = lazy(() => import("./pages/ChatPage/ChatPage"));
 const RulesPage = lazy(() => import("./pages/RulesPage/RulesPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage/AboutPage"));
 
@@ -38,7 +37,6 @@ function App() {
           <Route path="profile" element={<ProfilePage />} />
           <Route path="lobby" element={<LobbyPage />} />
           <Route path="game" element={<GamePage />} />
-          <Route path="chat" element={<ChatPage />} />
         </Route>
 
         {/* Unknown routes */}
