@@ -38,7 +38,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
     patch:
       tags:
         - Me
@@ -124,7 +124,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
   /me/avatar:
     patch:
       tags:
@@ -183,7 +183,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
   /me/games:
     get:
       tags:
@@ -223,4 +223,4 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error

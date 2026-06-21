@@ -36,7 +36,7 @@ paths:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
   /users/{userId}:
     get:
@@ -81,7 +81,7 @@ paths:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
   /users/{userId}/games:
     get:
@@ -126,4 +126,4 @@ paths:
               schema:
                 $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error

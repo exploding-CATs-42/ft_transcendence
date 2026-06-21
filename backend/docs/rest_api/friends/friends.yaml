@@ -45,7 +45,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
     post:
       tags:
@@ -107,7 +107,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
     delete:
       tags:
@@ -169,7 +169,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
   /me/friends/{userId}:
     patch:
@@ -245,4 +245,4 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
