@@ -27,6 +27,10 @@ export async function searchUsersController(
     });
   }
 
+  if (!req.user) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
   try {
     const users = await searchUsersByUsername(parsed.data.username);
     return res.status(200).json({ users });
@@ -53,6 +57,10 @@ export async function getUserByIdController(
     });
   }
 
+  if (!req.user) {
+    return res.status(401).json({ message: "Invalid token" });
+  }
+
   try {
     const user = await getPublicUserById(parsed.data.userId);
     return res.status(200).json({ user });
@@ -77,6 +85,10 @@ export async function getUserGamesController(
       message: "Validation error",
       errors: parsed.error.flatten(),
     });
+  }
+
+  if (!req.user) {
+    return res.status(401).json({ message: "Invalid token" });
   }
 
   try {
