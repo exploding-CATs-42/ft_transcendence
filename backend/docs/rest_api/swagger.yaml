@@ -38,6 +38,10 @@ paths:
     $ref: "users/users.yaml#/paths/~1users~1{userId}~1games"
   /me:
     $ref: "me/me.yaml#/paths/~1me"
+  /me/avatar:
+    $ref: "me/me.yaml#/paths/~1me~1avatar"
+  /me/games:
+    $ref: "me/me.yaml#/paths/~1me~1games"
   /me/friends:
     $ref: "friends/friends.yaml#/paths/~1me~1friends"
   /me/friends/{userId}:
@@ -56,12 +60,8 @@ components:
   schemas:
     User:
       $ref: "users/users.schemas.yaml#/components/schemas/User"
-    PublicProfileUser:
-      $ref: "users/users.schemas.yaml#/components/schemas/PublicProfileUser"
     FriendUser:
       $ref: "users/users.schemas.yaml#/components/schemas/FriendUser"
-    SelfProfileUser:
-      $ref: "users/users.schemas.yaml#/components/schemas/SelfProfileUser"
     RegisterRequest:
       $ref: "auth/auth.schemas.yaml#/components/schemas/RegisterRequest"
     LoginRequest:
@@ -80,10 +80,16 @@ components:
       $ref: "users/users.schemas.yaml#/components/schemas/UserGameHistoryItem"
     UserGamesResponse:
       $ref: "users/users.schemas.yaml#/components/schemas/UserGamesResponse"
+    GetMeResponse:
+      $ref: "me/me.schemas.yaml#/components/schemas/GetMeResponse"
     UpdateMeRequest:
       $ref: "me/me.schemas.yaml#/components/schemas/UpdateMeRequest"
     UpdateMeResponse:
       $ref: "me/me.schemas.yaml#/components/schemas/UpdateMeResponse"
+    UpdateAvatarResponse:
+      $ref: "me/me.schemas.yaml#/components/schemas/UpdateAvatarResponse"
+    GetMeGamesResponse:
+      $ref: "me/me.schemas.yaml#/components/schemas/GetMeGamesResponse"
     FriendListItem:
       $ref: "friends/friends.schemas.yaml#/components/schemas/FriendListItem"
     FriendsListResponse:
