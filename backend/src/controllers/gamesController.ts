@@ -58,6 +58,6 @@ export async function deleteGameController(
 ) {
   const parsed = validate(deleteGameParamsSchema, req.params);
 
-  const result = await deleteGame(req.user.id, parsed);
-  res.status(201).json(result);
+  await deleteGame(req.user.id, parsed);
+  res.status(200).json({ message: "Game deleted" });
 }
