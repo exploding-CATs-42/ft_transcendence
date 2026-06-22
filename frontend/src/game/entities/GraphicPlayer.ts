@@ -1,6 +1,5 @@
-import type { Point, LabelConfig } from "game/@types";
+import type { Point, LabelConfig, Player } from "game/@types";
 import { Textures } from "game/constants";
-import type { Player } from "game/entities";
 import { getRoundedAvatarTexture } from "game/utils";
 
 const AVATAR_WIDTH = 193;
