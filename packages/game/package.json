@@ -9,7 +9,8 @@
     "lint:fix": "eslint --fix ./src",
     "lint:check": "eslint ./src",
     "format:fix": "prettier --write ./src",
-    "format:check": "prettier --check ./src"
+    "format:check": "prettier --check ./src",
+    "xstate-helper": "tsx scripts/xstate-helper.ts"
   },
   "dependencies": {
     "xstate": "^5.31.1"
@@ -19,6 +20,8 @@
     "@types/node": "^25.6.0",
     "eslint": "^9.39.4",
     "prettier": "^3.8.1",
+    "ts-morph": "^28.0.0",
+    "tsx": "^4.21.0",
     "typescript": "5.9.3",
     "typescript-eslint": "^8.57.2",
     "vitest": "^4.1.2"

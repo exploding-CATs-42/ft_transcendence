@@ -98,4 +98,4 @@ backend/src/generated
 backend/data/games.json
 
 # xstate game machine visualization files
-backend/**/**.visualized.ts
+**/**.visualized.ts
