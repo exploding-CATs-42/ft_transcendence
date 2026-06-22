@@ -70,6 +70,8 @@ const LobbyPage = () => {
   }, []);
 
   useEffect(() => {
+    // We intentionally load the external games list after the page mounts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadGames();
   }, [loadGames]);
 
@@ -99,7 +101,7 @@ const LobbyPage = () => {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [toggleExistingGameModal]);
 
   const handleOpenJoinModalWithGameId = (selectedGameId: string) => {
     setGameId(selectedGameId);
