@@ -12,5 +12,6 @@ export default defineConfig([
         tsconfigRootDir: import.meta.dirname,
       },
     },
+    ignores: ["**/**.visualized.ts"],
   },
 ]);
