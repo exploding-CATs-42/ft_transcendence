@@ -24,9 +24,8 @@ import {
   GraphicHand,
   OpponentHand,
   PlayerSeat,
-  type Player,
 } from "../entities";
-import type { Point, LabelConfig, CardConfig } from "../@types";
+import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
   attachGameRoomSockets,
   type CleanupFunction,
