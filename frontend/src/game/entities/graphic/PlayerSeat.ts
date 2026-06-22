@@ -1,5 +1,5 @@
 import type { Point } from "game/@types";
-import type { GraphicPlayer, OpponentHand } from "game/entities";
+import type { GraphicPlayer, OpponentHand } from "game/entities/graphic";
 
 export class PlayerSeat {
   #container: Phaser.GameObjects.Container;
