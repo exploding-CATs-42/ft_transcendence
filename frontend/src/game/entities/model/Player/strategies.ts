@@ -1,42 +1,30 @@
 // Local level
-import type { OpponentContext, PlayerContext, MyContext } from "./context";
-import type { PlayerActionArgs, PlayerGuardsArgs } from "./types";
+import type { PlayerContext, MyContext } from "./context";
+import type { PlayerEvent } from "./events";
 import me from "./me";
 import opponent from "./opponent";
 
-interface PlayerStrategy {
+export interface PlayerStrategy<TContext> {
   guards: {
-    hasCards: (args: PlayerGuardsArgs) => boolean;
+    hasCards: (args: { context: TContext; event: PlayerEvent }) => boolean;
   };
   actions: {
-    addCard: (args: PlayerActionArgs) => PlayerContext;
+    playCard: (args: {
+      context: TContext;
+      event: PlayerEvent;
+    }) => Partial<TContext>;
   };
 }
 
-export function isMe(ctx: PlayerContext): ctx is MyContext {
+function isMe(ctx: PlayerContext): ctx is MyContext {
   return ctx.role === "me";
 }
 
-export function isOpponent(ctx: PlayerContext): ctx is OpponentContext {
-  return ctx.role === "opponent";
-}
-
-function createMyStrategy(context: MyContext): PlayerStrategy {
-  return {
-    guards: me.guards,
-    actions: me.actions,
-  };
-}
-
-function createOpponentStrategy(context: OpponentContext): PlayerStrategy {
-  return {
-    guards: opponent.guards,
-    actions: opponent.actions,
-  };
-}
-
-export function getStrategy(context: PlayerContext): PlayerStrategy {
-  return isMe(context)
-    ? createMyStrategy(context)
-    : createOpponentStrategy(context);
+export function getStrategy(
+  context: PlayerContext,
+): PlayerStrategy<PlayerContext> {
+  if (isMe(context)) {
+    return me as unknown as PlayerStrategy<PlayerContext>;
+  }
+  return opponent as unknown as PlayerStrategy<PlayerContext>;
 }

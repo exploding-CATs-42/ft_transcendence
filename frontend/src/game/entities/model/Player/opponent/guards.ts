@@ -1,6 +1,12 @@
+import type { PlayerEvent } from "../events";
 import type { OpponentContext } from "./context";
 
-const hasCards = (context: OpponentContext) => {
+interface OpponentGuardArgs {
+  context: OpponentContext;
+  event: PlayerEvent;
+}
+
+const hasCards = ({ context, event: _ }: OpponentGuardArgs) => {
   if (context.cardCount > 0) return true;
   return false;
 };

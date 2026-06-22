@@ -1,15 +1,20 @@
+import { PlayerEvents, type PlayerEvent } from "../events";
 import type { MyContext } from "./context";
 
-// Actions
-const addCard = (_context: MyContext) => {
-  // 	, event: PlayerEvent
-  //   if (event.type !== PlayerEvents.EXPLODE) return;
-  // 	{
-  //   ...context,
-  //   cards: MyAddCard(context.cards, card!),
-  // }
+interface MyActionArgs {
+  context: MyContext;
+  event: PlayerEvent;
+}
+
+const playCard = ({ context, event }: MyActionArgs) => {
+  if (event.type !== PlayerEvents.PLAY_CARD) return;
+
+  return {
+    ...context,
+    cards: [...context.cards, event.card],
+  };
 };
 
 export default {
-  addCard,
+  playCard,
 };

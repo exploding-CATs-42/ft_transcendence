@@ -1,13 +1,17 @@
+import type { PlayerEvent } from "../events";
 import type { OpponentContext } from "./context";
 
-// Actions
-const addCard = (context: OpponentContext) => {
+interface OpponentActionArgs {
+  context: OpponentContext;
+  event: PlayerEvent;
+}
+
+const playCard = ({ context, event: _ }: OpponentActionArgs) => {
   return {
-    ...context,
-    cardCount: context.cardCount + 1,
+    cardCount: context.cardCount - 1,
   };
 };
 
 export default {
-  addCard,
+  playCard,
 };

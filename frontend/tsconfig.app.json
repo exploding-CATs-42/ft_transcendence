@@ -43,8 +43,9 @@
       "routes": ["./src/web/routes/index"],
       "routes/*": ["./src/web/routes/*"],
       "socket": ["./src/web/socket/index"],
-      "socket/*": ["./src/web/socket/*"],
+      "socket/*": ["./src/web/socket/*"]
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["**/*.visualized.ts"]
 }
