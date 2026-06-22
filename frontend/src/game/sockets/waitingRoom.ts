@@ -23,15 +23,26 @@ export interface WaitingRoomHandlers {
 }
 
 let lastWaitingState: WaitingStatePayload | null = null;
+let lastGameStarted = false;
 
 export function trackWaitingState(): () => void {
-  const cache = (p: WaitingStatePayload) => {
+  const cacheWaitingState = (p: WaitingStatePayload) => {
     lastWaitingState = p;
   };
-  socket.on(ServerPrivateEvents.WAITING_STATE, cache);
+
+  const cacheGameStarted = () => {
+    lastGameStarted = true;
+  };
+
+  socket.on(ServerPrivateEvents.WAITING_STATE, cacheWaitingState);
+  socket.on(ServerPublicEvents.GAME_STARTED, cacheGameStarted);
+
   return () => {
-    socket.off(ServerPrivateEvents.WAITING_STATE, cache);
+    socket.off(ServerPrivateEvents.WAITING_STATE, cacheWaitingState);
+    socket.off(ServerPublicEvents.GAME_STARTED, cacheGameStarted);
+
     lastWaitingState = null;
+    lastGameStarted = false;
   };
 }
 
@@ -62,8 +73,13 @@ export function subscribeWaitingRoom(
   socket.on(ServerPublicEvents.COUNTDOWN_CANCELED, onCountdownCanceled);
   socket.on(ServerPublicEvents.GAME_STARTED, onGameStarted);
 
-  if (lastWaitingState)
+  if (lastWaitingState) {
     handlers.onWaitingState(lastWaitingState.waitingState.players);
+  }
+
+  if (lastGameStarted) {
+    handlers.onGameStarted();
+  }
 
   return () => {
     socket.off(ServerPrivateEvents.WAITING_STATE, onWaitingState);
