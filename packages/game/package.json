@@ -5,7 +5,7 @@
     ".": "./src/index.ts"
   },
   "scripts": {
-    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "typecheck": "tsc --noEmit -p tsconfig.package.json",
     "lint:fix": "eslint --fix ./src",
     "lint:check": "eslint ./src",
     "format:fix": "prettier --write ./src",
