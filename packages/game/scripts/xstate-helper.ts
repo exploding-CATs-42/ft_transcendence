@@ -1,10 +1,10 @@
 import { Project, SyntaxKind } from "ts-morph";
-import { GameTargets } from "../src/game/targets";
-import { GAME_MACHINE_ID, GameStates } from "../src/game/states";
-import { GameEvents } from "../src/game/events";
-import { GameActions } from "../src/game/actions";
-import { GameGuards } from "../src/game/guards";
-import { START_GAME_COUNTDOWN_MS } from "../src/constants/game";
+import { GameTargets } from "../src/targets";
+import { GameStates } from "../src/states";
+import { GameEvents } from "../src/events";
+import { GameActions } from "../src/actions";
+import { GameGuards } from "../src/guards";
+import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "../src/constants";
 
 // Build a lookup map of every identifier/expression → its runtime value
 const replacements = new Map<string, string>([
@@ -27,8 +27,8 @@ const replacements = new Map<string, string>([
   ["START_GAME_COUNTDOWN_MS", String(START_GAME_COUNTDOWN_MS)],
 ]);
 
-const project = new Project({ tsConfigFilePath: "tsconfig.json" });
-const sourceFile = project.getSourceFileOrThrow("src/game/gameMachine.ts");
+const project = new Project({ tsConfigFilePath: "tsconfig.package.json" });
+const sourceFile = project.getSourceFileOrThrow("src/gameMachine.ts");
 
 // Replace property access expressions (GameTargets.X, GameStates.X, etc.)
 sourceFile
