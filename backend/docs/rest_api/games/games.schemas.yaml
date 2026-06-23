@@ -1,0 +1,91 @@
+components:
+  schemas:
+    GameRecord:
+      type: object
+      required:
+        - id
+        - name
+        - maxPlayers
+        - createdAt
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+        maxPlayers:
+          type: integer
+        createdAt:
+          type: integer
+          format: int64
+          description: Creation timestamp (Unix epoch, milliseconds)
+          example: 1745835176910
+
+    CreateGameRequest:
+      type: object
+      required:
+        - gameName
+        - maxPlayers
+      properties:
+        gameName:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: Friday Night Table
+        maxPlayers:
+          type: integer
+          minimum: 2
+          maximum: 5
+          example: 4
+
+    GameResponse:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/GameRecord"
+
+    GamesListResponse:
+      type: array
+      items:
+        $ref: "#/components/schemas/GameRecord"
+
+    CurrentGameResponse:
+      type: object
+      nullable: true
+      allOf:
+        - $ref: "#/components/schemas/GameRecord"
+
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Operation completed
+
+    ValidationErrorResponse:
+      type: object
+      required:
+        - message
+        - errors
+      properties:
+        message:
+          type: string
+          example: Validation error
+        errors:
+          type: object
+          required:
+            - formErrors
+            - fieldErrors
+          properties:
+            formErrors:
+              type: array
+              items:
+                type: string
+              example: []
+            fieldErrors:
+              type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
