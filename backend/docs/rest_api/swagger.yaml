@@ -20,6 +20,8 @@ tags:
     description: Current authenticated user profile
   - name: Friends
     description: Friendship management for the current authenticated user
+  - name: Games
+    description: Game lobby management
 
 paths:
   /auth/register:
@@ -46,6 +48,10 @@ paths:
     $ref: "friends/friends.yaml#/paths/~1me~1friends"
   /me/friends/{userId}:
     $ref: "friends/friends.yaml#/paths/~1me~1friends~1{userId}"
+  /games:
+    $ref: "games/games.yaml#/paths/~1games"
+  /games/current:
+    $ref: "games/games.yaml#/paths/~1games~1current"
 
 components:
   securitySchemes:
@@ -106,3 +112,13 @@ components:
       $ref: "users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
     ValidationErrorResponse:
       $ref: "users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+    GameRecord:
+      $ref: "games/games.schemas.yaml#/components/schemas/GameRecord"
+    GameResponse:
+      $ref: "games/games.schemas.yaml#/components/schemas/GameResponse"
+    GamesListResponse:
+      $ref: "games/games.schemas.yaml#/components/schemas/GamesListResponse"
+    CurrentGameResponse:
+      $ref: "games/games.schemas.yaml#/components/schemas/CurrentGameResponse"
+    CreateGameRequest:
+      $ref: "games/games.schemas.yaml#/components/schemas/CreateGameRequest"
