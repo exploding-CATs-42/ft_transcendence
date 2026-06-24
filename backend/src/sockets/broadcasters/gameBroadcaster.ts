@@ -7,11 +7,16 @@ import { Game } from "data/types";
 import { GameOutEvents } from "game";
 import { io } from "../../app";
 
+export function emitLobbyGamesUpdated() {
+  io.emit(ServerPublicEvents.LOBBY_GAMES_UPDATED);
+}
+
 export function attachGameBroadcaster(game: Game) {
   const { instance: broadcaster, id: gameId } = game;
 
   broadcaster.on(GameOutEvents.GAME_STARTED, () => {
     io.to(gameId).emit(ServerPublicEvents.GAME_STARTED);
+    emitLobbyGamesUpdated();
   });
 
   broadcaster.on(GameOutEvents.COUNTDOWN_STARTED, (event) => {

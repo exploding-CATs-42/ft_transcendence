@@ -1,7 +1,9 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
+import { ServerPublicEvents } from "@exploding-cats/contracts";
 import api from "api";
+import { socket } from "socket";
 import type { GameInfo } from "api/games/games";
 import { Section, Button, List, GameListItem } from "components";
 import { useModal } from "hooks";
@@ -74,9 +76,18 @@ const LobbyPage = () => {
   }, []);
 
   useEffect(() => {
-    // We intentionally load the external games list after the page mounts.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    void loadGames();
+    const handleLobbyGamesUpdated = () => {
+      void loadGames();
+    };
+
+    socket.on(ServerPublicEvents.LOBBY_GAMES_UPDATED, handleLobbyGamesUpdated);
+
+    return () => {
+      socket.off(
+        ServerPublicEvents.LOBBY_GAMES_UPDATED,
+        handleLobbyGamesUpdated,
+      );
+    };
   }, [loadGames]);
 
   useEffect(() => {

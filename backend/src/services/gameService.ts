@@ -14,7 +14,7 @@ import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/contracts";
 import { GameRepository, toGameRecord } from "data";
-import { attachGameBroadcaster } from "sockets";
+import { attachGameBroadcaster, emitLobbyGamesUpdated } from "sockets";
 import { toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
@@ -93,6 +93,8 @@ export async function createGame(
     player,
   });
 
+  emitLobbyGamesUpdated();
+
   return toGameRecord(game);
 }
 
@@ -149,6 +151,8 @@ export async function joinGame(
     player,
   });
 
+  emitLobbyGamesUpdated();
+
   return {
     player: toWaitingPlayerView(player),
     waitingState: { players: playersBefore.map(toWaitingPlayerView) },
@@ -181,8 +185,12 @@ export async function leaveGame(
 
   if (isLastPlayer) {
     GameRepository.deleteGameById(input.gameId);
+    emitLobbyGamesUpdated();
+
     return { playerId: "" };
   }
+
+  emitLobbyGamesUpdated();
 
   return { playerId: player.id };
 }
