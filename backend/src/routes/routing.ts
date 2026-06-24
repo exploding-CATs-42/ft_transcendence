@@ -3,6 +3,7 @@ import type { Express } from "express";
 // Project level
 import { apiRateLimiter, errorMiddleware } from "middlewares";
 // Local level
+import { authRouter } from "./auth";
 import { docsRouter } from "./docs";
 import { usersRouter } from "./users";
 import { meRouter } from "./me";
@@ -17,6 +18,7 @@ export const setupRouting = (app: Express) => {
   });
 
   app.use("/docs", docsRouter);
+  app.use("/auth", authRouter);
   app.use("/users", usersRouter);
   app.use("/me", meRouter);
   app.use("/me/friends", friendsRouter);

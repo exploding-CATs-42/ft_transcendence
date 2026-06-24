@@ -31,7 +31,7 @@ export const api = axios.create({
 let refreshPromise: Promise<string> | null = null;
 
 const refreshAccessToken = async () => {
-  const refreshResponse = await api.post("/users/refresh");
+  const refreshResponse = await api.post("/auth/refresh");
   const { accessToken } = refreshResponse.data;
 
   return accessToken;
@@ -63,9 +63,9 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
-      requestUrl !== "/users/refresh" &&
-      requestUrl !== "/users/logout" &&
-      requestUrl !== "/users/login"
+      requestUrl !== "/auth/refresh" &&
+      requestUrl !== "/auth/logout" &&
+      requestUrl !== "/auth/login"
     ) {
       originalRequest._retry = true;
 
