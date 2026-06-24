@@ -49,7 +49,7 @@ refreshToken -> Set-Cookie -> browser stores it -> Cookie header
 ```
 
 Axios attaches the access token to every request as `Authorization: Bearer ...`.
-Because of that, `/users/refresh` can also show an `Authorization` header in
+Because of that, `/auth/refresh` can also show an `Authorization` header in
 DevTools. The backend refresh flow does not use that header. It reads the
 refresh token from the `refreshToken` cookie and validates it against the
 database session hash.
@@ -78,7 +78,7 @@ values remain active.
 Register route:
 
 ```ts
-usersRouter.post("/register", registerController);
+authRouter.post("/register", registerController);
 ```
 
 Registration creates only the user account. It does not create an authenticated
@@ -101,7 +101,7 @@ authenticate the new user immediately.
 Login route:
 
 ```ts
-usersRouter.post("/login", loginController);
+authRouter.post("/login", loginController);
 ```
 
 The controller calls `loginUser`, sets the refresh cookie, and returns the
@@ -142,7 +142,7 @@ After login:
 Refresh route:
 
 ```ts
-usersRouter.post("/refresh", refreshController);
+authRouter.post("/refresh", refreshController);
 ```
 
 The refresh token is read from cookies:
@@ -216,7 +216,7 @@ hot path.
 Logout route:
 
 ```ts
-usersRouter.post("/logout", logoutController);
+authRouter.post("/logout", logoutController);
 ```
 
 Logout also uses the refresh token cookie. If the cookie is valid, the backend
@@ -243,7 +243,7 @@ The refresh token cookie is configured as:
   httpOnly: true,
   secure: process.env["NODE_ENV"] === "production",
   sameSite: "lax",
-  path: "/api/users",
+  path: "/api/auth",
   maxAge: REFRESH_TOKEN_COOKIE_MAX_AGE_MS,
 }
 ```
@@ -253,9 +253,9 @@ Important details:
 - `httpOnly` prevents frontend JavaScript from reading the refresh token.
 - `secure` requires HTTPS in production.
 - `sameSite: "lax"` is a basic CSRF protection setting.
-- `path: "/api/users"` means the cookie is sent only to `/api/users/*`.
+- `path: "/api/auth"` means the cookie is sent only to `/api/auth/*`.
 
-When testing through nginx, requests should go through `/api/users/...`.
+When testing through nginx, auth requests should go through `/api/auth/...`.
 
 ## Backend: Protected HTTP Routes
 
@@ -394,14 +394,14 @@ importing React hooks into `axios.ts`.
 
 ## Frontend: Axios Setup
 
-The frontend auth API is exposed as `api.auth`, but the backend route names are
-still `/users/...`:
+The frontend auth API is exposed as `api.auth`, and the backend route names are
+also grouped under `/auth/...`:
 
 ```ts
-api.auth.register(); // POST /users/register
-api.auth.login(); // POST /users/login
-api.auth.logout(); // POST /users/logout
-api.auth.refresh(); // POST /users/refresh
+api.auth.register(); // POST /auth/register
+api.auth.login(); // POST /auth/login
+api.auth.logout(); // POST /auth/logout
+api.auth.refresh(); // POST /auth/refresh
 ```
 
 `axios.ts` keeps a callback for refreshed access tokens at module level:
@@ -496,9 +496,9 @@ api.interceptors.response.use(
       error.response?.status === 401 &&
       originalRequest &&
       !originalRequest._retry &&
-      requestUrl !== "/users/refresh" &&
-      requestUrl !== "/users/logout" &&
-      requestUrl !== "/users/login"
+      requestUrl !== "/auth/refresh" &&
+      requestUrl !== "/auth/logout" &&
+      requestUrl !== "/auth/login"
     ) {
       originalRequest._retry = true;
 
@@ -555,7 +555,7 @@ Flow:
 
 ```txt
 protected request -> 401
-/users/refresh -> 200
+/auth/refresh -> 200
 axios stores the new access token in request storage
 AuthProvider stores the new access token in localStorage
 axios retries the original request
@@ -564,7 +564,7 @@ axios retries the original request
 `refreshPromise` prevents multiple simultaneous refresh calls when several
 requests fail with `401` at the same time.
 
-If `/users/refresh` fails with `401`, axios clears request token storage and
+If `/auth/refresh` fails with `401`, axios clears request token storage and
 notifies `AuthProvider` that the session expired. This makes protected routes
 treat the user as anonymous instead of leaving a stale access token in the UI.
 
@@ -573,7 +573,7 @@ axios keeps the existing auth state and propagates the error. The app should not
 log the user out unless the backend explicitly rejects the session.
 
 `authVersion` prevents stale refresh results from being applied after logout. A
-refresh request stores the current version before awaiting `/users/refresh`. If
+refresh request stores the current version before awaiting `/auth/refresh`. If
 logout clears axios auth while refresh is pending, the version changes, so the
 returned access token is ignored and the original request is not retried.
 
@@ -581,10 +581,10 @@ This prevents this race:
 
 ```txt
 protected request -> 401
-/users/refresh starts
+/auth/refresh starts
 user logs out
 request auth storage is cleared
-/users/refresh returns a new accessToken
+/auth/refresh returns a new accessToken
 stale accessToken must not be written back to storage
 ```
 
@@ -592,16 +592,16 @@ The callback prevents a different stale-token problem:
 
 ```txt
 protected request -> 401
-/users/refresh returns a new accessToken
+/auth/refresh returns a new accessToken
 localStorage is updated with the same new accessToken
 page refresh restores the fresh accessToken instead of the expired one
 ```
 
 The interceptor intentionally skips:
 
-- `/users/refresh`, to avoid refreshing the refresh request itself;
-- `/users/logout`, because logout should not try to recover by refreshing;
-- `/users/login`, because invalid login credentials should not trigger a token
+- `/auth/refresh`, to avoid refreshing the refresh request itself;
+- `/auth/logout`, because logout should not try to recover by refreshing;
+- `/auth/login`, because invalid login credentials should not trigger a token
   refresh.
 
 ## Frontend: Logout Handling
@@ -641,18 +641,18 @@ axios module memory is reset
 ```
 
 `AuthProvider` starts in `loading` when a stored access token exists. It then
-checks whether the backend session is still valid by calling `/users/refresh`:
+checks whether the backend session is still valid by calling `/auth/refresh`:
 
 ```txt
 app starts
 localStorage has accessToken
-AuthProvider calls /users/refresh
+AuthProvider calls /auth/refresh
 ```
 
 If refresh succeeds:
 
 ```txt
-/users/refresh -> 200
+/auth/refresh -> 200
 store new accessToken
 authStatus = authenticated
 ```
@@ -660,7 +660,7 @@ authStatus = authenticated
 If refresh fails because the refresh token cookie is missing or expired:
 
 ```txt
-/users/refresh -> 401
+/auth/refresh -> 401
 backend clears refreshToken cookie when present
 clear local auth state
 authStatus = anonymous
@@ -736,7 +736,7 @@ expired access status: 401
 Then test refresh:
 
 ```js
-const refreshResponse = await fetch("/api/users/refresh", {
+const refreshResponse = await fetch("/api/auth/refresh", {
   method: "POST",
   credentials: "include",
 });
@@ -774,7 +774,7 @@ Expected:
 games status: 200
 ```
 
-After the refresh cookie expires, `/api/users/refresh` should return `401`. When
+After the refresh cookie expires, `/api/auth/refresh` should return `401`. When
 the expired cookie is still sent, the response should include a `Set-Cookie`
 header that clears `refreshToken`. If the browser has already deleted the
 expired cookie, the message is:
