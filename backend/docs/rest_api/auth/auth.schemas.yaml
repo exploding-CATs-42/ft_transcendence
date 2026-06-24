@@ -1,0 +1,68 @@
+components:
+  schemas:
+    RegisterRequest:
+      type: object
+      required:
+        - email
+        - username
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        username:
+          type: string
+          minLength: 3
+          maxLength: 30
+          example: alexfox
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          example: Password123!
+
+    LoginRequest:
+      type: object
+      required:
+        - email
+        - password
+      properties:
+        email:
+          type: string
+          format: email
+          example: alex@example.com
+        password:
+          type: string
+          minLength: 8
+          maxLength: 100
+          example: Password123!
+
+    AuthResponse:
+      type: object
+      required:
+        - user
+        - accessToken
+      properties:
+        user:
+          $ref: "../users/users.schemas.yaml#/components/schemas/User"
+        accessToken:
+          type: string
+          example: jwt-access-token
+
+    RegisterResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: "../users/users.schemas.yaml#/components/schemas/User"
+
+    RefreshResponse:
+      type: object
+      required:
+        - accessToken
+      properties:
+        accessToken:
+          type: string
+          example: new-jwt-access-token

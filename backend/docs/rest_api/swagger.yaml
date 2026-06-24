@@ -12,22 +12,24 @@ servers:
     description: Backend-only local development
 
 tags:
+  - name: Auth
+    description: Authentication and session management
   - name: Users
-    description: User authentication and public user data
+    description: Public user data
   - name: Me
     description: Current authenticated user profile
   - name: Friends
     description: Friendship management for the current authenticated user
 
 paths:
-  /users/register:
-    $ref: "users/users.yaml#/paths/~1users~1register"
-  /users/login:
-    $ref: "users/users.yaml#/paths/~1users~1login"
-  /users/logout:
-    $ref: "users/users.yaml#/paths/~1users~1logout"
-  /users/refresh:
-    $ref: "users/users.yaml#/paths/~1users~1refresh"
+  /auth/register:
+    $ref: "auth/auth.yaml#/paths/~1auth~1register"
+  /auth/login:
+    $ref: "auth/auth.yaml#/paths/~1auth~1login"
+  /auth/logout:
+    $ref: "auth/auth.yaml#/paths/~1auth~1logout"
+  /auth/refresh:
+    $ref: "auth/auth.yaml#/paths/~1auth~1refresh"
   /users:
     $ref: "users/users.yaml#/paths/~1users"
   /users/{userId}:
@@ -61,13 +63,15 @@ components:
     SelfProfileUser:
       $ref: "users/users.schemas.yaml#/components/schemas/SelfProfileUser"
     RegisterRequest:
-      $ref: "users/users.schemas.yaml#/components/schemas/RegisterRequest"
+      $ref: "auth/auth.schemas.yaml#/components/schemas/RegisterRequest"
     LoginRequest:
-      $ref: "users/users.schemas.yaml#/components/schemas/LoginRequest"
+      $ref: "auth/auth.schemas.yaml#/components/schemas/LoginRequest"
     AuthResponse:
-      $ref: "users/users.schemas.yaml#/components/schemas/AuthResponse"
+      $ref: "auth/auth.schemas.yaml#/components/schemas/AuthResponse"
+    RegisterResponse:
+      $ref: "auth/auth.schemas.yaml#/components/schemas/RegisterResponse"
     RefreshResponse:
-      $ref: "users/users.schemas.yaml#/components/schemas/RefreshResponse"
+      $ref: "auth/auth.schemas.yaml#/components/schemas/RefreshResponse"
     UserResponse:
       $ref: "users/users.schemas.yaml#/components/schemas/UserResponse"
     UserSearchResponse:
