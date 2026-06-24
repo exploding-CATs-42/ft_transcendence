@@ -45,7 +45,7 @@ const getExistingGameIdFromError = (error: unknown) => {
 const mapGameToLobbyGame = (game: GameInfo): LobbyGame => ({
   gameId: game.id,
   gameName: game.name,
-  players: [],
+  players: game.players,
 });
 
 const getGamePath = (gameId: string) => {

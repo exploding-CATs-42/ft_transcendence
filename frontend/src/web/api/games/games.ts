@@ -5,11 +5,18 @@ export type CreateGameReqBody = {
   maxPlayers: number;
 };
 
+export type GameInfoPlayer = {
+  id: string;
+  username: string;
+  avatarUrl: string | null;
+};
+
 export type GameInfo = {
   id: string;
   name: string;
   maxPlayers: number;
   createdAt: number;
+  players: GameInfoPlayer[];
 };
 
 const create = async (body: CreateGameReqBody): Promise<GameInfo> => {

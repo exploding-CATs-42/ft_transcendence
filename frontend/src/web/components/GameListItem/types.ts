@@ -1,10 +1,15 @@
-import type { ProfileUser } from "pages/ProfilePage/types";
 import type { UserId } from "pages/ProfilePage/types/ProfileUser";
+
+export type LobbyGamePlayer = {
+  id: UserId;
+  username: string;
+  avatarUrl: string | null;
+};
 
 export type LobbyGame = {
   gameId: string;
   gameName: string;
-  players: ProfileUser[];
+  players: LobbyGamePlayer[];
 };
 
 export interface UserGameHistoryItem extends LobbyGame {
@@ -13,6 +18,6 @@ export interface UserGameHistoryItem extends LobbyGame {
 }
 
 export type GameSlot = { id: number } & (
-  | { kind: "real"; player: ProfileUser }
+  | { kind: "real"; player: LobbyGamePlayer }
   | { kind: "placeholder" }
 );
