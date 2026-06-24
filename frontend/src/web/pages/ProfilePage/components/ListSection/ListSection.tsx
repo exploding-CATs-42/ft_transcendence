@@ -1,40 +1,27 @@
 // Libraries
 import { useState } from "react";
 //Project level
-import { Button, List, MatchListItem, SearchInput, Section } from "components";
+import { Section } from "components";
 // Local level
-import { FriendListItem, Tabs } from "../../components";
+import { Tabs, FriendsTab, GamesTab } from "../../components";
 import type { TabOption, FriendItem } from "../../types";
+import type { UserGameHistoryItem } from "components/GameListItem/types";
 import s from "./ListSection.module.css";
-import type { UserGameHistoryItem } from "components/MatchListItem/types";
 
 interface Props {
-  matches: UserGameHistoryItem[];
+  games: UserGameHistoryItem[];
   friends: FriendItem[];
 }
 
-export type ActiveTab = "matches" | "friends";
+export type ActiveTab = "games" | "friends";
 
 const tabs: TabOption[] = [
-  { key: "matches", label: "Last matches" },
+  { key: "games", label: "Last games" },
   { key: "friends", label: "Friends" },
 ];
 
-const ListSection = ({ matches, friends }: Props) => {
-  const [activeTab, setActiveTab] = useState<ActiveTab>("matches");
-
-  const sortedFriends = [...friends].sort((a, b) => {
-    const statusOrder = {
-      ACCEPTED: 0,
-      PENDING: 1,
-      REJECTED: 2,
-    };
-
-    if (statusOrder[a.status] !== statusOrder[b.status]) {
-      return statusOrder[b.status] - statusOrder[a.status];
-    }
-    return a.user.username.localeCompare(b.user.username);
-  });
+const ListSection = ({ games, friends }: Props) => {
+  const [activeTab, setActiveTab] = useState<ActiveTab>("games");
 
   return (
     <Section className={s.section}>
@@ -45,27 +32,9 @@ const ListSection = ({ matches, friends }: Props) => {
       />
 
       {activeTab === "friends" ? (
-        <>
-          <List
-            items={sortedFriends}
-            getKey={(friend) => friend.user.id}
-            renderItem={(friend) => <FriendListItem friend={friend} />}
-            className={s.list}
-            empty="No friends yet"
-          />
-          <div className={s.footer}>
-            <SearchInput />
-            <Button className={s.button}>Add</Button>
-          </div>
-        </>
+        <FriendsTab friends={friends}></FriendsTab>
       ) : (
-        <List
-          items={matches}
-          getKey={(match) => match.gameId}
-          renderItem={(match) => <MatchListItem match={match} />}
-          className={s.list}
-          empty="No matches yet"
-        />
+        <GamesTab games={games}></GamesTab>
       )}
     </Section>
   );

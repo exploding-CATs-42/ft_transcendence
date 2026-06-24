@@ -1,0 +1,25 @@
+{
+  "name": "@exploding-cats/contracts",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint:fix": "eslint --fix ./src",
+    "lint:check": "eslint ./src",
+    "format:fix": "prettier --write ./src",
+    "format:check": "prettier --check ./src"
+  },
+  "dependencies": {
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/node": "^25.6.0",
+    "eslint": "^9.39.4",
+    "prettier": "^3.8.1",
+    "typescript": "5.9.3",
+    "typescript-eslint": "^8.57.2"
+  }
+}

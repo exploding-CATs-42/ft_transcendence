@@ -11,6 +11,7 @@ const PLAYERS: Player[] = [
   {
     name: "player 1",
     id: "1",
+    avatarUrl: null,
     hand: [],
     isAlive: true,
     isConfirmed: false,
@@ -19,6 +20,7 @@ const PLAYERS: Player[] = [
   {
     name: "player 2",
     id: "2",
+    avatarUrl: null,
     hand: [],
     isAlive: true,
     isConfirmed: false,

@@ -6,6 +6,7 @@ export const Textures = {
   fullScreenToggle: "fullscreenToggle",
   cards: "cards",
   cardCover: "cardCover",
+  confirmedIcon: "confirmedIcon",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];

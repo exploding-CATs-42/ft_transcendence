@@ -2,8 +2,8 @@ import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT, Textures } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
 
-const CARD_WIDTH = 186;
-const CARD_HEIGHT = 260;
+const CARD_WIDTH = 186 * 1.75;
+const CARD_HEIGHT = 260 * 1.75;
 const CARD_BORDER_RADIUS = 20;
 
 const CARD_SPACING_CONFIG: SpacingConfig = {
@@ -14,7 +14,7 @@ const CARD_SPACING_CONFIG: SpacingConfig = {
 
 const BIGGEST_DEPTH = 100;
 
-const HOVER_LIFT = 30; // How many px the hovered card rises
+const HOVER_LIFT = 75; // How many px the hovered card rises
 const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
 
 type onCardDropCallback = (card: Phaser.GameObjects.Image) => void;

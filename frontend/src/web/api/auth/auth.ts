@@ -1,10 +1,10 @@
 // Project level
 import type {
+  RegisterRequestBody,
   RegisterResponse,
   LoginResponse,
   AccessToken,
-} from "@exploding-cats/shared-types";
-import type { RegisterRequestBody } from "@exploding-cats/shared-schemas";
+} from "@exploding-cats/contracts";
 // Local level
 import {
   api,

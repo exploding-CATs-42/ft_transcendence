@@ -6,7 +6,7 @@ import {
   PendingAction,
   TurnPhase,
 } from "game/types";
-import { PublicPlayerView } from "@exploding-cats/shared-types";
+import { PublicPlayerView } from "@exploding-cats/contracts";
 
 export interface PublicGameView {
   gameId: string;

@@ -1,28 +1,51 @@
-// Project level
-import { START_GAME_COUNTDOWN_MS } from "game/constants";
+// Local level
+import { START_GAME_COUNTDOWN_MS } from "./constants";
+import { GameOutEvent, GameOutEvents } from "./events";
 
-export const GameEmitters = {
-  GAME_STARTED: "GAME_STARTED",
-  COUNTDOWN_STARTED: "COUNTDOWN_STARTED",
-  COUNTDOWN_CANCELED: "COUNTDOWN_CANCELED",
-} as const;
-
-export type GameEmitters = (typeof GameEmitters)[keyof typeof GameEmitters];
-
-export type GameEmitter =
-  | { type: typeof GameEmitters.GAME_STARTED }
-  | { type: typeof GameEmitters.COUNTDOWN_STARTED; endsAt: number }
-  | { type: typeof GameEmitters.COUNTDOWN_CANCELED };
-
-export const countdownStarted = (): GameEmitter => ({
-  type: GameEmitters.COUNTDOWN_STARTED,
+export const countdownStarted = (): GameOutEvent => ({
+  type: GameOutEvents.COUNTDOWN_STARTED,
   endsAt: Date.now() + START_GAME_COUNTDOWN_MS,
 });
 
-export const countdownCanceled = (): GameEmitter => ({
-  type: GameEmitters.COUNTDOWN_CANCELED,
+export const countdownCanceled = (): GameOutEvent => ({
+  type: GameOutEvents.COUNTDOWN_CANCELED,
 });
 
-export const gameStarted = (): GameEmitter => ({
-  type: GameEmitters.GAME_STARTED,
+export const gameStarted = (): GameOutEvent => ({
+  type: GameOutEvents.GAME_STARTED,
 });
+
+/* emitter - is a function that emits an "event" object to the "outside world",
+ * giving it it's type and optional payload.
+ * it takes as a parameter an object, containing machine context,
+ * and an event that triggered the emission
+ */
+
+// emitter example
+/*
+ import { GameContext } from "./gameMachine";
+ import { GameEvent } from "./events"
+ type GameEmitterArgs = {
+   context: GameContext;
+   event: GameEvent;
+ }
+ export const emitter = ({ context, event }: GameEmitterArgs): GameOutEvent => {
+   if (context.players.length < 1) console.log("it's lonely out here")
+   return { type: GameOutEvents.PLAYER_ADDED, playerId: event.playerId };
+ };
+*/
+
+// flow example
+/*
+on: {
+  PLAYER_JOINED: {
+    actions: emit(({ context, event }) => ({
+      type: "PLAYER_ADDED",
+      playerId: event.playerId,
+    })),
+  },
+},
+
+where "event" passed to the emitter is "PLAYER_JOINED"
+and event emitted to the "outside world" is "PLAYER_ADDED"
+*/

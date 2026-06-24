@@ -1,7 +1,7 @@
 // Project level
 import { prisma, publicProfileSelect } from "lib/prisma";
 import { ProfileUserWithStats, UserGameHistoryItem } from "types";
-import { toProfileUser, toProfileUserWithStats } from "utils";
+import { toProfileUser, toProfileUserWithStats } from "mappers";
 
 export class UsersServiceError extends Error {
   public statusCode: number;
@@ -13,10 +13,10 @@ export class UsersServiceError extends Error {
 }
 
 export async function getFinishedGamesStats(userId: string): Promise<{
-  totalMatches: number;
+  totalGames: number;
   wins: number;
 }> {
-  const [totalMatches, wins] = await Promise.all([
+  const [totalGames, wins] = await Promise.all([
     prisma.userGame.count({
       where: {
         userId,
@@ -38,7 +38,7 @@ export async function getFinishedGamesStats(userId: string): Promise<{
   ]);
 
   return {
-    totalMatches,
+    totalGames,
     wins,
   };
 }
@@ -62,7 +62,7 @@ export async function getPublicUserById(
 export async function ensureUserExists(userId: string) {
   const user = await prisma.user.findUnique({
     where: { id: userId },
-    select: { id: true, username: true },
+    select: { id: true, username: true, avatarUrl: true },
   });
 
   if (!user) {

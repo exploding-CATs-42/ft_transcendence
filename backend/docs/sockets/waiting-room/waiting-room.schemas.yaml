@@ -1,0 +1,84 @@
+components:
+  schemas:
+    GameIdPayload:
+      type: object
+      required:
+        - gameId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+          description: Target game id; also the Socket.IO room name.
+          example: "8f3b2c1a-9d4e-4f7a-bc12-1a2b3c4d5e6f"
+
+    WaitingPlayerView:
+      type: object
+      required:
+        - id
+        - name
+        - isConfirmed
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Player (user) id.
+        name:
+          type: string
+          description: Player display name.
+        isConfirmed:
+          type: boolean
+          description: Whether the player has confirmed they are ready to start.
+
+    WaitingStateView:
+      type: object
+      required:
+        - players
+      properties:
+        players:
+          type: array
+          description: All players currently in the waiting room.
+          items:
+            $ref: "#/components/schemas/WaitingPlayerView"
+
+    WaitingStatePayload:
+      type: object
+      required:
+        - waitingState
+      properties:
+        waitingState:
+          $ref: "#/components/schemas/WaitingStateView"
+
+    PlayerJoinedPayload:
+      type: object
+      required:
+        - player
+      properties:
+        player:
+          $ref: "#/components/schemas/WaitingPlayerView"
+
+    PlayerIdPayload:
+      type: object
+      required:
+        - playerId
+      properties:
+        playerId:
+          type: string
+          format: uuid
+          description: Id of the player the event refers to.
+          example: "2c4d6e8f-1a3b-4c5d-9e7f-0a1b2c3d4e5f"
+
+    CountdownStartedPayload:
+      type: object
+      required:
+        - endsAt
+      properties:
+        endsAt:
+          type: integer
+          format: int64
+          description: >
+            Unix epoch timestamp in milliseconds at which the countdown ends
+            (`Date.now() + 10000`).
+          example: 1781990400000
+
+    EmptyPayload:
+      description: No payload is sent with this event.

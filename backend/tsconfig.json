@@ -6,7 +6,6 @@
     "module": "esnext",
     "moduleResolution": "bundler",
     "esModuleInterop": true,
-    "importHelpers": true,
     "resolveJsonModule": true,
     "isolatedModules": true,
     "outDir": "./dist",
@@ -35,6 +34,14 @@
       "middlewares/*": ["./src/middlewares/*"],
       "controllers": ["./src/controllers/index"],
       "controllers/*": ["./src/controllers/*"],
+      "data": ["./src/data/index"],
+      "data/*": ["./src/data/*"],
+      "sockets": ["./src/sockets/index"],
+      "sockets/*": ["./src/sockets/*"],
+      "mappers": ["./src/mappers/index"],
+      "mappers/*": ["./src/mappers/*"],
+      "config": ["./src/config/index"],
+      "config/*": ["./src/config/*"],
       "generated/*": ["./src/generated/*"]
     }
   },

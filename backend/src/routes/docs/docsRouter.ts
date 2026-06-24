@@ -3,6 +3,7 @@ import express from "express";
 import path from "node:path";
 import swaggerUi from "swagger-ui-express";
 import SwaggerParser from "@apidevtools/swagger-parser";
+import RefParser from "@apidevtools/json-schema-ref-parser";
 // Project level
 import { getPublicUrl } from "utils";
 
@@ -53,7 +54,15 @@ docsRouter.get("/sockets", (req, res) => {
   `);
 });
 
-docsRouter.get("/asyncapi.yaml", (_, res) => {
-  const rootPath = path.resolve(process.cwd(), "docs/sockets/asyncapi.yaml");
-  res.type("text/yaml").sendFile(rootPath);
+docsRouter.get("/asyncapi.yaml", async (_, res, next) => {
+  try {
+    const rootPath = path.resolve(process.cwd(), "docs/sockets/asyncapi.yaml");
+
+    const bundled = await RefParser.bundle(rootPath);
+
+    res.json(bundled);
+  } catch (error) {
+    console.error("AsyncAPI load error:", error);
+    next(error);
+  }
 });

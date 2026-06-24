@@ -1,123 +1,99 @@
-// Libraries
-import { createActor } from "xstate";
 // Project level
 import { ApiError, SocketError } from "errors";
 import {
   CancelStartParams,
   ConfirmStartParams,
   CreateGameRequestBody,
-  DeleteGameParams,
   GetGameByIdParams,
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
-import {
-  GameEvents,
-  gameMachine,
-  GameInstance,
-  GameInfo,
-  toWaitingPlayerView,
-  attachBroadcaster,
-} from "game";
+import { GameEvents } from "game";
+import { Game, GameRecord } from "data/types";
 import { Player } from "game/types";
 import { JoinGameResult, UserId } from "types";
-import { PlayerIdPayload } from "@exploding-cats/shared-types";
-import { GameStore } from "utils";
+import { PlayerIdPayload } from "@exploding-cats/contracts";
+import { GameRepository, toGameRecord } from "data";
+import { attachGameBroadcaster } from "sockets";
+import { toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
 
 function ensureGameExists(gameId: string) {
-  const game = GameStore.getGame(gameId);
+  const game = GameRepository.getGame(gameId);
 
   if (!game) {
-    throw new ApiError("GameInstance not found", 404);
+    throw new ApiError("Game not found", 404);
   }
 
   return game;
 }
 
-export async function getGames(userId: UserId): Promise<GameInfo[]> {
+export async function getGames(userId: UserId): Promise<GameRecord[]> {
   await ensureUserExists(userId);
 
-  return GameStore.getAllGames().map((game) => {
-    return game.info;
+  return GameRepository.getAllGames().map((game) => {
+    return toGameRecord(game);
   });
 }
 
 export async function getGameById(
   userId: UserId,
   input: GetGameByIdParams,
-): Promise<GameInstance> {
+): Promise<Game> {
   await ensureUserExists(userId);
 
   return ensureGameExists(input.gameId);
 }
 
-export async function getCurrentGame(userId: UserId): Promise<GameInfo | null> {
+export async function getCurrentGame(
+  userId: UserId,
+): Promise<GameRecord | null> {
   await ensureUserExists(userId);
 
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
+  const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
   if (!currentGame) {
     return null;
   }
 
-  return currentGame.info;
+  return toGameRecord(currentGame);
 }
 
 export async function createGame(
   userId: UserId,
   input: CreateGameRequestBody,
-): Promise<GameInfo> {
+): Promise<GameRecord> {
   const user = await ensureUserExists(userId);
 
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
+  const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
   if (currentGame) {
     throw new ApiError("Player already has an active or waiting game", 409, {
-      existingGameId: currentGame.info.id,
+      existingGameId: currentGame.id,
     });
   }
 
-  const actor = createActor(gameMachine);
-
-  const game: GameInstance = {
-    info: {
-      id: crypto.randomUUID(),
-      name: input.gameName,
-      maxPlayers: input.maxPlayers,
-      createdAt: Date.now(),
-      ownerId: user.id,
-    },
-    actor,
-  };
-
-  attachBroadcaster(game.info.id, actor);
-  actor.start();
+  const game = GameRepository.createGame(input.gameName, input.maxPlayers);
+  attachGameBroadcaster(game);
+  game.instance.start();
 
   const player: Player = {
     id: user.id,
     name: user.username,
+    avatarUrl: user.avatarUrl,
     hand: [],
     isConfirmed: false,
     isAlive: true,
     turnOrder: 0,
   };
 
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.JOIN_GAME,
     player,
   });
 
-  GameStore.setGame(game);
-  return game.info;
-}
-
-export async function deleteGame(userId: UserId, input: DeleteGameParams) {
-  await ensureUserExists(userId);
-  ensureGameExists(input.gameId);
-
-  GameStore.deleteGameById(input.gameId);
+  return toGameRecord(game);
 }
 
 export async function joinGame(
@@ -127,7 +103,7 @@ export async function joinGame(
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
+  const playersBefore = game.instance.getSnapshot().context.players;
 
   const alreadyJoined = playersBefore.some((p) => {
     return p.id === user.id;
@@ -138,43 +114,44 @@ export async function joinGame(
       return p.id === user.id;
     });
 
+    const filteredPlayers = playersBefore.filter((p) => p.id !== player?.id);
+
     return {
       player: toWaitingPlayerView(player!),
-      waitingState: { players: playersBefore.map(toWaitingPlayerView) },
+      waitingState: { players: filteredPlayers.map(toWaitingPlayerView) },
     };
   }
 
-  const currentGame = GameStore.findCurrentGameByUserId(userId);
+  const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
-  if (currentGame && currentGame.info.id !== input.gameId) {
+  if (currentGame && currentGame.id !== input.gameId) {
     throw new SocketError("Player already has an active or waiting game", {
-      existingGameId: currentGame.info.id,
+      existingGameId: currentGame.id,
     });
   }
 
-  if (playersBefore.length >= game.info.maxPlayers) {
-    throw new SocketError("GameInstance is full");
+  if (playersBefore.length >= game.maxPlayers) {
+    throw new SocketError("Game is full");
   }
 
   const player: Player = {
     id: user.id,
     name: user.username,
+    avatarUrl: user.avatarUrl,
     hand: [],
     isConfirmed: false,
     isAlive: true,
     turnOrder: 0,
   };
 
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.JOIN_GAME,
     player,
   });
 
-  const playersAfter = game.actor.getSnapshot().context.players;
-
   return {
     player: toWaitingPlayerView(player),
-    waitingState: { players: playersAfter.map(toWaitingPlayerView) },
+    waitingState: { players: playersBefore.map(toWaitingPlayerView) },
   };
 }
 
@@ -185,7 +162,7 @@ export async function leaveGame(
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
+  const playersBefore = game.instance.getSnapshot().context.players;
 
   const player = playersBefore.find((player) => {
     return player.id === user.id;
@@ -197,13 +174,13 @@ export async function leaveGame(
 
   const isLastPlayer = playersBefore.length === 1;
 
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.LEAVE_GAME,
     playerId: player.id,
   });
 
   if (isLastPlayer) {
-    GameStore.deleteGameById(input.gameId);
+    GameRepository.deleteGameById(input.gameId);
     return { playerId: "" };
   }
 
@@ -217,7 +194,7 @@ export async function confirmStart(
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
+  const playersBefore = game.instance.getSnapshot().context.players;
 
   const player = playersBefore.find((player) => {
     return player.id === user.id;
@@ -227,7 +204,7 @@ export async function confirmStart(
     throw new SocketError("Player is not in the game");
   }
 
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.CONFIRM_START,
     playerId: player.id,
   });
@@ -242,7 +219,7 @@ export async function cancelStart(
   const user = await ensureUserExists(userId);
 
   const game = ensureGameExists(input.gameId);
-  const playersBefore = game.actor.getSnapshot().context.players;
+  const playersBefore = game.instance.getSnapshot().context.players;
 
   const player = playersBefore.find((player) => {
     return player.id === user.id;
@@ -252,7 +229,7 @@ export async function cancelStart(
     throw new SocketError("Player is not in the game");
   }
 
-  game.actor.send({
+  game.instance.send({
     type: GameEvents.CANCEL_START,
     playerId: player.id,
   });

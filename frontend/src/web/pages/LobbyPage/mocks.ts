@@ -1,5 +1,5 @@
 import type { ProfileUser } from "pages/ProfilePage/types";
-import type { LobbyMatch } from "types";
+import type { LobbyGame } from "types";
 
 const alice: ProfileUser = {
   id: "u-1",
@@ -33,7 +33,7 @@ const diana: ProfileUser = {
   lastSeenAt: new Date(),
 };
 
-export const matchesMock: LobbyMatch[] = [
+export const gamesMock: LobbyGame[] = [
   {
     gameId: "g-1",
     gameName: "Table 1",

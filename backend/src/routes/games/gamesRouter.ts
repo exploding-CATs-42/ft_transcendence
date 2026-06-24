@@ -1,7 +1,6 @@
 // Project level
 import {
   createGameController,
-  deleteGameController,
   getGameByIdController,
   getGamesController,
   getCurrentGameController,
@@ -33,4 +32,3 @@ gamesRouter.get("/:gameId", errorHandler(getGameByIdController));
 gamesRouter.post("/", errorHandler(createGameController));
 gamesRouter.post("/:gameId/join", errorHandler(joinGameController));
 gamesRouter.post("/:gameId/leave", errorHandler(leaveGameController));
-gamesRouter.delete("/:gameId", errorHandler(deleteGameController));

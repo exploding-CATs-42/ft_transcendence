@@ -3,7 +3,6 @@ import type { Response } from "express";
 // Project level
 import {
   createGame,
-  deleteGame,
   getCurrentGame,
   getGameById,
   getGames,
@@ -12,7 +11,6 @@ import {
 } from "services";
 import {
   createGameSchema,
-  deleteGameParamsSchema,
   getGameByIdParamsSchema,
   joinGameSchema,
   leaveGameSchema,
@@ -64,16 +62,6 @@ export async function joinGameController(
 
   const result = await joinGame(parsed, req.user.id);
   res.status(200).json(result);
-}
-
-export async function deleteGameController(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
-  const parsed = validate(deleteGameParamsSchema, req.params);
-
-  const result = await deleteGame(req.user.id, parsed);
-  res.status(201).json(result);
 }
 
 export async function leaveGameController(

@@ -44,17 +44,17 @@ const OPPONENT_HAND_X_OFFSET = 96;
 const OPPONENT_HAND_Y_OFFSET = 180;
 
 // Draw and discard piles
-const CARD_WIDTH = 186;
-const CARD_HEIGHT = 260;
+const CARD_WIDTH = 186 * 1.5;
+const CARD_HEIGHT = 260 * 1.5;
 const CARD_BORDER_RADIUS = 20;
 
-const PILES_Y = 470;
+const PILES_Y = 410;
 const DRAW_PILE_POSITION: Point = {
-  x: 610,
+  x: 560,
   y: PILES_Y,
 };
 const DISCARD_PILE_POSITION: Point = {
-  x: 1100,
+  x: 1050,
   y: PILES_Y,
 };
 
@@ -126,11 +126,13 @@ export class GameRoom extends Scene {
 
   private createMyHand() {
     const onCardDrop = (card: Phaser.GameObjects.Image) => {
-      // move it to the discard pile
+      // move it to the discard pile and shrink it down to pile size
       this.tweens.add({
         targets: card,
         x: DISCARD_PILE_POSITION.x,
         y: DISCARD_PILE_POSITION.y,
+        displayWidth: CARD_WIDTH,
+        displayHeight: CARD_HEIGHT,
         duration: 300,
         ease: "Back.Out",
       });

@@ -9,6 +9,7 @@ import {
   waitingRoomBg,
   cards,
   cardCover,
+  confirmedIcon,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 
@@ -35,6 +36,7 @@ export class Preloader extends Scene {
       endFrame: 40,
     });
     this.load.image(Textures.cardCover, cardCover);
+    this.load.image(Textures.confirmedIcon, confirmedIcon);
   }
 
   create() {

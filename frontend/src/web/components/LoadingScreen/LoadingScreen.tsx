@@ -1,6 +1,9 @@
+//Libraries
 import { useState } from "react";
-import s from "./LoadingScreen.module.css";
+//Project level
 import { Loader } from "assets";
+//Local level
+import s from "./LoadingScreen.module.css";
 
 const LoadingScreen = () => {
   const [gifError, setGifError] = useState(false);

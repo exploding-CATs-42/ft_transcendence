@@ -15,28 +15,6 @@
   flex-direction: column;
 }
 
-.list {
-  padding-right: var(--inner-right-padding);
-}
-
-.footer {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
-  align-items: center;
-  gap: 12px;
-  padding-right: var(--inner-right-padding);
-  margin-inline: 8vw;
-}
-
-.button {
-  font-size: 20px;
-  line-height: 26px;
-  width: 120px;
-  height: 40px;
-  background-color: var(--throw-throw-burrito);
-}
-
 @media only screen and (min-width: 768px) {
   .section {
     --list-left-padding: 50px;

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { registerSchema } from "@exploding-cats/shared-schemas";
+import { registerSchema } from "@exploding-cats/contracts";
 
 export const registerFormSchema = registerSchema
   .extend({

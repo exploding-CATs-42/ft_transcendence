@@ -1,10 +1,10 @@
 // Project level
 import { ApiError } from "errors";
-import { MyProfileUser } from "types";
-import cloudinary from "../lib/cloudinary/cloudinary";
-import { prisma, selfProfileSelect } from "../lib/prisma";
-import { comparePassword, hashPassword } from "../utils/hash";
-import { toMyProfileUser, toSelfProfileUser } from "../utils/users";
+import { MyProfileUser, MyProfileUserWithStats } from "types";
+import cloudinary from "lib/cloudinary/cloudinary";
+import { prisma, selfProfileSelect } from "lib/prisma";
+import { comparePassword, hashPassword } from "utils";
+import { toMyProfileUser, toSelfProfileUser } from "mappers";
 // Local level
 import { getFinishedGamesStats } from "./usersService";
 
@@ -116,7 +116,9 @@ export async function updateMe(
   };
 }
 
-export async function getMe(userId: string): Promise<{ user: MyProfileUser }> {
+export async function getMe(
+  userId: string,
+): Promise<{ user: MyProfileUserWithStats }> {
   const user = await prisma.user.findUnique({
     where: { id: userId },
     select: selfProfileSelect,

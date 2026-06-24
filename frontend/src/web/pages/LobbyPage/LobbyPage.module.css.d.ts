@@ -4,7 +4,7 @@ declare const styles: {
   readonly "color": string;
   readonly "list": string;
   readonly "listSection": string;
-  readonly "matchButton": string;
+  readonly "gameButton": string;
   readonly "pageContainer": string;
 };
 export = styles;

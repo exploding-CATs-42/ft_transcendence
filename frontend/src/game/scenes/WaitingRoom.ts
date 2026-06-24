@@ -9,18 +9,15 @@ import {
   Textures,
 } from "game/constants";
 import { addBackgroundImage, addFullscreenToggle } from "game/utils";
-import { Button, GraphicPlayer, type Player, PlayerSeat } from "game/entities";
+import { Button, GraphicPlayer, PlayerSeat } from "game/entities";
 import type { LabelConfig, Size } from "game/@types";
-
-// It's just a placeholder and has to be removed later
-const data: { players: Player[] } = {
-  players: [
-    { username: "Player 2", imageUrl: null },
-    { username: "Player 3", imageUrl: null },
-    { username: "Player 4", imageUrl: null },
-    { username: "Player 5", imageUrl: null },
-  ],
-};
+import { type WaitingPlayerView } from "@exploding-cats/contracts";
+import {
+  cancelStart,
+  confirmStart,
+  subscribeWaitingRoom,
+  type WaitingRoomHandlers,
+} from "game/sockets";
 
 const NAME_LABEL_CONFIG: LabelConfig = {
   fontColor: "black",
@@ -37,9 +34,14 @@ const BUTTON_POSITION = {
   y: SCREEN_HEIGHT - 200,
 };
 
-export class WaitingRoom extends Scene {
+const WAITING_MESSAGE = "Waiting for other players...";
+
+export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   #seats: PlayerSeat[] = [];
-  #players: GraphicPlayer[] = [];
+  #playersById = new Map<string, GraphicPlayer>();
+  #waitingLabel!: Phaser.GameObjects.Text;
+  #countdownTimer: Phaser.Time.TimerEvent | null = null;
+  #unsubscribe: (() => void) | null = null;
 
   constructor() {
     super(Scenes.WaitingRoom);
@@ -55,24 +57,17 @@ export class WaitingRoom extends Scene {
     this.addWaitingLabel();
     this.addReadinessButton();
 
-    // Demonstration code
-    let count = 0;
-    const intervalId = setInterval(() => {
-      if (count < data.players.length) {
-        this.addPlayer(data.players[count]!);
-        ++count;
-      } else if (count < data.players.length * 2) {
-        const player = this.#players[0]!;
-        this.removePlayer(player);
-        ++count;
-      } else {
-        data.players.forEach((player) => {
-          this.addPlayer(player);
-        });
-        clearInterval(intervalId);
-      }
-    }, 500);
+    this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
+    this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
+
+    this.#unsubscribe = subscribeWaitingRoom(this);
   }
+
+  private cleanup = () => {
+    this.#unsubscribe?.();
+    this.#unsubscribe = null;
+    this.#countdownTimer?.remove();
+  };
 
   private buildSeats() {
     return WAITING_ROOM_SEATS.map((seat) => {
@@ -80,7 +75,9 @@ export class WaitingRoom extends Scene {
     });
   }
 
-  private addPlayer(player: Player) {
+  private addPlayer(player: WaitingPlayerView) {
+    if (this.#playersById.has(player.id)) return;
+
     const emptySeat = this.#seats.find((seat) => !seat.player);
 
     if (!emptySeat) return;
@@ -88,19 +85,24 @@ export class WaitingRoom extends Scene {
     const newPlayer = new GraphicPlayer(
       this,
       { x: 0, y: 0 },
-      player,
+      { username: player.name, imageUrl: player.avatarUrl },
       NAME_LABEL_CONFIG,
     );
 
-    this.#players.push(newPlayer);
+    this.#playersById.set(player.id, newPlayer);
     emptySeat.addPlayer(newPlayer);
   }
 
-  private removePlayer(player: GraphicPlayer) {
-    this.#players = this.#players.filter((p) => p !== player);
+  private removePlayer(playerId: string) {
+    const player = this.#playersById.get(playerId);
+
+    if (!player) return;
+
     this.#seats.forEach((seat) => {
       if (seat.player === player) seat.removePlayer();
     });
+
+    this.#playersById.delete(playerId);
   }
 
   private addReadinessButton() {
@@ -110,10 +112,12 @@ export class WaitingRoom extends Scene {
         ready = false;
         button.setBackgroundColor(0x61c51b);
         button.setText("Ready");
+        cancelStart();
       } else {
         ready = true;
         button.setBackgroundColor(0xff0000);
         button.setText("Cancel");
+        confirmStart();
       }
     };
 
@@ -128,13 +132,55 @@ export class WaitingRoom extends Scene {
   }
 
   private addWaitingLabel() {
-    this.add
-      .text(
-        this.scale.width / 2,
-        this.scale.height / 2,
-        "Waiting for other players to join...",
-        { fontSize: 80, color: "black", fontFamily: "Chewy" },
-      )
+    this.#waitingLabel = this.add
+      .text(this.scale.width / 2, this.scale.height / 2, WAITING_MESSAGE, {
+        fontSize: 80,
+        color: "black",
+        fontFamily: "Chewy",
+      })
       .setOrigin(0.5, 0);
   }
+
+  onWaitingState = (players: WaitingPlayerView[]) => {
+    players.forEach((player) => this.addPlayer(player));
+  };
+
+  onPlayerJoined = (player: WaitingPlayerView) => {
+    this.addPlayer(player);
+  };
+
+  onPlayerLeft = (playerId: string) => {
+    this.removePlayer(playerId);
+  };
+
+  onPlayerConfirmed = (playerId: string) => {
+    this.#playersById.get(playerId)?.setConfirmed(true);
+  };
+
+  onPlayerCanceled = (playerId: string) => {
+    this.#playersById.get(playerId)?.setConfirmed(false);
+  };
+
+  onCountdownStarted = (endsAt: number) => {
+    const tick = () => {
+      const secondsLeft = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+      this.#waitingLabel.setText(`Game starts in ${secondsLeft}...`);
+    };
+    tick();
+    this.#countdownTimer = this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: tick,
+    });
+  };
+
+  onCountdownCanceled = () => {
+    this.#countdownTimer?.remove();
+    this.#countdownTimer = null;
+    this.#waitingLabel.setText(WAITING_MESSAGE);
+  };
+
+  onGameStarted = () => {
+    this.scene.start(Scenes.GameRoom);
+  };
 }

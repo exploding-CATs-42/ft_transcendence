@@ -1,23 +1,22 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import api from "api";
-import { Section, Button, List, MatchListItem } from "components";
+import type { GameInfo } from "api/games/games";
+import { Section, Button, List, GameListItem } from "components";
 import { useModal } from "hooks";
-import type { LobbyMatch } from "types";
+import type { LobbyGame } from "types";
 import {
   CreateTableModal,
   type CreateTableFormValues,
 } from "./components/CreateTableModal";
 import { ExistingGameModal } from "./components/ExistingGameModal";
 import { JoinGameModal } from "./components/JoinGameModal";
-import { ManageLobbyModal } from "./components/ManageLobbyModal";
 import s from "./LobbyPage.module.css";
 
 type ExistingGame = {
   id: string;
   name: string;
-  ownerId: string;
 };
 
 type GameConflictDetails = {
@@ -43,67 +42,41 @@ const getExistingGameIdFromError = (error: unknown) => {
   return apiError.response.data?.details?.existingGameId ?? null;
 };
 
+const mapGameToLobbyGame = (game: GameInfo): LobbyGame => ({
+  gameId: game.id,
+  gameName: game.name,
+  players: [],
+});
+
+const getGamePath = (gameId: string) => {
+  return `/game?gameId=${encodeURIComponent(gameId)}`;
+};
+
 const LobbyPage = () => {
-  const [matches, setMatches] = useState<LobbyMatch[]>([]);
+  const [games, setGames] = useState<LobbyGame[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [isOpenExistingGameModal, toggleExistingGameModal] = useModal();
-  const [isOpenManageLobbyModal, toggleManageLobbyModal] = useModal();
   const [gameId, setGameId] = useState("");
   const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
-  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const navigate = useNavigate();
 
+  const loadGames = useCallback(async () => {
+    try {
+      const games = await api.games.getAll();
+
+      setGames(games.map(mapGameToLobbyGame));
+    } catch (error) {
+      console.error("Failed to load lobby games:", error);
+    }
+  }, []);
+
   useEffect(() => {
-    let ignore = false;
-
-    const loadGames = async () => {
-      try {
-        const games = await api.games.getAll();
-
-        if (ignore) return;
-
-        setMatches(
-          games.map((game) => ({
-            gameId: game.id,
-            gameName: game.name,
-            players: [],
-          })),
-        );
-      } catch (error) {
-        console.error("Failed to load lobby games:", error);
-      }
-    };
-
+    // We intentionally load the external games list after the page mounts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadGames();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
-
-  useEffect(() => {
-    let ignore = false;
-
-    const loadCurrentUser = async () => {
-      try {
-        const currentUser = await api.me.getMe();
-
-        if (ignore) return;
-
-        setCurrentUserId(currentUser.id);
-      } catch (error) {
-        console.error("Failed to load current user:", error);
-      }
-    };
-
-    void loadCurrentUser();
-
-    return () => {
-      ignore = true;
-    };
-  }, []);
+  }, [loadGames]);
 
   useEffect(() => {
     let ignore = false;
@@ -117,7 +90,6 @@ const LobbyPage = () => {
         setExistingGame({
           id: currentGame.id,
           name: currentGame.name,
-          ownerId: currentGame.ownerId,
         });
 
         toggleExistingGameModal(true);
@@ -131,7 +103,7 @@ const LobbyPage = () => {
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [toggleExistingGameModal]);
 
   const handleOpenJoinModalWithGameId = (selectedGameId: string) => {
     setGameId(selectedGameId);
@@ -147,9 +119,7 @@ const LobbyPage = () => {
       await api.games.joinById(trimmedGameId);
 
       toggleJoinModal(false);
-      navigate("/game", {
-        state: { gameId: trimmedGameId },
-      });
+      navigate(getGamePath(trimmedGameId));
     } catch (error) {
       console.error("Failed to join game:", error);
     }
@@ -159,47 +129,24 @@ const LobbyPage = () => {
     if (!existingGame) return;
 
     toggleExistingGameModal(false);
-
-    navigate("/game", {
-      state: { gameId: existingGame.id },
-    });
+    navigate(getGamePath(existingGame.id));
   };
 
-  const handleCloseExistingGameModal = () => {
-    toggleExistingGameModal(false);
-  };
-
-  const handleCloseManageLobbyModal = () => {
-    toggleManageLobbyModal(false);
-  };
-
-  const handleDeleteLobby = async () => {
-    if (!existingGame) return;
-
-    try {
-      await api.games.deleteById(existingGame.id);
-
-      setMatches((prevMatches) =>
-        prevMatches.filter((match) => match.gameId !== existingGame.id),
-      );
-
-      setExistingGame(null);
-      toggleManageLobbyModal(false);
-    } catch (error) {
-      console.error("Failed to delete lobby:", error);
+  const handleLeaveExistingGame = async () => {
+    if (!existingGame) {
+      toggleExistingGameModal(false);
+      return;
     }
-  };
-
-  const handleLeaveLobby = async () => {
-    if (!existingGame) return;
 
     try {
       await api.games.leaveById(existingGame.id);
 
       setExistingGame(null);
-      toggleManageLobbyModal(false);
+      toggleExistingGameModal(false);
+
+      await loadGames();
     } catch (error) {
-      console.error("Failed to leave lobby:", error);
+      console.error("Failed to leave current game:", error);
     }
   };
 
@@ -213,19 +160,8 @@ const LobbyPage = () => {
         maxPlayers,
       });
 
-      const newMatch: LobbyMatch = {
-        gameId: createdGame.id,
-        gameName: createdGame.name,
-        players: [],
-      };
-
-      setMatches((prevMatches) => [newMatch, ...prevMatches]);
-
-      setExistingGame({
-        id: createdGame.id,
-        name: createdGame.name,
-        ownerId: createdGame.ownerId,
-      });
+      toggleCreateModal(false);
+      navigate(getGamePath(createdGame.id));
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);
 
@@ -238,34 +174,26 @@ const LobbyPage = () => {
       setExistingGame({
         id: existingGameId,
         name: currentGame?.name ?? "your existing game",
-        ownerId: currentGame?.ownerId ?? "",
       });
 
       toggleCreateModal(false);
-      toggleManageLobbyModal(true);
+      toggleExistingGameModal(true);
     }
   };
-
-  const isCurrentGameOwner =
-    existingGame !== null && currentUserId === existingGame.ownerId;
 
   return (
     <div className={s.pageContainer}>
       <Section className={s.listSection}>
         <List
-          items={matches}
-          getKey={(match) => match.gameId}
-          renderItem={(match) => (
+          items={games}
+          getKey={(game) => game.gameId}
+          renderItem={(game) => (
             <button
               type="button"
-              className={s.matchButton}
-              onClick={() => handleOpenJoinModalWithGameId(match.gameId)}
+              className={s.gameButton}
+              onClick={() => handleOpenJoinModalWithGameId(game.gameId)}
             >
-              <MatchListItem
-                match={match}
-                isCurrentLobby={existingGame?.id === match.gameId}
-                onManageCurrentLobby={() => toggleManageLobbyModal(true)}
-              />
+              <GameListItem game={game} />
             </button>
           )}
           className={s.list}
@@ -303,16 +231,7 @@ const LobbyPage = () => {
         isOpen={isOpenExistingGameModal}
         gameName={existingGame?.name}
         onReturn={handleReturnToExistingGame}
-        onClose={handleCloseExistingGameModal}
-      />
-
-      <ManageLobbyModal
-        isOpen={isOpenManageLobbyModal}
-        gameName={existingGame?.name}
-        isOwner={isCurrentGameOwner}
-        onCancel={handleCloseManageLobbyModal}
-        onDeleteLobby={handleDeleteLobby}
-        onLeaveLobby={handleLeaveLobby}
+        onLeave={handleLeaveExistingGame}
       />
     </div>
   );

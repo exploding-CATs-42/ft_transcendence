@@ -5,15 +5,15 @@ interface Props {
   isOpen: boolean;
   gameName?: string | undefined;
   onReturn: () => void;
-  onClose: () => void;
+  onLeave: () => void | Promise<void>;
 }
 
-const ExistingGameModal = ({ isOpen, gameName, onReturn, onClose }: Props) => {
+const ExistingGameModal = ({ isOpen, gameName, onReturn, onLeave }: Props) => {
   return (
     <Modal
       className={s["existingGameModal"]!}
       isOpen={isOpen}
-      toggleModal={onClose}
+      toggleModal={onLeave}
     >
       <div className={s["existingGameModalContent"]!}>
         <h2 className={s["modalTitle"]!}>Active game found</h2>
@@ -28,8 +28,8 @@ const ExistingGameModal = ({ isOpen, gameName, onReturn, onClose }: Props) => {
             Yes, return
           </Button>
 
-          <Button className={s["cancelButton"]!} onClick={onClose}>
-            No
+          <Button className={s["cancelButton"]!} onClick={onLeave}>
+            No, leave game
           </Button>
         </div>
       </div>

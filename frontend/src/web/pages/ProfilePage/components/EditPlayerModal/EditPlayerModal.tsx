@@ -11,17 +11,24 @@ import {
   Modal,
   NameInput,
   PasswordInput,
+  AvatarWithAdd,
 } from "components";
-import type { MyProfileUser, ProfileUser } from "pages/ProfilePage/types";
+
 import type { BadRequestErrorResponse } from "types";
 import type { AxiosError } from "axios";
+
 import api from "api";
-// Local level
-import s from "./EditPlayerModal.module.css";
-import { AvatarWithAdd } from "components";
-import type { UpdateMeRequestBody } from "schemas/me/updateMeSchema";
-import { avatarSchema } from "schemas/me/updateMeAvatarSchema";
+
+import {
+  avatarSchema,
+  type UpdateMeRequestBody,
+} from "@exploding-cats/contracts";
+
 import { Spinner } from "assets";
+
+// Local level
+import type { MyProfileUser, ProfileUser } from "../../types";
+import s from "./EditPlayerModal.module.css";
 
 interface Props {
   isOpen: boolean;
@@ -64,16 +71,6 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     defaultValues: user,
   });
 
-  const emptyStringToUndefined = (value: string | undefined) =>
-    value === "" ? undefined : value;
-
-  const valuesToUpdate = (data: UpdateMeRequestBody) => ({
-    username: emptyStringToUndefined(data.username),
-    email: emptyStringToUndefined(data.email),
-    passwordNew: emptyStringToUndefined(data.passwordNew),
-    passwordOld: emptyStringToUndefined(data.passwordOld),
-  });
-
   const processFieldErrors = (
     fieldErrors: Record<string, string[]> | undefined,
   ) => {
@@ -111,16 +108,27 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     processFieldErrors(fieldErrors);
   };
 
-  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (data) => {
+  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async ({
+    username,
+    email,
+    passwordOld,
+    passwordNew,
+  }) => {
     try {
-      const updates = valuesToUpdate(data);
-      const updatedUser = await api.me.updateMe(updates);
+      const updateData = {
+        ...(username !== undefined && { username }),
+        ...(email !== undefined && { email }),
+        ...(passwordNew !== undefined && { passwordNew }),
+        ...(passwordOld !== undefined && { passwordOld }),
+      };
+
+      const updatedUser = await api.me.updateMe(updateData);
 
       updateUser(updatedUser);
-      reset(updatedUser);
-
+      reset(updateData);
       clearErrors();
 
+      toggleModal();
       toast.success("Success");
     } catch (error) {
       handleRequestErrors(error);

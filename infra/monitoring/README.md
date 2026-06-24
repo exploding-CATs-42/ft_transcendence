@@ -205,7 +205,7 @@ failure
 
 ## Socket Metrics
 
-Socket.IO metrics should cover connection state and game/chat events.
+Socket.IO metrics should cover connection state and game events.
 
 Current socket modules:
 
@@ -213,7 +213,6 @@ Current socket modules:
 | --- | --- |
 | Socket setup | `backend/src/sockets/setup.ts` |
 | Game handlers | `backend/src/sockets/game.ts` |
-| Chat handlers | `backend/src/sockets/chat.ts` |
 
 Use stable event names as labels. Do not use socket IDs, user IDs, game IDs, room IDs, IP addresses, usernames, emails, tokens, or message text as labels.
 
@@ -290,6 +289,5 @@ Never use these values as labels:
 | --- | --- |
 | User IDs, game IDs, room IDs, socket IDs | High cardinality |
 | Emails, usernames, tokens, IP addresses | Sensitive data |
-| Raw URLs or query strings | High cardinality and possible sensitive data |
-| Request bodies or chat messages | Sensitive data |
+| Raw URLs or query strings | High cardinality and possible sensitive data | Sensitive data |
 | Session IDs or refresh tokens | Sensitive data |
