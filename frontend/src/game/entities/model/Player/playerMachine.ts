@@ -6,7 +6,9 @@ import { type PlayerEvent, type PlayerOutEvent, PlayerEvents } from "./events";
 import { type PlayerContext } from "./context";
 import { exploded } from "./emitters";
 import { PlayerActions } from "./actions";
-import { PlayerGuards } from "./guard";
+import { PlayerGuards } from "./guards";
+import { PlayerTargets } from "./targets";
+import { machineId } from "./constants";
 
 export const playerMachine = setup({
   types: {
@@ -18,30 +20,117 @@ export const playerMachine = setup({
   actions: {
     // placeholders, overridden via .provide()
     [PlayerActions.PLAY_CARD]: assign(() => ({})),
+    [PlayerActions.DRAW_CARD]: assign(() => ({})),
+    [PlayerActions.TAKE_CARD]: assign(() => ({})),
+    [PlayerActions.GIVE_CARD]: assign(() => ({})),
+    [PlayerActions.DECREASE_TURN_COUNT]: assign(() => ({})),
+    [PlayerActions.INCREASE_TURN_COUNT]: assign(() => ({})),
   },
   guards: {
     // placeholders, overridden via .provide()
     [PlayerGuards.HAS_CARDS]: () => false,
+    [PlayerGuards.HAS_CARD]: () => false,
+    [PlayerGuards.HAS_ONE_TURN_LEFT]: () => false,
   },
 }).createMachine({
-  id: "Player",
-  initial: PlayerStates.ALIVE,
+  id: machineId,
+  initial: PlayerStates.IN_LOBBY,
   context: ({ input }) => input,
   states: {
-    [PlayerStates.ALIVE]: {
-      on: {
-        [PlayerEvents.PLAY_CARD]: {
-          guard: PlayerGuards.HAS_CARDS,
-          actions: PlayerActions.PLAY_CARD,
+    [PlayerStates.IN_LOBBY]: {
+      initial: PlayerStates.NOT_READY,
+      states: {
+        [PlayerStates.NOT_READY]: {
+          on: {
+            [PlayerEvents.CONFIRM_READINESS]: {
+              target: PlayerTargets.READY,
+            },
+          },
         },
-        [PlayerEvents.EXPLODE]: {
-          target: PlayerStates.DEAD,
+        [PlayerStates.READY]: {
+          on: {
+            [PlayerEvents.CANCEL_READINESS]: {
+              target: PlayerTargets.NOT_READY,
+            },
+            [PlayerEvents.GAME_STARTED]: {
+              target: PlayerTargets.IN_GAME,
+            },
+          },
         },
       },
     },
-    [PlayerStates.DEAD]: {
+    [PlayerStates.IN_GAME]: {
+      initial: PlayerStates.ALIVE,
+      states: {
+        [PlayerStates.ALIVE]: {
+          initial: PlayerStates.NORMAL,
+          states: {
+            [PlayerStates.MAKING_TURN]: {
+              states: {
+                [PlayerStates.NORMAL]: {
+                  on: {
+                    [PlayerEvents.GET_ATTACKED]: {
+                      actions: PlayerActions.INCREASE_TURN_COUNT,
+                      target: PlayerTargets.UNDER_ATTACK,
+                    },
+                  },
+                },
+                [PlayerStates.UNDER_ATTACK]: {
+                  on: {
+                    [PlayerEvents.TURN_COUNT_CHANGED]: {
+                      guard: PlayerGuards.HAS_ONE_TURN_LEFT,
+                      target: PlayerTargets.NORMAL,
+                    },
+                    [PlayerEvents.TURN_CHANGED]: {
+                      actions: PlayerActions.DECREASE_TURN_COUNT,
+                      target: PlayerTargets.NORMAL,
+                    },
+                  },
+                },
+              },
+            },
+            [PlayerStates.WAITING_FOR_TURN]: {},
+          },
+          on: {
+            [PlayerEvents.PLAY_CARD]: {
+              guard: PlayerGuards.HAS_CARD,
+              actions: PlayerActions.PLAY_CARD,
+            },
+            [PlayerEvents.DRAW_CARD]: {
+              actions: [
+                PlayerActions.DRAW_CARD,
+                PlayerActions.DECREASE_TURN_COUNT,
+              ],
+            },
+            [PlayerEvents.TAKE_CARD]: {
+              actions: PlayerActions.TAKE_CARD,
+            },
+            [PlayerEvents.GIVE_CARD]: {
+              guard: PlayerGuards.HAS_CARD,
+              actions: PlayerActions.GIVE_CARD,
+            },
+            [PlayerEvents.GIVE_ANY_CARD]: {
+              guard: PlayerGuards.HAS_CARDS,
+              actions: PlayerActions.GIVE_CARD,
+            },
+            [PlayerEvents.EXPLODE]: {
+              target: PlayerTargets.DEAD,
+            },
+          },
+        },
+        [PlayerStates.DEAD]: {
+          type: "final",
+          entry: emit(exploded),
+        },
+      },
+      on: {
+        [PlayerEvents.GAME_ENDED]: {
+          target: PlayerTargets.AFTER_GAME,
+        },
+      },
+    },
+    [PlayerStates.AFTER_GAME]: {
       type: "final",
-      entry: emit(exploded),
     },
   },
 });

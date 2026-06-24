@@ -2,11 +2,15 @@
 import type { MyContext as MyBaseContext } from "./me";
 import type { OpponentContext as OpponentBaseContext } from "./opponent";
 
-export interface MyContext extends MyBaseContext {
+interface SharedContext {
+  turnCount: number;
+}
+
+export interface MyContext extends MyBaseContext, SharedContext {
   role: "me";
 }
 
-export interface OpponentContext extends OpponentBaseContext {
+export interface OpponentContext extends OpponentBaseContext, SharedContext {
   role: "opponent";
 }
 
