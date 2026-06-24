@@ -1,7 +1,14 @@
 // Libraries
 import { Socket, Server } from "socket.io";
 // Project level
-import { cancelStart, confirmStart, joinGame, leaveGame } from "services";
+import {
+  cancelStart,
+  confirmStart,
+  getGameById,
+  joinGame,
+  leaveGame,
+} from "services";
+import { GameStates } from "game";
 import { withErrorHandler } from "utils";
 import {
   CancelStartParams,
@@ -43,6 +50,15 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
         socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+
+        const game = await getGameById(socket.data.sub, parsed);
+        const isPlaying = game.instance
+          .getSnapshot()
+          .matches(GameStates.PLAYING);
+
+        if (isPlaying) {
+          socket.emit(ServerPublicEvents.GAME_STARTED);
+        }
       },
     ),
   );

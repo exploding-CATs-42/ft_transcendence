@@ -8,7 +8,7 @@ import {
   WAITING_ROOM_SEATS,
   Textures,
 } from "game/constants";
-import { addBackgroundImage, addFullscreenToggle } from "game/utils";
+import { EventBus, addBackgroundImage, addFullscreenToggle } from "game/utils";
 import { Button, GraphicPlayer, PlayerSeat } from "game/entities";
 import type { LabelConfig, Size } from "game/@types";
 import { type WaitingPlayerView } from "@exploding-cats/contracts";
@@ -18,6 +18,8 @@ import {
   subscribeWaitingRoom,
   type WaitingRoomHandlers,
 } from "game/sockets";
+
+const LEAVE_GAME_EVENT = "leave-game";
 
 const NAME_LABEL_CONFIG: LabelConfig = {
   fontColor: "black",
@@ -32,6 +34,16 @@ const BUTTON_SIZE: Size = {
 const BUTTON_POSITION = {
   x: SCREEN_WIDTH / 2 - BUTTON_SIZE.width / 2,
   y: SCREEN_HEIGHT - 200,
+};
+
+const LEAVE_BUTTON_SIZE: Size = {
+  width: 260,
+  height: 70,
+};
+
+const LEAVE_BUTTON_POSITION = {
+  x: SCREEN_WIDTH - LEAVE_BUTTON_SIZE.width - 40,
+  y: 40,
 };
 
 const WAITING_MESSAGE = "Waiting for other players...";
@@ -54,6 +66,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
 
     this.#seats = this.buildSeats();
 
+    this.addLeaveGameButton();
     this.addWaitingLabel();
     this.addReadinessButton();
 
@@ -103,6 +116,16 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     });
 
     this.#playersById.delete(playerId);
+  }
+
+  private addLeaveGameButton() {
+    return new Button(
+      this,
+      LEAVE_BUTTON_POSITION,
+      LEAVE_BUTTON_SIZE,
+      "Leave game",
+      () => EventBus.emit(LEAVE_GAME_EVENT),
+    );
   }
 
   private addReadinessButton() {

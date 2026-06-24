@@ -15,13 +15,16 @@ import {
   addFullscreenToggle,
 } from "game/utils";
 import {
+  Button,
   GraphicPlayer,
   Hand,
   OpponentHand,
   PlayerSeat,
   type Player,
 } from "game/entities";
-import type { Point, LabelConfig, CardConfig } from "game/@types";
+import type { Point, LabelConfig, CardConfig, Size } from "game/@types";
+
+const LEAVE_GAME_EVENT = "leave-game";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -65,6 +68,16 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
+const LEAVE_BUTTON_SIZE: Size = {
+  width: 260,
+  height: 70,
+};
+
+const LEAVE_BUTTON_POSITION: Point = {
+  x: SCREEN_WIDTH - LEAVE_BUTTON_SIZE.width - 40,
+  y: 40,
+};
+
 // My hand
 const HAND_POSITION: Point = {
   x: SCREEN_WIDTH / 2,
@@ -83,6 +96,7 @@ export class GameRoom extends Scene {
   create() {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
+    this.addLeaveGameButton();
 
     const players = this.createPlayers(data.players);
     this.createOpponentHands(players);
@@ -102,6 +116,16 @@ export class GameRoom extends Scene {
     }, 500 * 15);
 
     EventBus.emit("scene-ready", this);
+  }
+
+  private addLeaveGameButton() {
+    return new Button(
+      this,
+      LEAVE_BUTTON_POSITION,
+      LEAVE_BUTTON_SIZE,
+      "Leave game",
+      () => EventBus.emit(LEAVE_GAME_EVENT),
+    );
   }
 
   private createPlayers(players: Player[]) {
