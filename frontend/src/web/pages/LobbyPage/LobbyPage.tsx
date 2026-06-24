@@ -122,6 +122,7 @@ const LobbyPage = () => {
       navigate(getGamePath(trimmedGameId));
     } catch (error) {
       console.error("Failed to join game:", error);
+      throw error;
     }
   };
 

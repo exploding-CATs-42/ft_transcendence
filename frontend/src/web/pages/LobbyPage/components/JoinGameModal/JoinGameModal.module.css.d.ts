@@ -7,6 +7,7 @@ declare const styles: {
   readonly "joinModalContent": string;
   readonly "modalInput": string;
   readonly "modalTitle": string;
+  readonly "submitError": string;
 };
 
 export = styles;

@@ -236,3 +236,12 @@
     line-height: 30px;
   }
 }
+
+.submitError {
+  width: min(100%, 420px);
+  margin: 8px auto 0;
+
+  color: #ff5f5f;
+  font-size: 16px;
+  text-align: center;
+}
