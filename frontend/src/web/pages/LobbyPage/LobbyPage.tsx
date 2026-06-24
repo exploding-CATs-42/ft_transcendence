@@ -45,6 +45,7 @@ const getExistingGameIdFromError = (error: unknown) => {
 const mapGameToLobbyGame = (game: GameInfo): LobbyGame => ({
   gameId: game.id,
   gameName: game.name,
+  maxPlayers: game.maxPlayers,
   players: game.players,
 });
 

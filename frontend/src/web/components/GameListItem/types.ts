@@ -9,6 +9,7 @@ export type LobbyGamePlayer = {
 export type LobbyGame = {
   gameId: string;
   gameName: string;
+  maxPlayers?: number;
   players: LobbyGamePlayer[];
 };
 
