@@ -14,6 +14,8 @@ export const PlayerEvents = {
   EXPLODE: "EXPLODE",
   TURN_COUNT_CHANGED: "TURN_COUNT_CHANGED",
   TURN_CHANGED: "TURN_CHANGED",
+  START_TURN: "START_TURN",
+  END_TURN: "END_TURN",
   GAME_ENDED: "GAME_ENDED",
 } as const;
 
@@ -32,6 +34,8 @@ export type PlayerEvent =
   | { type: typeof PlayerEvents.EXPLODE }
   | { type: typeof PlayerEvents.TURN_COUNT_CHANGED }
   | { type: typeof PlayerEvents.TURN_CHANGED }
+  | { type: typeof PlayerEvents.START_TURN }
+  | { type: typeof PlayerEvents.END_TURN }
   | { type: typeof PlayerEvents.GAME_ENDED };
 
 // Events emitted FROM the machine

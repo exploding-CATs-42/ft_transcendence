@@ -1,8 +1,6 @@
 export const PlayerActions = {
-  PLAY_CARD: "playCard",
-  DRAW_CARD: "drawCard",
-  TAKE_CARD: "takeCard",
-  GIVE_CARD: "giveCard",
+  ADD_CARD: "addCard",
+  REMOVE_CARD: "removeCard",
   DECREASE_TURN_COUNT: "decreaseTurnCount",
   INCREASE_TURN_COUNT: "increaseTurnCount",
 } as const;

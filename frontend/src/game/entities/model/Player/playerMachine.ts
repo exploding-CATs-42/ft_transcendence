@@ -19,10 +19,8 @@ export const playerMachine = setup({
   },
   actions: {
     // placeholders, overridden via .provide()
-    [PlayerActions.PLAY_CARD]: assign(() => ({})),
-    [PlayerActions.DRAW_CARD]: assign(() => ({})),
-    [PlayerActions.TAKE_CARD]: assign(() => ({})),
-    [PlayerActions.GIVE_CARD]: assign(() => ({})),
+    [PlayerActions.ADD_CARD]: assign(() => ({})),
+    [PlayerActions.REMOVE_CARD]: assign(() => ({})),
     [PlayerActions.DECREASE_TURN_COUNT]: assign(() => ({})),
     [PlayerActions.INCREASE_TURN_COUNT]: assign(() => ({})),
   },
@@ -63,9 +61,25 @@ export const playerMachine = setup({
       initial: PlayerStates.ALIVE,
       states: {
         [PlayerStates.ALIVE]: {
-          initial: PlayerStates.NORMAL,
+          initial: PlayerStates.WAITING_FOR_TURN,
           states: {
+            [PlayerStates.WAITING_FOR_TURN]: {
+              on: {
+                [PlayerEvents.START_TURN]: {
+                  target: PlayerTargets.MAKING_TURN,
+                },
+                [PlayerEvents.GIVE_CARD]: {
+                  guard: PlayerGuards.HAS_CARD,
+                  actions: PlayerActions.REMOVE_CARD,
+                },
+                [PlayerEvents.GIVE_ANY_CARD]: {
+                  guard: PlayerGuards.HAS_CARDS,
+                  actions: PlayerActions.REMOVE_CARD,
+                },
+              },
+            },
             [PlayerStates.MAKING_TURN]: {
+              initial: PlayerStates.NORMAL,
               states: {
                 [PlayerStates.NORMAL]: {
                   on: {
@@ -81,40 +95,31 @@ export const playerMachine = setup({
                       guard: PlayerGuards.HAS_ONE_TURN_LEFT,
                       target: PlayerTargets.NORMAL,
                     },
-                    [PlayerEvents.TURN_CHANGED]: {
-                      actions: PlayerActions.DECREASE_TURN_COUNT,
-                      target: PlayerTargets.NORMAL,
-                    },
                   },
                 },
               },
-            },
-            [PlayerStates.WAITING_FOR_TURN]: {},
-          },
-          on: {
-            [PlayerEvents.PLAY_CARD]: {
-              guard: PlayerGuards.HAS_CARD,
-              actions: PlayerActions.PLAY_CARD,
-            },
-            [PlayerEvents.DRAW_CARD]: {
-              actions: [
-                PlayerActions.DRAW_CARD,
-                PlayerActions.DECREASE_TURN_COUNT,
-              ],
-            },
-            [PlayerEvents.TAKE_CARD]: {
-              actions: PlayerActions.TAKE_CARD,
-            },
-            [PlayerEvents.GIVE_CARD]: {
-              guard: PlayerGuards.HAS_CARD,
-              actions: PlayerActions.GIVE_CARD,
-            },
-            [PlayerEvents.GIVE_ANY_CARD]: {
-              guard: PlayerGuards.HAS_CARDS,
-              actions: PlayerActions.GIVE_CARD,
-            },
-            [PlayerEvents.EXPLODE]: {
-              target: PlayerTargets.DEAD,
+              on: {
+                [PlayerEvents.END_TURN]: {
+                  actions: PlayerActions.DECREASE_TURN_COUNT,
+                  target: PlayerTargets.WAITING_FOR_TURN,
+                },
+                [PlayerEvents.PLAY_CARD]: {
+                  guard: PlayerGuards.HAS_CARD,
+                  actions: PlayerActions.REMOVE_CARD,
+                },
+                [PlayerEvents.DRAW_CARD]: {
+                  actions: [
+                    PlayerActions.ADD_CARD,
+                    PlayerActions.DECREASE_TURN_COUNT,
+                  ],
+                },
+                [PlayerEvents.TAKE_CARD]: {
+                  actions: PlayerActions.ADD_CARD,
+                },
+                [PlayerEvents.EXPLODE]: {
+                  target: PlayerTargets.DEAD,
+                },
+              },
             },
           },
         },
