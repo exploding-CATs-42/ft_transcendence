@@ -10,6 +10,7 @@ interface Props {
   toggleModal: () => void;
   onGameIdChange: (value: string) => void;
   onJoin: () => void;
+  onCreateClick: () => void;
 }
 
 const JoinGameModal = ({
@@ -18,6 +19,7 @@ const JoinGameModal = ({
   toggleModal,
   onGameIdChange,
   onJoin,
+  onCreateClick,
 }: Props) => {
   return (
     <Modal
@@ -34,7 +36,7 @@ const JoinGameModal = ({
           value={gameId}
           onChange={(event) => onGameIdChange(event.target.value)}
           iconName="puzzle"
-          iconClassName={s.icon}
+          iconClassName={s["icon"]!}
           placeholder="Table id"
         />
 
@@ -44,7 +46,11 @@ const JoinGameModal = ({
 
         <p className={s["createText"]!}>Want to create a room?</p>
 
-        <button className={s["createLink"]!} type="button">
+        <button
+          className={s["createLink"]!}
+          type="button"
+          onClick={onCreateClick}
+        >
           Create a new one
         </button>
       </div>

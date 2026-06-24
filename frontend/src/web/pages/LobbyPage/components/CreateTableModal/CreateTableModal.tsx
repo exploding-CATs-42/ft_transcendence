@@ -11,12 +11,18 @@ interface Props {
   isOpen: boolean;
   toggleModal: () => void;
   onSubmit: (values: CreateTableFormValues) => Promise<void>;
+  onJoinClick: () => void;
 }
 
 const MIN_PLAYERS = 2;
 const MAX_PLAYERS = 5;
 
-const CreateTableModal = ({ isOpen, toggleModal, onSubmit }: Props) => {
+const CreateTableModal = ({
+  isOpen,
+  toggleModal,
+  onSubmit,
+  onJoinClick,
+}: Props) => {
   const [gameName, setGameName] = useState("");
   const [maxPlayers, setMaxPlayers] = useState<number | null>(null);
   const [submitError, setSubmitError] = useState("");
@@ -43,6 +49,13 @@ const CreateTableModal = ({ isOpen, toggleModal, onSubmit }: Props) => {
 
     resetForm();
     toggleModal();
+  };
+
+  const handleJoinClick = () => {
+    if (isSubmitting) return;
+
+    resetForm();
+    onJoinClick();
   };
 
   const getGameNameValidationError = (value: string) => {
@@ -119,7 +132,7 @@ const CreateTableModal = ({ isOpen, toggleModal, onSubmit }: Props) => {
             setSubmitError("");
           }}
           iconName="puzzle"
-          iconClassName={s.icon}
+          iconClassName={s["icon"]!}
           placeholder="Table name"
           maxLength={30}
           disabled={isSubmitting}
@@ -179,7 +192,7 @@ const CreateTableModal = ({ isOpen, toggleModal, onSubmit }: Props) => {
         <button
           className={s["joinLink"]!}
           type="button"
-          onClick={handleClose}
+          onClick={handleJoinClick}
           disabled={isSubmitting}
         >
           Join an existing one

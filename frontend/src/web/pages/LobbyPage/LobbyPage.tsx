@@ -110,6 +110,17 @@ const LobbyPage = () => {
     toggleJoinModal(true);
   };
 
+  const handleOpenJoinFromCreateModal = () => {
+    toggleCreateModal(false);
+    toggleJoinModal(true);
+  };
+
+  const handleOpenCreateFromJoinModal = () => {
+    setGameId("");
+    toggleJoinModal(false);
+    toggleCreateModal(true);
+  };
+
   const handleJoinGame = async () => {
     const trimmedGameId = gameId.trim();
 
@@ -217,6 +228,7 @@ const LobbyPage = () => {
         isOpen={isOpenCreateModal}
         toggleModal={() => toggleCreateModal(false)}
         onSubmit={handleCreateTable}
+        onJoinClick={handleOpenJoinFromCreateModal}
       />
 
       <JoinGameModal
@@ -225,6 +237,7 @@ const LobbyPage = () => {
         toggleModal={toggleJoinModal}
         onGameIdChange={setGameId}
         onJoin={handleJoinGame}
+        onCreateClick={handleOpenCreateFromJoinModal}
       />
 
       <ExistingGameModal
