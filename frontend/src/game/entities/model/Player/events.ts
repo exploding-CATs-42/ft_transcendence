@@ -14,6 +14,7 @@ export const PlayerEvents = {
   TAKE_CARD: "TAKE_CARD",
   END_TURN: "END_TURN",
   GET_ATTACKED: "GET_ATTACKED",
+  TURN_COUNT_CHANGED: "TURN_COUNT_CHANGED",
 } as const;
 
 export type PlayerEvents = (typeof PlayerEvents)[keyof typeof PlayerEvents];
@@ -27,7 +28,8 @@ export type PlayerEvent =
   | { type: typeof PlayerEvents.DRAW_CARD; card: Card }
   | { type: typeof PlayerEvents.EXPLODE }
   | { type: typeof PlayerEvents.END_TURN }
-  | { type: typeof PlayerEvents.GET_ATTACKED; additionalTurnsCount: number };
+  | { type: typeof PlayerEvents.GET_ATTACKED; additionalTurnsCount: number }
+  | { type: typeof PlayerEvents.TURN_COUNT_CHANGED };
 
 // Events emitted FROM the machine
 export const PlayerOutEvents = {
