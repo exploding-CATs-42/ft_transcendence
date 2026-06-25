@@ -26,6 +26,7 @@ export const playerMachine = setup({
     // placeholders, overridden via .provide()
     [PlayerGuards.HAS_CARDS]: () => false,
     [PlayerGuards.HAS_CARD]: () => false,
+    [PlayerGuards.HAS_ONE_TURN_LEFT]: () => false,
   },
 }).createMachine({
   id: machineId,
@@ -86,7 +87,14 @@ export const playerMachine = setup({
                     },
                   },
                 },
-                [PlayerStates.UNDER_ATTACK]: {},
+                [PlayerStates.UNDER_ATTACK]: {
+                  on: {
+                    [PlayerEvents.TURN_COUNT_CHANGED]: {
+                      guard: PlayerGuards.HAS_ONE_TURN_LEFT,
+                      target: PlayerTargets.NORMAL,
+                    },
+                  },
+                },
               },
               on: {
                 [PlayerEvents.END_TURN]: {
