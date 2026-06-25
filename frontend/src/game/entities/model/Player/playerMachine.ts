@@ -106,6 +106,19 @@ export const playerMachine = setup({
                 [PlayerEvents.EXPLODE]: {
                   target: PlayerTargets.DEAD,
                 },
+                [PlayerEvents.PLAY_CARD]: {
+                  guard: PlayerGuards.HAS_CARD,
+                  actions: PlayerActions.REMOVE_CARD,
+                },
+                [PlayerEvents.DRAW_CARD]: {
+                  actions: [
+                    PlayerActions.ADD_CARD,
+                    PlayerActions.DECREASE_TURN_COUNT,
+                  ],
+                },
+                [PlayerEvents.TAKE_CARD]: {
+                  actions: PlayerActions.ADD_CARD,
+                },
               },
             },
           },
