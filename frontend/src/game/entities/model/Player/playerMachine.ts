@@ -20,6 +20,7 @@ export const playerMachine = setup({
     [PlayerActions.ADD_CARD]: assign(() => ({})),
     [PlayerActions.REMOVE_CARD]: assign(() => ({})),
     [PlayerActions.DECREASE_TURN_COUNT]: assign(() => ({})),
+    [PlayerActions.INCREASE_TURN_COUNT]: assign(() => ({})),
   },
   guards: {
     // placeholders, overridden via .provide()
@@ -77,7 +78,14 @@ export const playerMachine = setup({
             [PlayerStates.MAKING_TURN]: {
               initial: PlayerStates.NORMAL,
               states: {
-                [PlayerStates.NORMAL]: {},
+                [PlayerStates.NORMAL]: {
+                  on: {
+                    [PlayerEvents.GET_ATTACKED]: {
+                      actions: PlayerActions.INCREASE_TURN_COUNT,
+                      target: PlayerTargets.UNDER_ATTACK,
+                    },
+                  },
+                },
                 [PlayerStates.UNDER_ATTACK]: {},
               },
               on: {
