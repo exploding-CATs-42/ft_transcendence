@@ -55,6 +55,11 @@ export const playerMachine = setup({
         [PlayerStates.ALIVE]: {},
         [PlayerStates.DEAD]: { type: "final" },
       },
+      on: {
+        [PlayerEvents.GAME_ENDED]: {
+          target: PlayerTargets.AFTER_GAME,
+        },
+      },
     },
     [PlayerStates.AFTER_GAME]: { type: "final" },
   },
