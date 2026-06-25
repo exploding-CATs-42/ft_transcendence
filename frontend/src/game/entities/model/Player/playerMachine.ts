@@ -1,5 +1,5 @@
 // Libraries
-import { setup, assign } from "xstate";
+import { setup, assign, emit } from "xstate";
 // Local level
 import type { PlayerContext } from "./context";
 import { PlayerActions } from "./actions";
@@ -8,6 +8,7 @@ import { machineId } from "./constants";
 import { PlayerStates } from "./states";
 import { PlayerTargets } from "./targets";
 import { PlayerEvents } from "./events";
+import { exploded } from "./emitters";
 
 export const playerMachine = setup({
   types: {
@@ -59,7 +60,7 @@ export const playerMachine = setup({
             },
           },
         },
-        [PlayerStates.DEAD]: { type: "final" },
+        [PlayerStates.DEAD]: { type: "final", entry: emit(exploded) },
       },
       on: {
         [PlayerEvents.GAME_ENDED]: {

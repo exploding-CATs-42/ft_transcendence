@@ -26,6 +26,7 @@ export type PlayerEvent =
 export const PlayerOutEvents = {
   READINESS_CONFIRMED: "READINESS_CONFIRMED",
   READINESS_CANCELED: "READINESS_CANCELED",
+  EXPLODED: "EXPLODED",
   CARD_DRAWN: "CARD_DRAWN",
   CARD_TAKEN: "CARD_TAKEN",
 } as const;
@@ -36,5 +37,6 @@ export type PlayerOutEvents =
 export type PlayerOutEvent =
   | { type: typeof PlayerOutEvents.READINESS_CONFIRMED; playerId: string }
   | { type: typeof PlayerOutEvents.READINESS_CANCELED; playerId: string }
+  | { type: typeof PlayerOutEvents.EXPLODED }
   | { type: typeof PlayerOutEvents.CARD_DRAWN; card: Card }
   | { type: typeof PlayerOutEvents.CARD_TAKEN; card: Card };
