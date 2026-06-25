@@ -7,12 +7,14 @@ import { PlayerGuards } from "./guards";
 import { machineId } from "./constants";
 import { PlayerStates } from "./states";
 import { PlayerTargets } from "./targets";
-import { PlayerEvents } from "./events";
+import { type PlayerEvent, type PlayerOutEvent, PlayerEvents } from "./events";
 import { exploded } from "./emitters";
 
 export const playerMachine = setup({
   types: {
     context: {} as PlayerContext,
+    events: {} as PlayerEvent,
+    emitted: {} as PlayerOutEvent,
     input: {} as PlayerContext,
   },
   actions: {
