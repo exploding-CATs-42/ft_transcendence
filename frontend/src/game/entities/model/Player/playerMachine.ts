@@ -103,12 +103,10 @@ export const playerMachine = setup({
                   actions: PlayerActions.DECREASE_TURN_COUNT,
                   target: PlayerTargets.WAITING_FOR_TURN,
                 },
+                [PlayerEvents.EXPLODE]: {
+                  target: PlayerTargets.DEAD,
+                },
               },
-            },
-          },
-          on: {
-            [PlayerEvents.EXPLODE]: {
-              target: PlayerTargets.DEAD,
             },
           },
         },
