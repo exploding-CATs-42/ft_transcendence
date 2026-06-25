@@ -25,6 +25,7 @@ export type PlayerEvent =
   | { type: typeof PlayerEvents.CANCEL_READINESS; playerId: string }
   | { type: typeof PlayerEvents.GAME_STARTED }
   | { type: typeof PlayerEvents.GAME_ENDED }
+  | { type: typeof PlayerEvents.START_TURN }
   | { type: typeof PlayerEvents.TAKE_CARD; card: Card }
   | { type: typeof PlayerEvents.DRAW_CARD; card: Card }
   | { type: typeof PlayerEvents.PLAY_CARD; card: Card }
