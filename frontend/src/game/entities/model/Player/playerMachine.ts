@@ -54,6 +54,11 @@ export const playerMachine = setup({
       initial: PlayerStates.ALIVE,
       states: {
         [PlayerStates.ALIVE]: {
+          initial: PlayerStates.WAITING_FOR_TURN,
+          states: {
+            [PlayerStates.WAITING_FOR_TURN]: {},
+            [PlayerStates.MAKING_TURN]: {},
+          },
           on: {
             [PlayerEvents.EXPLODE]: {
               target: PlayerTargets.DEAD,
