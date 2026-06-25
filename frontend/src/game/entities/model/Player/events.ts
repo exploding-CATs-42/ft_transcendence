@@ -6,6 +6,7 @@ export const PlayerEvents = {
   CANCEL_READINESS: "CANCEL_READINESS",
   GAME_STARTED: "GAME_STARTED",
   GAME_ENDED: "GAME_ENDED",
+  EXPLODE: "EXPLODE",
   DRAW_CARD: "DRAW_CARD",
   TAKE_CARD: "TAKE_CARD",
 } as const;
@@ -18,7 +19,8 @@ export type PlayerEvent =
   | { type: typeof PlayerEvents.GAME_STARTED }
   | { type: typeof PlayerEvents.GAME_ENDED }
   | { type: typeof PlayerEvents.TAKE_CARD; card: Card }
-  | { type: typeof PlayerEvents.DRAW_CARD; card: Card };
+  | { type: typeof PlayerEvents.DRAW_CARD; card: Card }
+  | { type: typeof PlayerEvents.EXPLODE };
 
 // Events emitted FROM the machine
 export const PlayerOutEvents = {

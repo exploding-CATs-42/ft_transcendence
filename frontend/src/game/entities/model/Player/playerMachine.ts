@@ -52,7 +52,13 @@ export const playerMachine = setup({
     [PlayerStates.IN_GAME]: {
       initial: PlayerStates.ALIVE,
       states: {
-        [PlayerStates.ALIVE]: {},
+        [PlayerStates.ALIVE]: {
+          on: {
+            [PlayerEvents.EXPLODE]: {
+              target: PlayerTargets.DEAD,
+            },
+          },
+        },
         [PlayerStates.DEAD]: { type: "final" },
       },
       on: {
