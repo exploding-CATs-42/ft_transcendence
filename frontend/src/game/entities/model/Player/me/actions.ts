@@ -10,6 +10,26 @@ interface MyActionArgs {
 }
 
 /*
+Wrapping each action inside an assign() call allows me to do:
+
+return playerMachine.provide({
+  guards: strategy.guards,
+  actions: strategy.actions,
+});
+
+inside of `factory.ts`.
+Otherwise I'd have to do:
+
+playerMachine.provide({
+  guards: strategy.guards,
+  actions: {
+    [PlayerActions.ADD_CARD]: assign(strategy.actions.addCard) },
+    // and so on for each of the actions
+  }
+});
+*/
+
+/*
 Action - is a function that takes as arguments:
 - machine context 
 - and the event that triggered it
