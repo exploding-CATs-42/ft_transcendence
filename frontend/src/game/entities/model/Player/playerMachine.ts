@@ -5,6 +5,7 @@ import type { PlayerContext } from "./context";
 import { PlayerActions } from "./actions";
 import { PlayerGuards } from "./guards";
 import { machineId } from "./constants";
+import { PlayerStates } from "./states";
 
 export const playerMachine = setup({
   types: {
@@ -22,4 +23,10 @@ export const playerMachine = setup({
 }).createMachine({
   id: machineId,
   context: ({ input }) => input,
+  initial: PlayerStates.IN_LOBBY,
+  states: {
+    [PlayerStates.IN_LOBBY]: {},
+    [PlayerStates.IN_GAME]: {},
+    [PlayerStates.AFTER_GAME]: {},
+  },
 });
