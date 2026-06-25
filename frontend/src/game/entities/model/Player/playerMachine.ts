@@ -27,6 +27,6 @@ export const playerMachine = setup({
   states: {
     [PlayerStates.IN_LOBBY]: {},
     [PlayerStates.IN_GAME]: {},
-    [PlayerStates.AFTER_GAME]: {},
+    [PlayerStates.AFTER_GAME]: { type: "final" },
   },
 });
