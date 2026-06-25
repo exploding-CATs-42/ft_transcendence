@@ -46,5 +46,6 @@
       "socket/*": ["./src/web/socket/*"],
     }
   },
-  "include": ["src"]
+  "include": ["src"],
+  "exclude": ["**/*.visualized.ts"]
 }
