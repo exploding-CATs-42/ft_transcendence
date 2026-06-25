@@ -49,7 +49,13 @@ export const playerMachine = setup({
         },
       },
     },
-    [PlayerStates.IN_GAME]: {},
+    [PlayerStates.IN_GAME]: {
+      initial: PlayerStates.ALIVE,
+      states: {
+        [PlayerStates.ALIVE]: {},
+        [PlayerStates.DEAD]: { type: "final" },
+      },
+    },
     [PlayerStates.AFTER_GAME]: { type: "final" },
   },
 });
