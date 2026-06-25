@@ -56,7 +56,21 @@ export const playerMachine = setup({
         [PlayerStates.ALIVE]: {
           initial: PlayerStates.WAITING_FOR_TURN,
           states: {
-            [PlayerStates.WAITING_FOR_TURN]: {},
+            [PlayerStates.WAITING_FOR_TURN]: {
+              on: {
+                [PlayerEvents.START_TURN]: {
+                  target: PlayerTargets.MAKING_TURN,
+                },
+                [PlayerEvents.GIVE_CARD]: {
+                  guard: PlayerGuards.HAS_CARD,
+                  actions: PlayerActions.REMOVE_CARD,
+                },
+                [PlayerEvents.GIVE_ANY_CARD]: {
+                  guard: PlayerGuards.HAS_CARDS,
+                  actions: PlayerActions.REMOVE_CARD,
+                },
+              },
+            },
             [PlayerStates.MAKING_TURN]: {},
           },
           on: {
