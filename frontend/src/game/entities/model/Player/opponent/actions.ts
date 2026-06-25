@@ -9,6 +9,14 @@ interface OpponentActionArgs {
   event: PlayerEvent;
 }
 
+/*
+Action - is a function that takes as arguments:
+- machine context 
+- and the event that triggered it
+
+and usually performs some context mutations
+*/
+
 const addCard = assign(({ context, event: _ }: OpponentActionArgs) => {
   return {
     cardCount: context.cardCount + 1,
