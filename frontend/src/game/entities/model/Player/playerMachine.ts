@@ -18,10 +18,12 @@ export const playerMachine = setup({
   actions: {
     // placeholders, overridden via .provide()
     [PlayerActions.ADD_CARD]: assign(() => ({})),
+    [PlayerActions.REMOVE_CARD]: assign(() => ({})),
   },
   guards: {
     // placeholders, overridden via .provide()
     [PlayerGuards.HAS_CARDS]: () => false,
+    [PlayerGuards.HAS_CARD]: () => false,
   },
 }).createMachine({
   id: machineId,
@@ -71,7 +73,13 @@ export const playerMachine = setup({
                 },
               },
             },
-            [PlayerStates.MAKING_TURN]: {},
+            [PlayerStates.MAKING_TURN]: {
+              initial: PlayerStates.NORMAL,
+              states: {
+                [PlayerStates.NORMAL]: {},
+                [PlayerStates.UNDER_ATTACK]: {},
+              },
+            },
           },
           on: {
             [PlayerEvents.EXPLODE]: {
