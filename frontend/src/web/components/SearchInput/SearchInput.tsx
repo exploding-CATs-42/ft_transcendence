@@ -8,21 +8,15 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;
 }
 
-const SearchInput = ({
-  placeholder = "Player ID",
-  status = "normal",
-  value = "",
-  onChange = () => {},
-}: Props) => {
+const SearchInput = ({ placeholder = "Player ID", status, ...rest }: Props) => {
   return (
     <Input
-      status={status}
+      {...rest}
+      className={s.input}
       type="text"
       iconName="user"
       placeholder={placeholder}
-      className={s.input}
-      value={value}
-      onChange={onChange}
+      status={status}
     />
   );
 };
