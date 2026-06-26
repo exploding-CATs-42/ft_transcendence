@@ -3,11 +3,11 @@ import { useFriendsActions, useModal } from "hooks";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
 import { toast } from "react-toastify";
 // Project level
-import { Button, ConfirmPopup, List, SearchInput } from "components";
+import { ConfirmPopup, List } from "components";
 import type { FriendItem, UserId } from "@exploding-cats/contracts";
 import { getErrorMessage } from "utils";
 // Local level
-import { FriendListItem } from "../../components";
+import { FriendListItem, FriendshipSearchForm } from "../../components";
 import { sortFriends } from "../../utils";
 import s from "./FriendsTab.module.css";
 
@@ -20,7 +20,6 @@ interface Props {
 const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
   const [isOpenModal, toggleModal] = useModal();
   const [selectedFriendId, setSelectedFriendId] = useState<UserId | null>(null);
-  const [searchQuery, setSearchQuery] = useState<string>("");
   const {
     handleDeleteFriendship,
     handleCreateFriendship,
@@ -83,20 +82,7 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
       />
       {isMyProfile && (
         <>
-          <div className={s.footer}>
-            <SearchInput
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-            <Button
-              className={s.button}
-              onClick={() => {
-                handleCreateFriendship(searchQuery);
-              }}
-            >
-              Add
-            </Button>
-          </div>
+          <FriendshipSearchForm onSubmit={handleCreateFriendship} />
 
           <ConfirmPopup
             toggleModal={toggleModal}
