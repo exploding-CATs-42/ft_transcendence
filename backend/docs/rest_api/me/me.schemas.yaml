@@ -72,3 +72,12 @@ components:
           items:
             $ref: "../users/users.schemas.yaml#/components/schemas/UserGameHistoryItem"
             description: Game object with game details
+
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Operation completed
