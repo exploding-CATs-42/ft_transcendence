@@ -65,7 +65,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "../users/users.schemas.yaml#/components/schemas/MessageResponse"
               examples:
                 validationError:
                   value:
