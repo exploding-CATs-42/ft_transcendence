@@ -128,7 +128,12 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
       const updatedUser = await api.me.updateMe(updateData);
 
       updateUser(updatedUser);
-      reset(updateData);
+      reset({
+        username: updatedUser.username,
+        email: updatedUser.email,
+        passwordOld: undefined,
+        passwordNew: undefined,
+      });
       clearErrors();
 
       toggleModal();
