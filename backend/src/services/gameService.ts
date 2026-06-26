@@ -5,12 +5,11 @@ import {
   ConfirmStartParams,
   CreateGameRequestBody,
   DeleteGameParams,
-  GetGameByIdParams,
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
 import { GameEvents, Player } from "@exploding-cats/game-core";
-import { Game, GameRecord } from "data/types";
+import { GameRecord } from "data/types";
 import { JoinGameResult, UserId } from "types";
 import { PlayerIdPayload } from "@exploding-cats/contracts";
 import { GameRepository, toGameRecord } from "data";
@@ -35,15 +34,6 @@ export async function getGames(userId: UserId): Promise<GameRecord[]> {
   return GameRepository.getAllGames().map((game) => {
     return toGameRecord(game);
   });
-}
-
-export async function getGameById(
-  userId: UserId,
-  input: GetGameByIdParams,
-): Promise<Game> {
-  await ensureUserExists(userId);
-
-  return ensureGameExists(input.gameId);
 }
 
 export async function getCurrentGame(

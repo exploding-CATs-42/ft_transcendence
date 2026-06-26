@@ -1,18 +1,8 @@
 // Libraries
 import type { Response } from "express";
 // Project level
-import {
-  createGame,
-  deleteGame,
-  getCurrentGame,
-  getGameById,
-  getGames,
-} from "services";
-import {
-  createGameSchema,
-  deleteGameParamsSchema,
-  getGameByIdParamsSchema,
-} from "schemas";
+import { createGame, deleteGame, getCurrentGame, getGames } from "services";
+import { createGameSchema, deleteGameParamsSchema } from "schemas";
 import { AuthenticatedRequest } from "types";
 import { validate } from "utils";
 
@@ -29,16 +19,6 @@ export async function getCurrentGameController(
   res: Response,
 ) {
   const result = await getCurrentGame(req.user.id);
-  res.status(200).json(result);
-}
-
-export async function getGameByIdController(
-  req: AuthenticatedRequest,
-  res: Response,
-) {
-  const parsed = validate(getGameByIdParamsSchema, req.params);
-
-  const result = await getGameById(req.user.id, parsed);
   res.status(200).json(result);
 }
 
