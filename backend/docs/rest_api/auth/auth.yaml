@@ -107,12 +107,6 @@ paths:
       responses:
         "204":
           description: Session logged out successfully
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
         "401":
           description: Refresh token is missing or invalid, or the session does not exist
           content:
@@ -160,12 +154,6 @@ paths:
             application/json:
               schema:
                 $ref: "./auth.schemas.yaml#/components/schemas/RefreshResponse"
-        "400":
-          description: Validation error
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
         "401":
           description: Refresh token validation failed
           content:
