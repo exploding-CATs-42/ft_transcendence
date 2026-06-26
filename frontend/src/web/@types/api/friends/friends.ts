@@ -15,7 +15,6 @@ export interface UserIdBody {
 export const FriendshipDirection = {
   OUTGOING: "outgoing",
   INCOMING: "incoming",
-  ACCEPTED: "accepted",
 } as const;
 
 export type FriendshipDirection =
