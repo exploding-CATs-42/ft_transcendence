@@ -14,6 +14,7 @@ import {
   AvatarWithAdd,
 } from "components";
 
+import { zodResolver } from "@hookform/resolvers/zod";
 import type { BadRequestErrorResponse } from "types";
 import type { AxiosError } from "axios";
 
@@ -21,6 +22,7 @@ import api from "api";
 
 import {
   avatarSchema,
+  updateMeSchema,
   type UpdateMeRequestBody,
 } from "@exploding-cats/contracts";
 
@@ -69,6 +71,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     reset,
   } = useForm<UpdateMeRequestBody>({
     defaultValues: user,
+    resolver: zodResolver(updateMeSchema),
   });
 
   const processFieldErrors = (
