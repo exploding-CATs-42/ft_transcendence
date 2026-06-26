@@ -10,6 +10,7 @@ import { setupRouting } from "./routes";
 import { initSockets } from "./sockets";
 import { restoreGames } from "./startup";
 import { initGamePersistence } from "./data";
+import { apiRateLimiter } from "middlewares";
 
 const app = express();
 const server = createServer(app);
@@ -22,6 +23,8 @@ app.use(pino(prettyFormat()));
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+app.use(apiRateLimiter);
+app.set("trust proxy", 1);
 
 setupRouting(app);
 initSockets(io);
