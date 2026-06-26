@@ -103,6 +103,53 @@ paths:
               example:
                 message: Internal server error
 
+  /users/{userId}/friends:
+    get:
+      tags:
+        - Users
+      summary: List a user's friendship relations
+      description: Returns all friendship relations for the specified user.
+      operationId: getUserFriends
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: User id.
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Friendship relations returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "../friends/friends.schemas.yaml#/components/schemas/FriendsListResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
   /users/{userId}/games:
     get:
       tags:

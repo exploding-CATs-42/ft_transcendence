@@ -38,6 +38,8 @@ paths:
     $ref: "users/users.yaml#/paths/~1users~1{userId}"
   /users/{userId}/games:
     $ref: "users/users.yaml#/paths/~1users~1{userId}~1games"
+  /users/{userId}/friends:
+    $ref: "users/users.yaml#/paths/~1users~1{userId}~1friends"
   /me:
     $ref: "me/me.yaml#/paths/~1me"
   /me/avatar:
