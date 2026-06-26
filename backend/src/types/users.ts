@@ -27,7 +27,7 @@ export type MyProfileUserWithStats = MyProfileUser & GameStats;
 
 export type FriendUser = ProfileUser;
 
-export type FriendDirection = "incoming" | "outgoing" | "accepted";
+export type FriendDirection = "incoming" | "outgoing";
 
 export interface FriendListItem {
   user: FriendUser;

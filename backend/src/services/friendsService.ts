@@ -25,10 +25,6 @@ function getDirection(params: {
   requestedById: string;
   status: FriendshipStatus;
 }): FriendDirection {
-  if (params.status === FriendshipStatus.ACCEPTED) {
-    return "accepted";
-  }
-
   return params.requestedById === params.currentUserId
     ? "outgoing"
     : "incoming";
