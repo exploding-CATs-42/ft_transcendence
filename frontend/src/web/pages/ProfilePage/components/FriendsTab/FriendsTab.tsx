@@ -24,7 +24,7 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
     handleCreateFriendship,
     acceptFriendship,
     rejectFriendship,
-  } = useFriendsActions({ setFriends, toggleModal });
+  } = useFriendsActions({ setFriends });
 
   const sortedFriends = useMemo(() => sortFriends(friends), [friends]);
 

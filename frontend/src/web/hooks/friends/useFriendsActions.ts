@@ -13,10 +13,9 @@ import { getErrorMessage } from "utils";
 
 interface Props {
   setFriends: Dispatch<SetStateAction<FriendItem[]>>;
-  toggleModal: () => void;
 }
 
-export const useFriendsActions = ({ setFriends, toggleModal }: Props) => {
+export const useFriendsActions = ({ setFriends }: Props) => {
   const handleCreateFriendship = async (searchQuery: string) => {
     try {
       await api.friends.createFriendRequest({ userId: searchQuery });
@@ -66,8 +65,6 @@ export const useFriendsActions = ({ setFriends, toggleModal }: Props) => {
   const handleDeleteFriendship = async (friendId: UserId) => {
     try {
       await api.friends.deleteFriendship({ userId: friendId });
-      toggleModal();
-
       setFriends((prev) =>
         prev.filter((friend) => friend.user.id !== friendId),
       );
