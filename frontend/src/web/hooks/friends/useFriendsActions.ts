@@ -23,6 +23,11 @@ export const useFriendsActions = ({ setFriends, toggleModal }: Props) => {
     }
   };
 
+  const actionToStatus: Record<FriendshipRequestAction, FriendshipStatus> = {
+    accept: FriendshipStatus.ACCEPTED,
+    reject: FriendshipStatus.REJECTED,
+  };
+
   const updateFriendship = async (
     action: FriendshipRequestAction,
     friendId: UserId,
@@ -33,7 +38,7 @@ export const useFriendsActions = ({ setFriends, toggleModal }: Props) => {
       setFriends((prev) =>
         prev.map((friend) =>
           friend.user.id === friendId
-            ? { ...friend, status: FriendshipStatus.ACCEPTED }
+            ? { ...friend, status: actionToStatus[action] }
             : friend,
         ),
       );
