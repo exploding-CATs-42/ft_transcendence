@@ -1,5 +1,5 @@
 // Libraries
-import type { NextFunction, Request, Response } from "express";
+import type { Response } from "express";
 // Project level
 import {
   listFriendsQuerySchema,
@@ -11,152 +11,70 @@ import {
 } from "@exploding-cats/contracts";
 import {
   deleteFriendship,
-  FriendsServiceError,
   listFriends,
   sendFriendRequest,
   updateFriendship,
 } from "services";
+import { AuthenticatedRequest } from "types";
+import { validate } from "utils";
 
 export async function listFriendsController(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction,
 ) {
-  const parsed = listFriendsQuerySchema.safeParse(req.query);
-
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten(),
-    });
-  }
-
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
+  const query = validate(listFriendsQuerySchema, req.query);
 
   const params = userIdParamsSchema.safeParse(req.params);
   const userId = params.success ? params.data.userId : req.user.id;
 
-  try {
-    const friends = await listFriends({
-      currentUserId: userId,
-      ...(parsed.data.view !== undefined && { view: parsed.data.view }),
-    });
+  const friends = await listFriends({
+    currentUserId: userId,
+    ...(query.view !== undefined && { view: query.view }),
+  });
 
-    return res.status(200).json({ friends });
-  } catch (error) {
-    if (error instanceof FriendsServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-
-    return next(error);
-  }
+  res.status(200).json({ friends });
 }
 
 export async function createFriendRequestController(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction,
 ) {
-  const parsed = createFriendRequestSchema.safeParse(req.body);
+  const body = validate(createFriendRequestSchema, req.body);
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten(),
-    });
-  }
+  await sendFriendRequest({
+    currentUserId: req.user.id,
+    targetUserId: body.userId,
+  });
 
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-
-  try {
-    await sendFriendRequest({
-      currentUserId: req.user.id,
-      targetUserId: parsed.data.userId,
-    });
-
-    return res.status(201).json({ message: "Friend request sent" });
-  } catch (error) {
-    if (error instanceof FriendsServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-
-    return next(error);
-  }
+  res.status(201).json({ message: "Friend request sent" });
 }
 
 export async function updateFriendshipController(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction,
 ) {
-  const parsedParams = updateFriendshipParamsSchema.safeParse(req.params);
-  const parsedBody = updateFriendshipBodySchema.safeParse(req.body);
+  const params = validate(updateFriendshipParamsSchema, req.params);
+  const body = validate(updateFriendshipBodySchema, req.body);
 
-  if (!parsedParams.success || !parsedBody.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: {
-        params: parsedParams.success ? undefined : parsedParams.error.flatten(),
-        body: parsedBody.success ? undefined : parsedBody.error.flatten(),
-      },
-    });
-  }
+  await updateFriendship({
+    currentUserId: req.user.id,
+    targetUserId: params.userId,
+    action: body.action,
+  });
 
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-
-  try {
-    await updateFriendship({
-      currentUserId: req.user.id,
-      targetUserId: parsedParams.data.userId,
-      action: parsedBody.data.action,
-    });
-
-    return res.status(200).json({ message: "Friendship updated" });
-  } catch (error) {
-    if (error instanceof FriendsServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-
-    return next(error);
-  }
+  res.status(200).json({ message: "Friendship updated" });
 }
 
 export async function deleteFriendshipController(
-  req: Request,
+  req: AuthenticatedRequest,
   res: Response,
-  next: NextFunction,
 ) {
-  const parsed = deleteFriendshipSchema.safeParse(req.body);
+  const body = validate(deleteFriendshipSchema, req.body);
 
-  if (!parsed.success) {
-    return res.status(400).json({
-      message: "Validation error",
-      errors: parsed.error.flatten(),
-    });
-  }
+  await deleteFriendship({
+    currentUserId: req.user.id,
+    targetUserId: body.userId,
+  });
 
-  if (!req.user) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-
-  try {
-    await deleteFriendship({
-      currentUserId: req.user.id,
-      targetUserId: parsed.data.userId,
-    });
-
-    return res.status(200).json({ message: "Friendship deleted" });
-  } catch (error) {
-    if (error instanceof FriendsServiceError) {
-      return res.status(error.statusCode).json({ message: error.message });
-    }
-
-    return next(error);
-  }
+  res.status(200).json({ message: "Friendship deleted" });
 }
