@@ -5,3 +5,7 @@ export * from "./listFriendsSchema";
 export * from "./userIdParamsSchema";
 export * from "./userIdBodySchema";
 export * from "./FriendshipView";
+export * from "./FriendshipDirection";
+export * from "./FriendshipRequestAction";
+export * from "./FriendshipStatus";
+export * from "./FriendItem";
