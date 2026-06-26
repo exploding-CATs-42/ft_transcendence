@@ -1,3 +1,7 @@
+// Libraries
+import { toast } from "react-toastify";
+import type { Dispatch, SetStateAction } from "react";
+// Project level
 import {
   FriendshipStatus,
   type FriendItem,
@@ -5,8 +9,6 @@ import {
   type UserId,
 } from "@exploding-cats/contracts";
 import api from "api";
-import type { Dispatch, SetStateAction } from "react";
-import { toast } from "react-toastify";
 import { getErrorMessage } from "utils";
 
 interface Props {
