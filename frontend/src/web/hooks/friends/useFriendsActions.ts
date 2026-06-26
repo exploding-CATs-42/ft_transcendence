@@ -23,10 +23,9 @@ export const useFriendsActions = ({ setFriends }: Props) => {
     reject: FriendshipStatus.REJECTED,
   };
 
-  const updateFriendship = async (
-    action: FriendshipRequestAction,
-    friendId: UserId,
-  ) => {
+  const acceptFriendship = async (friendId: UserId) => {
+    const action: FriendshipRequestAction = "accept";
+
     await api.friends.updateFriendship({ action }, { userId: friendId });
 
     setFriends((prev) =>
@@ -38,12 +37,12 @@ export const useFriendsActions = ({ setFriends }: Props) => {
     );
   };
 
-  const acceptFriendship = async (friendId: UserId) => {
-    await updateFriendship("accept", friendId);
-  };
-
   const rejectFriendship = async (friendId: UserId) => {
-    await updateFriendship("reject", friendId);
+    const action: FriendshipRequestAction = "reject";
+
+    await api.friends.updateFriendship({ action }, { userId: friendId });
+
+    setFriends((prev) => prev.filter((friend) => friend.user.id !== friendId));
   };
 
   const handleDeleteFriendship = async (friendId: UserId) => {
