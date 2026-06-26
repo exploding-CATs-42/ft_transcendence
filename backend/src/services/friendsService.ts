@@ -175,15 +175,21 @@ export async function updateFriendship(params: {
     );
   }
 
+  if (params.action == "reject") {
+    await prisma.friendship.delete({
+      where: {
+        userLowId_userHighId: pair,
+      },
+    });
+    return;
+  }
+
   await prisma.friendship.update({
     where: {
       userLowId_userHighId: pair,
     },
     data: {
-      status:
-        params.action === "accept"
-          ? FriendshipStatus.ACCEPTED
-          : FriendshipStatus.REJECTED,
+      status: FriendshipStatus.ACCEPTED,
     },
   });
 }
