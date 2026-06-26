@@ -3,13 +3,14 @@ import s from "./FormField.module.css";
 interface Props {
   children: React.ReactNode;
   error?: string | undefined;
+  className?: string;
 }
 
-const FormField = ({ children, error }: Props) => {
+const FormField = ({ children, error, className = s.errorMessage }: Props) => {
   return (
     <label className={s.container}>
       {children}
-      {error && <span className={s.errorMessage}>{error}</span>}
+      {error && <span className={className}>{error}</span>}
     </label>
   );
 };
