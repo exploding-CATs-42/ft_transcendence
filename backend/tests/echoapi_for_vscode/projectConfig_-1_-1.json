@@ -16,7 +16,7 @@
       ],
       "env_var_list": {
         "accessToken": {
-          "current_value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZGNlODU4OS04NTc3LTRiODAtODIyMS02NTQ0NGE3YmVmOTQiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzgxNjQ0MDU4LCJleHAiOjE3ODE2NDQ5NTh9.jtCaIaRa-8jOk0psap6USlfUgV6AvuocA0bZYIcZV9s",
+          "current_value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZGNlODU4OS04NTc3LTRiODAtODIyMS02NTQ0NGE3YmVmOTQiLCJ0eXBlIjoiYWNjZXNzIiwiaWF0IjoxNzgyNDcxNDMwLCJleHAiOjE3ODI0NzIzMzB9.bNIlqKEAwh3dd4EP4TYuTTGPhFbfkP4eHEetw5QFY9A",
           "value": "",
           "description": ""
         },
@@ -50,15 +50,29 @@
       "localhost": [
         {
           "key": "refreshToken",
-          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZGNlODU4OS04NTc3LTRiODAtODIyMS02NTQ0NGE3YmVmOTQiLCJzZXNzaW9uSWQiOiIyZmE2ODg4Zi04MTNiLTQ0MTItYjYxMi0wZGI4Y2QyYmFjYTYiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc4MTY0NDA1OCwiZXhwIjoxNzgyMjQ4ODU4fQ.febPifDLr83PUbQft6u6V0eu8ZpJuOnML8b5UBSys4A",
-          "expires": "Tue, 23 Jun 2026 21:07:39 GMT",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZGNlODU4OS04NTc3LTRiODAtODIyMS02NTQ0NGE3YmVmOTQiLCJzZXNzaW9uSWQiOiI4YzA2MWNmZi1kYzE4LTQ4NDAtYjFiNy1jOTk4NzVkNDkyOWUiLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc4MjA2MDM0MiwiZXhwIjoxNzgyNjY1MTQyfQ.IZNKTeIURTSXoeyOLoi3KZe8HjTBrDNz7LMNJT8pWGc",
+          "expires": "Sun, 28 Jun 2026 16:45:43 GMT",
           "maxAge": 604800,
           "path": "/api/users",
           "httpOnly": true,
-          "creation": "2026-06-16T21:07:38.885Z",
+          "creation": "2026-06-21T16:45:42.909Z",
           "sameSite": "lax",
           "name": "refreshToken",
           "cookie_id": "94fc865786005",
+          "domain": "localhost",
+          "project_id": "-1"
+        },
+        {
+          "key": "refreshToken",
+          "value": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZGNlODU4OS04NTc3LTRiODAtODIyMS02NTQ0NGE3YmVmOTQiLCJzZXNzaW9uSWQiOiIyOTcyN2M4Yi0yYmZiLTQ4NzQtYTgzNy00ODNkZjY4NzM5MDciLCJ0eXBlIjoicmVmcmVzaCIsImlhdCI6MTc4MjQ3MTQzMCwiZXhwIjoxNzgzMDc2MjMwfQ.8IMxjmyS6ocNKb2RdYbGL5nFmT0U44H_NGHBH84em7c",
+          "expires": "Fri, 03 Jul 2026 10:57:10 GMT",
+          "maxAge": 604800,
+          "path": "/api/auth",
+          "httpOnly": true,
+          "creation": "2026-06-26T10:57:10.621Z",
+          "sameSite": "lax",
+          "name": "refreshToken",
+          "cookie_id": "350c8d9ab87009",
           "domain": "localhost",
           "project_id": "-1"
         }
