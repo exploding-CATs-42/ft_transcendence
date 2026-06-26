@@ -1,5 +1,4 @@
 // Libraries
-import { toast } from "react-toastify";
 import type { Dispatch, SetStateAction } from "react";
 // Project level
 import {
@@ -9,7 +8,6 @@ import {
   type UserId,
 } from "@exploding-cats/contracts";
 import api from "api";
-import { getErrorMessage } from "utils";
 
 interface Props {
   setFriends: Dispatch<SetStateAction<FriendItem[]>>;
@@ -17,14 +15,7 @@ interface Props {
 
 export const useFriendsActions = ({ setFriends }: Props) => {
   const handleCreateFriendship = async (searchQuery: string) => {
-    try {
-      await api.friends.createFriendRequest({ userId: searchQuery });
-
-      toast.success("Success");
-    } catch (error) {
-      const errmsg = getErrorMessage(error);
-      toast.error(errmsg);
-    }
+    await api.friends.createFriendRequest({ userId: searchQuery });
   };
 
   const actionToStatus: Record<FriendshipRequestAction, FriendshipStatus> = {
@@ -36,22 +27,15 @@ export const useFriendsActions = ({ setFriends }: Props) => {
     action: FriendshipRequestAction,
     friendId: UserId,
   ) => {
-    try {
-      await api.friends.updateFriendship({ action }, { userId: friendId });
+    await api.friends.updateFriendship({ action }, { userId: friendId });
 
-      setFriends((prev) =>
-        prev.map((friend) =>
-          friend.user.id === friendId
-            ? { ...friend, status: actionToStatus[action] }
-            : friend,
-        ),
-      );
-
-      toast.success("Success");
-    } catch (error) {
-      const errmsg = getErrorMessage(error);
-      toast.error(errmsg);
-    }
+    setFriends((prev) =>
+      prev.map((friend) =>
+        friend.user.id === friendId
+          ? { ...friend, status: actionToStatus[action] }
+          : friend,
+      ),
+    );
   };
 
   const acceptFriendship = async (friendId: UserId) => {
@@ -63,17 +47,8 @@ export const useFriendsActions = ({ setFriends }: Props) => {
   };
 
   const handleDeleteFriendship = async (friendId: UserId) => {
-    try {
-      await api.friends.deleteFriendship({ userId: friendId });
-      setFriends((prev) =>
-        prev.filter((friend) => friend.user.id !== friendId),
-      );
-
-      toast.success("Success");
-    } catch (error) {
-      const errmsg = getErrorMessage(error);
-      toast.error(errmsg);
-    }
+    await api.friends.deleteFriendship({ userId: friendId });
+    setFriends((prev) => prev.filter((friend) => friend.user.id !== friendId));
   };
 
   return {
