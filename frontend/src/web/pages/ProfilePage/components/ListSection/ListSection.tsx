@@ -2,9 +2,10 @@
 import { useState, type Dispatch, type SetStateAction } from "react";
 //Project level
 import { Section } from "components";
+import type { FriendItem } from "@exploding-cats/contracts";
 // Local level
 import { Tabs, FriendsTab, GamesTab } from "../../components";
-import type { TabOption, FriendItem } from "../../types";
+import type { TabOption } from "../../types";
 import type { UserGameHistoryItem } from "components/GameListItem/types";
 import s from "./ListSection.module.css";
 

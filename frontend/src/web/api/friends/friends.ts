@@ -1,4 +1,5 @@
 import type {
+  FriendItem,
   ListFriendsQuery,
   UpdateFriendshipBody,
   UpdateFriendshipParams,
@@ -6,7 +7,6 @@ import type {
   UserIdParams,
 } from "@exploding-cats/contracts";
 import { api } from "../axios";
-import type { FriendItem } from "pages/ProfilePage/types";
 
 const getMeFriends = async (
   query?: ListFriendsQuery,

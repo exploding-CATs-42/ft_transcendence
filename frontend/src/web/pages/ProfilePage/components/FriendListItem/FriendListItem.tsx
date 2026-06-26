@@ -1,9 +1,8 @@
 // Project level
 import { Avatar, ListItem } from "components";
-import type { UserId } from "@exploding-cats/contracts";
+import type { FriendItem, UserId } from "@exploding-cats/contracts";
 //Local level
 import s from "./FriendListItem.module.css";
-import type { FriendItem } from "pages/ProfilePage/types";
 import FriendControl from "../FriendControl/FriendControl";
 
 interface Props {

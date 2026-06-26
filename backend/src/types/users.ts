@@ -1,3 +1,5 @@
+import { FriendshipDirection } from "@exploding-cats/contracts";
+
 export interface GameStats {
   totalGames: number;
   wins: number;
@@ -27,12 +29,10 @@ export type MyProfileUserWithStats = MyProfileUser & GameStats;
 
 export type FriendUser = ProfileUser;
 
-export type FriendDirection = "incoming" | "outgoing";
-
 export interface FriendListItem {
   user: FriendUser;
   status: "PENDING" | "ACCEPTED" | "REJECTED";
-  direction: FriendDirection;
+  direction: FriendshipDirection;
 }
 
 export interface UserGameHistoryItem {
