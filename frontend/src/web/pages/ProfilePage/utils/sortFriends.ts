@@ -1,6 +1,6 @@
 import { FriendshipStatus, type FriendItem } from "@exploding-cats/contracts";
 
-const statusOrder: Record<FriendshipStatus, number> = {
+const statusPriority: Record<FriendshipStatus, number> = {
   [FriendshipStatus.ACCEPTED]: 0,
   [FriendshipStatus.PENDING]: 1,
   [FriendshipStatus.REJECTED]: 2,
@@ -8,9 +8,14 @@ const statusOrder: Record<FriendshipStatus, number> = {
 
 export const sortFriends = (friends: FriendItem[]) =>
   [...friends].sort((a, b) => {
-    const diff = statusOrder[a.status] - statusOrder[b.status];
+    const priorityA = statusPriority[a.status];
+    const priorityB = statusPriority[b.status];
 
-    if (diff !== 0) return diff;
+    if (priorityA < priorityB) return -1;
+    if (priorityA > priorityB) return 1;
 
-    return a.user.username.localeCompare(b.user.username);
+    const usernameA = a.user.username;
+    const usernameB = b.user.username;
+
+    return usernameA.localeCompare(usernameB);
   });
