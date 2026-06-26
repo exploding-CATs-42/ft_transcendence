@@ -1,19 +1,15 @@
-// Libraries
-import express from "express";
 // Project level
-import { authMiddleware } from "middlewares";
 import {
   createFriendRequestController,
   deleteFriendshipController,
   listFriendsController,
   updateFriendshipController,
 } from "controllers";
+import { createAuthenticatedRouter, errorHandler } from "utils";
 
-export const friendsRouter = express.Router();
+export const friendsRouter = createAuthenticatedRouter();
 
-friendsRouter.use(authMiddleware);
-
-friendsRouter.get("/", listFriendsController);
-friendsRouter.post("/", createFriendRequestController);
-friendsRouter.patch("/:userId", updateFriendshipController);
-friendsRouter.delete("/", deleteFriendshipController);
+friendsRouter.get("/", errorHandler(listFriendsController));
+friendsRouter.post("/", errorHandler(createFriendRequestController));
+friendsRouter.patch("/:userId", errorHandler(updateFriendshipController));
+friendsRouter.delete("/", errorHandler(deleteFriendshipController));
