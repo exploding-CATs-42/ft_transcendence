@@ -29,8 +29,8 @@ function getDirection(params: {
   status: FriendshipStatus;
 }): FriendshipDirection {
   return params.requestedById === params.currentUserId
-    ? "outgoing"
-    : "incoming";
+    ? FriendshipDirection.OUTGOING
+    : FriendshipDirection.INCOMING;
 }
 
 function filter(friendships: FriendListItem[], view?: FriendshipView) {
@@ -41,14 +41,16 @@ function filter(friendships: FriendListItem[], view?: FriendshipView) {
     case FriendshipView.INCOMING:
       return friendships.filter(
         (f) =>
-          f.status === FriendshipStatus.PENDING && f.direction === "incoming",
+          f.status === FriendshipStatus.PENDING &&
+          f.direction === FriendshipDirection.INCOMING,
       );
 
     case FriendshipView.FRIENDS_AND_REQUESTS:
       return friendships.filter(
         (f) =>
           f.status === FriendshipStatus.ACCEPTED ||
-          (f.status === FriendshipStatus.PENDING && f.direction === "incoming"),
+          (f.status === FriendshipStatus.PENDING &&
+            f.direction === FriendshipDirection.INCOMING),
       );
 
     default:
