@@ -66,6 +66,7 @@ const Modal = ({
           className={clsx(s.modalButton, closeButtonClassName)}
           type="button"
           onClick={() => toggleModal()}
+          aria-label="Close modal"
         >
           <Icon
             className={closeIconClassName}
