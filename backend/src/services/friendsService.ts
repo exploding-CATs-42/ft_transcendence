@@ -1,9 +1,12 @@
 // Project level
-import { FriendshipStatus } from "generated/prisma/client";
 import { publicProfileSelect, prisma } from "lib/prisma";
-import { FriendDirection, FriendListItem } from "types";
 import { toProfileUser } from "mappers";
-import { FriendshipView } from "@exploding-cats/contracts";
+import {
+  FriendshipDirection,
+  FriendshipStatus,
+  FriendshipView,
+} from "@exploding-cats/contracts";
+import { FriendListItem } from "types";
 
 export class FriendsServiceError extends Error {
   public statusCode: number;
@@ -24,7 +27,7 @@ function getDirection(params: {
   currentUserId: string;
   requestedById: string;
   status: FriendshipStatus;
-}): FriendDirection {
+}): FriendshipDirection {
   return params.requestedById === params.currentUserId
     ? "outgoing"
     : "incoming";

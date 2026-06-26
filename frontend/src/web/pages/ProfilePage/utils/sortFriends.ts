@@ -1,5 +1,4 @@
-import { FriendshipStatus } from "types";
-import type { FriendItem } from "../types";
+import { FriendshipStatus, type FriendItem } from "@exploding-cats/contracts";
 
 const statusOrder: Record<FriendshipStatus, number> = {
   [FriendshipStatus.ACCEPTED]: 0,

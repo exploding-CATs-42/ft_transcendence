@@ -1,9 +1,9 @@
 import { useEffect, useState } from "react";
 
-import type { FriendItem } from "pages/ProfilePage/types";
 import api from "api";
 import { getErrorMessage } from "utils";
 import { toast } from "react-toastify";
+import type { FriendItem } from "@exploding-cats/contracts";
 
 interface Props {
   userId: string | undefined;

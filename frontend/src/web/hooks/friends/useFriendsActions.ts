@@ -1,9 +1,12 @@
-import type { UserId } from "@exploding-cats/contracts";
+import {
+  FriendshipStatus,
+  type FriendItem,
+  type FriendshipRequestAction,
+  type UserId,
+} from "@exploding-cats/contracts";
 import api from "api";
-import type { FriendItem } from "pages/ProfilePage/types";
 import type { Dispatch, SetStateAction } from "react";
 import { toast } from "react-toastify";
-import { FriendshipStatus, type FriendshipRequestAction } from "types";
 import { getErrorMessage } from "utils";
 
 interface Props {
