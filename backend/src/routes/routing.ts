@@ -12,6 +12,7 @@ import { gamesRouter } from "./games";
 
 export const setupRouting = (app: Express) => {
   app.use(apiRateLimiter);
+  app.set("trust proxy", 1);
 
   app.get("/", (_, res) => {
     return res.json({ message: "Hello world!" });
