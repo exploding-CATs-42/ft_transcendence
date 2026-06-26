@@ -4,7 +4,7 @@ import { createPortal } from "react-dom";
 import clsx from "clsx";
 // Project level
 import { Icon } from "components";
-import type { IconName} from "types";
+import type { IconName } from "types";
 // Local level
 import s from "./Modal.module.css";
 
@@ -16,7 +16,7 @@ interface Props {
   toggleModal: () => void;
   previosModal?: boolean;
   className?: string;
-  closeButtonClaseName?: string;
+  closeButtonClassName?: string;
   closeIconClassName?: string;
   closeIconName?: IconName;
   closeIconWidth?: number;
@@ -29,7 +29,7 @@ const Modal = ({
   toggleModal,
   previosModal = false,
   className,
-  closeButtonClaseName,
+  closeButtonClassName,
   closeIconClassName,
   closeIconName = "cross",
   closeIconWidth = 12,
@@ -63,7 +63,7 @@ const Modal = ({
     >
       <div className={clsx(s.modalWindow, className)}>
         <button
-          className={clsx(s.modalButton, closeButtonClaseName)}
+          className={clsx(s.modalButton, closeButtonClassName)}
           type="button"
           onClick={() => toggleModal()}
         >
