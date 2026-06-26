@@ -8,6 +8,7 @@ import {
 import { validateDeckSizes } from "./deckValidation";
 import { DEFAULT_GAME_RULES } from "../constants";
 import rawCards from "../constants/cards.json";
+import { shuffle } from "./shuffle";
 
 export const cardDefinitions = rawCards as CardDefinition[];
 
@@ -25,14 +26,6 @@ export const createDeck = (): Deck => {
   }
 
   return deck;
-};
-
-// Fisher–Yates/Knuth shuffle
-export const shuffleDeck = (deck: Deck): void => {
-  for (let i = deck.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [deck[i], deck[j]] = [deck[j]!, deck[i]!];
-  }
 };
 
 /**
@@ -64,7 +57,7 @@ export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
   );
 
   // Shuffle regular cards
-  shuffleDeck(mainDeck);
+  shuffle(mainDeck);
 
   // Deal defuses and regular cards
   const DEFUSES_AMOUNT = DEFAULT_GAME_RULES.defusesDealtPerPlayer;
@@ -82,7 +75,7 @@ export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
   const finalDeck = [...mainDeck, ...defusesToInsert, ...kittensToInsert];
 
   // and shuffle it again to distribute the kittens inside the deck
-  shuffleDeck(finalDeck);
+  shuffle(finalDeck);
 
   return finalDeck;
 };
