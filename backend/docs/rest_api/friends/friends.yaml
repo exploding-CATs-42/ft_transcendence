@@ -237,7 +237,7 @@ paths:
                     message: Only pending friendships can be updated
                 outgoingRequest:
                   value:
-                    message: You cannot update your own outgoing request
+                    message: You cannot accept or reject a request you sent
         "500":
           description: Server error
           content:

@@ -170,7 +170,7 @@ export async function updateFriendship(params: {
 
   if (friendship.requestedById === params.currentUserId) {
     throw new FriendsServiceError(
-      "You cannot update your own outgoing request",
+      "You cannot accept or reject a request you sent",
       409,
     );
   }
