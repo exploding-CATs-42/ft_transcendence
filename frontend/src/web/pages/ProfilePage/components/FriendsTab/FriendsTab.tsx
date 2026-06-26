@@ -1,9 +1,11 @@
 // Libraries
 import { useFriendsActions, useModal } from "hooks";
 import { useMemo, useState, type Dispatch, type SetStateAction } from "react";
+import { toast } from "react-toastify";
 // Project level
 import { Button, ConfirmPopup, List, SearchInput } from "components";
 import type { FriendItem, UserId } from "@exploding-cats/contracts";
+import { getErrorMessage } from "utils";
 // Local level
 import { FriendListItem } from "../../components";
 import { sortFriends } from "../../utils";
@@ -33,11 +35,38 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
     toggleModal();
   };
 
+  const handleDeleteClick = async () => {
+    try {
+      if (selectedFriendId) await handleDeleteFriendship(selectedFriendId);
+      toggleModal();
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const handleAcceptClick = async (friendId: string) => {
+    try {
+      await acceptFriendship(friendId);
+      toast.success("Success");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
+  const handleRejectClick = async (friendId: string) => {
+    try {
+      await rejectFriendship(friendId);
+      toast.success("Success");
+    } catch (error) {
+      toast.error(getErrorMessage(error));
+    }
+  };
+
   const friendActions = isMyProfile
     ? {
         remove: handleRemoveClick,
-        accept: acceptFriendship,
-        reject: rejectFriendship,
+        accept: handleAcceptClick,
+        reject: handleRejectClick,
       }
     : undefined;
 
@@ -74,9 +103,7 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
             isOpenModal={isOpenModal}
             msg="Are you sure you want to remove your friend?"
             onConfirm={() => {
-              if (selectedFriendId) {
-                handleDeleteFriendship(selectedFriendId);
-              }
+              handleDeleteClick();
             }}
           />
         </>
