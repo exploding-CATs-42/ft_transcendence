@@ -4,11 +4,8 @@ import type { InputStatus } from "types";
 // Local level
 import s from "./SearchInput.module.css";
 
-interface Props {
-  placeholder?: string;
+interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
   status?: InputStatus;
-  value?: string;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
 }
 
 const SearchInput = ({
