@@ -147,7 +147,7 @@ export async function updateFriendship(params: {
   action: "accept" | "reject";
 }): Promise<void> {
   if (params.currentUserId === params.targetUserId) {
-    throw new FriendsServiceError("Invalid friendship target", 400);
+    throw new FriendsServiceError("Invalid friendship target", 409);
   }
 
   const pair = getCanonicalPair(params.currentUserId, params.targetUserId);
@@ -200,7 +200,7 @@ export async function deleteFriendship(params: {
   targetUserId: string;
 }): Promise<void> {
   if (params.currentUserId === params.targetUserId) {
-    throw new FriendsServiceError("Invalid friendship target", 400);
+    throw new FriendsServiceError("Invalid friendship target", 409);
   }
 
   const pair = getCanonicalPair(params.currentUserId, params.targetUserId);
