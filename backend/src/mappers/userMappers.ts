@@ -1,6 +1,6 @@
-// Project level
-import { MyProfileUser, ProfileUser } from "types";
+import { MyProfileUser, ProfileUser } from "@exploding-cats/contracts";
 
+// Project level
 export function toProfileUser(user: {
   id: string;
   username: string;

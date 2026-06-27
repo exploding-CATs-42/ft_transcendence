@@ -9,9 +9,9 @@ import {
   LeaveGameParams,
 } from "schemas";
 import { GameEvents, Player } from "@exploding-cats/game-core";
+import { PlayerIdPayload, UserId } from "@exploding-cats/contracts";
 import { GameRecord } from "data/types";
-import { JoinGameResult, UserId } from "types";
-import { PlayerIdPayload } from "@exploding-cats/contracts";
+import { JoinGameResult } from "types";
 import { GameRepository, toGameRecord } from "data";
 import { attachGameBroadcaster } from "sockets";
 import { toWaitingPlayerView } from "mappers";

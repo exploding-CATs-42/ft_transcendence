@@ -1,4 +1,4 @@
-import type { ProfileUser } from "pages/ProfilePage/types";
+import type { ProfileUser } from "@exploding-cats/contracts";
 import type { LobbyGame } from "types";
 
 const alice: ProfileUser = {

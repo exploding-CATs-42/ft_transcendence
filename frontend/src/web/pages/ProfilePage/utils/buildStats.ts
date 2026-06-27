@@ -1,5 +1,6 @@
+import type { ProfileUserWithStats } from "@exploding-cats/contracts";
+
 import type { ProfileStat } from "../types";
-import type { ProfileUserWithStats } from "../types/ProfileUser";
 
 export function buildStats(user: ProfileUserWithStats): ProfileStat[] {
   const totalGames = user.totalGames;

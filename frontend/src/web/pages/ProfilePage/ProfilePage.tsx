@@ -2,9 +2,9 @@
 import { useMemo } from "react";
 import { useLocation, Navigate, useParams } from "react-router-dom";
 //Project level
+import type { MyProfileUser } from "@exploding-cats/contracts";
 import { useFriends, useGames, useUser } from "hooks";
 import { LoadingScreen } from "../../components";
-import type { MyProfileUser } from "./types";
 //Local level
 import { ListSection, StatsSection, UserSection } from "./components";
 import { buildStats } from "./utils";

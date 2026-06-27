@@ -1,9 +1,9 @@
 // Project level
 import { Avatar, Section } from "components";
 // Local level
-import type { MyProfileUser, ProfileUser } from "../../types";
 import s from "./UserSection.module.css";
 import ProfileControls from "../ProfileControls/ProfileControls";
+import type { MyProfileUser, ProfileUser } from "@exploding-cats/contracts";
 
 type Props =
   | {

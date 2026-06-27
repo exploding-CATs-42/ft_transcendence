@@ -1,10 +1,9 @@
 import api from "api";
 import { useAuth, useModal } from "hooks";
 import { Button, Icon } from "components";
+import type { MyProfileUser, ProfileUser } from "@exploding-cats/contracts";
 
-import type { MyProfileUser, ProfileUser } from "../../types";
 import { EditPlayerModal } from "../../components";
-
 import s from "./ProfileControls.module.css";
 
 type Props = {

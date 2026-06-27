@@ -11,11 +11,12 @@ import {
   verifyRefreshToken,
   getRefreshTokenLifetimeMs,
 } from "utils";
-import type { AuthSessionResponse, RefreshSessionResponse, User } from "types";
+import type { AuthSessionResponse, RefreshSessionResponse } from "types";
 import type {
   RegisterResponse,
   RegisterRequestBody,
   LoginRequestBody,
+  User,
 } from "@exploding-cats/contracts";
 
 export class AuthServiceError extends Error {

@@ -1,5 +1,4 @@
-import type { ProfileUser } from "pages/ProfilePage/types";
-import type { UserId } from "pages/ProfilePage/types/ProfileUser";
+import type { ProfileUser, UserId } from "@exploding-cats/contracts";
 
 export type LobbyGame = {
   gameId: string;

@@ -6,7 +6,7 @@ import { useAuth } from "hooks";
 import api from "api";
 // Local level
 import s from "./Navigation.module.css";
-import type { PublicUser } from "pages/ProfilePage/types";
+import type { PublicUser } from "@exploding-cats/contracts";
 
 interface Props {
   onLinkClick?: () => void;
