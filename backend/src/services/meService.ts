@@ -89,7 +89,6 @@ export async function updateMe(
     username?: string;
     email?: string;
     passwordHash?: string;
-    avatarUrl?: string | null;
   } = {};
 
   if (input.username !== undefined) {
