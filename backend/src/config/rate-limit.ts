@@ -1,8 +1,10 @@
 import type { Options } from "express-rate-limit";
 import ms from "ms";
 
+const rateLimitExcludedPaths = new Set(["/metrics"]);
+
 export const apiRateLimitConfig: Partial<Options> = {
   limit: 100,
   windowMs: ms("15 min"),
-  skip: (req) => req.path === "/metrics",
+  skip: (req) => rateLimitExcludedPaths.has(req.path),
 };
