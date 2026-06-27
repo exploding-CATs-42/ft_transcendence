@@ -14,7 +14,6 @@ import {
   AvatarWithAdd,
 } from "components";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import type { BadRequestErrorResponse } from "types";
 import type { AxiosError } from "axios";
 
@@ -70,7 +69,11 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     clearErrors,
     reset,
   } = useForm<UpdateMeRequestBody>({
-    defaultValues: user,
+    defaultValues: {
+      ...user,
+      passwordNew: "",
+      passwordOld: "",
+    },
     resolver: zodResolver(updateMeSchema),
   });
 
@@ -134,6 +137,14 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
 
       toggleModal();
       toast.success("Success");
+
+      updateUser(updatedUser);
+      clearErrors();
+      reset({
+        ...user,
+        passwordNew: "",
+        passwordOld: "",
+      });
     } catch (error) {
       handleRequestErrors(error);
     }
@@ -260,6 +271,11 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
           type="button"
           onClick={() => {
             toggleModalView();
+            reset({
+              ...user,
+              passwordNew: "",
+              passwordOld: "",
+            });
             clearErrors();
           }}
         >
