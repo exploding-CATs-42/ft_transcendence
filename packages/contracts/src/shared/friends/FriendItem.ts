@@ -1,16 +1,11 @@
 import type {
   FriendshipDirection,
   FriendshipStatus,
+  FriendUser,
 } from "@exploding-cats/contracts";
 
 export type FriendItem = {
-  user: {
-    id: string;
-    username: string;
-    avatarUrl: string | null;
-    isOnline: boolean;
-    lastSeenAt: Date | null;
-  };
+  user: FriendUser;
   status: FriendshipStatus;
   direction: FriendshipDirection;
 };
