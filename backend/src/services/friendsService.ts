@@ -4,6 +4,7 @@ import { toProfileUser } from "mappers";
 import {
   FriendItem,
   FriendshipDirection,
+  FriendshipRequestAction,
   FriendshipStatus,
   FriendshipView,
 } from "@exploding-cats/contracts";
@@ -162,7 +163,7 @@ export async function sendFriendRequest(params: {
 export async function updateFriendship(params: {
   currentUserId: string;
   targetUserId: string;
-  action: "accept" | "reject";
+  action: FriendshipRequestAction;
 }): Promise<void> {
   if (params.currentUserId === params.targetUserId) {
     throw new FriendsServiceError("Invalid friendship target", 409);
@@ -194,7 +195,7 @@ export async function updateFriendship(params: {
     );
   }
 
-  if (params.action == "reject") {
+  if (params.action == FriendshipRequestAction.REJECT) {
     await prisma.friendship.delete({
       where: {
         userLowId_userHighId: pair,
