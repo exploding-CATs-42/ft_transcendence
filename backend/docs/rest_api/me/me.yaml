@@ -65,15 +65,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/MessageResponse"
-              examples:
-                validationError:
-                  value:
-                    message: Validation error
-
-                noFieldsProvided:
-                  value:
-                    message: At least one field must be provided
+                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
         "401":
           description: Authentication failed
           content:
