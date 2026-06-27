@@ -39,6 +39,8 @@ export const ServerPrivateEvents = {
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   INSERT_KITTEN_PROMPT: "INSERT_KITTEN_PROMPT",
   FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE",
+  //////////////////////////////////////////
+  OPPONENT_DREW_CARD: "OPPONENT_DREW_CARD",
 } as const;
 
 export const ServerErrorEvents = {

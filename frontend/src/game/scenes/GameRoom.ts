@@ -24,6 +24,8 @@ import {
   GraphicHand,
   OpponentHand,
   PlayerSeat,
+  type OpponentInstance,
+  createOpponentMachine,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -31,6 +33,8 @@ import {
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
+import { OpponentSocketHandlers } from "game/sockets/GameRoom/Opponent";
+import { OpponentHandController } from "game/controllers";
 
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
@@ -87,10 +91,24 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #detachSockets: CleanupFunction;
   #tempCardStorage: Card[] = [];
 
+  //////////////////////////////////
+  #opponentSocketHandler: OpponentSocketHandlers;
+  #opponentHandController: OpponentHandController;
+  #opponentMachine: OpponentInstance;
+
   constructor() {
     super(Scenes.GameRoom);
 
     this.#detachSockets = attachGameRoomSockets(this);
+
+    this.#opponentMachine = createOpponentMachine();
+    this.#opponentHandController = new OpponentHandController(
+      this.#opponentMachine,
+      this.#opponentHands[0]!,
+    );
+    this.#opponentSocketHandler = new OpponentSocketHandlers(
+      this.#opponentHandController,
+    );
   }
 
   create() {
@@ -262,6 +280,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private cleanup = () => {
     this.#detachSockets();
+
+    ///////////////////////////////
+    this.#opponentSocketHandler.destroy();
+    ///////////////////////////////
 
     // Remove whichever event didn't fire
     this.events.off(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
