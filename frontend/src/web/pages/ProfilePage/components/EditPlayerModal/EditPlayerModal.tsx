@@ -65,7 +65,7 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
   const {
     register,
     handleSubmit,
-    formState: { isSubmitting, errors, isDirty },
+    formState: { isSubmitting, errors, isDirty, dirtyFields },
     setError,
     clearErrors,
     reset,
@@ -111,19 +111,15 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     processFieldErrors(fieldErrors);
   };
 
-  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async ({
-    username,
-    email,
-    passwordOld,
-    passwordNew,
-  }) => {
+  const onSubmit: SubmitHandler<UpdateMeRequestBody> = async (
+    data: UpdateMeRequestBody,
+  ) => {
     try {
-      const updateData = {
-        ...(username !== undefined && { username }),
-        ...(email !== undefined && { email }),
-        ...(passwordNew !== undefined && { passwordNew }),
-        ...(passwordOld !== undefined && { passwordOld }),
-      };
+      const updateData = Object.fromEntries(
+        Object.entries(data).filter(
+          ([key]) => dirtyFields[key as keyof typeof dirtyFields],
+        ),
+      );
 
       const updatedUser = await api.me.updateMe(updateData);
 
