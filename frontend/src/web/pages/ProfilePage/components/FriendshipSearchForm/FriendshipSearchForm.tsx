@@ -28,6 +28,7 @@ function FriendshipSearchForm({ onSubmit }: Props) {
   const submit = async (data: UserIdBody) => {
     try {
       await onSubmit(data.userId);
+      toast.success("Success");
     } catch (error) {
       const err = error as AxiosError<BadRequestErrorResponse>;
 
