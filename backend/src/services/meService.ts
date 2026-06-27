@@ -104,10 +104,6 @@ export async function updateMe(
     data.passwordHash = await hashPassword(input.passwordNew);
   }
 
-  if (Object.keys(data).length === 0) {
-    throw new MeServiceError("At least one field must be provided", 400);
-  }
-
   const updatedUser = await prisma.user.update({
     where: { id: currentUserId },
     data,
