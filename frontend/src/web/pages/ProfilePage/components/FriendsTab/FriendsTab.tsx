@@ -37,6 +37,7 @@ const FriendsTab = ({ friends, setFriends, isMyProfile }: Props) => {
   const handleDeleteClick = async () => {
     try {
       if (selectedFriendId) await handleDeleteFriendship(selectedFriendId);
+      toast.success("Success");
       toggleModal();
     } catch (error) {
       toast.error(getErrorMessage(error));
