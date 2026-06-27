@@ -2,11 +2,11 @@
 import { publicProfileSelect, prisma } from "lib/prisma";
 import { toProfileUser } from "mappers";
 import {
+  FriendItem,
   FriendshipDirection,
   FriendshipStatus,
   FriendshipView,
 } from "@exploding-cats/contracts";
-import { FriendListItem } from "types";
 
 export class FriendsServiceError extends Error {
   public statusCode: number;
@@ -33,7 +33,7 @@ function getDirection(params: {
     : FriendshipDirection.INCOMING;
 }
 
-function filter(friendships: FriendListItem[], view?: FriendshipView) {
+function filter(friendships: FriendItem[], view?: FriendshipView) {
   switch (view) {
     case FriendshipView.ACCEPTED:
       return friendships.filter((f) => f.status === FriendshipStatus.ACCEPTED);
@@ -61,7 +61,7 @@ function filter(friendships: FriendListItem[], view?: FriendshipView) {
 export async function listFriends(params: {
   currentUserId: string;
   view?: FriendshipView;
-}): Promise<FriendListItem[]> {
+}): Promise<FriendItem[]> {
   const friendships = await prisma.friendship.findMany({
     where: {
       OR: [
