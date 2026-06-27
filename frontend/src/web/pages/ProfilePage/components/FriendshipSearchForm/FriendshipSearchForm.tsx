@@ -32,11 +32,13 @@ function FriendshipSearchForm({ onSubmit }: Props) {
     } catch (error) {
       const err = error as AxiosError<BadRequestErrorResponse>;
 
-      if (err.response?.status !== 400) {
-        toast.error(err.message);
+      const response = err.response?.data;
+      const fieldErrors = response?.errors?.fieldErrors;
+
+      if (err.response?.status !== 400 || !fieldErrors) {
+        toast.error(response?.message ?? err.message);
         return;
       }
-      const fieldErrors = err.response.data.errors.fieldErrors;
 
       Object.entries(fieldErrors).forEach(([field, messages]) => {
         const message = messages?.[0];
