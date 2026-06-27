@@ -3,12 +3,11 @@ import { toast } from "react-toastify";
 
 import api from "api";
 import { getErrorMessage } from "utils";
-
 import type {
   MyProfileUserWithStats,
   ProfileUser,
   ProfileUserWithStats,
-} from "pages/ProfilePage/types";
+} from "@exploding-cats/contracts";
 
 interface Props {
   userId: string | undefined;

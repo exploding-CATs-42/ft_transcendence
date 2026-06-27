@@ -1,7 +1,8 @@
 // Project level
+import { ProfileUserWithStats } from "@exploding-cats/contracts";
 import { prisma, publicProfileSelect } from "lib/prisma";
-import { ProfileUserWithStats, UserGameHistoryItem } from "types";
 import { toProfileUser, toProfileUserWithStats } from "mappers";
+import { UserGameHistoryItem } from "../../../packages/contracts/src/shared/users";
 
 export class UsersServiceError extends Error {
   public statusCode: number;

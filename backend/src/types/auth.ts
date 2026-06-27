@@ -1,5 +1,5 @@
+import { PublicUser, User } from "@exploding-cats/contracts";
 import { Request } from "express";
-import { PublicUser, User } from "./users";
 
 export interface AuthResponse {
   user: User;

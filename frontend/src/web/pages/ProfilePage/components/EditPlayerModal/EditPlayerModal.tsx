@@ -23,13 +23,14 @@ import api from "api";
 import {
   avatarSchema,
   updateMeSchema,
+  type MyProfileUser,
+  type ProfileUser,
   type UpdateMeRequestBody,
 } from "@exploding-cats/contracts";
 
 import { Spinner } from "assets";
 
 // Local level
-import type { MyProfileUser, ProfileUser } from "../../types";
 import s from "./EditPlayerModal.module.css";
 
 interface Props {

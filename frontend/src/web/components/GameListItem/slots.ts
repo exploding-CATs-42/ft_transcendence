@@ -1,4 +1,4 @@
-import type { ProfileUser } from "pages/ProfilePage/types";
+import type { ProfileUser } from "@exploding-cats/contracts";
 import type { GameSlot } from "./types";
 
 const MAX_PLAYERS = 5 as const; //! Will be replaced with real data later
