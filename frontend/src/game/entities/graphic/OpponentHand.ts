@@ -1,6 +1,9 @@
+// Project level
 import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { Textures } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
+// Local level
+import type { PlayerInstance } from "../model";
 
 const CARD_WIDTH = 46;
 const CARD_HEIGHT = 65;
@@ -30,6 +33,7 @@ export class OpponentHand {
   #badge: Phaser.GameObjects.Container; // container for circle, shadow and amount label
   #amountLabel: Phaser.GameObjects.Text;
   #cardCount: number = 0; // how many cards opponent has
+  #stateMachine: PlayerInstance;
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#scene = scene;
