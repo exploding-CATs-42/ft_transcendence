@@ -4,4 +4,5 @@ import ms from "ms";
 export const apiRateLimitConfig: Partial<Options> = {
   limit: 100,
   windowMs: ms("15 min"),
+  skip: (req) => req.path === "/metrics",
 };
