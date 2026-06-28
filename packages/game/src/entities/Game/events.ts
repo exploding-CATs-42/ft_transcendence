@@ -21,6 +21,7 @@ export type GameEvent =
 export const GameOutEvents = {
   COUNTDOWN_STARTED: "COUNTDOWN_STARTED",
   COUNTDOWN_CANCELED: "COUNTDOWN_CANCELED",
+  READINESS_CONFIRMED: "READINESS_CONFIRMED",
   GAME_STARTED: "GAME_STARTED",
   CARDS_DEALT: "CARDS_DEALT",
 } as const;
@@ -30,5 +31,6 @@ export type GameOutEvents = (typeof GameOutEvents)[keyof typeof GameOutEvents];
 export type GameOutEvent =
   | { type: typeof GameOutEvents.COUNTDOWN_STARTED; endsAt: number }
   | { type: typeof GameOutEvents.COUNTDOWN_CANCELED }
+  | { type: typeof GameOutEvents.READINESS_CONFIRMED; playerId: Player["id"] }
   | { type: typeof GameOutEvents.GAME_STARTED }
   | { type: typeof GameOutEvents.CARDS_DEALT; payload: HandPayload[] };
