@@ -9,3 +9,8 @@ export interface HandPayload {
 export interface TurnChangedPayload {
   playerId: string;
 }
+
+export interface CardPayload {
+  playerId: string;
+  card: Card;
+}
