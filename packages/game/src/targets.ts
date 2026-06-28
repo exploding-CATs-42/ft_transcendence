@@ -19,4 +19,8 @@ export const GameTargets = {
   ),
   PLAYING: getStatePath(GameStates.PLAYING),
   CHANGING_TURN: getStatePath(GameStates.PLAYING, GameStates.CHANGING_TURN),
+  WAITING_FOR_PLAYER_ACTIONS: getStatePath(
+    GameStates.PLAYING,
+    GameStates.WAITING_FOR_PLAYER_ACTIONS,
+  ),
 } as const;
