@@ -1,6 +1,6 @@
 import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
-import { createDeck, dealInitialCards, shuffle } from "./utils";
+import { createDeck, dealInitialCards, shuffle, drawOneCard } from "./utils";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -11,6 +11,7 @@ export const GameActions = {
   DEAL_CARDS: "dealCards",
   SHUFFLE_PLAYERS: "shufflePlayers",
   CHANGE_TURN: "changeTurn",
+  DRAW_CARD: "drawCard",
 } as const;
 
 export interface GameActionArgs {
@@ -106,4 +107,28 @@ export const changeTurn = ({ context }: GameActionArgs) => {
   }
 
   return context;
+};
+
+export const drawCard = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.DRAW_CARD) return context;
+
+  const deck = context.deck;
+
+  const lastDrawnCard = drawOneCard(deck);
+
+  if (!lastDrawnCard) return context;
+
+  const updatedPlayers = context.players.map((player) =>
+    player.id === event.playerId
+      ? {
+          ...player,
+          hand: [...player.hand, lastDrawnCard],
+        }
+      : player,
+  );
+  return {
+    deck,
+    players: updatedPlayers,
+    lastDrawnCard,
+  };
 };
