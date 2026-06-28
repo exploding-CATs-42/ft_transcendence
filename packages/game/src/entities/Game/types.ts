@@ -19,8 +19,6 @@ export type GameSnapshot = Snapshot<unknown>;
 export interface GameActionArgs {
   context: GameContext;
   event: GameEvent;
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
-  spawn: Function;
 }
 
 export type GameAction = (typeof GameActions)[keyof typeof GameActions];

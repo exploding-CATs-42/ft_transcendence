@@ -33,6 +33,10 @@ export function attachGameBroadcaster(game: Game) {
       socket.emit(ServerPrivateEvents.YOUR_HAND, hand);
     });
   });
+
+  broadcaster.on(GameOutEvents.READINESS_CONFIRMED, () => {
+    io.to(gameId).emit(ServerPublicEvents.PLAYER_CONFIRMED);
+  });
 }
 
 /* broadcaster - is a function that just repeats/broadcasts events

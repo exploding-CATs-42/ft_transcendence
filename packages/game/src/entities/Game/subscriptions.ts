@@ -1,15 +1,16 @@
-// subscriptions.ts
-import type { GameInstance } from "./types";
+// Libraries
+import { AnyActorRef } from "xstate";
+// Local level
 import { PlayerOutEvents, type PlayerInstance } from "../Player";
 import { GameEvents } from "./events";
 
 export const subscribeToPlayerEvents = (
   player: PlayerInstance,
-  game: GameInstance,
-) => {
+  game: AnyActorRef,
+): void => {
   player.on(PlayerOutEvents.READINESS_CONFIRMED, ({ playerId }) => {
     game.send({ type: GameEvents.PLAYER_CONFIRMED_READINESS, playerId });
   });
 
-  // every future player out-event goes here, in one place
+  // Every future player-emitted event goes here, in one place.
 };

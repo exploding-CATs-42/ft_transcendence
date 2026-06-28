@@ -1,9 +1,12 @@
 // Local level
 import { START_GAME_COUNTDOWN_MS } from "./constants";
-import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
-import type { HandPayload } from "./eventPayloads";
-import type { GameContext } from "./gameMachine";
-import { Card } from "../../types";
+import { GameContext } from "./context";
+import {
+  GameEvent,
+  GameEvents,
+  type GameOutEvent,
+  GameOutEvents,
+} from "./events";
 
 type GameEmitterArgs = {
   context: GameContext;
@@ -23,23 +26,11 @@ export const gameStarted = (): GameOutEvent => ({
   type: GameOutEvents.GAME_STARTED,
 });
 
-export const cardsDealt = ({ context }: GameEmitterArgs): GameOutEvent => {
-  const payload: HandPayload[] = context.players.map((player) => {
-    // -------------------------------
-    // Temporary console logs that have to be removed later
-    console.log("---------------");
-    console.log(`playerId: ${player.id},`);
-    console.log(`cards: ${player.hand.map((card: Card) => card.type)}`);
-    console.log("---------------");
-    // -------------------------------
-
-    return {
-      playerId: player.id,
-      cards: player.hand,
-    };
-  });
-
-  return { type: GameOutEvents.CARDS_DEALT, payload };
+export const playerConfirmedReadiness = ({
+  event,
+}: GameEmitterArgs): GameOutEvent => {
+  if (event.type !== GameEvents.PLAYER_CONFIRMED_READINESS) throw Error;
+  return { type: GameOutEvents.READINESS_CONFIRMED, playerId: event.playerId };
 };
 
 /* emitter - is a function that emits an "event" object to the "outside world",
@@ -47,32 +38,3 @@ export const cardsDealt = ({ context }: GameEmitterArgs): GameOutEvent => {
  * it takes as a parameter an object, containing machine context,
  * and an event that triggered the emission
  */
-
-// emitter example
-/*
- import { GameContext } from "./gameMachine";
- import { GameEvent } from "./events"
- type GameEmitterArgs = {
-   context: GameContext;
-   event: GameEvent;
- }
- export const emitter = ({ context, event }: GameEmitterArgs): GameOutEvent => {
-   if (context.players.length < 1) console.log("it's lonely out here")
-   return { type: GameOutEvents.PLAYER_ADDED, playerId: event.playerId };
- };
-*/
-
-// flow example
-/*
-on: {
-  PLAYER_JOINED: {
-    actions: emit(({ context, event }) => ({
-      type: "PLAYER_ADDED",
-      playerId: event.playerId,
-    })),
-  },
-},
-
-where "event" passed to the emitter is "PLAYER_JOINED"
-and event emitted to the "outside world" is "PLAYER_ADDED"
-*/

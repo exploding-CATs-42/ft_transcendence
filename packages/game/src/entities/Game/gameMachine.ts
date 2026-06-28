@@ -1,16 +1,18 @@
 // Libraries
-import { assign, emit, sendTo } from "xstate";
+import { emit } from "xstate";
 // Local level
 import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
-import { GameActions } from "./actions";
+// import { GameActions } from "./actions";
 import { GameEvents } from "./events";
 import { GameGuards } from "./guards";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
-import { countdownCanceled, countdownStarted } from "./emitters";
+import {
+  countdownCanceled,
+  countdownStarted,
+  playerConfirmedReadiness,
+} from "./emitters";
 import { gameSetup } from "./setup";
-import { playerMachine } from "../Player";
-import { subscribeToPlayerEvents } from "./subscriptions";
 
 export const gameMachine = gameSetup.createMachine({
   id: GAME_MACHINE_ID,
@@ -30,18 +32,7 @@ export const gameMachine = gameSetup.createMachine({
           },
           on: {
             [GameEvents.JOIN_GAME]: {
-              actions: assign(({ context, event, spawn, self }) => {
-                // Create the dynamic child actor
-                const player = spawn(playerMachine);
-
-                subscribeToPlayerEvents(player, self);
-                const players = new Map(context.players);
-                players.set(event.player.id, player);
-
-                return {
-                  players,
-                };
-              }),
+              actions: "addPlayer",
             },
           },
         },
@@ -54,10 +45,18 @@ export const gameMachine = gameSetup.createMachine({
           },
           on: {
             [GameEvents.JOIN_GAME]: {
-              actions: [GameActions.ADD_PLAYER, emit(countdownCanceled)],
+              actions: ["addPlayer", emit(countdownCanceled)],
               target: GameTargets.WAITING_CONFIRMING,
             },
           },
+        },
+      },
+      on: {
+        [GameEvents.PLAYER_CONFIRM_READINESS]: {
+          actions: "forwardReadinessToPlayer",
+        },
+        [GameEvents.PLAYER_CONFIRMED_READINESS]: {
+          actions: emit(playerConfirmedReadiness),
         },
       },
     },
