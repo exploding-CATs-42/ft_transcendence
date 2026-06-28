@@ -9,6 +9,7 @@ import {
   changeTurn,
   shufflePlayers,
   dealCards,
+  drawCard,
   fillDeck,
   removePlayer,
   removePlayerConfirmation,
@@ -48,6 +49,7 @@ export const gameMachine = setup({
     [GameActions.DEAL_CARDS]: assign(dealCards),
     [GameActions.SHUFFLE_PLAYERS]: assign(shufflePlayers),
     [GameActions.CHANGE_TURN]: assign(changeTurn),
+    [GameActions.DRAW_CARD]: assign(drawCard),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -130,7 +132,13 @@ export const gameMachine = setup({
             target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
           },
         },
-        [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {},
+        [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
+          on: {
+            [GameEvents.DRAW_CARD]: {
+              actions: GameActions.DRAW_CARD,
+            },
+          },
+        },
       },
     },
   },
