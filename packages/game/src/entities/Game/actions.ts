@@ -1,8 +1,7 @@
-import type { GameContext } from "./gameMachine";
-import { type GameEvent, GameEvents } from "./events";
+import { GameEvents } from "./events";
 import { createDeck, dealInitialCards } from "../../utils";
 import { assign } from "xstate";
-import { GameAction, GameActionImplementation } from "./types";
+import { GameAction, GameActionArgs, GameActionImplementation } from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -12,11 +11,6 @@ export const GameActions = {
   FILL_DECK: "fillDeck",
   DEAL_CARDS: "dealCards",
 } as const;
-
-export interface GameActionArgs {
-  context: GameContext;
-  event: GameEvent;
-}
 
 const addPlayer = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.JOIN_GAME) return context;
