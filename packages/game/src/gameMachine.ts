@@ -6,6 +6,7 @@ import {
   GameActions,
   addPlayer,
   addPlayerConfirmation,
+  changeTurn,
   shufflePlayers,
   dealCards,
   fillDeck,
@@ -20,6 +21,7 @@ import {
   countdownCanceled,
   countdownStarted,
   gameStarted,
+  turnChanged,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -44,6 +46,7 @@ export const gameMachine = setup({
     [GameActions.FILL_DECK]: assign(fillDeck),
     [GameActions.DEAL_CARDS]: assign(dealCards),
     [GameActions.SHUFFLE_PLAYERS]: assign(shufflePlayers),
+    [GameActions.CHANGE_TURN]: assign(changeTurn),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -117,6 +120,10 @@ export const gameMachine = setup({
             GameActions.DEAL_CARDS,
             emit(cardsDealt),
           ],
+          always: GameTargets.CHANGING_TURN,
+        },
+        [GameStates.CHANGING_TURN]: {
+          entry: [GameActions.CHANGE_TURN, emit(turnChanged)],
         },
       },
     },
