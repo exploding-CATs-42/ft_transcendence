@@ -10,7 +10,7 @@ import {
 } from "schemas";
 import { GameEvents, Player } from "@exploding-cats/game-core";
 import { PlayerIdPayload, UserId } from "@exploding-cats/contracts";
-import { GameRecord } from "data/types";
+import { GameId, GameRecord } from "data/types";
 import { JoinGameResult } from "types";
 import { GameRepository, toGameRecord } from "data";
 import { attachGameBroadcaster } from "sockets";
@@ -26,6 +26,16 @@ function ensureGameExists(gameId: string) {
   }
 
   return game;
+}
+
+async function getGameContext(userId: UserId, gameId: GameId) {
+  const user = await ensureUserExists(userId);
+  const game = ensureGameExists(gameId);
+  const players = game.instance.getSnapshot().context.players;
+
+  const player = players.find((p) => p.id === user.id);
+
+  return { user, game, players, player };
 }
 
 export async function getGames(userId: UserId): Promise<GameRecord[]> {
@@ -96,24 +106,18 @@ export async function joinGame(
   input: JoinGameParams,
   userId: UserId,
 ): Promise<JoinGameResult> {
-  const user = await ensureUserExists(userId);
+  const {
+    user,
+    game,
+    players: playersBefore,
+    player,
+  } = await getGameContext(userId, input.gameId);
 
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.instance.getSnapshot().context.players;
-
-  const alreadyJoined = playersBefore.some((p) => {
-    return p.id === user.id;
-  });
-
-  if (alreadyJoined) {
-    const player = playersBefore.find((p) => {
-      return p.id === user.id;
-    });
-
-    const filteredPlayers = playersBefore.filter((p) => p.id !== player?.id);
+  if (player) {
+    const filteredPlayers = playersBefore.filter((p) => p.id !== player.id);
 
     return {
-      player: toWaitingPlayerView(player!),
+      player: toWaitingPlayerView(player),
       waitingState: { players: filteredPlayers.map(toWaitingPlayerView) },
     };
   }
@@ -130,7 +134,7 @@ export async function joinGame(
     throw new SocketError("Game is full");
   }
 
-  const player: Player = {
+  const newPlayer: Player = {
     id: user.id,
     name: user.username,
     avatarUrl: user.avatarUrl,
@@ -141,11 +145,11 @@ export async function joinGame(
 
   game.instance.send({
     type: GameEvents.JOIN_GAME,
-    player,
+    player: newPlayer,
   });
 
   return {
-    player: toWaitingPlayerView(player),
+    player: toWaitingPlayerView(newPlayer),
     waitingState: { players: playersBefore.map(toWaitingPlayerView) },
   };
 }
@@ -154,14 +158,11 @@ export async function leaveGame(
   input: LeaveGameParams,
   userId: UserId,
 ): Promise<PlayerIdPayload> {
-  const user = await ensureUserExists(userId);
-
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.instance.getSnapshot().context.players;
-
-  const player = playersBefore.find((player) => {
-    return player.id === user.id;
-  });
+  const {
+    game,
+    players: playersBefore,
+    player,
+  } = await getGameContext(userId, input.gameId);
 
   if (!player) {
     throw new SocketError("Player is not in the game");
@@ -186,14 +187,7 @@ export async function confirmStart(
   input: ConfirmStartParams,
   userId: UserId,
 ): Promise<PlayerIdPayload> {
-  const user = await ensureUserExists(userId);
-
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.instance.getSnapshot().context.players;
-
-  const player = playersBefore.find((player) => {
-    return player.id === user.id;
-  });
+  const { game, player } = await getGameContext(userId, input.gameId);
 
   if (!player) {
     throw new SocketError("Player is not in the game");
@@ -211,14 +205,7 @@ export async function cancelStart(
   input: CancelStartParams,
   userId: UserId,
 ): Promise<PlayerIdPayload> {
-  const user = await ensureUserExists(userId);
-
-  const game = ensureGameExists(input.gameId);
-  const playersBefore = game.instance.getSnapshot().context.players;
-
-  const player = playersBefore.find((player) => {
-    return player.id === user.id;
-  });
+  const { game, player } = await getGameContext(userId, input.gameId);
 
   if (!player) {
     throw new SocketError("Player is not in the game");
