@@ -1,4 +1,4 @@
-import type { Player } from "./types";
+import type { Player } from "../../types";
 import type { HandPayload } from "./eventPayloads";
 
 // Events sent TO the machine

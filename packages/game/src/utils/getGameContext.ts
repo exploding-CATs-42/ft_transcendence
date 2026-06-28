@@ -1,5 +1,4 @@
-import type { GameContext } from "../gameMachine";
-import type { GameInstance } from "../types";
+import type { GameInstance, GameContext } from "../entities/Game";
 
 export const getGameContext = (gameInstance: GameInstance): GameContext => {
   return gameInstance.getSnapshot().context;

@@ -1,6 +1,6 @@
 import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
-import { createDeck, dealInitialCards } from "./utils";
+import { createDeck, dealInitialCards } from "../../utils";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",

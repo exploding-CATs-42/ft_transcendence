@@ -3,6 +3,7 @@ import { START_GAME_COUNTDOWN_MS } from "./constants";
 import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
 import type { HandPayload } from "./eventPayloads";
 import type { GameContext } from "./gameMachine";
+import { Card } from "../../types";
 
 type GameEmitterArgs = {
   context: GameContext;
@@ -28,7 +29,7 @@ export const cardsDealt = ({ context }: GameEmitterArgs): GameOutEvent => {
     // Temporary console logs that have to be removed later
     console.log("---------------");
     console.log(`playerId: ${player.id},`);
-    console.log(`cards: ${player.hand.map((card) => card.type)}`);
+    console.log(`cards: ${player.hand.map((card: Card) => card.type)}`);
     console.log("---------------");
     // -------------------------------
 
