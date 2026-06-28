@@ -5,7 +5,7 @@ import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
 import actions, { GameActions } from "./actions";
 import type { Player, Deck } from "../../types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
-import { GameGuards, hasEnoughPlayers } from "./guards";
+import guards, { GameGuards } from "./guards";
 import {
   cardsDealt,
   countdownCanceled,
@@ -27,9 +27,7 @@ export const gameMachine = setup({
     emitted: {} as GameOutEvent,
   },
   actions: actions,
-  guards: {
-    [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
-  },
+  guards: guards,
 }).createMachine({
   id: GAME_MACHINE_ID,
   initial: GameStates.WAITING,

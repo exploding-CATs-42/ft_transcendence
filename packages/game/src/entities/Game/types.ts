@@ -9,6 +9,7 @@ import {
 import { GameContext, gameMachine } from "./gameMachine";
 import { GameEvent, GameOutEvent } from "./events";
 import { GameActions } from "./actions";
+import { GameGuards } from "./guards";
 
 export type GameInstance = Actor<typeof gameMachine>;
 export type GameSnapshot = Snapshot<unknown>;
@@ -31,3 +32,15 @@ export type GameActionImplementation = ActionFunction<
   never,
   GameOutEvent
 >;
+
+// Guards
+export interface GameGuardArgs {
+  context: GameContext;
+  event: GameEvent;
+}
+
+export type GameGuard = (typeof GameGuards)[keyof typeof GameGuards];
+export type GameGuardImplementation = ({
+  context,
+  event,
+}: GameGuardArgs) => boolean;
