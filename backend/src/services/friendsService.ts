@@ -125,10 +125,28 @@ export async function sendFriendRequest(params: {
     where: {
       userLowId_userHighId: pair,
     },
+    select: {
+      requestedById: true,
+      status: true,
+    },
   });
 
-  if (existingFriendship) {
-    throw new FriendsServiceError("Friend request already sent", 409);
+  switch (existingFriendship?.status) {
+    case "PENDING":
+      if (existingFriendship.requestedById === params.currentUserId) {
+        throw new FriendsServiceError("Friend request already sent", 409);
+      }
+
+      throw new FriendsServiceError(
+        "This user has already sent you a friend request",
+        409,
+      );
+
+    case "ACCEPTED":
+      throw new FriendsServiceError(
+        "You cannot send a friend request to your friend",
+        409,
+      );
   }
 
   await prisma.friendship.create({
