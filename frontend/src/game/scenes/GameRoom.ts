@@ -1,7 +1,7 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import type { Card } from "@exploding-cats/game-core";
+import type { Card, CardPayload } from "@exploding-cats/game-core";
 import type { HandPayload } from "@exploding-cats/contracts";
 // Local level
 import {
@@ -28,6 +28,7 @@ import {
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
   attachGameRoomSockets,
+  drawCard,
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
@@ -211,6 +212,24 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private drawCard = () => {
+    drawCard();
+  };
+
+  private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
+    return {
+      frame: frame,
+      size: {
+        width: CARD_WIDTH,
+        height: CARD_HEIGHT,
+      },
+    };
+  }
+
+  onCardsDealt = (hand: HandPayload): void => {
+    this.#tempCardStorage = hand.cards;
+  };
+
+  onCardReceived = (payload: CardPayload): void => {
     // Generate random insert index
     const cardCount = this.#myHand.getCount();
     const insertIndex = Phaser.Math.Between(0, cardCount);
@@ -239,25 +258,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       onComplete: () => {
         // then destroy it
         faceDownCard.destroy();
+
         // and spawn the real card into player's hand
-        const frame = getCardFrame(this, 0);
+
+        const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
+        const frame = getCardFrame(this, frameIndex);
         this.#myHand.addCard(frame, insertIndex);
       },
     });
-  };
-
-  private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
-    return {
-      frame: frame,
-      size: {
-        width: CARD_WIDTH,
-        height: CARD_HEIGHT,
-      },
-    };
-  }
-
-  onCardsDealt = (hand: HandPayload): void => {
-    this.#tempCardStorage = hand.cards;
   };
 
   private cleanup = () => {
