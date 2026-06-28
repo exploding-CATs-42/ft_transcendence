@@ -1,6 +1,6 @@
 import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
-import { createDeck, dealInitialCards } from "./utils";
+import { createDeck, dealInitialCards, shuffle } from "./utils";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -9,6 +9,7 @@ export const GameActions = {
   REMOVE_PLAYER_CONFIRMATION: "removePlayerConfirmation",
   FILL_DECK: "fillDeck",
   DEAL_CARDS: "dealCards",
+  SHUFFLE_PLAYERS: "shufflePlayers",
 } as const;
 
 export interface GameActionArgs {
@@ -72,4 +73,12 @@ export const dealCards = ({ context }: GameActionArgs) => {
     deck: newDeck,
     players,
   };
+};
+
+export const shufflePlayers = ({ context }: GameActionArgs) => {
+  const players = context.players.slice();
+
+  shuffle(players);
+
+  return { players };
 };
