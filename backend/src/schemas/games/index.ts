@@ -4,3 +4,4 @@ export * from "./joinGameSchema";
 export * from "./leaveGameSchema";
 export * from "./confirmStartSchema";
 export * from "./cancelStartSchema";
+export * from "./drawCardSchema";
