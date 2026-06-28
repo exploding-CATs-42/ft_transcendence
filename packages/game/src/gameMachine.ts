@@ -124,7 +124,11 @@ export const gameMachine = setup({
         },
         [GameStates.CHANGING_TURN]: {
           entry: [GameActions.CHANGE_TURN, emit(turnChanged)],
+          always: {
+            target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
+          },
         },
+        [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {},
       },
     },
   },
