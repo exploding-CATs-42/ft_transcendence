@@ -1,16 +1,18 @@
 // Local level
 import { MIN_PLAYERS } from "../../constants";
 import { GameGuard, GameGuardArgs, GameGuardImplementation } from "./types";
+import { PlayerStates } from "../Player";
 
 export const GameGuards = {
   HAS_ENOUGH_PLAYERS: "hasEnoughPlayers",
 } as const;
 
-const hasEnoughPlayers = ({ context }: GameGuardArgs) => {
-  return (
-    context.players.length >= MIN_PLAYERS &&
-    context.players.every((p) => p.isConfirmed)
+export const hasEnoughPlayers = ({ context }: GameGuardArgs) => {
+  const allConfirmed = [...context.players.values()].every((p) =>
+    p.getSnapshot().matches({ [PlayerStates.IN_LOBBY]: PlayerStates.READY }),
   );
+
+  return context.players.size >= MIN_PLAYERS && allConfirmed;
 };
 
 export default {

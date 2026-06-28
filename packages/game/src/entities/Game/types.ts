@@ -1,23 +1,26 @@
 // Libraries
 import {
   ActionFunction,
-  Actor,
+  ActorRefFrom,
   NonReducibleUnknown,
   type Snapshot,
 } from "xstate";
 // Local level
-import { GameContext, gameMachine } from "./gameMachine";
+import { gameMachine } from "./gameMachine";
+import { GameContext } from "./context";
 import { GameEvent, GameOutEvent } from "./events";
 import { GameActions } from "./actions";
 import { GameGuards } from "./guards";
 
-export type GameInstance = Actor<typeof gameMachine>;
+export type GameInstance = ActorRefFrom<typeof gameMachine>;
 export type GameSnapshot = Snapshot<unknown>;
 
 // Actions
 export interface GameActionArgs {
   context: GameContext;
   event: GameEvent;
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-function-type
+  spawn: Function;
 }
 
 export type GameAction = (typeof GameActions)[keyof typeof GameActions];

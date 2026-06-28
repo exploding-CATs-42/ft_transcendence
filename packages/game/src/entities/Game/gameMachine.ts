@@ -1,40 +1,24 @@
 // Libraries
-import { emit, setup } from "xstate";
+import { assign, emit, sendTo } from "xstate";
 // Local level
 import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
-import actions, { GameActions } from "./actions";
-import type { Player, Deck } from "../../types";
-import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
-import guards, { GameGuards } from "./guards";
-import {
-  cardsDealt,
-  countdownCanceled,
-  countdownStarted,
-  gameStarted,
-} from "./emitters";
+import { GameActions } from "./actions";
+import { GameEvents } from "./events";
+import { GameGuards } from "./guards";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
+import { countdownCanceled, countdownStarted } from "./emitters";
+import { gameSetup } from "./setup";
+import { playerMachine } from "../Player";
+import { subscribeToPlayerEvents } from "./subscriptions";
 
-export interface GameContext {
-  players: Player[];
-  deck: Deck;
-}
-
-export const gameMachine = setup({
-  types: {
-    context: {} as GameContext,
-    events: {} as GameEvent,
-    emitted: {} as GameOutEvent,
-  },
-  actions: actions,
-  guards: guards,
-}).createMachine({
+export const gameMachine = gameSetup.createMachine({
   id: GAME_MACHINE_ID,
-  initial: GameStates.WAITING,
   context: () => ({
-    players: [],
+    players: new Map(),
     deck: [],
   }),
+  initial: GameStates.WAITING,
   states: {
     [GameStates.WAITING]: {
       initial: GameStates.WAITING_CONFIRMING,
@@ -46,16 +30,18 @@ export const gameMachine = setup({
           },
           on: {
             [GameEvents.JOIN_GAME]: {
-              actions: GameActions.ADD_PLAYER,
-            },
-            [GameEvents.LEAVE_GAME]: {
-              actions: GameActions.REMOVE_PLAYER,
-            },
-            [GameEvents.CONFIRM_READINESS]: {
-              actions: GameActions.ADD_PLAYER_CONFIRMATION,
-            },
-            [GameEvents.CANCEL_READINESS]: {
-              actions: GameActions.REMOVE_PLAYER_CONFIRMATION,
+              actions: assign(({ context, event, spawn, self }) => {
+                // Create the dynamic child actor
+                const player = spawn(playerMachine);
+
+                subscribeToPlayerEvents(player, self);
+                const players = new Map(context.players);
+                players.set(event.player.id, player);
+
+                return {
+                  players,
+                };
+              }),
             },
           },
         },
@@ -68,36 +54,13 @@ export const gameMachine = setup({
           },
           on: {
             [GameEvents.JOIN_GAME]: {
-              target: GameTargets.WAITING_CONFIRMING,
               actions: [GameActions.ADD_PLAYER, emit(countdownCanceled)],
-            },
-            [GameEvents.LEAVE_GAME]: {
               target: GameTargets.WAITING_CONFIRMING,
-              actions: [GameActions.REMOVE_PLAYER, emit(countdownCanceled)],
-            },
-            [GameEvents.CANCEL_READINESS]: {
-              target: GameTargets.WAITING_CONFIRMING,
-              actions: [
-                GameActions.REMOVE_PLAYER_CONFIRMATION,
-                emit(countdownCanceled),
-              ],
             },
           },
         },
       },
     },
-    [GameStates.PLAYING]: {
-      entry: emit(gameStarted),
-      initial: GameStates.DEALING_CARDS,
-      states: {
-        [GameStates.DEALING_CARDS]: {
-          entry: [
-            GameActions.FILL_DECK,
-            GameActions.DEAL_CARDS,
-            emit(cardsDealt),
-          ],
-        },
-      },
-    },
+    [GameStates.PLAYING]: {},
   },
 });
