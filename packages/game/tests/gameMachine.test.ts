@@ -43,7 +43,7 @@ const addPlayers = (actor: Actor, players: Player[]) => {
 
 const markAsReady = (actor: Actor, players: Player[]) => {
   players.forEach((player) => {
-    actor.send({ type: GameEvents.CONFIRM_START, playerId: player.id });
+    actor.send({ type: GameEvents.CONFIRM_READINESS, playerId: player.id });
   });
 };
 

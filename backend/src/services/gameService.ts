@@ -212,7 +212,7 @@ export async function confirmStart(
   }
 
   game.instance.send({
-    type: GameEvents.CONFIRM_START,
+    type: GameEvents.CONFIRM_READINESS,
     playerId: player.id,
   });
 

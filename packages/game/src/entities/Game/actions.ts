@@ -33,7 +33,7 @@ export const removePlayer = ({ context, event }: GameActionArgs) => {
 };
 
 export const addPlayerConfirmation = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEvents.CONFIRM_START) return context;
+  if (event.type !== GameEvents.CONFIRM_READINESS) return context;
 
   return {
     players: context.players.map((p) =>

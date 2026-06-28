@@ -68,7 +68,7 @@ export const gameMachine = setup({
             [GameEvents.LEAVE_GAME]: {
               actions: GameActions.REMOVE_PLAYER,
             },
-            [GameEvents.CONFIRM_START]: {
+            [GameEvents.CONFIRM_READINESS]: {
               actions: GameActions.ADD_PLAYER_CONFIRMATION,
             },
             [GameEvents.CANCEL_START]: {
