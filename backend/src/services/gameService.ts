@@ -5,6 +5,7 @@ import {
   ConfirmStartParams,
   CreateGameRequestBody,
   DeleteGameParams,
+  DrawCardParams,
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
@@ -218,4 +219,20 @@ export async function cancelStart(
   });
 
   return { playerId: player.id };
+}
+
+export async function drawCard(input: DrawCardParams, userId: UserId) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+
+  game.instance.send({
+    type: GameEvents.DRAW_CARD,
+    playerId: player.id,
+  });
+
+  const lastDrawnCard = game.instance.getSnapshot().context.lastDrawnCard;
+  if (!lastDrawnCard) {
+    throw new SocketError("Could not draw card");
+  }
+
+  return { playerId: player.id, card: lastDrawnCard };
 }
