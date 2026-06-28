@@ -1,6 +1,8 @@
+// Libraries
+import { assign } from "xstate";
+// Local level
 import { GameEvents } from "./events";
 import { createDeck, dealInitialCards } from "../../utils";
-import { assign } from "xstate";
 import { GameAction, GameActionArgs, GameActionImplementation } from "./types";
 
 export const GameActions = {
