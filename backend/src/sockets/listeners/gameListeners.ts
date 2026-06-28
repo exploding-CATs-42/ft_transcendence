@@ -1,13 +1,21 @@
 // Libraries
 import { Socket, Server } from "socket.io";
 // Project level
-import { cancelStart, confirmStart, joinGame, leaveGame } from "services";
+import {
+  cancelStart,
+  confirmStart,
+  drawCard,
+  joinGame,
+  leaveGame,
+} from "services";
 import { withErrorHandler } from "utils";
 import {
   CancelStartParams,
   cancelStartSchema,
   ConfirmStartParams,
   confirmStartSchema,
+  DrawCardParams,
+  drawCardSchema,
   JoinGameParams,
   joinGameSchema,
   LeaveGameParams,
@@ -22,6 +30,7 @@ import {
   ServerPublicEvents,
   WaitingStatePayload,
 } from "@exploding-cats/contracts";
+import { CardPayload } from "@exploding-cats/game-core";
 // Local level
 import { socketsMap } from "../socketsMap";
 
@@ -99,6 +108,25 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const publicPayload: PlayerIdPayload = { playerId };
 
         io.to(room).emit(ServerPublicEvents.PLAYER_CANCELED, publicPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.DRAW_CARD,
+    withErrorHandler(
+      drawCardSchema,
+      socket,
+      ServerErrorEvents.DRAW_CARD_ERROR,
+      async (parsed: DrawCardParams) => {
+        const { playerId, card } = await drawCard(parsed, socket.data.sub);
+
+        const room = parsed.gameId;
+
+        const payload: CardPayload = { playerId, card };
+
+        socket.emit(ServerPrivateEvents.CARD_RECEIVED, payload);
+        io.to(room).emit(ServerPublicEvents.CARD_DRAWN);
       },
     ),
   );
