@@ -46,7 +46,7 @@ export const removePlayerConfirmation = ({
   context,
   event,
 }: GameActionArgs) => {
-  if (event.type !== GameEvents.CANCEL_START) return context;
+  if (event.type !== GameEvents.CANCEL_READINESS) return context;
 
   return {
     players: context.players.map((p) =>

@@ -71,7 +71,7 @@ export const gameMachine = setup({
             [GameEvents.CONFIRM_READINESS]: {
               actions: GameActions.ADD_PLAYER_CONFIRMATION,
             },
-            [GameEvents.CANCEL_START]: {
+            [GameEvents.CANCEL_READINESS]: {
               actions: GameActions.REMOVE_PLAYER_CONFIRMATION,
             },
           },
@@ -92,7 +92,7 @@ export const gameMachine = setup({
               target: GameTargets.WAITING_CONFIRMING,
               actions: [GameActions.REMOVE_PLAYER, emit(countdownCanceled)],
             },
-            [GameEvents.CANCEL_START]: {
+            [GameEvents.CANCEL_READINESS]: {
               target: GameTargets.WAITING_CONFIRMING,
               actions: [
                 GameActions.REMOVE_PLAYER_CONFIRMATION,

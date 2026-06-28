@@ -237,7 +237,7 @@ export async function cancelStart(
   }
 
   game.instance.send({
-    type: GameEvents.CANCEL_START,
+    type: GameEvents.CANCEL_READINESS,
     playerId: player.id,
   });
 
