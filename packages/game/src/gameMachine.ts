@@ -13,7 +13,7 @@ import {
   removePlayer,
   removePlayerConfirmation,
 } from "./actions";
-import type { Player, Deck } from "./types";
+import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import { GameGuards, hasEnoughPlayers } from "./guards";
 import {
@@ -30,6 +30,7 @@ export interface GameContext {
   players: Player[];
   deck: Deck;
   currentTurnPlayerId: string | null;
+  lastDrawnCard: Card | null;
 }
 
 export const gameMachine = setup({
@@ -58,6 +59,7 @@ export const gameMachine = setup({
     players: [],
     deck: [],
     currentTurnPlayerId: null,
+    lastDrawnCard: null,
   }),
   states: {
     [GameStates.WAITING]: {
