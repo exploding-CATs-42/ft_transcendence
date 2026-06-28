@@ -5,3 +5,7 @@ export interface HandPayload {
   playerId: string;
   cards: Card[];
 }
+
+export interface TurnChangedPayload {
+  playerId: string;
+}
