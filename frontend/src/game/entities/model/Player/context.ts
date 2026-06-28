@@ -1,12 +1,6 @@
-import type { MyContext as MyBaseContext } from "./me";
-import type { OpponentContext as OpponentBaseContext } from "./opponent";
+import type { Card } from "@exploding-cats/game-core";
 
-export interface MyContext extends MyBaseContext {
-  role: "me";
+export interface PlayerContext {
+  cards: Card[];
+  turnCount: number;
 }
-
-export interface OpponentContext extends OpponentBaseContext {
-  role: "opponent";
-}
-
-export type PlayerContext = MyContext | OpponentContext;

@@ -21,14 +21,14 @@ export const PlayerEvents = {
 export type PlayerEvents = (typeof PlayerEvents)[keyof typeof PlayerEvents];
 
 export type PlayerEvent =
-  | { type: typeof PlayerEvents.CONFIRM_READINESS }
-  | { type: typeof PlayerEvents.CANCEL_READINESS }
+  | { type: typeof PlayerEvents.CONFIRM_READINESS; playerId: string }
+  | { type: typeof PlayerEvents.CANCEL_READINESS; playerId: string }
   | { type: typeof PlayerEvents.GAME_STARTED }
   | { type: typeof PlayerEvents.GAME_ENDED }
   | { type: typeof PlayerEvents.START_TURN }
   | { type: typeof PlayerEvents.TAKE_CARD; card: Card }
   | { type: typeof PlayerEvents.DRAW_CARD; card: Card }
-  | { type: typeof PlayerEvents.PLAY_CARD }
+  | { type: typeof PlayerEvents.PLAY_CARD; card: Card }
   | { type: typeof PlayerEvents.EXPLODE }
   | { type: typeof PlayerEvents.END_TURN }
   | { type: typeof PlayerEvents.GET_ATTACKED; additionalTurnsCount: number }
@@ -47,8 +47,8 @@ export type PlayerOutEvents =
   (typeof PlayerOutEvents)[keyof typeof PlayerOutEvents];
 
 export type PlayerOutEvent =
-  | { type: typeof PlayerOutEvents.READINESS_CONFIRMED; playerId: string } // which means that we'd need to store player id inside the machine context
+  | { type: typeof PlayerOutEvents.READINESS_CONFIRMED; playerId: string }
   | { type: typeof PlayerOutEvents.READINESS_CANCELED; playerId: string }
   | { type: typeof PlayerOutEvents.EXPLODED }
-  | { type: typeof PlayerOutEvents.CARD_DRAWN }
-  | { type: typeof PlayerOutEvents.CARD_TAKEN };
+  | { type: typeof PlayerOutEvents.CARD_DRAWN; card: Card }
+  | { type: typeof PlayerOutEvents.CARD_TAKEN; card: Card };

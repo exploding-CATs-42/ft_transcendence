@@ -7,7 +7,10 @@ import {
   type OpponentInstance,
 } from "game/entities/model";
 import { OpponentHand } from "game/entities/graphic";
-import { ServerPrivateEvents } from "@exploding-cats/contracts";
+import {
+  ServerPrivateEvents,
+  ServerPublicEvents,
+} from "@exploding-cats/contracts";
 
 export class OpponentHandController {
   #machine: OpponentInstance;
@@ -24,8 +27,8 @@ export class OpponentHandController {
   }
 
   private connectSocketToHandlers = (socket: Socket) => {
-    socket.on(ServerPrivateEvents.)
-  }
+    socket.on(ServerPublicEvents.PLAYER_CONFIRMED);
+  };
 
   onTakeCard = () => {
     this.#machine.send({ type: OpponentEvents.TAKE_CARD });
