@@ -4,7 +4,11 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/contracts";
-import { GameOutEvents, HandPayload } from "@exploding-cats/game-core";
+import {
+  GameOutEvents,
+  HandPayload,
+  TurnChangedPayload,
+} from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
@@ -32,6 +36,12 @@ export function attachGameBroadcaster(game: Game) {
       const socket = socketsMap.get(hand.playerId)!;
       socket.emit(ServerPrivateEvents.YOUR_HAND, hand);
     });
+  });
+
+  broadcaster.on(GameOutEvents.TURN_CHANGED, (event) => {
+    const payload: TurnChangedPayload = event.payload;
+
+    io.to(gameId).emit(ServerPublicEvents.TURN_CHANGED, payload);
   });
 }
 
