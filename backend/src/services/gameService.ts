@@ -38,6 +38,19 @@ async function getGameContext(userId: UserId, gameId: GameId) {
   return { user, game, players, player };
 }
 
+async function requirePlayerInGame(userId: UserId, gameId: GameId) {
+  const context = await getGameContext(userId, gameId);
+
+  if (!context.player) {
+    throw new SocketError("Player is not in the game");
+  }
+
+  return {
+    ...context,
+    player: context.player,
+  };
+}
+
 export async function getGames(userId: UserId): Promise<GameRecord[]> {
   await ensureUserExists(userId);
 
@@ -162,11 +175,7 @@ export async function leaveGame(
     game,
     players: playersBefore,
     player,
-  } = await getGameContext(userId, input.gameId);
-
-  if (!player) {
-    throw new SocketError("Player is not in the game");
-  }
+  } = await requirePlayerInGame(userId, input.gameId);
 
   const isLastPlayer = playersBefore.length === 1;
 
@@ -187,11 +196,7 @@ export async function confirmStart(
   input: ConfirmStartParams,
   userId: UserId,
 ): Promise<PlayerIdPayload> {
-  const { game, player } = await getGameContext(userId, input.gameId);
-
-  if (!player) {
-    throw new SocketError("Player is not in the game");
-  }
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
 
   game.instance.send({
     type: GameEvents.CONFIRM_START,
@@ -205,11 +210,7 @@ export async function cancelStart(
   input: CancelStartParams,
   userId: UserId,
 ): Promise<PlayerIdPayload> {
-  const { game, player } = await getGameContext(userId, input.gameId);
-
-  if (!player) {
-    throw new SocketError("Player is not in the game");
-  }
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
 
   game.instance.send({
     type: GameEvents.CANCEL_START,
