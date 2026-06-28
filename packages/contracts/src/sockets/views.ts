@@ -3,7 +3,6 @@ export interface PublicPlayerView {
   name: string;
   handSize: number;
   isAlive: boolean;
-  turnOrder: number;
 }
 
 export interface WaitingPlayerView {

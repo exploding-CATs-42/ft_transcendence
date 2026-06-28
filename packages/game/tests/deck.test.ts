@@ -13,7 +13,6 @@ const PLAYERS: Player[] = [
     hand: [],
     isAlive: true,
     isConfirmed: false,
-    turnOrder: 0,
   },
   {
     name: "player 2",
@@ -22,7 +21,6 @@ const PLAYERS: Player[] = [
     hand: [],
     isAlive: true,
     isConfirmed: false,
-    turnOrder: 1,
   },
 ];
 

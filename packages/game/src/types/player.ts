@@ -7,5 +7,4 @@ export interface Player {
   hand: Card[];
   isConfirmed: boolean;
   isAlive: boolean;
-  turnOrder: number;
 }
