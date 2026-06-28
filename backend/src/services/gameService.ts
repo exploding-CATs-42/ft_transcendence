@@ -75,7 +75,6 @@ export async function createGame(
     hand: [],
     isConfirmed: false,
     isAlive: true,
-    turnOrder: 0,
   };
 
   game.instance.send({
@@ -138,7 +137,6 @@ export async function joinGame(
     hand: [],
     isConfirmed: false,
     isAlive: true,
-    turnOrder: 0,
   };
 
   game.instance.send({
