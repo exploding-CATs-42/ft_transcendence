@@ -1,16 +1,8 @@
 // Libraries
-import { assign, emit, setup } from "xstate";
+import { emit, setup } from "xstate";
 // Local level
 import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
-import {
-  GameActions,
-  addPlayer,
-  addPlayerConfirmation,
-  dealCards,
-  fillDeck,
-  removePlayer,
-  removePlayerConfirmation,
-} from "./actions";
+import actions, { GameActions } from "./actions";
 import type { Player, Deck } from "../../types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import { GameGuards, hasEnoughPlayers } from "./guards";
@@ -34,14 +26,7 @@ export const gameMachine = setup({
     events: {} as GameEvent,
     emitted: {} as GameOutEvent,
   },
-  actions: {
-    [GameActions.ADD_PLAYER]: assign(addPlayer),
-    [GameActions.REMOVE_PLAYER]: assign(removePlayer),
-    [GameActions.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
-    [GameActions.REMOVE_PLAYER_CONFIRMATION]: assign(removePlayerConfirmation),
-    [GameActions.FILL_DECK]: assign(fillDeck),
-    [GameActions.DEAL_CARDS]: assign(dealCards),
-  },
+  actions: actions,
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
   },

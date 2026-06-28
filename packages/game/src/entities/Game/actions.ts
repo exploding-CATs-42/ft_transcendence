@@ -1,6 +1,8 @@
 import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards } from "../../utils";
+import { assign } from "xstate";
+import { GameAction, GameActionImplementation } from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -16,7 +18,7 @@ export interface GameActionArgs {
   event: GameEvent;
 }
 
-export const addPlayer = ({ context, event }: GameActionArgs) => {
+const addPlayer = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.JOIN_GAME) return context;
 
   return {
@@ -24,7 +26,7 @@ export const addPlayer = ({ context, event }: GameActionArgs) => {
   };
 };
 
-export const removePlayer = ({ context, event }: GameActionArgs) => {
+const removePlayer = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.LEAVE_GAME) return context;
 
   return {
@@ -32,7 +34,7 @@ export const removePlayer = ({ context, event }: GameActionArgs) => {
   };
 };
 
-export const addPlayerConfirmation = ({ context, event }: GameActionArgs) => {
+const addPlayerConfirmation = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.CONFIRM_READINESS) return context;
 
   return {
@@ -42,10 +44,7 @@ export const addPlayerConfirmation = ({ context, event }: GameActionArgs) => {
   };
 };
 
-export const removePlayerConfirmation = ({
-  context,
-  event,
-}: GameActionArgs) => {
+const removePlayerConfirmation = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.CANCEL_READINESS) return context;
 
   return {
@@ -55,12 +54,12 @@ export const removePlayerConfirmation = ({
   };
 };
 
-export const fillDeck = () => {
+const fillDeck = () => {
   const deck = createDeck();
   return { deck };
 };
 
-export const dealCards = ({ context }: GameActionArgs) => {
+const dealCards = ({ context }: GameActionArgs) => {
   const players = context.players.map((player) => ({
     ...player,
     hand: [...player.hand],
@@ -73,3 +72,12 @@ export const dealCards = ({ context }: GameActionArgs) => {
     players,
   };
 };
+
+export default {
+  [GameActions.ADD_PLAYER]: assign(addPlayer),
+  [GameActions.REMOVE_PLAYER]: assign(removePlayer),
+  [GameActions.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
+  [GameActions.REMOVE_PLAYER_CONFIRMATION]: assign(removePlayerConfirmation),
+  [GameActions.FILL_DECK]: assign(fillDeck),
+  [GameActions.DEAL_CARDS]: assign(dealCards),
+} satisfies Record<GameAction, GameActionImplementation>;
