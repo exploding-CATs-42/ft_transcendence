@@ -26,6 +26,7 @@ import { GameTargets } from "./targets";
 export interface GameContext {
   players: Player[];
   deck: Deck;
+  currentTurnPlayerId: string | null;
 }
 
 export const gameMachine = setup({
@@ -51,6 +52,7 @@ export const gameMachine = setup({
   context: () => ({
     players: [],
     deck: [],
+    currentTurnPlayerId: null,
   }),
   states: {
     [GameStates.WAITING]: {
