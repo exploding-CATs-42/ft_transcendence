@@ -10,6 +10,7 @@ export const GameActions = {
   FILL_DECK: "fillDeck",
   DEAL_CARDS: "dealCards",
   SHUFFLE_PLAYERS: "shufflePlayers",
+  CHANGE_TURN: "changeTurn",
 } as const;
 
 export interface GameActionArgs {
@@ -81,4 +82,28 @@ export const shufflePlayers = ({ context }: GameActionArgs) => {
   shuffle(players);
 
   return { players };
+};
+
+export const changeTurn = ({ context }: GameActionArgs) => {
+  const { players, currentTurnPlayerId } = context;
+
+  /*
+    On the first turn, currentTurnPlayerId is null, so findIndex() returns -1.
+    Starting the loop at i = 1 makes (-1 + 1) % players.length === 0,
+    so the first player in the array gets the first turn.
+  */
+  const currentPlayerIndex = players.findIndex(
+    (player) => player.id === currentTurnPlayerId,
+  );
+
+  // Return next alive player
+  for (let i = 1; i <= players.length; ++i) {
+    const nextPlayer = players[(currentPlayerIndex + i) % players.length]!;
+
+    if (nextPlayer.isAlive) {
+      return { currentTurnPlayerId: nextPlayer.id };
+    }
+  }
+
+  return context;
 };
