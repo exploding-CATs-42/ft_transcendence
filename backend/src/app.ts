@@ -10,6 +10,8 @@ import { setupRouting } from "./routes";
 import { initSockets } from "./sockets";
 import { restoreGames } from "./startup";
 import { initGamePersistence } from "./data";
+import { httpMetricsMiddleware } from "middlewares/express/httpMetricsMiddleware";
+import { userOperationMetricsMiddleware } from "middlewares/express/userOperationMetricsMiddleware";
 import { apiRateLimiter } from "middlewares";
 
 const app = express();
@@ -23,6 +25,8 @@ app.use(pino(prettyFormat()));
 app.use(cors(corsOptions));
 app.use(cookieParser());
 app.use(express.json());
+app.use(httpMetricsMiddleware);
+app.use(userOperationMetricsMiddleware);
 app.use(apiRateLimiter);
 app.set("trust proxy", 1);
 
