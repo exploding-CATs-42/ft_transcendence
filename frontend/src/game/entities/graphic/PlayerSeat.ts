@@ -27,6 +27,8 @@ export class PlayerSeat {
   }
 
   addHand(hand: OpponentHand) {
+    if (this.hand) return;
+
     this.#container.add(hand.container);
     this.hand = hand;
   }
