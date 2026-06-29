@@ -85,7 +85,12 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     const newPlayer = new GraphicPlayer(
       this,
       { x: 0, y: 0 },
-      { username: player.name, imageUrl: player.avatarUrl },
+      {
+        id: player.id,
+        name: player.name,
+        avatarUrl: player.avatarUrl,
+        isAlive: true,
+      },
       NAME_LABEL_CONFIG,
     );
 

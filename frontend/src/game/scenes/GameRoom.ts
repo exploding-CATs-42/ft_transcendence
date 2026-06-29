@@ -36,11 +36,11 @@ import {
 // It's just a placeholder and has to be removed later
 const data: { players: Player[] } = {
   players: [
-    { username: "You", imageUrl: null },
-    { username: "Player 2", imageUrl: null },
-    { username: "Player 3", imageUrl: null },
-    { username: "Player 4", imageUrl: null },
-    { username: "Player 5", imageUrl: null },
+    { id: "1", avatarUrl: null, isAlive: true, name: "me" },
+    { id: "2", avatarUrl: null, isAlive: true, name: "player1" },
+    { id: "3", avatarUrl: null, isAlive: true, name: "player2" },
+    { id: "4", avatarUrl: null, isAlive: true, name: "player3" },
+    { id: "5", avatarUrl: null, isAlive: true, name: "player4" },
   ],
 };
 
