@@ -173,18 +173,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const hand = new OpponentHand(this, { x, y });
       const opponent = players[i]!;
       this.#opponents.set(opponent.id, hand);
-
-      // Demonstration code
-      let count = 0;
-      const intervalId = setInterval(() => {
-        if (count < 7) hand.addCard();
-        else hand.removeCard();
-        count++;
-
-        if (count === 14) {
-          clearInterval(intervalId);
-        }
-      }, 500);
     }
   }
 
