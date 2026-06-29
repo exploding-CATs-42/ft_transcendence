@@ -83,7 +83,7 @@ const HAND_POSITION: Point = {
 
 export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
-  #opponentHands: OpponentHand[] = [];
+  #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
   #detachSockets: CleanupFunction;
   #tempCardStorage: Card[] = [];
@@ -135,7 +135,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const opponent = players[i]!;
       const opponentSeat = new PlayerSeat(this, GAME_ROOM_SEATS[i]!);
       opponentSeat.addPlayer(opponent);
-      opponentSeat.addHand(this.#opponentHands[i - 1]!);
+      opponentSeat.addHand(this.#opponents.get(opponent.id)!);
 
       this.#players.set(opponent.id, opponentSeat);
     }
@@ -164,7 +164,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const y = OPPONENT_HAND_Y_OFFSET;
 
       const hand = new OpponentHand(this, { x, y });
-      this.#opponentHands.push(hand);
+      const opponent = players[i]!;
+      this.#opponents.set(opponent.id, hand);
 
       // Demonstration code
       let count = 0;
