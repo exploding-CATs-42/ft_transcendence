@@ -107,12 +107,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDrawPile();
     this.createDiscardPile();
     this.createMyHand();
-
-    hand.cards.forEach((card) => {
-      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
-      const frame = getCardFrame(this, frameIndex);
-      this.#myHand.addCard(card, frame);
-    });
+    this.fillMyHandWithCards(hand.cards);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -160,6 +155,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     };
 
     this.#myHand = new GraphicHand(this, HAND_POSITION, onCardDrop);
+  }
+
+  private fillMyHandWithCards(cards: Card[]) {
+    cards.forEach((card) => {
+      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
+      const frame = getCardFrame(this, frameIndex);
+      this.#myHand.addCard(card, frame);
+    });
   }
 
   private createOpponentHands(players: GraphicPlayer[]) {
