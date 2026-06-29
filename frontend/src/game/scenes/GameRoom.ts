@@ -33,7 +33,7 @@ import {
   type GameRoomHandlers,
   type GameStartedPayload,
 } from "../sockets";
-import { fakePlayers } from "./mockData";
+import { fakeCards, fakePlayers } from "./mockData";
 
 // Opponents
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -79,7 +79,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #detachSockets: CleanupFunction;
   #tempDataStorage: GameStartedPayload = {
     players: fakePlayers,
-    hand: { cards: [] },
+    hand: { cards: fakeCards },
   };
 
   constructor() {
