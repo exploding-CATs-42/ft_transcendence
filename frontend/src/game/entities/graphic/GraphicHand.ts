@@ -2,6 +2,7 @@ import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
 import type { Card } from "@exploding-cats/game-core";
+import type { GraphicCard } from "./GraphicCard";
 
 const CARD_WIDTH = 186 * 1.75;
 const CARD_HEIGHT = 260 * 1.75;
@@ -18,7 +19,7 @@ const BIGGEST_DEPTH = 100;
 const HOVER_LIFT = 75; // How many px the hovered card rises
 const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
 
-type onCardDropCallback = (card: Phaser.GameObjects.Image) => void;
+type onCardDropCallback = (card: GraphicCard) => void;
 
 export class GraphicHand {
   #scene: Phaser.Scene;
@@ -138,10 +139,16 @@ export class GraphicHand {
 
       card.off("drop", onCardDrop);
       card.disableInteractive();
-      this.#onCardDropCallback(card);
       card.setDepth(0);
-
       this.reflowCards();
+
+      const cardData = this.#cardsData.get(card)!;
+      this.#cardsData.delete(card);
+      const graphicCard: GraphicCard = {
+        image: card,
+        data: cardData,
+      };
+      this.#onCardDropCallback(graphicCard);
     };
 
     card.on("drop", onCardDrop);
