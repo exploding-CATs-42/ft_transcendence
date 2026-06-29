@@ -4,11 +4,16 @@ import {
   httpRequestDurationSeconds,
 } from "../../metrics/httpMetrics";
 
-function getRouteLable(req: Request) {
+function getRouteLabel(req: Request) {
   if (req.route?.path && typeof req.route.path === "string") {
     return `${req.baseUrl}${req.route.path}`;
   }
-  return req.baseUrl || req.path;
+
+  return "unmatched";
+}
+
+function shouldSkipHttpMetrics(req: Request, route: string) {
+  return req.baseUrl === "/metrics" || route === "/metrics/";
 }
 
 export function httpMetricsMiddleware(
@@ -22,9 +27,15 @@ export function httpMetricsMiddleware(
     const durationSeconds =
       Number(process.hrtime.bigint() - startedAt) / 1_000_000_000;
 
+    const route = getRouteLabel(req);
+
+    if (shouldSkipHttpMetrics(req, route)) {
+      return;
+    }
+
     const labels = {
       method: req.method,
-      route: getRouteLable(req),
+      route,
       status_code: String(res.statusCode),
     };
 
@@ -34,3 +45,4 @@ export function httpMetricsMiddleware(
 
   next();
 }
+
