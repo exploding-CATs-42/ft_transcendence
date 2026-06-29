@@ -20,12 +20,13 @@ import {
   getCardFrame,
 } from "../utils";
 import {
+  Button,
   GraphicPlayer,
   GraphicHand,
   OpponentHand,
   PlayerSeat,
 } from "../entities";
-import type { Point, LabelConfig, CardConfig, Player } from "../@types";
+import type { Point, LabelConfig, CardConfig, Player, Size } from "../@types";
 import {
   attachGameRoomSockets,
   type CleanupFunction,
@@ -74,6 +75,18 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
+const LEAVE_GAME_EVENT = "leave-game";
+
+const LEAVE_BUTTON_SIZE: Size = {
+  width: 260,
+  height: 70,
+};
+
+const LEAVE_BUTTON_POSITION: Point = {
+  x: SCREEN_WIDTH - LEAVE_BUTTON_SIZE.width - 40,
+  y: 40,
+};
+
 // My hand
 const HAND_POSITION: Point = {
   x: SCREEN_WIDTH / 2,
@@ -96,6 +109,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   create() {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
+
+    this.addLeaveGameButton();
 
     const players = this.createPlayers(data.players);
     this.createOpponentHands(players);
@@ -124,6 +139,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
     EventBus.emit("scene-ready", this);
+  }
+
+  private addLeaveGameButton() {
+    return new Button(
+      this,
+      LEAVE_BUTTON_POSITION,
+      LEAVE_BUTTON_SIZE,
+      "Leave game",
+      () => EventBus.emit(LEAVE_GAME_EVENT),
+    );
   }
 
   private createPlayers(players: Player[]) {
