@@ -4,10 +4,12 @@ import type { GraphicPlayer, OpponentHand } from "game/entities/graphic";
 export class PlayerSeat {
   #container: Phaser.GameObjects.Container;
   player: GraphicPlayer | null;
+  hand: OpponentHand | null;
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#container = scene.add.container(position.x, position.y);
     this.player = null;
+    this.hand = null;
   }
 
   addPlayer(player: GraphicPlayer) {
