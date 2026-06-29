@@ -102,6 +102,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const graphicPlayers = this.createPlayers(players);
     this.createOpponentHands(graphicPlayers);
+    this.fillOpponentHands(hand.cards.length);
     this.fillSeats(graphicPlayers);
 
     this.createCardDropZone();
@@ -175,6 +176,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const opponent = players[i]!;
       this.#opponents.set(opponent.id, hand);
     }
+  }
+
+  private fillOpponentHands(cardsPerPlayer: number) {
+    this.#opponents.forEach((opponentHand) => {
+      for (let i = 0; i < cardsPerPlayer; ++i) {
+        opponentHand.addCard();
+      }
+    });
   }
 
   private createDrawPile() {
