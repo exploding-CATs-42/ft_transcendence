@@ -40,6 +40,7 @@ export const OpponentOutEvents = {
   EXPLODED: "EXPLODED",
   CARD_DRAWN: "CARD_DRAWN",
   CARD_TAKEN: "CARD_TAKEN",
+  CARD_PLAYED: "CARD_PLAYED",
 } as const;
 
 export type OpponentOutEvents =
@@ -50,4 +51,5 @@ export type OpponentOutEvent =
   | { type: typeof OpponentOutEvents.READINESS_CANCELED; playerId: string }
   | { type: typeof OpponentOutEvents.EXPLODED }
   | { type: typeof OpponentOutEvents.CARD_DRAWN }
-  | { type: typeof OpponentOutEvents.CARD_TAKEN };
+  | { type: typeof OpponentOutEvents.CARD_TAKEN }
+  | { type: typeof OpponentOutEvents.CARD_PLAYED };

@@ -1,5 +1,5 @@
 // Libraries
-import type { ActionFunction, Actor, NonReducibleUnknown } from "xstate";
+import type { ActionFunction, ActorRefFrom, NonReducibleUnknown } from "xstate";
 // Local level
 import type { OpponentActions } from "./actions";
 import type { OpponentContext } from "./context";
@@ -8,7 +8,7 @@ import type { OpponentGuards } from "./guards";
 import type { opponentMachine } from "./opponentMachine";
 
 // Machine
-export type OpponentInstance = Actor<typeof opponentMachine>;
+export type OpponentInstance = ActorRefFrom<typeof opponentMachine>;
 
 // Actions
 export interface OpponentActionArgs {

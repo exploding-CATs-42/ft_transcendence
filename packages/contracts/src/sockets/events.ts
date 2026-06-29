@@ -27,6 +27,9 @@ export const ServerPublicEvents = {
   FAVOR_RESOLVED: "FAVOR_RESOLVED",
   DECK_SHUFFLED: "DECK_SHUFFLED",
   GAME_OVER: "GAME_OVER",
+  //////////////////////////////////////////
+  OPPONENT_DREW_CARD: "OPPONENT_DREW_CARD",
+  OPPONENT_PLAYED_CARD: "OPPONENT_PLAYED_CARD",
 } as const;
 
 export const ServerPrivateEvents = {
@@ -39,8 +42,6 @@ export const ServerPrivateEvents = {
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   INSERT_KITTEN_PROMPT: "INSERT_KITTEN_PROMPT",
   FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE",
-  //////////////////////////////////////////
-  OPPONENT_DREW_CARD: "OPPONENT_DREW_CARD",
 } as const;
 
 export const ServerErrorEvents = {
