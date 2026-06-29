@@ -89,6 +89,8 @@ const LobbyPage = () => {
       }
     };
 
+    // We intentionally load the lobby games list after the page mounts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     void loadGames();
     void loadCurrentGame();
 
