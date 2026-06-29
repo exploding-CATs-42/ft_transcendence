@@ -94,19 +94,21 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   create() {
+    const { hand, players } = this.#tempDataStorage;
+
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
 
-    const players = this.createPlayers(this.#tempDataStorage.players);
-    this.createOpponentHands(players);
-    this.fillSeats(players);
+    const graphicPlayers = this.createPlayers(players);
+    this.createOpponentHands(graphicPlayers);
+    this.fillSeats(graphicPlayers);
 
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
     this.createMyHand();
 
-    this.#tempDataStorage.hand.cards.forEach((card) => {
+    hand.cards.forEach((card) => {
       const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
       const frame = getCardFrame(this, frameIndex);
       this.#myHand.addCard(card, frame);
