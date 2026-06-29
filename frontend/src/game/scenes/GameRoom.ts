@@ -107,14 +107,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
 
-    // Demonstration code
-    this.#seats[1]?.moveTo(GAME_ROOM_SEATS[4]!);
-    this.#seats[4]?.moveTo(GAME_ROOM_SEATS[1]!);
-    const intervalId = setInterval(() => {
-      this.#opponentHands[3]?.addCard();
-      clearInterval(intervalId);
-    }, 500 * 15);
-
     this.#tempCardStorage.forEach((card) => {
       const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
       const frame = getCardFrame(this, frameIndex);
