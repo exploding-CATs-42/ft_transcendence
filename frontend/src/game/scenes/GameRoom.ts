@@ -154,6 +154,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         duration: 300,
         ease: "Back.Out",
       });
+      // REMOVE THIS LATER
+      console.log(card.data.type);
     };
 
     this.#myHand = new GraphicHand(this, HAND_POSITION, onCardDrop);
