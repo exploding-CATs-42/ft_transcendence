@@ -5,8 +5,10 @@ import { getRoundedAvatarTexture } from "game/utils";
 const AVATAR_WIDTH = 193;
 
 export class GraphicPlayer implements Player {
-  readonly username: string;
-  readonly imageUrl: string | null;
+  readonly id: string;
+  readonly name: string;
+  readonly avatarUrl: string | null;
+  isAlive: boolean;
   readonly container: Phaser.GameObjects.Container;
   private avatar: Phaser.GameObjects.Image;
   private label: Phaser.GameObjects.Text;
@@ -18,15 +20,17 @@ export class GraphicPlayer implements Player {
     player: Player,
     labelConfig: LabelConfig,
   ) {
-    this.username = player.username;
-    this.imageUrl = player.imageUrl;
+    this.id = player.id;
+    this.name = player.name;
+    this.avatarUrl = player.avatarUrl;
+    this.isAlive = player.isAlive;
     this.confirmedIcon = this.addConfirmedIcon(scene);
 
     const { x, y } = position;
     this.container = scene.add.container(x, y);
 
     this.avatar = this.addAvatar(scene);
-    this.label = this.addUsernameLabel(scene, player.username, labelConfig);
+    this.label = this.addUsernameLabel(scene, player.name, labelConfig);
 
     this.container.add([this.avatar, this.label, this.confirmedIcon]);
   }
@@ -34,7 +38,7 @@ export class GraphicPlayer implements Player {
   private addAvatar(scene: Phaser.Scene) {
     const textureKey = getRoundedAvatarTexture(scene);
     const avatar = scene.add.image(0, 0, textureKey).setOrigin(0, 0);
-    if (this.imageUrl) this.loadRemoteAvatar(scene, avatar, this.imageUrl);
+    if (this.avatarUrl) this.loadRemoteAvatar(scene, avatar, this.avatarUrl);
     return avatar;
   }
 
