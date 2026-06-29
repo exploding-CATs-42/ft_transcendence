@@ -1,4 +1,6 @@
 export interface Player {
-  username: string;
-  imageUrl: string | null;
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  isAlive: boolean;
 }
