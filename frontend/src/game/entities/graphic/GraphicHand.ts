@@ -1,6 +1,7 @@
 import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
+import type { Card } from "@exploding-cats/game-core";
 
 const CARD_WIDTH = 186 * 1.75;
 const CARD_HEIGHT = 260 * 1.75;
@@ -22,6 +23,7 @@ type onCardDropCallback = (card: Phaser.GameObjects.Image) => void;
 export class GraphicHand {
   #scene: Phaser.Scene;
   #position: Point;
+  #cardsData: Map<Phaser.GameObjects.Image, Card> = new Map();
   #cards: Phaser.GameObjects.Image[] = [];
   #onCardDropCallback: onCardDropCallback;
 
