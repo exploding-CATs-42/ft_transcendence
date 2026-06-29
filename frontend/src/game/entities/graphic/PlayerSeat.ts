@@ -28,6 +28,7 @@ export class PlayerSeat {
 
   addHand(hand: OpponentHand) {
     this.#container.add(hand.container);
+    this.hand = hand;
   }
 
   moveTo(position: Point) {
