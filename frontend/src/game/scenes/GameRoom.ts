@@ -118,7 +118,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#tempCardStorage.forEach((card) => {
       const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
       const frame = getCardFrame(this, frameIndex);
-      this.#myHand.addCard(frame);
+      this.#myHand.addCard(card, frame);
     });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
@@ -260,10 +260,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         faceDownCard.destroy();
 
         // and spawn the real card into player's hand
-
         const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
         const frame = getCardFrame(this, frameIndex);
-        this.#myHand.addCard(frame, insertIndex);
+        this.#myHand.addCard(payload.card, frame, insertIndex);
       },
     });
   };
