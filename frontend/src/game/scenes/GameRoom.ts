@@ -24,6 +24,7 @@ import {
   GraphicHand,
   OpponentHand,
   PlayerSeat,
+  type GraphicCard,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -142,10 +143,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private createMyHand() {
-    const onCardDrop = (card: Phaser.GameObjects.Image) => {
+    const onCardDrop = (card: GraphicCard) => {
       // move it to the discard pile and shrink it down to pile size
       this.tweens.add({
-        targets: card,
+        targets: card.image,
         x: DISCARD_PILE_POSITION.x,
         y: DISCARD_PILE_POSITION.y,
         displayWidth: CARD_WIDTH,
