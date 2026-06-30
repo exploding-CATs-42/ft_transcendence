@@ -1,15 +1,23 @@
 import {
   ClientEvents,
   ServerPrivateEvents,
-  type HandPayload,
+  ServerPublicEvents,
 } from "@exploding-cats/contracts";
 import type { CardPayload } from "@exploding-cats/game-core";
+import type { Card } from "@exploding-cats/game-core";
+import type { Player } from "game/@types";
 import { socket } from "socket";
 import { emit } from "./gameSession";
 
+// REMOVE THIS LATER
+export type GameStartedPayload = {
+  players: Player[];
+  hand: { cards: Card[] };
+};
+
 export interface GameRoomHandlers {
-  onCardsDealt(hand: HandPayload): void;
   onCardReceived(card: CardPayload): void;
+  onGameStarted(payload: GameStartedPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -18,8 +26,8 @@ export function attachGameRoomSockets(
   handlers: GameRoomHandlers,
 ): CleanupFunction {
   const subscriptions = [
-    [ServerPrivateEvents.YOUR_HAND, handlers.onCardsDealt],
     [ServerPrivateEvents.CARD_RECEIVED, handlers.onCardReceived],
+    [ServerPublicEvents.GAME_STARTED, handlers.onGameStarted],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {

@@ -32,6 +32,7 @@ import {
   drawCard,
   type CleanupFunction,
   type GameRoomHandlers,
+  type GameStartedPayload,
 } from "../sockets";
 
 // It's just a placeholder and has to be removed later
@@ -87,7 +88,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
   #detachSockets: CleanupFunction;
-  #tempCardStorage: Card[] = [];
+  #tempDataStorage: GameStartedPayload = {
+    players: [],
+    hand: { cards: [] },
+  };
 
   constructor() {
     super(Scenes.GameRoom);
@@ -108,7 +112,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
 
-    this.#tempCardStorage.forEach((card) => {
+    this.#tempDataStorage.hand.cards.forEach((card) => {
       const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
       const frame = getCardFrame(this, frameIndex);
       this.#myHand.addCard(card, frame);
@@ -154,6 +158,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         duration: 300,
         ease: "Back.Out",
       });
+
       // REMOVE THIS LATER
       console.log(card.data.type);
     };
@@ -223,9 +228,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     };
   }
 
-  onCardsDealt = (hand: HandPayload): void => {
-    this.#tempCardStorage = hand.cards;
-  };
+  onGameStarted(payload: { players: Player[]; hand: HandPayload }): void {
+    this.#tempDataStorage = payload;
+  }
 
   onCardReceived = (payload: CardPayload): void => {
     // Generate random insert index
