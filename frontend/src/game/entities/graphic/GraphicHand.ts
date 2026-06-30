@@ -39,7 +39,7 @@ export class GraphicHand {
 
   // -------------- Public API --------------
 
-  addCard(frame: Phaser.Textures.Frame, insertIndex = -1) {
+  addCard(card: Card, frame: Phaser.Textures.Frame, insertIndex = -1) {
     if (insertIndex === -1)
       insertIndex = Phaser.Math.Between(0, this.#cards.length);
 
@@ -47,18 +47,19 @@ export class GraphicHand {
 
     const x = this.getInsertPositionX(insertIndex);
     const y = SCREEN_HEIGHT;
-    const newCard = this.addInteractiveCard(x, y, frame);
-    newCard.setDepth(insertIndex + 1);
+    const newCardImage = this.addInteractiveCard(x, y, frame);
+    newCardImage.setDepth(insertIndex + 1);
 
     this.#scene.tweens.add({
-      targets: newCard,
+      targets: newCardImage,
       x: x,
       y: this.#position.y,
       duration: 500,
       ease: "Back.easeOut",
 
       onComplete: () => {
-        this.#cards.splice(insertIndex, 0, newCard);
+        this.#cards.splice(insertIndex, 0, newCardImage);
+        this.#cardsData.set(newCardImage, card);
         if (this.#cards.length > 1) this.reflowCards();
       },
     });
