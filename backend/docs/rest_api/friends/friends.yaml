@@ -4,18 +4,20 @@ paths:
       tags:
         - Friends
       summary: List friendship relations
-      description: Returns all friendship relations for the authenticated user. If status=incoming is provided, only incoming pending friend requests are returned.
+      description: Returns all friendship relations for the authenticated user. The optional "view" query parameter filters which relations are returned.
       operationId: listFriends
       security:
         - bearerAuth: []
       parameters:
-        - name: status
+        - name: view
           in: query
           required: false
-          description: Optional filter. Only "incoming" is supported.
+          description: Optional filter for which relations to return. Defaults to all relations.
           schema:
             type: string
             enum:
+              - friends_and_requests
+              - accepted
               - incoming
       responses:
         "200":
@@ -45,7 +47,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
     post:
       tags:
@@ -107,7 +109,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
     delete:
       tags:
@@ -169,7 +171,7 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error
 
   /me/friends/{userId}:
     patch:
@@ -245,4 +247,4 @@ paths:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
-                message: Server error
+                message: Internal server error

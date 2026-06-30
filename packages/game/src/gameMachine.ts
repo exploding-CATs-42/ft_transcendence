@@ -9,13 +9,14 @@ import {
   changeTurn,
   shufflePlayers,
   dealCards,
+  drawCard,
   fillDeck,
   removePlayer,
   removePlayerConfirmation,
 } from "./actions";
-import type { Player, Deck } from "./types";
+import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
-import { GameGuards, hasEnoughPlayers } from "./guards";
+import { GameGuards, hasEnoughCards, hasEnoughPlayers } from "./guards";
 import {
   cardsDealt,
   countdownCanceled,
@@ -30,6 +31,7 @@ export interface GameContext {
   players: Player[];
   deck: Deck;
   currentTurnPlayerId: string | null;
+  lastDrawnCard: Card | null;
 }
 
 export const gameMachine = setup({
@@ -47,9 +49,11 @@ export const gameMachine = setup({
     [GameActions.DEAL_CARDS]: assign(dealCards),
     [GameActions.SHUFFLE_PLAYERS]: assign(shufflePlayers),
     [GameActions.CHANGE_TURN]: assign(changeTurn),
+    [GameActions.DRAW_CARD]: assign(drawCard),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
+    [GameGuards.HAS_ENOUGH_CARDS]: hasEnoughCards,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -58,6 +62,7 @@ export const gameMachine = setup({
     players: [],
     deck: [],
     currentTurnPlayerId: null,
+    lastDrawnCard: null,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -129,6 +134,17 @@ export const gameMachine = setup({
         },
         [GameStates.CHANGING_TURN]: {
           entry: [GameActions.CHANGE_TURN, emit(turnChanged)],
+          always: {
+            target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
+          },
+        },
+        [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
+          on: {
+            [GameEvents.DRAW_CARD]: {
+              guard: GameGuards.HAS_ENOUGH_CARDS,
+              actions: GameActions.DRAW_CARD,
+            },
+          },
         },
       },
     },

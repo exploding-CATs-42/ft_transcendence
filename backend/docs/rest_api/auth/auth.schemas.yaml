@@ -14,12 +14,13 @@ components:
         username:
           type: string
           minLength: 3
-          maxLength: 30
+          maxLength: 20
           example: alexfox
         password:
           type: string
           minLength: 8
-          maxLength: 100
+          maxLength: 128
+          description: Must include an uppercase letter, a lowercase letter, a number, and a special character.
           example: Password123!
 
     LoginRequest:
@@ -34,8 +35,6 @@ components:
           example: alex@example.com
         password:
           type: string
-          minLength: 8
-          maxLength: 100
           example: Password123!
 
     AuthResponse:

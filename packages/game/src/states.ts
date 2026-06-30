@@ -5,4 +5,5 @@ export const GameStates = {
   PLAYING: "playing",
   DEALING_CARDS: "dealingCards",
   CHANGING_TURN: "changingTurn",
+  WAITING_FOR_PLAYER_ACTIONS: "waitingForPlayerActions",
 } as const;

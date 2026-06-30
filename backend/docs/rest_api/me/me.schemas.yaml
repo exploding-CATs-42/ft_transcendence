@@ -1,5 +1,23 @@
 components:
   schemas:
+    MyProfileUser:
+      allOf:
+        - $ref: "../users/users.schemas.yaml#/components/schemas/User"
+        - $ref: "../users/users.schemas.yaml#/components/schemas/OnlineStatus"
+
+    MyProfileUserWithStats:
+      allOf:
+        - $ref: "#/components/schemas/MyProfileUser"
+        - $ref: "../users/users.schemas.yaml#/components/schemas/GameStats"
+
+    GetMeResponse:
+      type: object
+      required:
+        - user
+      properties:
+        user:
+          $ref: "#/components/schemas/MyProfileUserWithStats"
+
     UpdateMeRequest:
       type: object
       minProperties: 1
@@ -13,16 +31,18 @@ components:
           type: string
           format: email
           example: alex_new@example.com
-        password:
+        passwordOld:
           type: string
           minLength: 8
           maxLength: 100
-          example: NewPassword123!
-        avatarUrl:
+          description: Current password - required when updating password
+          example: OldPassword123!
+        passwordNew:
           type: string
-          format: uri
-          nullable: true
-          example: https://example.com/avatar.png
+          minLength: 8
+          maxLength: 100
+          description: New password - required when updating password
+          example: NewPassword123!
 
     UpdateMeResponse:
       type: object
@@ -30,4 +50,34 @@ components:
         - user
       properties:
         user:
-          $ref: "../users/users.schemas.yaml#/components/schemas/SelfProfileUser"
+          $ref: "#/components/schemas/MyProfileUser"
+
+    UpdateAvatarResponse:
+      type: object
+      required:
+        - avatarUrl
+      properties:
+        avatarUrl:
+          type: string
+          format: uri
+          example: https://res.cloudinary.com/example/image/upload/v1234567890/avatar.png
+
+    GetMeGamesResponse:
+      type: object
+      required:
+        - games
+      properties:
+        games:
+          type: array
+          items:
+            $ref: "../users/users.schemas.yaml#/components/schemas/UserGameHistoryItem"
+            description: Game object with game details
+
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Operation completed

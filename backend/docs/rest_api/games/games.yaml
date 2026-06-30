@@ -1,20 +1,25 @@
 paths:
-  /me:
+  /games:
     get:
       tags:
-        - Me
-      summary: Get current user profile
-      description: Retrieves the authenticated user's profile information.
-      operationId: getMe
+        - Games
+      summary: Get all games
+      description: Returns all games available in the system.
+      operationId: getGames
       security:
         - bearerAuth: []
       responses:
         "200":
-          description: User profile retrieved successfully
+          description: Games returned successfully
           content:
             application/json:
               schema:
-                $ref: "./me.schemas.yaml#/components/schemas/GetMeResponse"
+                $ref: "./games.schemas.yaml#/components/schemas/GamesListResponse"
+                example:
+                  - id: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
+                    name: Friday Night Table
+                    maxPlayers: 4
+                    createdAt: 1745835176910
         "401":
           description: Invalid or missing access token
           content:
@@ -39,12 +44,12 @@ paths:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               example:
                 message: Internal server error
-    patch:
+    post:
       tags:
-        - Me
-      summary: Update current user profile
-      description: Updates the authenticated user's profile fields. At least one field must be provided. Both passwordOld and passwordNew must be provided together to change password.
-      operationId: updateMe
+        - Games
+      summary: Create a new game
+      description: Creates a new game instance and automatically joins the creator as a player.
+      operationId: createGame
       security:
         - bearerAuth: []
       requestBody:
@@ -52,36 +57,28 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "./me.schemas.yaml#/components/schemas/UpdateMeRequest"
+              $ref: "./games.schemas.yaml#/components/schemas/CreateGameRequest"
       responses:
-        "200":
-          description: Profile updated successfully
+        "201":
+          description: Game created successfully
           content:
             application/json:
               schema:
-                $ref: "./me.schemas.yaml#/components/schemas/UpdateMeResponse"
+                $ref: "./games.schemas.yaml#/components/schemas/GameResponse"
         "400":
           description: Validation error
           content:
             application/json:
               schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "./games.schemas.yaml#/components/schemas/ValidationErrorResponse"
         "401":
-          description: Authentication failed
+          description: Invalid or missing access token
           content:
             application/json:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              examples:
-                invalidToken:
-                  summary: Invalid or missing access token
-                  value:
-                    message: Invalid token
-
-                invalidCurrentPassword:
-                  summary: Current password is incorrect
-                  value:
-                    message: Please enter valid password
+              example:
+                message: Invalid token
         "404":
           description: User not found
           content:
@@ -91,123 +88,119 @@ paths:
               example:
                 message: User not found
         "409":
-          description: Request conflict
+          description: User already has an active or waiting game
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Player already has an active or waiting game
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
+  /games/current:
+    get:
+      tags:
+        - Games
+      summary: Get current active game
+      description: Returns the current active or waiting game for the authenticated user. Returns null if none exists.
+      operationId: getCurrentGame
+      security:
+        - bearerAuth: []
+
+      responses:
+        "200":
+          description: Current game returned successfully (or null)
+          content:
+            application/json:
+              schema:
+                $ref: "./games.schemas.yaml#/components/schemas/CurrentGameResponse"
+
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+
+        "404":
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: User not found
+
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
+    delete:
+      tags:
+        - Games
+      summary: Delete a game
+      description: Deletes a game by id for the authenticated user.
+      operationId: deleteGame
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          description: Game id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Game deleted successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./games.schemas.yaml#/components/schemas/MessageResponse"
+              example:
+                message: Game deleted
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./games.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "404":
+          description: Game or user not found
           content:
             application/json:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
               examples:
-                emailAlreadyInUse:
+                userNotFound:
                   value:
-                    message: Email already in use 
-                missingCurrentPassword:
-                  summary: New password provided without current password
+                    message: User not found
+                gameNotFound:
                   value:
-                    message: Enter your current password to set a new password
-
-                missingNewPassword:
-                  summary: Current password provided without new password
-                  value:
-                    message: Enter your new password
-        "500":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Internal server error
-  /me/avatar:
-    patch:
-      tags:
-        - Me
-      summary: Update user avatar
-      description: Updates the authenticated user's avatar. Accepts image file upload via multipart form data.
-      operationId: updateMeAvatar
-      security:
-        - bearerAuth: []
-      requestBody:
-        required: true
-        content:
-          multipart/form-data:
-            schema:
-              type: object
-              required:
-                - avatar
-              properties:
-                avatar:
-                  type: string
-                  format: binary
-                  description: Avatar image file
-      responses:
-        "200":
-          description: Avatar updated successfully
-          content:
-            application/json:
-              schema:
-                $ref: "./me.schemas.yaml#/components/schemas/UpdateAvatarResponse"
-        "400":
-          description: Invalid file or validation error
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
-        "401":
-          description: Invalid or missing access token
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Invalid token
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: User not found
-        "500":
-          description: Server error
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Internal server error
-  /me/games:
-    get:
-      tags:
-        - Me
-      summary: Get current user's games
-      description: Retrieves all games that the authenticated user is participating in or has participated in.
-      operationId: getMeGames
-      security:
-        - bearerAuth: []
-      responses:
-        "200":
-          description: User games retrieved successfully
-          content:
-            application/json:
-              schema:
-                $ref: "./me.schemas.yaml#/components/schemas/GetMeGamesResponse"
-        "401":
-          description: Invalid or missing access token
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Invalid token
-        "404":
-          description: User not found
-          content:
-            application/json:
-              schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: User not found
+                    message: Game not found
         "500":
           description: Server error
           content:
