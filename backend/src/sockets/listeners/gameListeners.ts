@@ -5,9 +5,11 @@ import {
   cancelStart,
   confirmStart,
   drawCard,
+  getGameById,
   joinGame,
   leaveGame,
 } from "services";
+import { CardPayload, GameStates } from "@exploding-cats/game-core";
 import { withErrorHandler } from "utils";
 import {
   CancelStartParams,
@@ -30,7 +32,6 @@ import {
   ServerPublicEvents,
   WaitingStatePayload,
 } from "@exploding-cats/contracts";
-import { CardPayload } from "@exploding-cats/game-core";
 // Local level
 import { socketsMap } from "../socketsMap";
 
@@ -55,6 +56,15 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
         socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+
+        const game = await getGameById(socket.data.sub, parsed);
+        const isPlaying = game.instance
+          .getSnapshot()
+          .matches(GameStates.PLAYING);
+
+        if (isPlaying) {
+          socket.emit(ServerPublicEvents.GAME_STARTED);
+        }
       },
     ),
   );
@@ -69,6 +79,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await leaveGame(parsed, socket.data.sub);
         const room = parsed.gameId;
         await socket.leave(room);
+        socketsMap.delete(playerId);
 
         const publicPayload: PlayerIdPayload = { playerId };
 

@@ -4,14 +4,13 @@ import {
   CancelStartParams,
   ConfirmStartParams,
   CreateGameRequestBody,
-  DeleteGameParams,
   DrawCardParams,
   JoinGameParams,
   LeaveGameParams,
 } from "schemas";
 import { GameEvents, Player } from "@exploding-cats/game-core";
 import { PlayerIdPayload, UserId } from "@exploding-cats/contracts";
-import { GameId, GameRecord } from "data/types";
+import { Game, GameId, GameRecord } from "data/types";
 import { JoinGameResult } from "types";
 import { GameRepository, toGameRecord } from "data";
 import { attachGameBroadcaster } from "sockets";
@@ -74,6 +73,15 @@ export async function getCurrentGame(
   return toGameRecord(currentGame);
 }
 
+export async function getGameById(
+  userId: UserId,
+  input: JoinGameParams,
+): Promise<Game> {
+  await ensureUserExists(userId);
+
+  return ensureGameExists(input.gameId);
+}
+
 export async function createGame(
   userId: UserId,
   input: CreateGameRequestBody,
@@ -109,13 +117,6 @@ export async function createGame(
   return toGameRecord(game);
 }
 
-export async function deleteGame(userId: UserId, input: DeleteGameParams) {
-  await ensureUserExists(userId);
-  ensureGameExists(input.gameId);
-
-  GameRepository.deleteGameById(input.gameId);
-}
-
 export async function joinGame(
   input: JoinGameParams,
   userId: UserId,
@@ -139,13 +140,13 @@ export async function joinGame(
   const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
   if (currentGame && currentGame.id !== input.gameId) {
-    throw new SocketError("Player already has an active or waiting game", {
+    throw new ApiError("Player already has an active or waiting game", 409, {
       existingGameId: currentGame.id,
     });
   }
 
   if (playersBefore.length >= game.maxPlayers) {
-    throw new SocketError("Game is full");
+    throw new ApiError("Game is full", 409);
   }
 
   const newPlayer: Player = {
@@ -176,7 +177,11 @@ export async function leaveGame(
     game,
     players: playersBefore,
     player,
-  } = await requirePlayerInGame(userId, input.gameId);
+  } = await getGameContext(userId, input.gameId);
+
+  if (!player) {
+    throw new ApiError("Player is not in the game", 409);
+  }
 
   const isLastPlayer = playersBefore.length === 1;
 
@@ -187,7 +192,6 @@ export async function leaveGame(
 
   if (isLastPlayer) {
     GameRepository.deleteGameById(input.gameId);
-    return { playerId: "" };
   }
 
   return { playerId: player.id };
@@ -230,6 +234,7 @@ export async function drawCard(input: DrawCardParams, userId: UserId) {
   });
 
   const lastDrawnCard = game.instance.getSnapshot().context.lastDrawnCard;
+
   if (!lastDrawnCard) {
     throw new SocketError("Could not draw card");
   }

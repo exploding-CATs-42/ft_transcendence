@@ -1,8 +1,14 @@
 // Libraries
 import type { Response } from "express";
 // Project level
-import { createGame, deleteGame, getCurrentGame, getGames } from "services";
-import { createGameSchema, deleteGameParamsSchema } from "schemas";
+import {
+  createGame,
+  getCurrentGame,
+  getGames,
+  joinGame,
+  leaveGame,
+} from "services";
+import { createGameSchema, joinGameSchema, leaveGameSchema } from "schemas";
 import { AuthenticatedRequest } from "types";
 import { validate } from "utils";
 
@@ -32,12 +38,22 @@ export async function createGameController(
   res.status(201).json(result);
 }
 
-export async function deleteGameController(
+export async function joinGameController(
   req: AuthenticatedRequest,
   res: Response,
 ) {
-  const parsed = validate(deleteGameParamsSchema, req.params);
+  const parsed = validate(joinGameSchema, req.params);
 
-  await deleteGame(req.user.id, parsed);
-  res.status(200).json({ message: "Game deleted" });
+  const result = await joinGame(parsed, req.user.id);
+  res.status(200).json(result);
+}
+
+export async function leaveGameController(
+  req: AuthenticatedRequest,
+  res: Response,
+) {
+  const parsed = validate(leaveGameSchema, req.params);
+
+  const result = await leaveGame(parsed, req.user.id);
+  res.status(200).json(result);
 }

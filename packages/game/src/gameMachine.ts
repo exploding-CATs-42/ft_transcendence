@@ -118,6 +118,11 @@ export const gameMachine = setup({
     [GameStates.PLAYING]: {
       entry: [GameActions.SHUFFLE_PLAYERS, emit(gameStarted)],
       initial: GameStates.DEALING_CARDS,
+      on: {
+        [GameEvents.LEAVE_GAME]: {
+          actions: GameActions.REMOVE_PLAYER,
+        },
+      },
       states: {
         [GameStates.DEALING_CARDS]: {
           entry: [

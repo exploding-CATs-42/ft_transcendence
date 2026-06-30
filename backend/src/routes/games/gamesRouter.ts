@@ -1,9 +1,10 @@
 // Project level
 import {
   createGameController,
-  deleteGameController,
   getGamesController,
   getCurrentGameController,
+  joinGameController,
+  leaveGameController,
 } from "controllers";
 import { createAuthenticatedRouter, errorHandler } from "utils";
 
@@ -27,4 +28,5 @@ export const gamesRouter = createAuthenticatedRouter();
 gamesRouter.get("/", errorHandler(getGamesController));
 gamesRouter.get("/current", errorHandler(getCurrentGameController));
 gamesRouter.post("/", errorHandler(createGameController));
-gamesRouter.delete("/:gameId", errorHandler(deleteGameController));
+gamesRouter.post("/:gameId/join", errorHandler(joinGameController));
+gamesRouter.post("/:gameId/leave", errorHandler(leaveGameController));

@@ -15,10 +15,12 @@ export const emit = (event: string, payload: object = {}) =>
 
 export function connectToGameSession(socket: Socket, gameId: string) {
   const join = () => socket.emit(ClientEvents.JOIN_GAME, { gameId });
+
   if (socket.connected) join();
+
   socket.on("connect", join);
+
   return () => {
-    socket.emit(ClientEvents.LEAVE_GAME, { gameId });
     socket.off("connect", join);
   };
 }
