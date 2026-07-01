@@ -1,10 +1,15 @@
-import type { Point } from "game/@types";
+import type { Point, Size } from "game/@types";
 import { Textures } from "game/constants";
 import type { GraphicPlayer, OpponentHand } from "game/entities/graphic";
 
 const TARGET_ICON_OFFSET: Point = {
   x: 30,
   y: 156,
+};
+
+const HIT_AREA_SIZE: Size = {
+  width: 200,
+  height: 200,
 };
 
 export class PlayerSeat {
@@ -15,6 +20,9 @@ export class PlayerSeat {
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#container = scene.add.container(position.x, position.y);
+    this.#container.setSize(HIT_AREA_SIZE.width, HIT_AREA_SIZE.height);
+    this.#container.setInteractive();
+
     this.player = null;
     this.hand = null;
     this.targetIcon = this.createTargetIcon(scene);
