@@ -59,8 +59,13 @@ export class PlayerSeat {
   }
 
   private setupContainer(container: Phaser.GameObjects.Container) {
-    container.setSize(HIT_BOX_SIZE.width, HIT_BOX_SIZE.height);
-    container.setInteractive();
+    const { width, height } = HIT_BOX_SIZE;
+    container.setSize(width, height);
+    container.setInteractive(
+      new Phaser.Geom.Rectangle(width / 2 - 30, height / 2 - 30, width, height),
+      Phaser.Geom.Rectangle.Contains,
+    );
+
     container.on("pointerdown", () => {
       if (this.onClick) this.onClick(this.player!.id);
     });
