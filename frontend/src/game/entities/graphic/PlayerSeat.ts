@@ -7,9 +7,9 @@ const TARGET_ICON_OFFSET: Point = {
   y: 156,
 };
 
-const HIT_AREA_SIZE: Size = {
-  width: 200,
-  height: 200,
+const HIT_BOX_SIZE: Size = {
+  width: 240,
+  height: 300,
 };
 
 export class PlayerSeat {
@@ -59,7 +59,7 @@ export class PlayerSeat {
   }
 
   private setupContainer(container: Phaser.GameObjects.Container) {
-    container.setSize(HIT_AREA_SIZE.width, HIT_AREA_SIZE.height);
+    container.setSize(HIT_BOX_SIZE.width, HIT_BOX_SIZE.height);
     container.setInteractive();
     container.on("pointerdown", () => {
       if (this.onClick) this.onClick(this.player!.id);
