@@ -11,6 +11,7 @@ import {
   cardCover,
   confirmedIcon,
   playerSpotlight,
+  targetIcon,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 
@@ -39,6 +40,7 @@ export class Preloader extends Scene {
     this.load.image(Textures.cardCover, cardCover);
     this.load.image(Textures.confirmedIcon, confirmedIcon);
     this.load.image(Textures.playerSpotlight, playerSpotlight);
+    this.load.image(Textures.targetIcon, targetIcon);
   }
 
   create() {
