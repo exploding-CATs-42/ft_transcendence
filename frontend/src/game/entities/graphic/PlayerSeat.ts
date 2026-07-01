@@ -5,11 +5,13 @@ export class PlayerSeat {
   #container: Phaser.GameObjects.Container;
   player: GraphicPlayer | null;
   hand: OpponentHand | null;
+  targetIcon: Phaser.GameObjects.Image | null;
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#container = scene.add.container(position.x, position.y);
     this.player = null;
     this.hand = null;
+    this.targetIcon = null;
   }
 
   addPlayer(player: GraphicPlayer) {
