@@ -17,7 +17,7 @@ export class PlayerSeat {
   player: GraphicPlayer | null;
   hand: OpponentHand | null;
   targetIcon: Phaser.GameObjects.Image;
-  onClick?: (playerId: string) => void;
+  onClick?: ((playerId: string) => void) | null;
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#container = scene.add.container(position.x, position.y);
