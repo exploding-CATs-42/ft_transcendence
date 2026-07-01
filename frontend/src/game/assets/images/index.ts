@@ -4,3 +4,4 @@ export { default as waitingRoomBg } from "./waiting_room_background.png";
 export { default as gameRoomBg } from "./game_room_background.png";
 export { default as cards } from "./cards.webp";
 export { default as cardCover } from "./cover.png";
+export { default as targetIcon } from "./target.png";
