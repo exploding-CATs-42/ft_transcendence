@@ -35,7 +35,7 @@ import {
 } from "../sockets";
 import { fakeCards, fakePlayers } from "./mockData";
 
-// Opponents
+// -------------------- OPPONENTS --------------------
 const NAME_LABEL_CONFIG: LabelConfig = {
   fontColor: "white",
   strokeColor: "black",
@@ -44,7 +44,7 @@ const NAME_LABEL_CONFIG: LabelConfig = {
 const OPPONENT_HAND_X_OFFSET = 96;
 const OPPONENT_HAND_Y_OFFSET = 180;
 
-// Draw and discard piles
+// -------------- DRAW AND DISCARD PILES --------------
 const CARD_WIDTH = 186 * 1.5;
 const CARD_HEIGHT = 260 * 1.5;
 const CARD_BORDER_RADIUS = 20;
@@ -66,12 +66,13 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
-// My hand
+// -------------------- MY HAND --------------------
 const HAND_POSITION: Point = {
   x: SCREEN_WIDTH / 2,
   y: 940,
 };
 
+// -------------------- GAME ROOM --------------------
 export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
   #opponents: Map<string, OpponentHand> = new Map();
@@ -84,9 +85,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   constructor() {
     super(Scenes.GameRoom);
-
     this.#detachSockets = attachGameRoomSockets(this);
   }
+
+  // -------------------- INITIALIZATION --------------------
 
   create() {
     const { hand: cards, players } = this.#tempDataStorage;
@@ -193,21 +195,19 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
   }
 
-  private addCard(frame: Phaser.Textures.Frame, position: Point) {
-    const cardConfig = this.buildCardConfig(frame);
-    const card = addCardVisual(this, position, cardConfig, CARD_BORDER_RADIUS);
-    return card;
-  }
-
   private createCardDropZone() {
     const { x, y, width, height } = CARD_DROP_ZONE;
     const zone = this.add.zone(x, y, width, height).setOrigin(0, 0);
     zone.setRectangleDropZone(width, height);
   }
 
-  private drawCard = () => {
-    drawCard();
-  };
+  // -------------------- UTILS --------------------
+
+  private addCard(frame: Phaser.Textures.Frame, position: Point) {
+    const cardConfig = this.buildCardConfig(frame);
+    const card = addCardVisual(this, position, cardConfig, CARD_BORDER_RADIUS);
+    return card;
+  }
 
   private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
     return {
@@ -218,6 +218,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       },
     };
   }
+
+  // -------------------- SOCKETS --------------------
 
   onGameStarted = (payload: GameStartedPayload): void => {
     this.#tempDataStorage = payload;
@@ -259,6 +261,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         this.#myHand.addCard(payload.card, frame, insertIndex);
       },
     });
+  };
+
+  private drawCard = () => {
+    drawCard();
   };
 
   private cleanup = () => {
