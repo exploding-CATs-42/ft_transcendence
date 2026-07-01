@@ -45,6 +45,11 @@ export class PlayerSeat {
     this.#container.setPosition(position.x, position.y);
   }
 
+  setTargetIconVisible(value: boolean) {
+    this.targetIcon.setVisible(value);
+    if (value === true) this.#container.bringToTop(this.targetIcon);
+  }
+
   private createTargetIcon(scene: Phaser.Scene) {
     const { x, y } = TARGET_ICON_OFFSET;
     const image = scene.add.image(x, y, Textures.targetIcon);
