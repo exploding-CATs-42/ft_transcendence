@@ -232,6 +232,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     };
   }
 
+  // -------------------- ACTIONS --------------------
+
+  private showOpponentTargetIcons() {
+    const players = [...this.#players.values()];
+    for (let i = 1; i < players.length; ++i)
+      players[i]?.setTargetIconVisible(true);
+  }
+
   // -------------------- SOCKETS --------------------
 
   onCardReceived = (payload: CardPayload): void => {
