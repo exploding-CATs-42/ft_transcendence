@@ -17,11 +17,15 @@ export class PlayerSeat {
   player: GraphicPlayer | null;
   hand: OpponentHand | null;
   targetIcon: Phaser.GameObjects.Image;
+  onClick?: (playerId: string) => void;
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#container = scene.add.container(position.x, position.y);
     this.#container.setSize(HIT_AREA_SIZE.width, HIT_AREA_SIZE.height);
     this.#container.setInteractive();
+    this.#container.on("pointerdown", () => {
+      if (this.onClick) this.onClick(this.player!.id);
+    });
 
     this.player = null;
     this.hand = null;
