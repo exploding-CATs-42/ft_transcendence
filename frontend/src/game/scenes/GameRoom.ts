@@ -79,7 +79,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #detachSockets: CleanupFunction;
   #tempDataStorage: GameStartedPayload = {
     players: fakePlayers,
-    hand: { cards: fakeCards },
+    hand: fakeCards,
   };
 
   constructor() {
@@ -89,21 +89,21 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   create() {
-    const { hand, players } = this.#tempDataStorage;
+    const { hand: cards, players } = this.#tempDataStorage;
 
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
 
     const graphicPlayers = this.createPlayers(players);
     this.createOpponentHands(graphicPlayers);
-    this.fillOpponentHands(hand.cards.length);
+    this.fillOpponentHands(cards.length);
     this.fillSeats(graphicPlayers);
 
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
     this.createMyHand();
-    this.fillMyHandWithCards(hand.cards);
+    this.fillMyHandWithCards(cards);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);

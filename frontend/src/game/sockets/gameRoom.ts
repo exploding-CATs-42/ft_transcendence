@@ -11,7 +11,7 @@ import { emit } from "./gameSession";
 // REMOVE THIS LATER
 export type GameStartedPayload = {
   players: Player[];
-  hand: { cards: Card[] };
+  hand: Card[];
 };
 
 export interface GameRoomHandlers {
