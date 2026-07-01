@@ -227,6 +227,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       players[i]?.setTargetIconVisible(true);
   }
 
+  private selectOpponent(index: number) {
+    const players = [...this.#players.values()];
+    for (let i = 1; i < players.length; ++i)
+      if (i != index) players[i]?.setTargetIconVisible(false);
+  }
+
   // -------------------- SOCKETS --------------------
 
   onGameStarted = (payload: GameStartedPayload): void => {
