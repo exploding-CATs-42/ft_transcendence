@@ -137,7 +137,7 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
 export const dropCard = ({ context, event }: GameActionArgs) => {
   if (event.type != GameEvents.DROP_CARD) return context;
 
-  const { playerId, card } = event;
+  const { playerId, cardType } = event;
   const players = context.players;
 
   const player = players.find((player) => player.id === playerId);
@@ -145,7 +145,7 @@ export const dropCard = ({ context, event }: GameActionArgs) => {
   const hand = player?.hand;
   if (!hand) return context;
 
-  const cardIndex = hand?.indexOf(card);
+  const cardIndex = hand.findIndex((card) => card.type === cardType);
 
   const updatedHand = [...hand];
   if (cardIndex != -1) {

@@ -5,6 +5,7 @@ import {
   cancelStart,
   confirmStart,
   drawCard,
+  dropCard,
   joinGame,
   leaveGame,
 } from "services";
@@ -33,6 +34,8 @@ import {
 import { CardPayload } from "@exploding-cats/game-core";
 // Local level
 import { socketsMap } from "../socketsMap";
+import { DropCardParams, dropCardSchema } from "schemas/games/dropCardSchema";
+import { serve } from "swagger-ui-express";
 
 export const registerGameEventHandlers = (io: Server, socket: Socket) => {
   socket.on(
@@ -127,6 +130,23 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.CARD_RECEIVED, payload);
         io.to(room).emit(ServerPublicEvents.CARD_DRAWN);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.DROP_CARD,
+    withErrorHandler(
+      dropCardSchema,
+      socket,
+      ServerErrorEvents.DROP_CARD_ERROR,
+      async (parsed: DropCardParams) => {
+        await dropCard(parsed, socket.data.sub);
+
+        const room = parsed.gameId;
+
+        socket.emit(ServerPrivateEvents.CARD_REMOVED);
+        io.to(room).emit(ServerPublicEvents.CARD_PLAYED);
       },
     ),
   );

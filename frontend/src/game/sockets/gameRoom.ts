@@ -17,6 +17,7 @@ export type GameStartedPayload = {
 export interface GameRoomHandlers {
   onCardReceived(card: CardPayload): void;
   onGameStarted(payload: GameStartedPayload): void;
+  onCardRemoved(): void;
 }
 
 export type CleanupFunction = () => void;
@@ -27,6 +28,7 @@ export function attachGameRoomSockets(
   const subscriptions = [
     [ServerPrivateEvents.CARD_RECEIVED, handlers.onCardReceived],
     [ServerPublicEvents.GAME_STARTED, handlers.onGameStarted],
+    [ServerPrivateEvents.CARD_REMOVED, handlers.onCardRemoved],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
@@ -41,3 +43,4 @@ export function attachGameRoomSockets(
 }
 
 export const drawCard = () => emit(ClientEvents.DRAW_CARD);
+export const dropCard = () => emit(ClientEvents.DROP_CARD, dropCard);

@@ -14,3 +14,7 @@ export interface CardPayload {
   playerId: string;
   card: Card;
 }
+
+export interface DropCardPayload {
+  gameId: string;
+}

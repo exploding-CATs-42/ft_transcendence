@@ -1,7 +1,7 @@
 import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
-import type { Card } from "@exploding-cats/game-core";
+import { dropCard, type Card } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
 
 const CARD_WIDTH = 186 * 1.75;
@@ -133,7 +133,7 @@ export class GraphicHand {
     card.on("dragend", onDragEnd);
   }
 
-  private attachCardDropHandler(card: Phaser.GameObjects.Image) {
+  private onCardRemoved(card: Phaser.GameObjects.Image) {
     const onCardDrop = () => {
       this.#cards = this.#cards.filter((c) => c !== card);
 
@@ -150,8 +150,10 @@ export class GraphicHand {
       };
       this.#onCardDropCallback(graphicCard);
     };
+  }
 
-    card.on("drop", onCardDrop);
+  private attachCardDropHandler(card: Phaser.GameObjects.Image) {
+    card.on("drop", dropCard);
   }
 
   private attachCardHoverHandler(card: Phaser.GameObjects.Image) {

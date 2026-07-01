@@ -1,4 +1,4 @@
-import type { Card, Player } from "./types";
+import type { CardType, Player } from "./types";
 import type { HandPayload, TurnChangedPayload } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -19,7 +19,11 @@ export type GameEvent =
   | { type: typeof GameEvents.CONFIRM_START; playerId: Player["id"] }
   | { type: typeof GameEvents.CANCEL_START; playerId: Player["id"] }
   | { type: typeof GameEvents.DRAW_CARD; playerId: Player["id"] }
-  | { type: typeof GameEvents.DROP_CARD; playerId: Player["id"]; card: Card };
+  | {
+      type: typeof GameEvents.DROP_CARD;
+      playerId: Player["id"];
+      cardType: CardType;
+    };
 
 // Events emitted FROM the machine
 export const GameOutEvents = {

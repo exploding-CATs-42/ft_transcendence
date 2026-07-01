@@ -261,6 +261,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   };
 
+  onCardRemoved(): void {}
+
   private cleanup = () => {
     this.#detachSockets();
 

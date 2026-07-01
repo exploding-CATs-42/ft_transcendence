@@ -4,6 +4,7 @@ export const ClientEvents = {
   CONFIRM_START: "confirm-start",
   CANCEL_START: "cancel-start",
   DRAW_CARD: "draw-card",
+  DROP_CARD: "drop-card",
 } as const;
 
 export const ServerPublicEvents = {
@@ -16,7 +17,7 @@ export const ServerPublicEvents = {
   CARD_DRAWN: "card-drawn",
   GAME_STARTED: "game-started",
   TURN_CHANGED: "TURN_CHANGED",
-  CARD_PLAYED: "CARD_PLAYED",
+  CARD_PLAYED: "card-played",
   COMBO_PLAYED: "COMBO_PLAYED",
   NOPE_PLAYED: "NOPE_PLAYED",
   NOPE_WINDOW_RESOLVED: "NOPE_WINDOW_RESOLVED",
@@ -35,7 +36,7 @@ export const ServerPrivateEvents = {
   WAITING_STATE: "waiting-state",
   YOUR_HAND: "YOUR_HAND",
   CARD_RECEIVED: "card-received",
-  CARD_REMOVED: "CARD_REMOVED",
+  CARD_REMOVED: "card-removed",
   SEE_THE_FUTURE_PEEK: "SEE_THE_FUTURE_PEEK",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   INSERT_KITTEN_PROMPT: "INSERT_KITTEN_PROMPT",
@@ -48,4 +49,5 @@ export const ServerErrorEvents = {
   CONFIRM_START_ERROR: "confirm-start-error",
   CANCEL_START_ERROR: "cancel-start-error",
   DRAW_CARD_ERROR: "draw-card-error",
+  DROP_CARD_ERROR: "drop-card-error",
 } as const;
