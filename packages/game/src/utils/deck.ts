@@ -13,13 +13,15 @@ import { shuffle } from "./shuffle";
 export const cardDefinitions = rawCards as CardDefinition[];
 
 export const createDeck = (): Deck => {
+  let id = 0;
+
   const deck: Deck = [];
 
   for (const definition of cardDefinitions) {
     const { count, ...cardData } = definition;
     for (let i = 0; i < count; i++) {
       deck.push({
-        id: i,
+        id: id++,
         ...cardData,
       });
     }
