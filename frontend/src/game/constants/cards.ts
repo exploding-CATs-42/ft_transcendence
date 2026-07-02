@@ -20,50 +20,62 @@ export const CARD_TYPE_TO_FRAME: Record<CardType, number> = {
 
 export const CARD_OPTIONS: CardOption[] = [
   {
+    type: CardType.HAIRY_POTATO_CAT,
     iconTextureKey: Textures.hairyPotatoCat,
     label: "Hairy potato cat",
   },
   {
+    type: CardType.BEARD_CAT,
     iconTextureKey: Textures.beardCat,
     label: "Beard cat",
   },
   {
+    type: CardType.CATTERMELON,
     iconTextureKey: Textures.cattermelon,
     label: "Cattermelon",
   },
   {
+    type: CardType.TACOCAT,
     iconTextureKey: Textures.tacocat,
     label: "Tacocat",
   },
   {
+    type: CardType.RAINBOW_RALPHING_CAT,
     iconTextureKey: Textures.rainbowRalphingCat,
     label: "Rainbow ralphing cat",
   },
   {
+    type: CardType.ATTACK,
     iconTextureKey: Textures.attack,
     label: "Attack",
   },
   {
+    type: CardType.DEFUSE,
     iconTextureKey: Textures.defuse,
     label: "Defuse",
   },
   {
+    type: CardType.FAVOR,
     iconTextureKey: Textures.favor,
     label: "Favor",
   },
   {
+    type: CardType.NOPE,
     iconTextureKey: Textures.nope,
     label: "Nope",
   },
   {
+    type: CardType.SEE_THE_FUTURE,
     iconTextureKey: Textures.seeTheFuture,
     label: "See the future",
   },
   {
+    type: CardType.SHUFFLE,
     iconTextureKey: Textures.shuffle,
     label: "Shuffle",
   },
   {
+    type: CardType.SKIP,
     iconTextureKey: Textures.skip,
     label: "Skip",
   },
