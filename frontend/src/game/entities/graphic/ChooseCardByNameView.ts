@@ -23,6 +23,7 @@ class GraphicCardOption extends Phaser.GameObjects.Container {
     const icon = this.addIcon(scene, cardOption.iconTextureKey);
     const label = this.addLabel(scene, cardOption.label);
     this.add([icon, label]);
+    this.setPosition(position.x, position.y);
   }
 
   private addIcon(scene: Phaser.Scene, textureKey: string) {
