@@ -12,6 +12,7 @@ export const GameActions = {
   SHUFFLE_PLAYERS: "shufflePlayers",
   CHANGE_TURN: "changeTurn",
   DRAW_CARD: "drawCard",
+  DROP_CARD: "dropCard",
 } as const;
 
 export interface GameActionArgs {
@@ -130,5 +131,36 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
     deck,
     players: updatedPlayers,
     lastDrawnCard,
+  };
+};
+
+export const dropCard = ({ context, event }: GameActionArgs) => {
+  if (event.type != GameEvents.DROP_CARD) return context;
+
+  const { playerId, cardId } = event;
+  const players = context.players;
+
+  const player = players.find((player) => player.id === playerId);
+  if (!player) return context;
+
+  const hand = player.hand;
+
+  const cardIndex = hand.findIndex((card) => card.id === cardId);
+  if (cardIndex === -1) {
+    return {
+      lastPlayedCard: null,
+    };
+  }
+
+  const playedCard = hand[cardIndex];
+  const updatedHand = hand.filter((_, i) => i !== cardIndex);
+
+  const updatedPlayers = players.map((player) =>
+    player.id === playerId ? { ...player, hand: updatedHand } : player,
+  );
+
+  return {
+    players: updatedPlayers,
+    lastPlayedCard: playedCard!,
   };
 };
