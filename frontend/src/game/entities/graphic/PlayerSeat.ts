@@ -25,7 +25,7 @@ export class PlayerSeat {
 
     this.player = null;
     this.hand = null;
-    this.targetIcon = this.createTargetIcon(scene);
+    this.targetIcon = this.addTargetIcon(scene);
   }
 
   addPlayer(player: GraphicPlayer) {
@@ -71,7 +71,7 @@ export class PlayerSeat {
     });
   }
 
-  private createTargetIcon(scene: Phaser.Scene) {
+  private addTargetIcon(scene: Phaser.Scene) {
     const { x, y } = TARGET_ICON_OFFSET;
     const image = scene.add.image(x, y, Textures.targetIcon);
     image.setVisible(false);
