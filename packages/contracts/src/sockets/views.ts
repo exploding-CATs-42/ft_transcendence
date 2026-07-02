@@ -1,14 +1,14 @@
-export interface PublicPlayerView {
-  id: string;
-  name: string;
-  handSize: number;
-  isAlive: boolean;
-}
-
-export interface WaitingPlayerView {
+export interface PlayerView {
   id: string;
   name: string;
   avatarUrl: string | null;
+}
+
+export interface GamePlayerView extends PlayerView {
+  isAlive: boolean;
+}
+
+export interface WaitingPlayerView extends PlayerView {
   isConfirmed: boolean;
 }
 
