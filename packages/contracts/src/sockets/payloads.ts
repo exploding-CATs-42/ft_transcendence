@@ -1,4 +1,4 @@
-import type { Card } from "@exploding-cats/game-core";
+import type { Card, CardType } from "@exploding-cats/game-core";
 import type {
   GamePlayerView,
   WaitingPlayerView,
@@ -28,8 +28,7 @@ export interface GameStartedPayload {
 
 export interface CardPlayedPayload {
   playerId: string;
-  cardType: string;
-  actionId: string;
+  cardType: CardType;
   nopeWindowExpiresAt: number;
 }
 
@@ -44,6 +43,6 @@ export type CardRemovalReason =
   (typeof CardRemovalReason)[keyof typeof CardRemovalReason];
 
 export interface CardRemovedPayload {
-  cardId: string;
+  cardId: number;
   reason: CardRemovalReason;
 }
