@@ -5,6 +5,7 @@ import {
   cancelStart,
   confirmStart,
   drawCard,
+  dropCard,
   joinGame,
   leaveGame,
 } from "services";
@@ -16,12 +17,16 @@ import {
   confirmStartSchema,
   DrawCardParams,
   drawCardSchema,
+  DropCardParams,
+  dropCardSchema,
   JoinGameParams,
   joinGameSchema,
   LeaveGameParams,
   leaveGameSchema,
 } from "schemas";
 import {
+  CardPlayedPayload,
+  CardRemovedPayload,
   ClientEvents,
   PlayerIdPayload,
   PlayerJoinedPayload,
@@ -127,6 +132,33 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.CARD_RECEIVED, payload);
         io.to(room).emit(ServerPublicEvents.CARD_DRAWN);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.DROP_CARD,
+    withErrorHandler(
+      dropCardSchema,
+      socket,
+      ServerErrorEvents.DROP_CARD_ERROR,
+      async (parsed: DropCardParams) => {
+        const { playerId, card } = await dropCard(parsed, socket.data.user.id);
+
+        const room = parsed.gameId;
+        const cardRemovedPayload: CardRemovedPayload = {
+          cardId: card.id,
+          reason: "PLAYED",
+        };
+
+        const cardPlayedPayload: CardPlayedPayload = {
+          playerId,
+          cardType: card.type,
+          nopeWindowExpiresAt: -1, // TODO: Replace with the real expiration timestamp.
+        };
+
+        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
       },
     ),
   );
