@@ -89,6 +89,7 @@ const LABEL_OFFSET: Point = {
 };
 
 class GraphicCardOption extends Phaser.GameObjects.Container {
+  onClick?: (type: CardType) => void;
   #type: CardType;
 
   constructor(scene: Phaser.Scene, position: Point, cardOption: CardOption) {
@@ -111,6 +112,10 @@ class GraphicCardOption extends Phaser.GameObjects.Container {
     this.setSize(width, height);
     this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
     this.input!.cursor = "pointer";
+
+    this.on("pointerdown", () => {
+      if (this.onClick) this.onClick(this.#type);
+    });
   }
 
   private addIcon(scene: Phaser.Scene, textureKey: string) {
