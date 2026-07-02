@@ -24,6 +24,7 @@ import {
   OpponentHand,
   PlayerSeat,
   type GraphicCard,
+  Modal,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -79,6 +80,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
+  #modal!: Modal;
   #detachSockets: CleanupFunction;
   // The first TURN_CHANGED arrives before create() runs (scene.start
   // is deferred to the next frame), when #players is still empty.
@@ -113,6 +115,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
+
+    this.#modal = new Modal(this).setVisible(false);
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
