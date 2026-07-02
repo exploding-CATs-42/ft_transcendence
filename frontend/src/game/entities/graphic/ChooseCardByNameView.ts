@@ -1,9 +1,22 @@
 import type { CardOption, Point } from "game/@types";
+import { CARD_OPTIONS } from "game/constants";
 
+// ------------------- CONFIGURATION -------------------
+const CARD_OPTIONS_PER_ROW = 4;
+const COLUMN_GAP = 300;
+const ROW_GAP = 200;
+
+const ICONS_CONTAINER_OFFSET = {
+  x: 100,
+  y: 104,
+};
+
+// ---------------------- CLASS ----------------------
 export class ChooseCardByNameView extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene) {
     super(scene);
     const background = this.addBackground(scene);
+    const images = this.addCardOptions(scene);
   }
 
   private addBackground(scene: Phaser.Scene) {
@@ -20,6 +33,38 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
     );
 
     return background;
+  }
+
+  private addCardOptions(scene: Phaser.Scene) {
+    const iconsContainer = scene.add.container();
+    this.fillContainerWithIcons(scene, iconsContainer);
+
+    // Put it in the middle of the black background
+    const { x, y } = ICONS_CONTAINER_OFFSET;
+    iconsContainer.setPosition(x, y);
+
+    return iconsContainer;
+  }
+
+  private fillContainerWithIcons(
+    scene: Phaser.Scene,
+    container: Phaser.GameObjects.Container,
+  ) {
+    const iconsAmount = CARD_OPTIONS.length;
+    const rowsCount = iconsAmount / CARD_OPTIONS_PER_ROW;
+    const columnsCount = CARD_OPTIONS_PER_ROW;
+    let i = 0;
+    const pos: Point = { x: 0, y: 0 };
+    for (let y = 0; y < rowsCount; ++y) {
+      for (let x = 0; x < columnsCount && i < iconsAmount; ++x) {
+        const icon = new GraphicCardOption(scene, pos, CARD_OPTIONS[i]!);
+        container.add(icon);
+        pos.x += COLUMN_GAP;
+        ++i;
+      }
+      pos.x = 0;
+      pos.y += ROW_GAP;
+    }
   }
 }
 
