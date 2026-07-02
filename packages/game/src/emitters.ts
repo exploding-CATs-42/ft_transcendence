@@ -1,7 +1,6 @@
 // Local level
 import { START_GAME_COUNTDOWN_MS } from "./constants";
 import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
-import type { HandPayload } from "./eventPayloads";
 import type { GameContext } from "./gameMachine";
 
 type GameEmitterArgs = {
@@ -22,25 +21,6 @@ export const gameStarted = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.GAME_STARTED,
   players: context.players,
 });
-
-export const cardsDealt = ({ context }: GameEmitterArgs): GameOutEvent => {
-  const payload: HandPayload[] = context.players.map((player) => {
-    // -------------------------------
-    // Temporary console logs that have to be removed later
-    console.log("---------------");
-    console.log(`playerId: ${player.id},`);
-    console.log(`cards: ${player.hand.map((card) => card.type)}`);
-    console.log("---------------");
-    // -------------------------------
-
-    return {
-      playerId: player.id,
-      cards: player.hand,
-    };
-  });
-
-  return { type: GameOutEvents.CARDS_DEALT, payload };
-};
 
 export const turnChanged = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.TURN_CHANGED,
