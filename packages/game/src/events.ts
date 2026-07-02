@@ -8,6 +8,7 @@ export const GameEvents = {
   CONFIRM_START: "CONFIRM_START",
   CANCEL_START: "CANCEL_START",
   DRAW_CARD: "DRAW_CARD",
+  DROP_CARD: "DROP_CARD",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -17,7 +18,12 @@ export type GameEvent =
   | { type: typeof GameEvents.LEAVE_GAME; playerId: Player["id"] }
   | { type: typeof GameEvents.CONFIRM_START; playerId: Player["id"] }
   | { type: typeof GameEvents.CANCEL_START; playerId: Player["id"] }
-  | { type: typeof GameEvents.DRAW_CARD; playerId: Player["id"] };
+  | { type: typeof GameEvents.DRAW_CARD; playerId: Player["id"] }
+  | {
+      type: typeof GameEvents.DROP_CARD;
+      playerId: Player["id"];
+      cardId: number;
+    };
 
 // Events emitted FROM the machine
 export const GameOutEvents = {
