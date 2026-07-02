@@ -70,7 +70,7 @@ describe("game machine", () => {
     });
   });
 
-  it("transitions to playing.dealingCards state after 10 seconds from entering waiting.starting state", () => {
+  it("transitions to playing.waitingForPlayerActions state after 10 seconds from entering waiting.starting state", () => {
     vi.useFakeTimers();
 
     const actor = createActor(gameMachine);
@@ -82,7 +82,7 @@ describe("game machine", () => {
     vi.advanceTimersByTime(START_GAME_COUNTDOWN_MS);
 
     expect(actor.getSnapshot().value).toEqual({
-      [GameStates.PLAYING]: GameStates.DEALING_CARDS,
+      [GameStates.PLAYING]: GameStates.WAITING_FOR_PLAYER_ACTIONS,
     });
 
     vi.useRealTimers();
