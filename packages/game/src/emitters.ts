@@ -18,8 +18,9 @@ export const countdownCanceled = (): GameOutEvent => ({
   type: GameOutEvents.COUNTDOWN_CANCELED,
 });
 
-export const gameStarted = (): GameOutEvent => ({
+export const gameStarted = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.GAME_STARTED,
+  players: context.players,
 });
 
 export const cardsDealt = ({ context }: GameEmitterArgs): GameOutEvent => {
