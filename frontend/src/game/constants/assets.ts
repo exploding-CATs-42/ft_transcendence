@@ -21,6 +21,7 @@ export const Textures = {
   seeTheFuture: "seeTheFuture",
   shuffle: "shuffle",
   skip: "skip",
+  tacocat: "tacocat",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
