@@ -11,7 +11,10 @@ import {
 import { addBackgroundImage, addFullscreenToggle } from "game/utils";
 import { Button, GraphicPlayer, PlayerSeat } from "game/entities";
 import type { LabelConfig, Size } from "game/@types";
-import { type WaitingPlayerView } from "@exploding-cats/contracts";
+import {
+  type GameStartedPayload,
+  type WaitingPlayerView,
+} from "@exploding-cats/contracts";
 import {
   cancelStart,
   confirmStart,
@@ -185,7 +188,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.#waitingLabel.setText(WAITING_MESSAGE);
   };
 
-  onGameStarted = () => {
-    this.scene.start(Scenes.GameRoom);
+  onGameStarted = (payload: GameStartedPayload) => {
+    this.scene.start(Scenes.GameRoom, payload);
   };
 }
