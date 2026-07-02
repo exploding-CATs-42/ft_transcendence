@@ -45,10 +45,6 @@ export const CardRemovalReason = {
 export type CardRemovalReason =
   (typeof CardRemovalReason)[keyof typeof CardRemovalReason];
 
-export interface YourHandPayload {
-  hand: Card[];
-}
-
 export interface CardReceivedPayload {
   card: Card;
   fromId: string | null;
