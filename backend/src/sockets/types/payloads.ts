@@ -7,13 +7,6 @@ export interface JoinGameResult {
   waitingState: WaitingStateView;
 }
 
-export interface CardPlayedPayload {
-  playerId: string;
-  cardType: string;
-  actionId: string;
-  nopeWindowExpiresAt: number;
-}
-
 export interface ComboPlayedPayload {
   playerId: string;
   cardTypes: string;
@@ -35,24 +28,9 @@ export interface NopeWindowResolvedPayload {
   executed: boolean;
 }
 
-export const CardRemovalReason = {
-  PLAYED: "PLAYED",
-  STOLEN: "STOLEN",
-  GIVEN_AWAY: "GIVEN_AWAY",
-  EXPLODED: "EXPLODED",
-} as const;
-
-export type CardRemovalReason =
-  (typeof CardRemovalReason)[keyof typeof CardRemovalReason];
-
 export interface CardReceivedPayload {
   card: Card;
   fromId: string | null;
-}
-
-export interface CardRemovedPayload {
-  cardId: string;
-  reason: CardRemovalReason;
 }
 
 export interface SeeTheFuturePeekPayload {
