@@ -31,7 +31,10 @@ export const GameOutEvents = {
 export type GameOutEvents = (typeof GameOutEvents)[keyof typeof GameOutEvents];
 
 export type GameOutEvent =
-  | { type: typeof GameOutEvents.GAME_STARTED }
+  | {
+      type: typeof GameOutEvents.GAME_STARTED;
+      players: Player[];
+    }
   | { type: typeof GameOutEvents.COUNTDOWN_STARTED; endsAt: number }
   | { type: typeof GameOutEvents.COUNTDOWN_CANCELED }
   | { type: typeof GameOutEvents.CARDS_DEALT; payload: HandPayload[] }
