@@ -14,3 +14,4 @@ export { default as favor } from "./favor.png";
 export { default as hairyPotatoCat } from "./hairy-potato-cat.png";
 export { default as nope } from "./nope.png";
 export { default as rainbowRalphingCat } from "./rainbow-ralphing-cat.png";
+export { default as seeTheFuture } from "./see-the-future.png";
