@@ -35,6 +35,7 @@ export const ServerPrivateEvents = {
   WAITING_STATE: "waiting-state",
   YOUR_HAND: "YOUR_HAND",
   CARD_RECEIVED: "card-received",
+  GAME_STARTED: "game-started",
   CARD_REMOVED: "CARD_REMOVED",
   SEE_THE_FUTURE_PEEK: "SEE_THE_FUTURE_PEEK",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
