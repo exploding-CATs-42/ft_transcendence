@@ -1,5 +1,9 @@
 // Project level
-import { GamePlayerView, WaitingPlayerView } from "@exploding-cats/contracts";
+import {
+  GamePlayerView,
+  GameStartedPayload,
+  WaitingPlayerView,
+} from "@exploding-cats/contracts";
 import { Player } from "@exploding-cats/game-core";
 
 export const toWaitingPlayerView = (p: Player): WaitingPlayerView => ({
@@ -15,3 +19,19 @@ export const toGamePlayerView = (p: Player): GamePlayerView => ({
   avatarUrl: p.avatarUrl,
   isAlive: p.isAlive,
 });
+
+export const toGameStartedPayload = (
+  players: Player[],
+  playerId: string,
+): GameStartedPayload => {
+  const playerIndex = players.findIndex((player) => player.id === playerId);
+  const orderedPlayers = [
+    ...players.slice(playerIndex),
+    ...players.slice(0, playerIndex),
+  ];
+
+  return {
+    players: orderedPlayers.map((player) => toGamePlayerView(player)),
+    hand: players[playerIndex]!.hand,
+  };
+};
