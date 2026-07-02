@@ -11,3 +11,4 @@ export { default as cattermelon } from "./cattermelon.png";
 export { default as defuse } from "./defuse.png";
 export { default as explodingKitten } from "./exploding-kitten.png";
 export { default as favor } from "./favor.png";
+export { default as hairyPotatoCat } from "./hairy-potato-cat.png";

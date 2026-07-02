@@ -15,6 +15,7 @@ export const Textures = {
   defuse: "defuse",
   explodingKitten: "explodingKitten",
   favor: "favor",
+  hairyPotatoCat: "hairyPotatoCat",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
