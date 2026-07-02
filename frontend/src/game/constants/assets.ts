@@ -19,6 +19,7 @@ export const Textures = {
   nope: "nope",
   rainbowRalphingCat: "rainbowRalphingCat",
   seeTheFuture: "seeTheFuture",
+  shuffle: "shuffle",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
