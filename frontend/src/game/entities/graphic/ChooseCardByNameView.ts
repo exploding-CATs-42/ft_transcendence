@@ -6,6 +6,12 @@ const CARD_OPTIONS_PER_ROW = 4;
 const COLUMN_GAP = 300;
 const ROW_GAP = 200;
 
+const BACKGROUND_CONFIG = {
+  width: 1200,
+  height: 670,
+  radius: 20,
+};
+
 const ICONS_CONTAINER_OFFSET = {
   x: 100,
   y: 104,
@@ -22,19 +28,13 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
   }
 
   private addBackground(scene: Phaser.Scene) {
-    const width = 1200;
-    const height = 670;
+    const { width, height, radius } = BACKGROUND_CONFIG;
 
-    // black background
-    const background = scene.add.rectangle(
-      width / 2,
-      height / 2,
-      width,
-      height,
-      0x000000,
-    );
+    const graphics = scene.add.graphics();
+    graphics.fillStyle(0x000000, 1);
+    graphics.fillRoundedRect(0, 0, width, height, radius);
 
-    return background;
+    return graphics;
   }
 
   private addCardOptions(scene: Phaser.Scene) {
