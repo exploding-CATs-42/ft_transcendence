@@ -1,3 +1,4 @@
+import type { CardType } from "@exploding-cats/game-core";
 import type { CardOption, Point } from "game/@types";
 import { CARD_OPTIONS } from "game/constants";
 
@@ -88,8 +89,11 @@ const LABEL_OFFSET: Point = {
 };
 
 class GraphicCardOption extends Phaser.GameObjects.Container {
+  #type: CardType;
+
   constructor(scene: Phaser.Scene, position: Point, cardOption: CardOption) {
     super(scene);
+    this.#type = cardOption.type;
     const icon = this.addIcon(scene, cardOption.iconTextureKey);
     const label = this.addLabel(scene, cardOption.label);
     this.add([icon, label]);
