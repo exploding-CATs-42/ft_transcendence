@@ -1,6 +1,7 @@
 // Project level
 import {
   CountdownStartedPayload,
+  GameStartedPayload,
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/contracts";
@@ -12,12 +13,23 @@ import {
 import { Game } from "data/types";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
+import { toGameStartedPayload } from "mappers";
 
 export function attachGameBroadcaster(game: Game) {
   const { instance: broadcaster, id: gameId } = game;
 
-  broadcaster.on(GameOutEvents.GAME_STARTED, () => {
-    io.to(gameId).emit(ServerPublicEvents.GAME_STARTED);
+  broadcaster.on(GameOutEvents.GAME_STARTED, (event) => {
+    const players = event.players;
+
+    players.forEach((player) => {
+      const socket = socketsMap.get(player.id);
+      const payload: GameStartedPayload = toGameStartedPayload(
+        players,
+        player.id,
+      );
+
+      socket?.emit(ServerPrivateEvents.GAME_STARTED, payload);
+    });
   });
 
   broadcaster.on(GameOutEvents.COUNTDOWN_STARTED, (event) => {
