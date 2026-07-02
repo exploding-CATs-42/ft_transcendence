@@ -3,6 +3,7 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
   type CountdownStartedPayload,
+  type GameStartedPayload,
   type PlayerIdPayload,
   type PlayerJoinedPayload,
   type WaitingPlayerView,
@@ -19,7 +20,7 @@ export interface WaitingRoomHandlers {
   onPlayerCanceled(playerId: string): void;
   onCountdownStarted(endsAt: number): void;
   onCountdownCanceled(): void;
-  onGameStarted(): void;
+  onGameStarted(payload: GameStartedPayload): void;
 }
 
 let lastWaitingState: WaitingStatePayload | null = null;
@@ -51,7 +52,7 @@ export function subscribeWaitingRoom(
   const onCountdownStarted = (p: CountdownStartedPayload) =>
     handlers.onCountdownStarted(p.endsAt);
   const onCountdownCanceled = () => handlers.onCountdownCanceled();
-  const onGameStarted = () => handlers.onGameStarted();
+  const onGameStarted = (p: GameStartedPayload) => handlers.onGameStarted(p);
 
   socket.on(ServerPrivateEvents.WAITING_STATE, onWaitingState);
   socket.on(ServerPublicEvents.PLAYER_JOINED, onPlayerJoined);
@@ -60,7 +61,7 @@ export function subscribeWaitingRoom(
   socket.on(ServerPublicEvents.PLAYER_CANCELED, onPlayerCanceled);
   socket.on(ServerPublicEvents.COUNTDOWN_STARTED, onCountdownStarted);
   socket.on(ServerPublicEvents.COUNTDOWN_CANCELED, onCountdownCanceled);
-  socket.on(ServerPublicEvents.GAME_STARTED, onGameStarted);
+  socket.on(ServerPrivateEvents.GAME_STARTED, onGameStarted);
 
   if (lastWaitingState)
     handlers.onWaitingState(lastWaitingState.waitingState.players);
@@ -73,7 +74,7 @@ export function subscribeWaitingRoom(
     socket.off(ServerPublicEvents.PLAYER_CANCELED, onPlayerCanceled);
     socket.off(ServerPublicEvents.COUNTDOWN_STARTED, onCountdownStarted);
     socket.off(ServerPublicEvents.COUNTDOWN_CANCELED, onCountdownCanceled);
-    socket.off(ServerPublicEvents.GAME_STARTED, onGameStarted);
+    socket.off(ServerPrivateEvents.GAME_STARTED, onGameStarted);
   };
 }
 
