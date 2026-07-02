@@ -14,7 +14,6 @@ export const ServerPublicEvents = {
   COUNTDOWN_STARTED: "countdown-started",
   COUNTDOWN_CANCELED: "countdown-canceled",
   CARD_DRAWN: "card-drawn",
-  GAME_STARTED: "game-started",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "CARD_PLAYED",
   COMBO_PLAYED: "COMBO_PLAYED",
