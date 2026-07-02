@@ -10,3 +10,4 @@ export { default as beardCat } from "./beard-cat.png";
 export { default as cattermelon } from "./cattermelon.png";
 export { default as defuse } from "./defuse.png";
 export { default as explodingKitten } from "./exploding-kitten.png";
+export { default as favor } from "./favor.png";
