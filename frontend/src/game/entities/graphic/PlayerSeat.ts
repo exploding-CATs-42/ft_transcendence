@@ -70,6 +70,7 @@ export class PlayerSeat {
       new Phaser.Geom.Rectangle(width / 2 - 30, height / 2 - 30, width, height),
       Phaser.Geom.Rectangle.Contains,
     );
+    container.input!.cursor = "pointer";
 
     container.on("pointerdown", () => {
       if (this.onClick) this.onClick(this.player!.id);
