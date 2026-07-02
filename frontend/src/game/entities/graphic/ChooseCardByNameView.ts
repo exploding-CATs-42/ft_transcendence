@@ -17,6 +17,8 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
     super(scene);
     const background = this.addBackground(scene);
     const images = this.addCardOptions(scene);
+
+    this.add([background, images]);
   }
 
   private addBackground(scene: Phaser.Scene) {
