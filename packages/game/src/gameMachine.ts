@@ -18,7 +18,6 @@ import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import { GameGuards, hasEnoughCards, hasEnoughPlayers } from "./guards";
 import {
-  cardsDealt,
   countdownCanceled,
   countdownStarted,
   gameStarted,
@@ -116,17 +115,14 @@ export const gameMachine = setup({
       },
     },
     [GameStates.PLAYING]: {
-      entry: [GameActions.SHUFFLE_PLAYERS, emit(gameStarted)],
-      initial: GameStates.DEALING_CARDS,
+      entry: [
+        GameActions.SHUFFLE_PLAYERS,
+        GameActions.FILL_DECK,
+        GameActions.DEAL_CARDS,
+        emit(gameStarted),
+      ],
+      initial: GameStates.CHANGING_TURN,
       states: {
-        [GameStates.DEALING_CARDS]: {
-          entry: [
-            GameActions.FILL_DECK,
-            GameActions.DEAL_CARDS,
-            emit(cardsDealt),
-          ],
-          always: GameTargets.CHANGING_TURN,
-        },
         [GameStates.CHANGING_TURN]: {
           entry: [GameActions.CHANGE_TURN, emit(turnChanged)],
           always: {
