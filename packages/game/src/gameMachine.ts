@@ -13,6 +13,7 @@ import {
   fillDeck,
   removePlayer,
   removePlayerConfirmation,
+  dropCard,
 } from "./actions";
 import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
@@ -31,6 +32,7 @@ export interface GameContext {
   deck: Deck;
   currentTurnPlayerId: string | null;
   lastDrawnCard: Card | null;
+  lastPlayedCard: Card | null;
 }
 
 export const gameMachine = setup({
@@ -49,6 +51,7 @@ export const gameMachine = setup({
     [GameActions.SHUFFLE_PLAYERS]: assign(shufflePlayers),
     [GameActions.CHANGE_TURN]: assign(changeTurn),
     [GameActions.DRAW_CARD]: assign(drawCard),
+    [GameActions.DROP_CARD]: assign(dropCard),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -62,6 +65,7 @@ export const gameMachine = setup({
     deck: [],
     currentTurnPlayerId: null,
     lastDrawnCard: null,
+    lastPlayedCard: null,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -135,6 +139,9 @@ export const gameMachine = setup({
               guard: GameGuards.HAS_ENOUGH_CARDS,
               actions: GameActions.DRAW_CARD,
               target: GameStates.CHANGING_TURN,
+            },
+            [GameEvents.DROP_CARD]: {
+              actions: GameActions.DROP_CARD,
             },
           },
         },
