@@ -1,6 +1,6 @@
 import { type Card, CardType } from "@exploding-cats/game-core";
 import type { CardConfig, Point } from "game/@types";
-import { CARD_TYPE_TO_FRAME } from "game/constants";
+import { CARD_TYPE_TO_FRAME, Textures } from "game/constants";
 import { addCardVisual, getCardFrame } from "game/utils";
 
 // -------------- CARD CONFIGURATION --------------
@@ -15,6 +15,7 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, cards: Card[]) {
     super(scene);
     this.addCards(scene, cards);
+    this.addConfirmationButton(scene);
   }
 
   // ------------------ INITIALIZATION ------------------
@@ -26,6 +27,13 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
       this.add(cardObject);
       pos.x += SPACING_BETWEEN_CARDS;
     });
+  }
+
+  private addConfirmationButton(scene: Phaser.Scene) {
+    const confirmationButton = scene.add
+      .image(540, 500, Textures.confirmedIcon)
+      .setDisplaySize(100, 100);
+    this.add(confirmationButton);
   }
 
   // ------------------ UTILS ------------------
