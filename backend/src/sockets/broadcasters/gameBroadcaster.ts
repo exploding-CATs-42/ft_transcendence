@@ -5,11 +5,7 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/contracts";
-import {
-  GameOutEvents,
-  HandPayload,
-  TurnChangedPayload,
-} from "@exploding-cats/game-core";
+import { GameOutEvents, TurnChangedPayload } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
@@ -40,14 +36,6 @@ export function attachGameBroadcaster(game: Game) {
 
   broadcaster.on(GameOutEvents.COUNTDOWN_CANCELED, () => {
     io.to(gameId).emit(ServerPublicEvents.COUNTDOWN_CANCELED);
-  });
-
-  broadcaster.on(GameOutEvents.CARDS_DEALT, (event) => {
-    const hands: HandPayload[] = event.payload;
-    hands.forEach((hand) => {
-      const socket = socketsMap.get(hand.playerId)!;
-      socket.emit(ServerPrivateEvents.YOUR_HAND, hand);
-    });
   });
 
   broadcaster.on(GameOutEvents.TURN_CHANGED, (event) => {
