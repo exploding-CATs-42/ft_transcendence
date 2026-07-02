@@ -12,6 +12,8 @@ const CARD_BORDER_RADIUS = 20;
 const SPACING_BETWEEN_CARDS = 400;
 
 export class SeeTheFutureView extends Phaser.GameObjects.Container {
+  onConfirm?: () => void;
+
   constructor(scene: Phaser.Scene, cards: Card[]) {
     super(scene);
     this.addCards(scene, cards);
@@ -34,6 +36,10 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
       .image(540, 500, Textures.confirmedIcon)
       .setDisplaySize(100, 100)
       .setInteractive({ useHandCursor: true });
+
+    confirmationButton.on("pointerdown", () => {
+      if (this.onConfirm) this.onConfirm();
+    });
 
     this.add(confirmationButton);
   }
