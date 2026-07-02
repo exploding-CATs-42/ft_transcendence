@@ -3,6 +3,23 @@ import type { CardOption, Point } from "game/@types";
 export class ChooseCardByNameView extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene) {
     super(scene);
+    const background = this.addBackground(scene);
+  }
+
+  private addBackground(scene: Phaser.Scene) {
+    const width = 1200;
+    const height = 670;
+
+    // black background
+    const background = scene.add.rectangle(
+      width / 2,
+      height / 2,
+      width,
+      height,
+      0x000000,
+    );
+
+    return background;
   }
 }
 
