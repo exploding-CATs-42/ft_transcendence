@@ -4,3 +4,4 @@ export { GraphicHand } from "./GraphicHand";
 export { PlayerSeat } from "./PlayerSeat";
 export { Button } from "./Button";
 export type { GraphicCard } from "./GraphicCard";
+export { Modal } from "./Modal";
