@@ -20,9 +20,7 @@ export class PlayerSeat {
   onClick?: ((playerId: string) => void) | null;
 
   constructor(scene: Phaser.Scene, position: Point) {
-    this.#container = scene.add.container(position.x, position.y);
-    this.addHitBox(this.#container);
-
+    this.#container = this.initializeContainer(scene, position);
     this.player = null;
     this.hand = null;
     this.targetIcon = this.addTargetIcon(scene);
@@ -56,6 +54,13 @@ export class PlayerSeat {
   setTargetIconVisible(value: boolean) {
     this.targetIcon.setVisible(value);
     if (value === true) this.#container.bringToTop(this.targetIcon);
+  }
+
+  private initializeContainer(scene: Phaser.Scene, position: Point) {
+    const container = scene.add.container(position.x, position.y);
+    this.addHitBox(container);
+
+    return container;
   }
 
   private addHitBox(container: Phaser.GameObjects.Container) {
