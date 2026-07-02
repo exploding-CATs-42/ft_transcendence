@@ -98,6 +98,19 @@ class GraphicCardOption extends Phaser.GameObjects.Container {
     const label = this.addLabel(scene, cardOption.label);
     this.add([icon, label]);
     this.setPosition(position.x, position.y);
+    this.addHitBox();
+  }
+
+  private addHitBox() {
+    // I don't really know why these 4 numbers look like they look like
+    // I found them just by iterating through different combinations
+    const width = 250;
+    const height = 150;
+    const hitArea = new Phaser.Geom.Rectangle(60, 24, width, height);
+
+    this.setSize(width, height);
+    this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
+    this.input!.cursor = "pointer";
   }
 
   private addIcon(scene: Phaser.Scene, textureKey: string) {
