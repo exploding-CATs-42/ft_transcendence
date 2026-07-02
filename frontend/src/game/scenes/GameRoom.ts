@@ -248,10 +248,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private selectOpponent = (playerId: string) => {
+    let selectedOpponent;
+
     const players = [...this.#players.values()];
     for (let i = 1; i < players.length; ++i) {
       const seat = players[i]!;
       if (seat.player?.id != playerId) players[i]?.setTargetIconVisible(false);
+      else selectedOpponent = players[i]!;
       seat.onClick = null;
     }
   };
