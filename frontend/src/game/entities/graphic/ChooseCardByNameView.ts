@@ -20,6 +20,8 @@ const ICONS_CONTAINER_OFFSET = {
 
 // ---------------------- CLASS ----------------------
 export class ChooseCardByNameView extends Phaser.GameObjects.Container {
+  onSelection?: (type: CardType) => void;
+
   constructor(scene: Phaser.Scene) {
     super(scene);
     const background = this.addBackground(scene);
@@ -61,6 +63,10 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
     for (let y = 0; y < rowsCount; ++y) {
       for (let x = 0; x < columnsCount && i < iconsAmount; ++x) {
         const icon = new GraphicCardOption(scene, pos, CARD_OPTIONS[i]!);
+        icon.onClick = (type) => {
+          this.onSelection?.(type);
+        };
+
         container.add(icon);
         pos.x += COLUMN_GAP;
         ++i;
