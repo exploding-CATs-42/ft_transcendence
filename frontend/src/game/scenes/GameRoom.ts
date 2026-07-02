@@ -31,9 +31,8 @@ import {
   drawCard,
   type CleanupFunction,
   type GameRoomHandlers,
-  type GameStartedPayload,
 } from "../sockets";
-import { fakeCards, fakePlayers } from "./mockData";
+import type { GameStartedPayload } from "@exploding-cats/contracts";
 
 // Opponents
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -77,10 +76,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
   #detachSockets: CleanupFunction;
-  #tempDataStorage: GameStartedPayload = {
-    players: fakePlayers,
-    hand: fakeCards,
-  };
 
   constructor() {
     super(Scenes.GameRoom);
@@ -88,8 +83,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#detachSockets = attachGameRoomSockets(this);
   }
 
-  create() {
-    const { hand: cards, players } = this.#tempDataStorage;
+  create(data: GameStartedPayload) {
+    const { players, hand: cards } = data;
 
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
@@ -218,10 +213,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       },
     };
   }
-
-  onGameStarted = (payload: GameStartedPayload): void => {
-    this.#tempDataStorage = payload;
-  };
 
   onCardReceived = (payload: CardPayload): void => {
     // Generate random insert index
