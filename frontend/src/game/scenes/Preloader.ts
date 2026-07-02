@@ -12,6 +12,19 @@ import {
   confirmedIcon,
   playerSpotlight,
   targetIcon,
+  attack,
+  beardCat,
+  cattermelon,
+  defuse,
+  explodingKitten,
+  favor,
+  hairyPotatoCat,
+  nope,
+  rainbowRalphingCat,
+  seeTheFuture,
+  shuffle,
+  skip,
+  tacocat,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 
@@ -41,6 +54,19 @@ export class Preloader extends Scene {
     this.load.image(Textures.confirmedIcon, confirmedIcon);
     this.load.image(Textures.playerSpotlight, playerSpotlight);
     this.load.image(Textures.targetIcon, targetIcon);
+    this.load.image(Textures.attack, attack);
+    this.load.image(Textures.beardCat, beardCat);
+    this.load.image(Textures.cattermelon, cattermelon);
+    this.load.image(Textures.defuse, defuse);
+    this.load.image(Textures.explodingKitten, explodingKitten);
+    this.load.image(Textures.favor, favor);
+    this.load.image(Textures.hairyPotatoCat, hairyPotatoCat);
+    this.load.image(Textures.nope, nope);
+    this.load.image(Textures.rainbowRalphingCat, rainbowRalphingCat);
+    this.load.image(Textures.seeTheFuture, seeTheFuture);
+    this.load.image(Textures.shuffle, shuffle);
+    this.load.image(Textures.skip, skip);
+    this.load.image(Textures.tacocat, tacocat);
   }
 
   create() {
