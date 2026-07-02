@@ -21,7 +21,7 @@ export class PlayerSeat {
 
   constructor(scene: Phaser.Scene, position: Point) {
     this.#container = scene.add.container(position.x, position.y);
-    this.setupContainer(this.#container);
+    this.addHitBox(this.#container);
 
     this.player = null;
     this.hand = null;
@@ -58,7 +58,7 @@ export class PlayerSeat {
     if (value === true) this.#container.bringToTop(this.targetIcon);
   }
 
-  private setupContainer(container: Phaser.GameObjects.Container) {
+  private addHitBox(container: Phaser.GameObjects.Container) {
     const { width, height } = HIT_BOX_SIZE;
     container.setSize(width, height);
     container.setInteractive(
