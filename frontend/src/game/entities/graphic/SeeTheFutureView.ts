@@ -54,6 +54,18 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
     return card;
   }
 
+  private addLabel(scene: Phaser.Scene, position: Point, index: number) {
+    const { x, y } = position;
+    const text = index === 0 ? "Top" : `  ${index + 1}`;
+    const label = scene.add.text(x, y, text, {
+      fontFamily: "Chewy",
+      fontSize: 44,
+      stroke: "black",
+      strokeThickness: 1,
+    });
+    return label;
+  }
+
   private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
     return {
       frame: frame,
