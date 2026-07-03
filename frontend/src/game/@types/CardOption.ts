@@ -2,6 +2,6 @@ import type { CardType } from "@exploding-cats/game-core";
 
 export interface CardOption {
   type: CardType;
-  iconTextureKey: string;
+  iconFrameIndex: number;
   label: string;
 }
