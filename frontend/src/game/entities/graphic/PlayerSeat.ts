@@ -56,6 +56,11 @@ export class PlayerSeat {
     if (value === true) this.#container.bringToTop(this.targetIcon);
   }
 
+  setCursorPointer(value: boolean) {
+    if (value === true) this.#container.input!.cursor = "pointer";
+    else this.#container.input!.cursor = "default";
+  }
+
   private initializeContainer(scene: Phaser.Scene, position: Point) {
     const container = scene.add.container(position.x, position.y);
     this.addHitBox(container);
@@ -70,7 +75,6 @@ export class PlayerSeat {
       new Phaser.Geom.Rectangle(width / 2 - 30, height / 2 - 30, width, height),
       Phaser.Geom.Rectangle.Contains,
     );
-    container.input!.cursor = "pointer";
 
     container.on("pointerdown", () => {
       if (this.onClick) this.onClick(this.player!.id);
