@@ -1,7 +1,7 @@
 import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
-import type { Card } from "@exploding-cats/game-core";
+import { type Card } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
 
 const CARD_WIDTH = 186 * 1.75;
@@ -24,7 +24,7 @@ type onCardDropCallback = (card: GraphicCard) => void;
 export class GraphicHand {
   #scene: Phaser.Scene;
   #position: Point;
-  #cardsData: Map<Phaser.GameObjects.Image, Card> = new Map();
+  #cardsData: Map<number, GraphicCard> = new Map();
   #cards: Phaser.GameObjects.Image[] = [];
   #onCardDropCallback: onCardDropCallback;
 
@@ -48,19 +48,19 @@ export class GraphicHand {
 
     const x = this.getInsertPositionX(insertIndex);
     const y = SCREEN_HEIGHT;
-    const newCardImage = this.addInteractiveCard(x, y, frame);
-    newCardImage.setDepth(insertIndex + 1);
+    const newGraphicCard = this.addGraphicCard(x, y, frame, card);
+    newGraphicCard.image.setDepth(insertIndex + 1);
 
     this.#scene.tweens.add({
-      targets: newCardImage,
+      targets: newGraphicCard.image,
       x: x,
       y: this.#position.y,
       duration: 500,
       ease: "Back.easeOut",
 
       onComplete: () => {
-        this.#cards.splice(insertIndex, 0, newCardImage);
-        this.#cardsData.set(newCardImage, card);
+        this.#cards.splice(insertIndex, 0, newGraphicCard.image);
+        this.#cardsData.set(card.id, newGraphicCard);
         if (this.#cards.length > 1) this.reflowCards();
       },
     });
@@ -72,13 +72,14 @@ export class GraphicHand {
 
   // -------------- Card --------------
 
-  private addInteractiveCard(
+  private addGraphicCard(
     x: number,
     y: number,
     frame: Phaser.Textures.Frame,
-  ): Phaser.GameObjects.Image {
+    data: Card,
+  ): GraphicCard {
     const cardConfig = this.buildCardConfig(frame);
-    const card = addCardVisual(
+    const image = addCardVisual(
       this.#scene,
       { x, y },
       cardConfig,
@@ -88,23 +89,28 @@ export class GraphicHand {
       useHandCursor: true,
     });
 
-    this.attachCardDragHandlers(card);
-    this.attachCardDropHandler(card);
-    this.attachCardHoverHandler(card);
+    const newGraphicCard = {
+      image,
+      data,
+    };
 
-    return card;
+    this.attachCardDragHandlers(newGraphicCard.image);
+    this.attachCardDropHandler(newGraphicCard);
+    this.attachCardHoverHandler(newGraphicCard.image);
+
+    return newGraphicCard;
   }
 
   // -------------- Event handlers --------------
 
-  private attachCardDragHandlers(card: Phaser.GameObjects.Image) {
+  private attachCardDragHandlers(cardImage: Phaser.GameObjects.Image) {
     let originX: number;
     let originDepth: number;
 
     const onDragStart = () => {
-      originX = card.x;
-      originDepth = card.depth;
-      card.setDepth(BIGGEST_DEPTH);
+      originX = cardImage.x;
+      originDepth = cardImage.depth;
+      cardImage.setDepth(BIGGEST_DEPTH);
     };
 
     const onDrag = (
@@ -112,15 +118,15 @@ export class GraphicHand {
       dragX: number,
       dragY: number,
     ) => {
-      card.x = dragX;
-      card.y = dragY;
+      cardImage.x = dragX;
+      cardImage.y = dragY;
     };
 
     const onDragEnd = () => {
-      card.setDepth(originDepth);
+      cardImage.setDepth(originDepth);
 
       this.#scene.tweens.add({
-        targets: card,
+        targets: cardImage,
         x: originX,
         y: this.#position.y,
         duration: 300,
@@ -128,33 +134,31 @@ export class GraphicHand {
       });
     };
 
-    card.on("dragstart", onDragStart);
-    card.on("drag", onDrag);
-    card.on("dragend", onDragEnd);
+    cardImage.on("dragstart", onDragStart);
+    cardImage.on("drag", onDrag);
+    cardImage.on("dragend", onDragEnd);
   }
 
-  private attachCardDropHandler(card: Phaser.GameObjects.Image) {
-    const onCardDrop = () => {
-      this.#cards = this.#cards.filter((c) => c !== card);
+  private attachCardDropHandler(graphicCard: GraphicCard) {
+    const cardImage = graphicCard.image;
 
-      card.off("drop", onCardDrop);
-      card.disableInteractive();
-      card.setDepth(0);
+    const onCardDrop = () => {
+      this.#cards = this.#cards.filter((c) => c !== cardImage);
+
+      cardImage.off("drop", onCardDrop);
+      cardImage.disableInteractive();
+      cardImage.setDepth(0);
       this.reflowCards();
 
-      const cardData = this.#cardsData.get(card)!;
-      this.#cardsData.delete(card);
-      const graphicCard: GraphicCard = {
-        image: card,
-        data: cardData,
-      };
+      const cardData = graphicCard.data;
+      this.#cardsData.delete(cardData.id);
       this.#onCardDropCallback(graphicCard);
     };
 
-    card.on("drop", onCardDrop);
+    cardImage.on("drop", onCardDrop);
   }
 
-  private attachCardHoverHandler(card: Phaser.GameObjects.Image) {
+  private attachCardHoverHandler(cardImage: Phaser.GameObjects.Image) {
     const tween = (target: Phaser.GameObjects.Image, props: object) => {
       this.#scene.tweens.add({
         targets: target,
@@ -189,21 +193,21 @@ export class GraphicHand {
 
     const liftCard = () => {
       const targetY = this.#position.y - HOVER_LIFT;
-      tween(card, { y: targetY });
+      tween(cardImage, { y: targetY });
     };
 
     const lowerCard = () => {
       const baseY = this.#position.y;
-      tween(card, { y: baseY });
+      tween(cardImage, { y: baseY });
     };
 
-    card.on("pointerover", () => {
-      const hoveredIndex = this.#cards.indexOf(card);
+    cardImage.on("pointerover", () => {
+      const hoveredIndex = this.#cards.indexOf(cardImage);
       liftCard();
       applyHoverLayout(hoveredIndex);
     });
 
-    card.on("pointerout", () => {
+    cardImage.on("pointerout", () => {
       lowerCard();
       resetLayout();
     });
