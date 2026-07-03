@@ -11,6 +11,7 @@ import {
 } from "@exploding-cats/contracts";
 import { socket } from "socket";
 import { emit } from "./gameSession";
+import { hasCachedGameState } from "./gameRoom";
 
 export interface WaitingRoomHandlers {
   onWaitingState(players: WaitingPlayerView[]): void;
@@ -65,6 +66,7 @@ export function subscribeWaitingRoom(
 
   if (lastWaitingState)
     handlers.onWaitingState(lastWaitingState.waitingState.players);
+  if (hasCachedGameState()) handlers.onGameStarted();
 
   return () => {
     socket.off(ServerPrivateEvents.WAITING_STATE, onWaitingState);
