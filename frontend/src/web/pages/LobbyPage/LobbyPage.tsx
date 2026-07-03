@@ -1,9 +1,10 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
+import { ClientEvents, ServerPrivateEvents } from "@exploding-cats/contracts";
 import api from "api";
 import { Section, Button, List, GameListItem } from "components";
-import { useModal } from "hooks";
+import { useModal, useSocket } from "hooks";
 import type { LobbyGame } from "types";
 import {
   CreateTableModal,
@@ -41,6 +42,12 @@ const getExistingGameIdFromError = (error: unknown) => {
   return apiError.response.data?.details?.existingGameId ?? null;
 };
 
+const toLobbyGame = (game: { id: string; name: string }): LobbyGame => ({
+  gameId: game.id,
+  gameName: game.name,
+  players: [],
+});
+
 const LobbyPage = () => {
   const [games, setGames] = useState<LobbyGame[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
@@ -49,34 +56,33 @@ const LobbyPage = () => {
   const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
 
   const navigate = useNavigate();
+  const { socket } = useSocket();
+
+  const loadGames = useCallback(async () => {
+    const games = await api.games.getAll();
+
+    setGames(games.map(toLobbyGame));
+  }, []);
 
   useEffect(() => {
     let ignore = false;
 
-    const loadGames = async () => {
+    const loadLobbyGames = async () => {
       try {
-        const games = await api.games.getAll();
-
         if (ignore) return;
 
-        setGames(
-          games.map((game) => ({
-            gameId: game.id,
-            gameName: game.name,
-            players: [],
-          })),
-        );
+        await loadGames();
       } catch (error) {
         console.error("Failed to load lobby games:", error);
       }
     };
 
-    void loadGames();
+    void loadLobbyGames();
 
     return () => {
       ignore = true;
     };
-  }, []);
+  }, [loadGames]);
 
   useEffect(() => {
     let ignore = false;
@@ -125,6 +131,16 @@ const LobbyPage = () => {
 
   const handleCloseExistingGameModal = () => {
     setExistingGame(null);
+  };
+
+  const handleLeaveExistingGame = () => {
+    if (!existingGame) return;
+
+    socket.once(ServerPrivateEvents.LEFT_GAME, () => {
+      setExistingGame(null);
+      void loadGames();
+    });
+    socket.emit(ClientEvents.LEAVE_GAME, { gameId: existingGame.id });
   };
 
   const handleCreateTable = async ({
@@ -213,6 +229,7 @@ const LobbyPage = () => {
         isOpen={Boolean(existingGame)}
         gameName={existingGame?.name}
         onReturn={handleReturnToExistingGame}
+        onLeave={handleLeaveExistingGame}
         onClose={handleCloseExistingGameModal}
       />
     </div>

@@ -98,6 +98,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await leaveGame(parsed, socket.data.user.id);
         const room = parsed.gameId;
         await socket.leave(room);
+        socketsMap.delete(socket.data.sub);
 
         const publicPayload: PlayerIdPayload = { playerId };
 

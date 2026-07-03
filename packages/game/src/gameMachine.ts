@@ -125,6 +125,11 @@ export const gameMachine = setup({
         GameActions.DEAL_CARDS,
         emit(gameStarted),
       ],
+      on: {
+        [GameEvents.LEAVE_GAME]: {
+          actions: GameActions.REMOVE_PLAYER,
+        },
+      },
       initial: GameStates.CHANGING_TURN,
       states: {
         [GameStates.CHANGING_TURN]: {

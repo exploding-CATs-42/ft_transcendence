@@ -9,7 +9,7 @@ import {
 } from "@exploding-cats/contracts";
 import type { CardPayload } from "@exploding-cats/game-core";
 import { socket } from "socket";
-import { emit } from "./gameSession";
+import { emit, leaveGame } from "./gameSession";
 
 export interface GameRoomHandlers {
   onCardReceived(card: CardPayload): void;
@@ -66,3 +66,4 @@ export function attachGameRoomSockets(
 export const drawCard = () => emit(ClientEvents.DRAW_CARD);
 export const dropCard = (cardId: number) =>
   emit(ClientEvents.DROP_CARD, { cardId });
+export const leaveCurrentGame = leaveGame;

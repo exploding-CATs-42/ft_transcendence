@@ -1,5 +1,7 @@
 // Libraries
 import { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import { ServerPrivateEvents } from "@exploding-cats/contracts";
 // Project level
 import {
   connectToGameSession,
@@ -12,6 +14,7 @@ import { useSocket } from "./useSocket";
 
 export function useGameSession(gameId: string) {
   const { socket } = useSocket();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!gameId) return;
@@ -19,10 +22,17 @@ export function useGameSession(gameId: string) {
     const untrackWaitingState = trackWaitingState();
     const untrackGameState = trackGameState();
     const leaveRoom = connectToGameSession(socket, gameId);
+    const handleLeftGame = () => {
+      navigate("/lobby");
+    };
+
+    socket.on(ServerPrivateEvents.LEFT_GAME, handleLeftGame);
+
     return () => {
+      socket.off(ServerPrivateEvents.LEFT_GAME, handleLeftGame);
       leaveRoom();
       untrackGameState();
       untrackWaitingState();
     };
-  }, [socket, gameId]);
+  }, [socket, gameId, navigate]);
 }
