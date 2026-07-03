@@ -361,9 +361,15 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     drawCard();
   };
 
-  onCardRemoved = (_payload: CardRemovedPayload): void => {};
+  onCardRemoved = (payload: CardRemovedPayload): void => {
+    this.#myHand.removeCard(payload.cardId);
+  };
 
-  onCardPlayed = (_payload: CardPlayedPayload): void => {};
+  onCardPlayed = (payload: CardPlayedPayload): void => {
+    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.cardType];
+    const cardFrame = getCardFrame(this, frameIndex);
+    this.addCard(cardFrame, DISCARD_PILE_POSITION);
+  };
 
   private cleanup = () => {
     this.#detachSockets();
