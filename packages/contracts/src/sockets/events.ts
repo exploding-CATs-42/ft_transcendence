@@ -1,5 +1,6 @@
 export const ClientEvents = {
   JOIN_GAME: "join-game",
+  RECONNECT_GAME: "reconnect-game",
   LEAVE_GAME: "leave-game",
   CONFIRM_START: "confirm-start",
   CANCEL_START: "cancel-start",
@@ -33,6 +34,8 @@ export const ServerPublicEvents = {
 export const ServerPrivateEvents = {
   LEFT_GAME: "left-game",
   WAITING_STATE: "waiting-state",
+  YOUR_HAND: "YOUR_HAND",
+  GAME_STATE: "game-state",
   CARD_RECEIVED: "card-received",
   GAME_STARTED: "game-started",
   CARD_REMOVED: "card-removed",
@@ -45,6 +48,7 @@ export const ServerPrivateEvents = {
 export const ServerErrorEvents = {
   JOIN_GAME_ERROR: "join-game-error",
   LEAVE_GAME_ERROR: "leave-game-error",
+  RECONNECT_GAME_ERROR: "reconnect-game-error",
   CONFIRM_START_ERROR: "confirm-start-error",
   CANCEL_START_ERROR: "cancel-start-error",
   DRAW_CARD_ERROR: "draw-card-error",

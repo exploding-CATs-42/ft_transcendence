@@ -2,6 +2,7 @@
 import {
   GamePlayerView,
   GameStartedPayload,
+  PublicPlayerView,
   WaitingPlayerView,
 } from "@exploding-cats/contracts";
 import { Player } from "@exploding-cats/game-core";
@@ -18,6 +19,11 @@ export const toGamePlayerView = (p: Player): GamePlayerView => ({
   name: p.name,
   avatarUrl: p.avatarUrl,
   isAlive: p.isAlive,
+});
+
+export const toPublicPlayerView = (p: Player): PublicPlayerView => ({
+  ...toGamePlayerView(p),
+  handSize: p.hand.length,
 });
 
 export const toGameStartedPayload = (
