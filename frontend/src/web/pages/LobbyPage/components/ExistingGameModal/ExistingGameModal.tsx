@@ -1,4 +1,5 @@
-import { Button, Modal } from "components";
+import Button from "components/Button/Button";
+import Modal from "components/Modal/Modal";
 import s from "./ExistingGameModal.module.css";
 
 interface Props {
