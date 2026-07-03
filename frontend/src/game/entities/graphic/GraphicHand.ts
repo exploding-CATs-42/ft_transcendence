@@ -3,6 +3,7 @@ import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
 import { type Card } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
+import { dropCard } from "game/sockets";
 
 const CARD_WIDTH = 186 * 1.75;
 const CARD_HEIGHT = 260 * 1.75;
@@ -139,23 +140,36 @@ export class GraphicHand {
     cardImage.on("dragend", onDragEnd);
   }
 
+  removeCard(cardId: number) {
+    const card = this.#cardsData.get(cardId)!;
+    const cardImage = card.image;
+
+    this.#cards = this.#cards.filter((c) => c !== cardImage);
+    cardImage.off("drop", () => {
+      dropCard(cardData.id);
+    });
+
+    cardImage.disableInteractive();
+    cardImage.setDepth(0);
+    this.reflowCards();
+
+    const cardData = card.data;
+    this.#cardsData.delete(cardId);
+
+    const graphicCard: GraphicCard = {
+      image: cardImage,
+      data: cardData,
+    };
+    this.#onCardDropCallback(graphicCard);
+  }
+
   private attachCardDropHandler(graphicCard: GraphicCard) {
+    const cardData = graphicCard.data;
     const cardImage = graphicCard.image;
 
-    const onCardDrop = () => {
-      this.#cards = this.#cards.filter((c) => c !== cardImage);
-
-      cardImage.off("drop", onCardDrop);
-      cardImage.disableInteractive();
-      cardImage.setDepth(0);
-      this.reflowCards();
-
-      const cardData = graphicCard.data;
-      this.#cardsData.delete(cardData.id);
-      this.#onCardDropCallback(graphicCard);
-    };
-
-    cardImage.on("drop", onCardDrop);
+    cardImage.on("drop", () => {
+      dropCard(cardData.id);
+    });
   }
 
   private attachCardHoverHandler(cardImage: Phaser.GameObjects.Image) {
