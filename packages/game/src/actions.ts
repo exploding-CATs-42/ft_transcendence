@@ -31,8 +31,29 @@ export const addPlayer = ({ context, event }: GameActionArgs) => {
 export const removePlayer = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.LEAVE_GAME) return context;
 
+  const leavingPlayerIndex = context.players.findIndex(
+    (player) => player.id === event.playerId,
+  );
+
+  if (leavingPlayerIndex === -1) return context;
+
+  const players = context.players.filter((p) => p.id !== event.playerId);
+
+  if (context.currentTurnPlayerId !== event.playerId) {
+    return { players };
+  }
+
+  for (let i = 0; i < players.length; ++i) {
+    const nextPlayer = players[(leavingPlayerIndex + i) % players.length]!;
+
+    if (nextPlayer.isAlive) {
+      return { players, currentTurnPlayerId: nextPlayer.id };
+    }
+  }
+
   return {
-    players: context.players.filter((p) => p.id !== event.playerId),
+    players,
+    currentTurnPlayerId: null,
   };
 };
 

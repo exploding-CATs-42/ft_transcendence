@@ -5,10 +5,17 @@ interface Props {
   isOpen: boolean;
   gameName?: string | undefined;
   onReturn: () => void;
+  onLeave: () => void;
   onClose: () => void;
 }
 
-const ExistingGameModal = ({ isOpen, gameName, onReturn, onClose }: Props) => {
+const ExistingGameModal = ({
+  isOpen,
+  gameName,
+  onReturn,
+  onLeave,
+  onClose,
+}: Props) => {
   return (
     <Modal
       className={s["existingGameModal"]!}
@@ -28,8 +35,8 @@ const ExistingGameModal = ({ isOpen, gameName, onReturn, onClose }: Props) => {
             Yes, return
           </Button>
 
-          <Button className={s["cancelButton"]!} onClick={onClose}>
-            No
+          <Button className={s["cancelButton"]!} onClick={onLeave}>
+            No, leave
           </Button>
         </div>
       </div>

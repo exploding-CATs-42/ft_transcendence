@@ -30,6 +30,7 @@ import {
   GraphicHand,
   OpponentHand,
   PlayerSeat,
+  Button,
   type GraphicCard,
   Modal,
   SeeTheFutureView,
@@ -38,6 +39,7 @@ import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
   attachGameRoomSockets,
   drawCard,
+  leaveCurrentGame,
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
@@ -84,6 +86,16 @@ type GameRoomData = GameStartedPayload | GameStatePayload;
 const hasTurnState = (data: GameRoomData): data is GameStatePayload =>
   "currentTurnPlayerId" in data;
 
+const LEAVE_BUTTON_SIZE = {
+  width: 260,
+  height: 72,
+};
+
+const LEAVE_BUTTON_POSITION: Point = {
+  x: SCREEN_WIDTH - LEAVE_BUTTON_SIZE.width - 24,
+  y: 24,
+};
+
 // -------------------- GAME ROOM --------------------
 export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
@@ -119,6 +131,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
+    this.addLeaveGameButton();
 
     const graphicPlayers = this.createPlayers(players);
     this.createOpponentHands(graphicPlayers);
@@ -282,6 +295,26 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     return card;
   }
 
+  private addLeaveGameButton() {
+    const button = new Button(
+      this,
+      LEAVE_BUTTON_POSITION,
+      LEAVE_BUTTON_SIZE,
+      "Leave game",
+      this.leaveGame,
+    );
+
+    button.setBackgroundColor(0xc73535);
+  }
+
+  private drawCard = () => {
+    drawCard();
+  };
+
+  private leaveGame = () => {
+    leaveCurrentGame();
+  };
+
   setCurrentTurn(playerId: string) {
     this.#players.forEach((seat, id) => {
       seat.player?.setTurnActive(id === playerId);
@@ -374,10 +407,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onTurnChanged = (payload: PlayerIdPayload) => {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
-  };
-
-  private drawCard = () => {
-    drawCard();
   };
 
   onCardRemoved = (payload: CardRemovedPayload): void => {

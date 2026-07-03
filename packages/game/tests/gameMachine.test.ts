@@ -147,4 +147,58 @@ describe("game machine", () => {
       ).toBeTruthy();
     });
   });
+
+  it("removes a player who leaves after the game has started", () => {
+    vi.useFakeTimers();
+
+    const actor = createActor(gameMachine);
+
+    actor.start();
+    addPlayers(actor, PLAYERS);
+    markAsReady(actor, PLAYERS);
+    vi.advanceTimersByTime(START_GAME_COUNTDOWN_MS);
+
+    const leavingPlayerId = PLAYERS[0]!.id;
+
+    actor.send({
+      type: GameEvents.LEAVE_GAME,
+      playerId: leavingPlayerId,
+    });
+
+    const snapshot = actor.getSnapshot();
+
+    expect(snapshot.context.players).not.toContainEqual(
+      expect.objectContaining({ id: leavingPlayerId }),
+    );
+
+    vi.useRealTimers();
+  });
+
+  it("moves the turn when the current player leaves", () => {
+    vi.useFakeTimers();
+
+    const actor = createActor(gameMachine);
+
+    actor.start();
+    addPlayers(actor, PLAYERS);
+    markAsReady(actor, PLAYERS);
+    vi.advanceTimersByTime(START_GAME_COUNTDOWN_MS);
+
+    const currentTurnPlayerId = actor.getSnapshot().context.currentTurnPlayerId;
+    expect(currentTurnPlayerId).not.toBeNull();
+
+    actor.send({
+      type: GameEvents.LEAVE_GAME,
+      playerId: currentTurnPlayerId!,
+    });
+
+    const snapshot = actor.getSnapshot();
+
+    expect(snapshot.context.currentTurnPlayerId).not.toBe(currentTurnPlayerId);
+    expect(snapshot.context.players).toContainEqual(
+      expect.objectContaining({ id: snapshot.context.currentTurnPlayerId }),
+    );
+
+    vi.useRealTimers();
+  });
 });
