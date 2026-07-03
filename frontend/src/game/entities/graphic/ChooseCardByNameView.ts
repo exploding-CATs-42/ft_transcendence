@@ -1,6 +1,6 @@
 import type { CardType } from "@exploding-cats/game-core";
 import type { CardOption, Point } from "game/@types";
-import { CARD_OPTIONS } from "game/constants";
+import { CARD_OPTIONS, Textures } from "game/constants";
 
 // ------------------- CONFIGURATION -------------------
 const CARD_OPTIONS_PER_ROW = 4;
@@ -101,7 +101,7 @@ class GraphicCardOption extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, position: Point, cardOption: CardOption) {
     super(scene);
     this.#type = cardOption.type;
-    const icon = this.addIcon(scene, cardOption.iconTextureKey);
+    const icon = this.addIcon(scene, cardOption.iconFrameIndex);
     const label = this.addLabel(scene, cardOption.label);
     this.add([icon, label]);
     this.setPosition(position.x, position.y);
@@ -124,9 +124,9 @@ class GraphicCardOption extends Phaser.GameObjects.Container {
     });
   }
 
-  private addIcon(scene: Phaser.Scene, textureKey: string) {
+  private addIcon(scene: Phaser.Scene, iconFrameIndex: number) {
     const { x, y } = ICON_OFFSET;
-    const icon = scene.add.image(x, y, textureKey);
+    const icon = scene.add.image(x, y, Textures.cardTypeIcons, iconFrameIndex);
     return icon;
   }
 

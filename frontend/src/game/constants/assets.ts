@@ -9,19 +9,7 @@ export const Textures = {
   confirmedIcon: "confirmedIcon",
   playerSpotlight: "playerSpotlight",
   targetIcon: "targetIcon",
-  attack: "attack",
-  beardCat: "beardCat",
-  cattermelon: "cattermelon",
-  defuse: "defuse",
-  explodingKitten: "explodingKitten",
-  favor: "favor",
-  hairyPotatoCat: "hairyPotatoCat",
-  nope: "nope",
-  rainbowRalphingCat: "rainbowRalphingCat",
-  seeTheFuture: "seeTheFuture",
-  shuffle: "shuffle",
-  skip: "skip",
-  tacocat: "tacocat",
+  cardTypeIcons: "cardTypeIcons",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];

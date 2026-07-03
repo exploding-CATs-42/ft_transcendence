@@ -1,6 +1,5 @@
 import { CardType } from "@exploding-cats/game-core";
 import type { CardOption } from "game/@types/CardOption";
-import { Textures } from "./assets";
 
 export const CARD_TYPE_TO_FRAME: Record<CardType, number> = {
   [CardType.EXPLODING_KITTEN]: 0,
@@ -21,62 +20,62 @@ export const CARD_TYPE_TO_FRAME: Record<CardType, number> = {
 export const CARD_OPTIONS: CardOption[] = [
   {
     type: CardType.HAIRY_POTATO_CAT,
-    iconTextureKey: Textures.hairyPotatoCat,
+    iconFrameIndex: 5,
     label: "Hairy potato cat",
   },
   {
     type: CardType.BEARD_CAT,
-    iconTextureKey: Textures.beardCat,
+    iconFrameIndex: 1,
     label: "Beard cat",
   },
   {
     type: CardType.CATTERMELON,
-    iconTextureKey: Textures.cattermelon,
+    iconFrameIndex: 2,
     label: "Cattermelon",
   },
   {
     type: CardType.TACOCAT,
-    iconTextureKey: Textures.tacocat,
+    iconFrameIndex: 11,
     label: "Tacocat",
   },
   {
     type: CardType.RAINBOW_RALPHING_CAT,
-    iconTextureKey: Textures.rainbowRalphingCat,
+    iconFrameIndex: 7,
     label: "Rainbow ralphing cat",
   },
   {
     type: CardType.ATTACK,
-    iconTextureKey: Textures.attack,
+    iconFrameIndex: 0,
     label: "Attack",
   },
   {
     type: CardType.DEFUSE,
-    iconTextureKey: Textures.defuse,
+    iconFrameIndex: 3,
     label: "Defuse",
   },
   {
     type: CardType.FAVOR,
-    iconTextureKey: Textures.favor,
+    iconFrameIndex: 4,
     label: "Favor",
   },
   {
     type: CardType.NOPE,
-    iconTextureKey: Textures.nope,
+    iconFrameIndex: 6,
     label: "Nope",
   },
   {
     type: CardType.SEE_THE_FUTURE,
-    iconTextureKey: Textures.seeTheFuture,
+    iconFrameIndex: 8,
     label: "See the future",
   },
   {
     type: CardType.SHUFFLE,
-    iconTextureKey: Textures.shuffle,
+    iconFrameIndex: 9,
     label: "Shuffle",
   },
   {
     type: CardType.SKIP,
-    iconTextureKey: Textures.skip,
+    iconFrameIndex: 10,
     label: "Skip",
   },
 ];
