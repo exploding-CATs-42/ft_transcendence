@@ -16,7 +16,9 @@ export function authMiddleware(
 
     const payload = verifyAccessToken(token);
 
-    socket.data = payload;
+    socket.data.user = {
+      id: payload.sub,
+    };
 
     next();
   } catch (_) {
