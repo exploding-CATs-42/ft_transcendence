@@ -2,7 +2,7 @@
 import { Outlet } from "react-router-dom";
 import { ToastContainer, type ToastContainerProps } from "react-toastify";
 // Project level
-import { Header } from "components";
+import { ActiveGamePrompt, Header } from "components";
 import { useToastPosition } from "hooks";
 
 const Layout = () => {
@@ -21,6 +21,7 @@ const Layout = () => {
       <main>
         <Outlet />
       </main>
+      <ActiveGamePrompt />
       <ToastContainer {...toastConfig} />
     </>
   );
