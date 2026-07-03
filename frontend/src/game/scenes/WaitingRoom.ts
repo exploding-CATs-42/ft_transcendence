@@ -18,6 +18,7 @@ import {
 import {
   cancelStart,
   confirmStart,
+  leaveWaitingGame,
   subscribeWaitingRoom,
   type WaitingRoomHandlers,
 } from "game/sockets";
@@ -35,6 +36,16 @@ const BUTTON_SIZE: Size = {
 const BUTTON_POSITION = {
   x: SCREEN_WIDTH / 2 - BUTTON_SIZE.width / 2,
   y: SCREEN_HEIGHT - 200,
+};
+
+const LEAVE_BUTTON_SIZE: Size = {
+  width: 260,
+  height: 72,
+};
+
+const LEAVE_BUTTON_POSITION = {
+  x: SCREEN_WIDTH - LEAVE_BUTTON_SIZE.width - 24,
+  y: 24,
 };
 
 const WAITING_MESSAGE = "Waiting for other players...";
@@ -59,6 +70,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
 
     this.addWaitingLabel();
     this.addReadinessButton();
+    this.addLeaveGameButton();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -138,6 +150,22 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     );
     return button;
   }
+
+  private addLeaveGameButton() {
+    const button = new Button(
+      this,
+      LEAVE_BUTTON_POSITION,
+      LEAVE_BUTTON_SIZE,
+      "Leave game",
+      this.leaveGame,
+    );
+
+    button.setBackgroundColor(0xc73535);
+  }
+
+  private leaveGame = () => {
+    leaveWaitingGame();
+  };
 
   private addWaitingLabel() {
     this.#waitingLabel = this.add
