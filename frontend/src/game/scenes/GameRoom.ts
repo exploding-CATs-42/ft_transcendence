@@ -25,6 +25,7 @@ import {
   PlayerSeat,
   type GraphicCard,
   Modal,
+  SeeTheFutureView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -37,6 +38,7 @@ import type {
   GameStartedPayload,
   PlayerIdPayload,
 } from "@exploding-cats/contracts";
+import { fakeCards, fakePlayers } from "./mockData";
 
 // -------------------- OPPONENTS --------------------
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -94,8 +96,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   // -------------------- INITIALIZATION --------------------
 
-  create(data: GameStartedPayload) {
-    const { players, hand: cards } = data;
+  create(_data: GameStartedPayload) {
+    // const { players, hand: cards } = data;
+    const players = fakePlayers;
+    const cards = fakeCards;
 
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
@@ -118,8 +122,47 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.#modal = new Modal(this).setVisible(false);
 
-    // REMOVE THIS LATER
-    this.showOpponentTargetIcons();
+    // --------------- REMOVE THIS LATER ---------------
+    const threeCards: Card[] = [
+      {
+        id: 0,
+        type: "EXPLODING_KITTEN",
+        name: "",
+        description: "",
+        playable: false,
+        targetRequired: false,
+        comboEligible: false,
+        playableOutOfTurn: false,
+      },
+      {
+        id: 1,
+        type: "DEFUSE",
+        name: "",
+        description: "",
+        playable: true,
+        targetRequired: false,
+        comboEligible: false,
+        playableOutOfTurn: false,
+      },
+      {
+        id: 2,
+        type: "ATTACK",
+        name: "",
+        description: "",
+        playable: true,
+        targetRequired: false,
+        comboEligible: true,
+        playableOutOfTurn: false,
+      },
+    ];
+    const view = new SeeTheFutureView(this, threeCards);
+    view.onConfirm = () => {
+      this.#modal.setVisible(false);
+    };
+
+    this.#modal.setContent(view);
+    this.#modal.setVisible(true);
+    // -------------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
