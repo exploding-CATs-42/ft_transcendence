@@ -10,7 +10,7 @@ import {
   type WaitingStatePayload,
 } from "@exploding-cats/contracts";
 import { socket } from "socket";
-import { emit } from "./gameSession";
+import { emit, leaveGame } from "./gameSession";
 import { hasCachedGameState } from "./gameRoom";
 
 export interface WaitingRoomHandlers {
@@ -82,3 +82,4 @@ export function subscribeWaitingRoom(
 
 export const confirmStart = () => emit(ClientEvents.CONFIRM_START);
 export const cancelStart = () => emit(ClientEvents.CANCEL_START);
+export const leaveWaitingGame = leaveGame;
