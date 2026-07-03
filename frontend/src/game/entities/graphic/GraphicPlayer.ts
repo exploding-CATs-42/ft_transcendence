@@ -4,6 +4,10 @@ import { getRoundedAvatarTexture } from "game/utils";
 
 const AVATAR_WIDTH = 193;
 
+const SPOTLIGHT_POSITION: Point = { x: 103, y: 30 };
+const SPOTLIGHT_WIDTH = 320;
+const SPOTLIGHT_HEIGHT = 400;
+
 export class GraphicPlayer implements Player {
   readonly id: string;
   readonly name: string;
@@ -13,6 +17,7 @@ export class GraphicPlayer implements Player {
   private avatar: Phaser.GameObjects.Image;
   private label: Phaser.GameObjects.Text;
   private confirmedIcon: Phaser.GameObjects.Image;
+  private spotlight: Phaser.GameObjects.Image;
 
   constructor(
     scene: Phaser.Scene,
@@ -29,10 +34,25 @@ export class GraphicPlayer implements Player {
     const { x, y } = position;
     this.container = scene.add.container(x, y);
 
+    this.spotlight = this.addSpotlight(scene);
     this.avatar = this.addAvatar(scene);
     this.label = this.addUsernameLabel(scene, player.name, labelConfig);
 
-    this.container.add([this.avatar, this.label, this.confirmedIcon]);
+    this.container.add([
+      this.spotlight,
+      this.avatar,
+      this.label,
+      this.confirmedIcon,
+    ]);
+  }
+
+  private addSpotlight(scene: Phaser.Scene) {
+    const { x, y } = SPOTLIGHT_POSITION;
+
+    return scene.add
+      .image(x, y, Textures.playerSpotlight)
+      .setDisplaySize(SPOTLIGHT_WIDTH, SPOTLIGHT_HEIGHT)
+      .setVisible(false);
   }
 
   private addAvatar(scene: Phaser.Scene) {
@@ -114,6 +134,10 @@ export class GraphicPlayer implements Player {
 
   setConfirmed(confirmed: boolean) {
     this.confirmedIcon.setVisible(confirmed);
+  }
+
+  setTurnActive(active: boolean) {
+    this.spotlight.setVisible(active);
   }
 
   moveTo(x: number, y: number) {
