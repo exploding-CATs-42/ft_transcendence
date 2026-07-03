@@ -22,6 +22,8 @@ export interface GameRoomHandlers {
 export type CleanupFunction = () => void;
 let lastGameState: GameStatePayload | null = null;
 
+export const hasCachedGameState = () => lastGameState !== null;
+
 export function trackGameState(): CleanupFunction {
   const cache = (payload: GameStatePayload) => {
     lastGameState = payload;
