@@ -32,7 +32,10 @@ import {
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
-import type { GameStartedPayload } from "@exploding-cats/contracts";
+import type {
+  GameStartedPayload,
+  PlayerIdPayload,
+} from "@exploding-cats/contracts";
 
 // Opponents
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -76,6 +79,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
   #detachSockets: CleanupFunction;
+  // The first TURN_CHANGED arrives before create() runs (scene.start
+  // is deferred to the next frame), when #players is still empty.
+  // Save the turn here so create() can re-apply it once seats exist.
+  #currentTurnPlayerId: string | null = null;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -93,6 +100,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createOpponentHands(graphicPlayers);
     this.fillOpponentHands(cards.length);
     this.fillSeats(graphicPlayers);
+
+    // Re-apply a turn that arrived before the scene existed
+    if (this.#currentTurnPlayerId) {
+      this.setCurrentTurn(this.#currentTurnPlayerId);
+    }
 
     this.createCardDropZone();
     this.createDrawPile();
@@ -204,6 +216,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     drawCard();
   };
 
+  setCurrentTurn(playerId: string) {
+    this.#players.forEach((seat, id) => {
+      seat.player?.setTurnActive(id === playerId);
+    });
+  }
+
   private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
     return {
       frame: frame,
@@ -250,6 +268,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         this.#myHand.addCard(payload.card, frame, insertIndex);
       },
     });
+  };
+
+  onTurnChanged = (payload: PlayerIdPayload) => {
+    this.#currentTurnPlayerId = payload.playerId;
+    this.setCurrentTurn(this.#currentTurnPlayerId);
   };
 
   private cleanup = () => {
