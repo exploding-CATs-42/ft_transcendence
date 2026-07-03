@@ -134,6 +134,7 @@ export const gameMachine = setup({
             [GameEvents.DRAW_CARD]: {
               guard: GameGuards.HAS_ENOUGH_CARDS,
               actions: GameActions.DRAW_CARD,
+              target: GameStates.CHANGING_TURN,
             },
           },
         },
