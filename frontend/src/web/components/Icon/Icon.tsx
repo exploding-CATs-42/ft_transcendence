@@ -19,7 +19,8 @@ export type IconName =
   | "user"
   | "burger-menu"
   | "puzzle"
-  | "download";
+  | "download"
+  | "copy";
 
 interface Props {
   width?: number;
