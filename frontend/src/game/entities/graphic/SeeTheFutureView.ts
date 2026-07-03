@@ -47,6 +47,11 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
   // ------------------ UTILS ------------------
 
   private addCard(scene: Phaser.Scene, position: Point, type: CardType) {
+    const card = this.addImage(scene, position, type);
+    return card;
+  }
+
+  private addImage(scene: Phaser.Scene, position: Point, type: CardType) {
     const frameIndex = CARD_TYPE_TO_FRAME[type];
     const frame = getCardFrame(scene, frameIndex);
     const cardConfig = this.buildCardConfig(frame);
