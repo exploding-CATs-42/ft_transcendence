@@ -35,6 +35,8 @@ import {
   type GameRoomHandlers,
 } from "../sockets";
 import type {
+  CardPlayedPayload,
+  CardRemovedPayload,
   GameStartedPayload,
   PlayerIdPayload,
 } from "@exploding-cats/contracts";
@@ -358,6 +360,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private drawCard = () => {
     drawCard();
   };
+
+  onCardRemoved = (_payload: CardRemovedPayload): void => {};
+
+  onCardPlayed = (_payload: CardPlayedPayload): void => {};
 
   private cleanup = () => {
     this.#detachSockets();
