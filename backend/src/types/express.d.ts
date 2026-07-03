@@ -5,6 +5,9 @@ declare global {
     interface Request {
       user?: AuthenticatedUser;
     }
+    interface Socket {
+      user?: AuthenticatedUser;
+    }
   }
 }
 
