@@ -41,3 +41,5 @@ export function attachGameRoomSockets(
 }
 
 export const drawCard = () => emit(ClientEvents.DRAW_CARD);
+export const dropCard = (cardId: number) =>
+  emit(ClientEvents.DROP_CARD, { cardId });
