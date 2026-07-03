@@ -44,7 +44,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       async (parsed: JoinGameParams) => {
         const { waitingState, player } = await joinGame(
           parsed,
-          socket.data.sub,
+          socket.data.user.id,
         );
         const room = parsed.gameId;
         await socket.join(room);
@@ -66,7 +66,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
-        const { playerId } = await leaveGame(parsed, socket.data.sub);
+        const { playerId } = await leaveGame(parsed, socket.data.user.id);
         const room = parsed.gameId;
         await socket.leave(room);
 
@@ -85,7 +85,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.CONFIRM_START_ERROR,
       async (parsed: ConfirmStartParams) => {
-        const { playerId } = await confirmStart(parsed, socket.data.sub);
+        const { playerId } = await confirmStart(parsed, socket.data.user.id);
         const room = parsed.gameId;
 
         const publicPayload: PlayerIdPayload = { playerId };
@@ -102,7 +102,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.CANCEL_START_ERROR,
       async (parsed: CancelStartParams) => {
-        const { playerId } = await cancelStart(parsed, socket.data.sub);
+        const { playerId } = await cancelStart(parsed, socket.data.user.id);
         const room = parsed.gameId;
 
         const publicPayload: PlayerIdPayload = { playerId };
@@ -119,7 +119,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.DRAW_CARD_ERROR,
       async (parsed: DrawCardParams) => {
-        const { playerId, card } = await drawCard(parsed, socket.data.sub);
+        const { playerId, card } = await drawCard(parsed, socket.data.user.id);
 
         const room = parsed.gameId;
 
