@@ -24,8 +24,8 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
 
   private addCards(scene: Phaser.Scene, cards: Card[]) {
     const pos: Point = { x: 0, y: 0 };
-    cards.forEach((card) => {
-      const cardObject = this.addCard(scene, pos, card.type);
+    cards.forEach((card, index) => {
+      const cardObject = this.addCard(scene, pos, card.type, index);
       this.add(cardObject);
       pos.x += SPACING_BETWEEN_CARDS;
     });
@@ -46,8 +46,16 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
 
   // ------------------ UTILS ------------------
 
-  private addCard(scene: Phaser.Scene, position: Point, type: CardType) {
-    const card = this.addImage(scene, position, type);
+  private addCard(
+    scene: Phaser.Scene,
+    position: Point,
+    type: CardType,
+    index: number,
+  ) {
+    const card = scene.add.container(position.x, position.y);
+    const label = this.addLabel(scene, { x: 108, y: 0 }, index);
+    const image = this.addImage(scene, { x: 0, y: 70 }, type);
+    card.add([label, image]);
     return card;
   }
 
