@@ -33,7 +33,7 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
 
   private addConfirmationButton(scene: Phaser.Scene) {
     const confirmationButton = scene.add
-      .image(540, 500, Textures.confirmedIcon)
+      .image(540, 550, Textures.confirmedIcon)
       .setDisplaySize(100, 100)
       .setInteractive({ useHandCursor: true });
 
