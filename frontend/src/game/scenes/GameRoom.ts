@@ -1,7 +1,7 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import type { Card, CardPayload, CardType } from "@exploding-cats/game-core";
+import type { Card, CardPayload } from "@exploding-cats/game-core";
 // Local level
 import {
   Scenes,
@@ -25,7 +25,6 @@ import {
   PlayerSeat,
   type GraphicCard,
   Modal,
-  ChooseCardByNameView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -242,6 +241,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   // -------------------- ACTIONS --------------------
 
+  // @ts-expect-error remove this comment later
   private showOpponentTargetIcons() {
     const players = [...this.#players.values()];
     for (let i = 1; i < players.length; ++i) {
@@ -253,6 +253,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private selectOpponent = (playerId: string) => {
+    /* eslint-disable @typescript-eslint/no-unused-vars */
+    // @ts-expect-error remove this comment later
     let selectedOpponent;
 
     const players = [...this.#players.values()];
@@ -263,19 +265,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       if (seat.player?.id != playerId) players[i]?.setTargetIconVisible(false);
       else selectedOpponent = players[i]!;
     }
-
-    // REMOVE THIS LATER
-    // this code has to be placed somewhere else
-    // since we would only show it when player played "three of a kind"
-    const view = new ChooseCardByNameView(this);
-    view.onSelection = (type: CardType) => {
-      console.log(type);
-      this.#modal.setVisible(false);
-      selectedOpponent!.setTargetIconVisible(false);
-    };
-
-    this.#modal.setContent(view);
-    this.#modal.setVisible(true);
   };
 
   // -------------------- SOCKETS --------------------
