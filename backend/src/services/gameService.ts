@@ -8,14 +8,19 @@ import {
   DrawCardParams,
   JoinGameParams,
   LeaveGameParams,
+  ReconnectGameParams,
 } from "schemas";
-import { GameEvents, Player } from "@exploding-cats/game-core";
-import { PlayerIdPayload, UserId } from "@exploding-cats/contracts";
-import { GameId, GameRecord } from "data/types";
+import { GameEvents, GameStates, Player } from "@exploding-cats/game-core";
+import {
+  GameStatePayload,
+  PlayerIdPayload,
+  UserId,
+} from "@exploding-cats/contracts";
+import { Game, GameId, GameRecord } from "data/types";
 import { JoinGameResult } from "types";
 import { GameRepository, toGameRecord } from "data";
 import { attachGameBroadcaster } from "sockets";
-import { toWaitingPlayerView } from "mappers";
+import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
 import { DropCardParams } from "schemas/games/dropCardSchema";
@@ -28,6 +33,23 @@ function ensureGameExists(gameId: string) {
   }
 
   return game;
+}
+
+function isGameInProgress(game: Game): boolean {
+  const { value } = game.instance.getSnapshot();
+
+  if (typeof value === "string") {
+    return value === GameStates.PLAYING;
+  }
+
+  return value !== null && GameStates.PLAYING in value;
+}
+
+function orderPlayersForPlayer(players: Player[], playerId: UserId): Player[] {
+  const currentPlayer = players.find((player) => player.id === playerId);
+  const otherPlayers = players.filter((player) => player.id !== playerId);
+
+  return currentPlayer ? [currentPlayer, ...otherPlayers] : otherPlayers;
 }
 
 async function getGameContext(userId: UserId, gameId: GameId) {
@@ -128,6 +150,10 @@ export async function joinGame(
     player,
   } = await getGameContext(userId, input.gameId);
 
+  if (isGameInProgress(game)) {
+    throw new SocketError("Game is already in progress");
+  }
+
   if (player) {
     const filteredPlayers = playersBefore.filter((p) => p.id !== player.id);
 
@@ -166,6 +192,29 @@ export async function joinGame(
   return {
     player: toWaitingPlayerView(newPlayer),
     waitingState: { players: playersBefore.map(toWaitingPlayerView) },
+  };
+}
+
+export async function reconnectGame(
+  input: ReconnectGameParams,
+  userId: UserId,
+): Promise<GameStatePayload> {
+  const { game, players, player } = await requirePlayerInGame(
+    userId,
+    input.gameId,
+  );
+
+  if (!isGameInProgress(game)) {
+    throw new SocketError("Game is not in progress");
+  }
+
+  const orderedPlayers = orderPlayersForPlayer(players, player.id);
+
+  return {
+    players: orderedPlayers.map(toPublicPlayerView),
+    hand: player.hand,
+    currentTurnPlayerId:
+      game.instance.getSnapshot().context.currentTurnPlayerId,
   };
 }
 

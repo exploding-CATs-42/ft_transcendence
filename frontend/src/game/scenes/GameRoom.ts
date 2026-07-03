@@ -2,6 +2,13 @@
 import { Scene } from "phaser";
 // Project level
 import type { Card, CardPayload } from "@exploding-cats/game-core";
+import type {
+  CardPlayedPayload,
+  CardRemovedPayload,
+  GameStartedPayload,
+  GameStatePayload,
+  PlayerIdPayload,
+} from "@exploding-cats/contracts";
 // Local level
 import {
   Scenes,
@@ -34,13 +41,6 @@ import {
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
-import type {
-  CardPlayedPayload,
-  CardRemovedPayload,
-  GameStartedPayload,
-  PlayerIdPayload,
-} from "@exploding-cats/contracts";
-import { fakeCards, fakePlayers } from "./mockData";
 
 // -------------------- OPPONENTS --------------------
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -79,6 +79,11 @@ const HAND_POSITION: Point = {
   y: 940,
 };
 
+type GameRoomData = GameStartedPayload | GameStatePayload;
+
+const hasTurnState = (data: GameRoomData): data is GameStatePayload =>
+  "currentTurnPlayerId" in data;
+
 // -------------------- GAME ROOM --------------------
 export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
@@ -86,6 +91,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #myHand!: GraphicHand;
   #modal!: Modal;
   #detachSockets: CleanupFunction;
+  #pendingGameState: GameStatePayload | null = null;
   // The first TURN_CHANGED arrives before create() runs (scene.start
   // is deferred to the next frame), when #players is still empty.
   // Save the turn here so create() can re-apply it once seats exist.
@@ -98,10 +104,18 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   // -------------------- INITIALIZATION --------------------
 
-  create(_data: GameStartedPayload) {
-    // const { players, hand: cards } = data;
-    const players = fakePlayers;
-    const cards = fakeCards;
+  create(data?: GameRoomData) {
+    const gameData = this.#pendingGameState ?? data;
+
+    if (!gameData) {
+      throw new Error("Game room started without game data");
+    }
+
+    const { players, hand: cards } = gameData;
+
+    if (hasTurnState(gameData)) {
+      this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
+    }
 
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
@@ -313,6 +327,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   // -------------------- SOCKETS --------------------
+
+  onGameState = (payload: GameStatePayload): void => {
+    this.#pendingGameState = payload;
+    this.#currentTurnPlayerId = payload.currentTurnPlayerId;
+  };
 
   onCardReceived = (payload: CardPayload): void => {
     // Generate random insert index

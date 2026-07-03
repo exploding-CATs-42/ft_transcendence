@@ -8,6 +8,10 @@ export interface GamePlayerView extends PlayerView {
   isAlive: boolean;
 }
 
+export interface PublicPlayerView extends GamePlayerView {
+  handSize: number;
+}
+
 export interface WaitingPlayerView extends PlayerView {
   isConfirmed: boolean;
 }

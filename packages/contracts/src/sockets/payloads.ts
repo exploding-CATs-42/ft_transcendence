@@ -1,6 +1,7 @@
 import type { Card, CardType } from "@exploding-cats/game-core";
 import type {
   GamePlayerView,
+  PublicPlayerView,
   WaitingPlayerView,
   WaitingStateView,
 } from "./views";
@@ -45,4 +46,10 @@ export type CardRemovalReason =
 export interface CardRemovedPayload {
   cardId: number;
   reason: CardRemovalReason;
+}
+
+export interface GameStatePayload {
+  players: PublicPlayerView[];
+  hand: Card[];
+  currentTurnPlayerId: string | null;
 }

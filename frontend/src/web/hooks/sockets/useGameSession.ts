@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import {
   connectToGameSession,
   setGameId,
+  trackGameState,
   trackWaitingState,
 } from "game/sockets";
 // Local level
@@ -16,9 +17,11 @@ export function useGameSession(gameId: string) {
     if (!gameId) return;
     setGameId(gameId);
     const untrackWaitingState = trackWaitingState();
+    const untrackGameState = trackGameState();
     const leaveRoom = connectToGameSession(socket, gameId);
     return () => {
       leaveRoom();
+      untrackGameState();
       untrackWaitingState();
     };
   }, [socket, gameId]);

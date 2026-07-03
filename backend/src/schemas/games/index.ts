@@ -1,6 +1,7 @@
 export * from "./createGameSchema";
 export * from "./deleteGameSchema";
 export * from "./joinGameSchema";
+export * from "./reconnectGameSchema";
 export * from "./leaveGameSchema";
 export * from "./confirmStartSchema";
 export * from "./cancelStartSchema";

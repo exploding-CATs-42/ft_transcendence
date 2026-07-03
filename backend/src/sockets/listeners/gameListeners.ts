@@ -8,6 +8,7 @@ import {
   dropCard,
   joinGame,
   leaveGame,
+  reconnectGame,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -23,11 +24,14 @@ import {
   joinGameSchema,
   LeaveGameParams,
   leaveGameSchema,
+  ReconnectGameParams,
+  reconnectGameSchema,
 } from "schemas";
 import {
   CardPlayedPayload,
   CardRemovedPayload,
   ClientEvents,
+  GameStatePayload,
   PlayerIdPayload,
   PlayerJoinedPayload,
   ServerErrorEvents,
@@ -60,6 +64,26 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
         socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.RECONNECT_GAME,
+    withErrorHandler(
+      reconnectGameSchema,
+      socket,
+      ServerErrorEvents.RECONNECT_GAME_ERROR,
+      async (parsed: ReconnectGameParams) => {
+        const gameState = await reconnectGame(parsed, socket.data.sub);
+        const room = parsed.gameId;
+        await socket.join(room);
+        socketsMap.set(socket.data.sub, socket);
+
+        const payload: GameStatePayload = gameState;
+
+        socket.emit(ServerPrivateEvents.GAME_STATE, payload);
+        socket.emit(ServerPrivateEvents.GAME_STARTED);
       },
     ),
   );
