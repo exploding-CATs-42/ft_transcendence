@@ -7,6 +7,7 @@ export const Textures = {
   cards: "cards",
   cardCover: "cardCover",
   confirmedIcon: "confirmedIcon",
+  playerSpotlight: "playerSpotlight",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
