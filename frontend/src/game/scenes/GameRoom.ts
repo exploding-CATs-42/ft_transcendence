@@ -248,6 +248,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const player = players[i]!;
       player.setTargetIconVisible(true);
       player.onClick = this.selectOpponent;
+      player.setCursorPointer(true);
     }
   }
 
@@ -258,6 +259,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     for (let i = 1; i < players.length; ++i) {
       const seat = players[i]!;
       seat.onClick = null;
+      seat.setCursorPointer(false);
       if (seat.player?.id != playerId) players[i]?.setTargetIconVisible(false);
       else selectedOpponent = players[i]!;
     }
