@@ -7,3 +7,4 @@ export { default as cardCover } from "./cover.png";
 export { default as targetIcon } from "./target.png";
 export { default as cardTypeIcons } from "./card-types.png";
 export { default as attackIcon } from "./attack.png";
+export { default as shuffleSpritesheet } from "./cloud.png";
