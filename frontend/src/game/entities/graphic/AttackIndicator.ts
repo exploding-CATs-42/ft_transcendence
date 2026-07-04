@@ -13,6 +13,9 @@ const BADGE_OFFSET: Point = { x: 26, y: -20 };
 const BADGE_RADIUS = 17;
 const BADGE_TEXT_COLOR = "#ffffff";
 
+const BADGE_SHADOW_OFFSET: Point = { x: -1, y: 3 };
+const BADGE_SHADOW_RADIUS = BADGE_RADIUS + 1;
+
 export class AttackIndicator extends Phaser.GameObjects.Container {
   #turnsCountLabel: Phaser.GameObjects.Text;
   #turnsCount: number = 0;
@@ -55,6 +58,12 @@ export class AttackIndicator extends Phaser.GameObjects.Container {
     const { x, y } = BADGE_OFFSET;
     const badge = scene.add.container(x, y);
 
+    // Shadow
+    const { x: sX, y: sY } = BADGE_SHADOW_OFFSET;
+    const shadow = scene.add.graphics();
+    shadow.fillStyle(0x000000, 0.3);
+    shadow.fillCircle(sX, sY, BADGE_SHADOW_RADIUS);
+
     // Circle
     const circle = scene.add.graphics();
     circle.fillStyle(BADGE_COLOR, 1);
@@ -69,7 +78,7 @@ export class AttackIndicator extends Phaser.GameObjects.Container {
       })
       .setOrigin(0.5);
 
-    badge.add([circle, label]);
+    badge.add([shadow, circle, label]);
     return { badge, label };
   }
 }
