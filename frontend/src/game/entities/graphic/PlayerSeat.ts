@@ -1,11 +1,17 @@
 import type { Point, Size } from "game/@types";
 import { Textures } from "game/constants";
-import type { GraphicPlayer, OpponentHand } from "game/entities/graphic";
+import {
+  type GraphicPlayer,
+  type OpponentHand,
+  AttackIndicator,
+} from "game/entities/graphic";
 
 const TARGET_ICON_OFFSET: Point = {
   x: 30,
   y: 156,
 };
+
+const ATTACK_INDICATOR_OFFSET: Point = TARGET_ICON_OFFSET;
 
 const HIT_BOX_SIZE: Size = {
   width: 240,
@@ -17,6 +23,7 @@ export class PlayerSeat {
   player: GraphicPlayer | null;
   hand: OpponentHand | null;
   targetIcon: Phaser.GameObjects.Image;
+  attackIndicator: AttackIndicator;
   onClick?: ((playerId: string) => void) | null;
 
   constructor(scene: Phaser.Scene, position: Point) {
@@ -24,6 +31,7 @@ export class PlayerSeat {
     this.player = null;
     this.hand = null;
     this.targetIcon = this.addTargetIcon(scene);
+    this.attackIndicator = this.addAttackIndicator(scene);
   }
 
   addPlayer(player: GraphicPlayer) {
@@ -88,5 +96,13 @@ export class PlayerSeat {
     this.#container.add(image);
 
     return image;
+  }
+
+  private addAttackIndicator(scene: Phaser.Scene) {
+    const attackIndicator = new AttackIndicator(scene, ATTACK_INDICATOR_OFFSET);
+    attackIndicator.setVisible(false);
+    this.#container.add(attackIndicator);
+
+    return attackIndicator;
   }
 }
