@@ -13,6 +13,7 @@ import {
   playerSpotlight,
   targetIcon,
   cardTypeIcons,
+  attackIcon,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -47,6 +48,7 @@ export class Preloader extends Scene {
       frameWidth: 91,
       frameHeight: 91,
     });
+    this.load.image(Textures.attackIcon, attackIcon);
   }
 
   create() {
