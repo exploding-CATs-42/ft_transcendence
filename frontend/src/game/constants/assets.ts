@@ -11,6 +11,7 @@ export const Textures = {
   targetIcon: "targetIcon",
   cardTypeIcons: "cardTypeIcons",
   attackIcon: "attackIcon",
+  shuffle: "shuffle",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
