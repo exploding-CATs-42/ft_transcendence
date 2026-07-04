@@ -32,8 +32,6 @@ import {
   PlayerSeat,
   Button,
   type GraphicCard,
-  Modal,
-  SeeTheFutureView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -101,7 +99,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
-  #modal!: Modal;
   #detachSockets: CleanupFunction;
   #pendingGameState: GameStatePayload | null = null;
   // The first TURN_CHANGED arrives before create() runs (scene.start
@@ -148,50 +145,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
-
-    this.#modal = new Modal(this).setVisible(false);
-
-    // --------------- REMOVE THIS LATER ---------------
-    const threeCards: Card[] = [
-      {
-        id: 0,
-        type: "EXPLODING_KITTEN",
-        name: "",
-        description: "",
-        playable: false,
-        targetRequired: false,
-        comboEligible: false,
-        playableOutOfTurn: false,
-      },
-      {
-        id: 1,
-        type: "DEFUSE",
-        name: "",
-        description: "",
-        playable: true,
-        targetRequired: false,
-        comboEligible: false,
-        playableOutOfTurn: false,
-      },
-      {
-        id: 2,
-        type: "ATTACK",
-        name: "",
-        description: "",
-        playable: true,
-        targetRequired: false,
-        comboEligible: true,
-        playableOutOfTurn: false,
-      },
-    ];
-    const view = new SeeTheFutureView(this, threeCards);
-    view.onConfirm = () => {
-      this.#modal.setVisible(false);
-    };
-
-    this.#modal.setContent(view);
-    this.#modal.setVisible(true);
-    // -------------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
