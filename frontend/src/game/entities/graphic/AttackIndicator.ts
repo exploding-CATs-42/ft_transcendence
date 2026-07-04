@@ -8,11 +8,16 @@ const ICON_OUTLINE_RADIUS = 32;
 const ICON_SHADOW_OFFSET: Point = ICON_OUTLINE_OFFSET;
 const ICON_SHADOW_RADIUS = 38;
 
+const BADGE_COLOR = 0xad0003;
+const BADGE_OFFSET: Point = { x: 26, y: -20 };
+const BADGE_RADIUS = 17;
+
 export class AttackIndicator extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, position: Point) {
     super(scene, position.x, position.y);
     const attackIcon = this.addIcon(scene);
-    this.add(attackIcon);
+    const { badge: turnsCountBadge } = this.buildBadge(scene);
+    this.add([attackIcon, turnsCountBadge]);
   }
 
   // --------------- Utils ---------------
@@ -39,5 +44,16 @@ export class AttackIndicator extends Phaser.GameObjects.Container {
     iconContainer.add([shadow, outline, icon]);
 
     return iconContainer;
+  }
+
+  private buildBadge(scene: Phaser.Scene) {
+    const { x, y } = BADGE_OFFSET;
+    const badge = scene.add.container(x, y);
+
+    const circle = scene.add.graphics();
+    circle.fillStyle(BADGE_COLOR, 1);
+    circle.fillCircle(0, 0, BADGE_RADIUS);
+
+    return { badge };
   }
 }
