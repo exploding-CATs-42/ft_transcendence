@@ -5,6 +5,7 @@ import type {
   WaitingPlayerView,
   WaitingStateView,
 } from "./views";
+import type { UserId } from "../shared";
 
 export interface PlayerIdPayload {
   playerId: string;
@@ -52,4 +53,9 @@ export interface GameStatePayload {
   players: PublicPlayerView[];
   hand: Card[];
   currentTurnPlayerId: string | null;
+}
+
+export interface FriendOnlineStatusChangedPayload {
+  userId: UserId;
+  isOnline: boolean;
 }
