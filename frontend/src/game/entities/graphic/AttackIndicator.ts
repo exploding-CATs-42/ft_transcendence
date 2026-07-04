@@ -28,6 +28,21 @@ export class AttackIndicator extends Phaser.GameObjects.Container {
     this.add([attackIcon, turnsCountBadge]);
   }
 
+  // --------------- Public API ---------------
+
+  setTurnsCount(amount: number) {
+    this.#turnsCount = amount;
+    this.#turnsCountLabel.text = `${this.#turnsCount}X`;
+  }
+
+  decreaseTurnsCountOn(amount: number) {
+    this.setTurnsCount(this.#turnsCount - amount);
+  }
+
+  increaseTurnsCountOn(amount: number) {
+    this.setTurnsCount(this.#turnsCount + amount);
+  }
+
   // --------------- Utils ---------------
 
   private addIcon(scene: Phaser.Scene) {
