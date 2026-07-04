@@ -10,6 +10,7 @@ export const Textures = {
   playerSpotlight: "playerSpotlight",
   targetIcon: "targetIcon",
   cardTypeIcons: "cardTypeIcons",
+  attackIcon: "attackIcon",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
