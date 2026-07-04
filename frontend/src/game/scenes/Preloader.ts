@@ -14,6 +14,7 @@ import {
   targetIcon,
   cardTypeIcons,
   attackIcon,
+  shuffleSpritesheet,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -49,6 +50,11 @@ export class Preloader extends Scene {
       frameHeight: 91,
     });
     this.load.image(Textures.attackIcon, attackIcon);
+    this.load.spritesheet(Textures.shuffle, shuffleSpritesheet, {
+      frameWidth: 411,
+      frameHeight: 480,
+      endFrame: 23,
+    });
   }
 
   create() {
