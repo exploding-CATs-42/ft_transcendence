@@ -39,6 +39,7 @@ export const ServerPrivateEvents = {
   CARD_RECEIVED: "card-received",
   GAME_STARTED: "game-started",
   CARD_REMOVED: "card-removed",
+  FRIEND_ONLINE_STATUS_CHANGED: "friend-online-status-changed",
   SEE_THE_FUTURE_PEEK: "SEE_THE_FUTURE_PEEK",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   INSERT_KITTEN_PROMPT: "INSERT_KITTEN_PROMPT",
