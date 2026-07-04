@@ -11,8 +11,8 @@ const ICON_SHADOW_RADIUS = 38;
 export class AttackIndicator extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, position: Point) {
     super(scene, position.x, position.y);
-    const icon = this.addIcon(scene);
-    this.add(icon);
+    const attackIcon = this.addIcon(scene);
+    this.add(attackIcon);
   }
 
   // --------------- Utils ---------------
