@@ -2,7 +2,7 @@
   min-height: min-content;
   display: grid;
   grid-template-columns: max-content max-content max-content auto;
-  grid-template-areas: "avatar name editButton logoutButton";
+  grid-template-areas: "avatar nameContainer editButton logoutButton";
   align-items: center;
   padding-block: 5px;
   padding-inline: 25px;
@@ -12,11 +12,21 @@
   grid-area: avatar;
 }
 
-.name {
+.nameContainer {
   font-size: 20px;
   margin-left: 8px;
-  grid-area: name;
+  grid-area: nameContainer;
   text-align: center;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  gap: 8px;
+}
+
+.copyIcon {
+  fill: var(--off-white);
 }
 
 @media only screen and (min-width: 768px) {
@@ -24,7 +34,7 @@
     grid-template-columns: auto auto;
     grid-template-areas:
       "avatar logoutButton"
-      "name editButton";
+      "nameContainer editButton";
 
     padding-block: 20.5px;
     padding-inline: 26px;
@@ -35,10 +45,15 @@
     justify-self: center;
   }
 
-  .name {
+  .nameContainer {
     font-size: 25px;
     line-height: 33px;
     margin-left: 0;
+  }
+
+  .copyIcon {
+    width: 30px;
+    height: 30px;
   }
 }
 
@@ -49,7 +64,7 @@
     grid-template-columns: auto auto;
     grid-template-areas:
       "avatar avatar"
-      "name editButton"
+      "nameContainer editButton"
       "logoutButton logoutButton";
     justify-items: center;
     column-gap: 0;
@@ -62,7 +77,7 @@
     top: calc((var(--top-padding) + 137px / 2) * -1);
   }
 
-  .name {
+  .nameContainer {
     font-size: 30px;
     line-height: 39px;
     justify-self: flex-end;
