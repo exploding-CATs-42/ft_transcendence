@@ -216,7 +216,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.#waitingLabel.setText(WAITING_MESSAGE);
   };
 
-  onGameStarted = (payload: GameStartedPayload) => {
+  onGameStarted = (payload?: GameStartedPayload) => {
     this.scene.start(Scenes.GameRoom, payload);
   };
 }

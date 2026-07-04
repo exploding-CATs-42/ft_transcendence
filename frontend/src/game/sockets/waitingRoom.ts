@@ -21,7 +21,7 @@ export interface WaitingRoomHandlers {
   onPlayerCanceled(playerId: string): void;
   onCountdownStarted(endsAt: number): void;
   onCountdownCanceled(): void;
-  onGameStarted(payload: GameStartedPayload): void;
+  onGameStarted(payload?: GameStartedPayload): void;
 }
 
 let lastWaitingState: WaitingStatePayload | null = null;
