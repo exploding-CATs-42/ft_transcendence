@@ -64,6 +64,11 @@ export class PlayerSeat {
     if (value === true) this.#container.bringToTop(this.targetIcon);
   }
 
+  setAttackIndicatorVisible(value: boolean) {
+    this.attackIndicator.setVisible(value);
+    if (value === true) this.#container.bringToTop(this.attackIndicator);
+  }
+
   setCursorPointer(value: boolean) {
     if (value === true) this.#container.input!.cursor = "pointer";
     else this.#container.input!.cursor = "default";
