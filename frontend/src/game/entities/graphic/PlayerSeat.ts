@@ -69,6 +69,11 @@ export class PlayerSeat {
     if (value === true) this.#container.bringToTop(this.attackIndicator);
   }
 
+  setDead() {
+    this.player!.setDead();
+    this.hand?.container.setVisible(false);
+  }
+
   setCursorPointer(value: boolean) {
     if (value === true) this.#container.input!.cursor = "pointer";
     else this.#container.input!.cursor = "default";
