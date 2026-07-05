@@ -289,10 +289,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     button.setBackgroundColor(0xc73535);
   }
 
-  private drawCard = () => {
-    drawCard();
-  };
-
   private leaveGame = () => {
     leaveCurrentGame();
   };
@@ -393,6 +389,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onTurnChanged = (payload: PlayerIdPayload) => {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
+  };
+
+  private drawCard = () => {
+    if (!this.isMyTurn()) return;
+    drawCard();
   };
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
