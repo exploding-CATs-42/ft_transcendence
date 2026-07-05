@@ -1,6 +1,17 @@
-import { MyProfileUser, ProfileUser } from "@exploding-cats/contracts";
+import { MyProfileUser, ProfileUser, UserId } from "@exploding-cats/contracts";
+import { isUserOnline } from "sockets/onlineUsers";
 
 // Project level
+
+export function toUserWithOnlineStatus<T extends { id: UserId }>(
+  user: T,
+): T & { isOnline: boolean } {
+  return {
+    ...user,
+    isOnline: isUserOnline(user.id),
+  };
+}
+
 export function toProfileUser(user: {
   id: string;
   username: string;
