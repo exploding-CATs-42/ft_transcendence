@@ -41,7 +41,6 @@ import {
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
-import { ShuffleAnimation } from "game/animations";
 
 // -------------------- OPPONENTS --------------------
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -74,10 +73,10 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
-const SHUFFLE_ANIMATION_POSITION = {
-  x: DRAW_PILE_POSITION.x + 110,
-  y: DRAW_PILE_POSITION.y + 160,
-};
+// const SHUFFLE_ANIMATION_POSITION = {
+//   x: DRAW_PILE_POSITION.x + 110,
+//   y: DRAW_PILE_POSITION.y + 160,
+// };
 
 // -------------------- MY HAND --------------------
 const HAND_POSITION: Point = {
@@ -151,21 +150,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
-
-    // -------------- REMOVE THIS LATER --------------
-    const shuffleAnimation = new ShuffleAnimation(
-      this,
-      SHUFFLE_ANIMATION_POSITION,
-    );
-    shuffleAnimation.playAnimation();
-
-    shuffleAnimation.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
-      setTimeout(() => {
-        shuffleAnimation.setVisible(true);
-        shuffleAnimation.playAnimation();
-      }, 3000);
-    });
-    // -----------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
