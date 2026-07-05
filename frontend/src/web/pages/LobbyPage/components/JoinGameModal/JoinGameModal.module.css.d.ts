@@ -3,6 +3,7 @@ declare const styles: {
   readonly "createText": string;
   readonly "icon": string;
   readonly "joinButton": string;
+  readonly "joinError": string;
   readonly "joinModal": string;
   readonly "joinModalContent": string;
   readonly "modalInput": string;

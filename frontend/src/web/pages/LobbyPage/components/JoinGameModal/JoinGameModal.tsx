@@ -7,6 +7,8 @@ import s from "./JoinGameModal.module.css";
 interface Props {
   isOpen: boolean;
   gameId: string;
+  joinError: string;
+  isJoining: boolean;
   toggleModal: () => void;
   onGameIdChange: (value: string) => void;
   onJoin: () => void;
@@ -16,6 +18,8 @@ interface Props {
 const JoinGameModal = ({
   isOpen,
   gameId,
+  joinError,
+  isJoining,
   toggleModal,
   onGameIdChange,
   onJoin,
@@ -38,10 +42,18 @@ const JoinGameModal = ({
           iconName="puzzle"
           iconClassName={s.icon}
           placeholder="Table id"
+          status={joinError ? "error" : "normal"}
+          disabled={isJoining}
         />
 
-        <Button className={s["joinButton"]!} onClick={onJoin}>
-          Join
+        {joinError && <p className={s["joinError"]!}>{joinError}</p>}
+
+        <Button
+          className={s["joinButton"]!}
+          onClick={onJoin}
+          disabled={isJoining}
+        >
+          {isJoining ? "Joining..." : "Join"}
         </Button>
 
         <p className={s["createText"]!}>Want to create a room?</p>
@@ -50,6 +62,7 @@ const JoinGameModal = ({
           className={s["createLink"]!}
           type="button"
           onClick={onCreateClick}
+          disabled={isJoining}
         >
           Create a new one
         </button>
