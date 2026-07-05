@@ -8,7 +8,7 @@ export const GameEvents = {
   CONFIRM_START: "CONFIRM_START",
   CANCEL_START: "CANCEL_START",
   DRAW_CARD: "DRAW_CARD",
-  DROP_CARD: "DROP_CARD",
+  PLAY_CARD: "PLAY_CARD",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -20,7 +20,7 @@ export type GameEvent =
   | { type: typeof GameEvents.CANCEL_START; playerId: Player["id"] }
   | { type: typeof GameEvents.DRAW_CARD; playerId: Player["id"] }
   | {
-      type: typeof GameEvents.DROP_CARD;
+      type: typeof GameEvents.PLAY_CARD;
       playerId: Player["id"];
       cardId: number;
     };
