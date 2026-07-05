@@ -13,6 +13,7 @@ import { initGamePersistence } from "./data";
 import { httpMetricsMiddleware } from "middlewares/express/httpMetricsMiddleware";
 import { userOperationMetricsMiddleware } from "middlewares/express/userOperationMetricsMiddleware";
 import { apiRateLimiter } from "middlewares";
+import { initOnlineUsers } from "sockets/onlineUsers";
 
 const app = express();
 const server = createServer(app);
@@ -31,6 +32,7 @@ app.use(apiRateLimiter);
 app.set("trust proxy", 1);
 
 setupRouting(app);
+initOnlineUsers(io);
 initSockets(io);
 
 export default server;
