@@ -108,6 +108,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #myHand!: GraphicHand;
   #detachSockets: CleanupFunction;
   #pendingGameState: GameStatePayload | null = null;
+  #meId: string | null = null;
   // The first TURN_CHANGED arrives before create() runs (scene.start
   // is deferred to the next frame), when #players is still empty.
   // Save the turn here so create() can re-apply it once seats exist.
@@ -181,6 +182,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private fillSeats(players: GraphicPlayer[]) {
     const me = players[0]!;
+    this.#meId = me.id;
     const mySeat = new PlayerSeat(this, GAME_ROOM_SEATS[0]!);
     mySeat.addPlayer(me);
     this.#players.set(me.id, mySeat);
@@ -194,6 +196,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.#players.set(opponent.id, opponentSeat);
     }
   }
+
+  private isMyTurn = () => this.#meId === this.#currentTurnPlayerId;
 
   private createMyHand() {
     const onCardDrop = (card: GraphicCard) => {
