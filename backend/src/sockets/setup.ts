@@ -5,6 +5,7 @@ import { socketAuthMiddleware } from "middlewares";
 import { UserId } from "@exploding-cats/contracts";
 // Local level
 import { registerGameEventHandlers } from "./listeners";
+import { broadcastOnlineStatusToFriends } from "./broadcasters";
 
 export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);
@@ -14,6 +15,7 @@ export const initSockets = (io: Server) => {
     const userId: UserId = socket.data.user.id;
 
     socket.join(userId);
+    broadcastOnlineStatusToFriends(userId, true);
 
     // Register feature-specific handlers
     registerGameEventHandlers(io, socket);
