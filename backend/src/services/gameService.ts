@@ -46,10 +46,11 @@ function isGameInProgress(game: Game): boolean {
 }
 
 function orderPlayersForPlayer(players: Player[], playerId: UserId): Player[] {
-  const currentPlayer = players.find((player) => player.id === playerId);
-  const otherPlayers = players.filter((player) => player.id !== playerId);
+  const playerIndex = players.findIndex((player) => player.id === playerId);
 
-  return currentPlayer ? [currentPlayer, ...otherPlayers] : otherPlayers;
+  if (playerIndex === -1) return players;
+
+  return [...players.slice(playerIndex), ...players.slice(0, playerIndex)];
 }
 
 async function getGameContext(userId: UserId, gameId: GameId) {

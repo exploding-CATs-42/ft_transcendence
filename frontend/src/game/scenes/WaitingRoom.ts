@@ -13,6 +13,7 @@ import { Button, GraphicPlayer, PlayerSeat } from "game/entities";
 import type { LabelConfig, Size } from "game/@types";
 import {
   type GameStartedPayload,
+  type GameStatePayload,
   type WaitingPlayerView,
 } from "@exploding-cats/contracts";
 import {
@@ -216,7 +217,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.#waitingLabel.setText(WAITING_MESSAGE);
   };
 
-  onGameStarted = (payload?: GameStartedPayload) => {
+  onGameStarted = (payload?: GameStartedPayload | GameStatePayload) => {
     this.scene.start(Scenes.GameRoom, payload);
   };
 }
