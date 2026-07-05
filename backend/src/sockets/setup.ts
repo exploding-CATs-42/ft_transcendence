@@ -22,6 +22,8 @@ export const initSockets = (io: Server) => {
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
+
+      broadcastOnlineStatusToFriends(userId, false);
     });
   });
 };
