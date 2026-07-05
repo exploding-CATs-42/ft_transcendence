@@ -4,11 +4,19 @@ const BACKGROUND_CONFIG = {
   color: 0x2ea3dc,
   borderRadius: 20,
 };
+
+const TEXT_CONFIG = {
+  color: "white",
+  fontFamily: "Chewy",
+  fontSize: 54,
+};
+
 export class SkipView extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, _playerName: string) {
     super(scene);
     const background = this.addBackground(scene);
-    this.add([background]);
+    const actionLabel = this.addActionLabel(scene);
+    this.add([background, actionLabel]);
   }
 
   private addBackground(scene: Phaser.Scene) {
@@ -25,5 +33,11 @@ export class SkipView extends Phaser.GameObjects.Container {
     );
 
     return graphics;
+  }
+
+  private addActionLabel(scene: Phaser.Scene) {
+    const text = "SKIPPED A TURN";
+    const label = scene.add.text(-160, 0, text, { ...TEXT_CONFIG });
+    return label;
   }
 }
