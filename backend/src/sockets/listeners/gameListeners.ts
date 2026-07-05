@@ -75,15 +75,14 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.RECONNECT_GAME_ERROR,
       async (parsed: ReconnectGameParams) => {
-        const gameState = await reconnectGame(parsed, socket.data.sub);
+        const gameState = await reconnectGame(parsed, socket.data.user.id);
         const room = parsed.gameId;
         await socket.join(room);
-        socketsMap.set(socket.data.sub, socket);
+        socketsMap.set(socket.data.user.id, socket);
 
         const payload: GameStatePayload = gameState;
 
         socket.emit(ServerPrivateEvents.GAME_STATE, payload);
-        socket.emit(ServerPrivateEvents.GAME_STARTED);
       },
     ),
   );
@@ -98,7 +97,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await leaveGame(parsed, socket.data.user.id);
         const room = parsed.gameId;
         await socket.leave(room);
-        socketsMap.delete(socket.data.sub);
+        socketsMap.delete(socket.data.user.id);
 
         const publicPayload: PlayerIdPayload = { playerId };
 
