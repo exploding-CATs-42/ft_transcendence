@@ -8,3 +8,4 @@ export { Modal } from "./Modal";
 export { ChooseCardByNameView } from "./ChooseCardByNameView";
 export { SeeTheFutureView } from "./SeeTheFutureView";
 export { AttackIndicator } from "./AttackIndicator";
+export { SkipView } from "./SkipView";
