@@ -32,6 +32,10 @@
   color: var(--zombie-kittens);
 }
 
+.offline {
+  color: var(--dark-gray);
+}
+
 @media only screen and (min-width: 768px) {
   .container {
     padding-block: 4px;
