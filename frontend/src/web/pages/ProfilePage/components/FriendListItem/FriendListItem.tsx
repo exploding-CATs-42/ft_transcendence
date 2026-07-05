@@ -1,3 +1,5 @@
+// Libraries
+import clsx from "clsx";
 // Project level
 import { Avatar, ListItem } from "components";
 import type { FriendItem, UserId } from "@exploding-cats/contracts";
@@ -30,7 +32,9 @@ const FriendListItem = ({ friend, friendActions }: Props) => {
           <div className={s.infoContainer}>
             <span className={s.username}>{friend.user.username}</span>
 
-            <span className={s.status}>
+            <span
+              className={clsx(s.status, { [s.offline]: !friend.user.isOnline })}
+            >
               {friend.user.isOnline ? "online" : "offline"}
             </span>
           </div>
