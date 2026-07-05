@@ -15,6 +15,7 @@ import {
   cardTypeIcons,
   attackIcon,
   shuffleSpritesheet,
+  dead,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -55,6 +56,7 @@ export class Preloader extends Scene {
       frameHeight: 480,
       endFrame: 23,
     });
+    this.load.image(Textures.dead, dead);
   }
 
   create() {
