@@ -53,6 +53,8 @@ const LobbyPage = () => {
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
+  const [joinError, setJoinError] = useState("");
+  const [isJoiningGame, setIsJoiningGame] = useState(false);
   const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
 
   const navigate = useNavigate();
@@ -111,26 +113,66 @@ const LobbyPage = () => {
 
   const handleOpenJoinModalWithGameId = (selectedGameId: string) => {
     setGameId(selectedGameId);
+    setJoinError("");
     toggleJoinModal(true);
   };
 
   const handleOpenCreateModal = () => {
+    setJoinError("");
     toggleJoinModal(false);
     toggleCreateModal(true);
   };
 
   const handleOpenJoinModal = () => {
+    setJoinError("");
     toggleCreateModal(false);
     toggleJoinModal(true);
   };
 
-  const handleJoinGame = () => {
+  const handleCloseJoinModal = () => {
+    setJoinError("");
+    setIsJoiningGame(false);
+    toggleJoinModal(false);
+  };
+
+  const handleGameIdChange = (value: string) => {
+    setGameId(value);
+    setJoinError("");
+  };
+
+  const handleJoinGame = async () => {
     const trimmedGameId = gameId.trim();
 
-    if (!trimmedGameId) return;
+    setJoinError("");
 
-    toggleJoinModal(false);
-    navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
+    if (!trimmedGameId) {
+      setJoinError("Please enter a table id");
+      return;
+    }
+
+    setIsJoiningGame(true);
+
+    try {
+      const availableGames = await api.games.getAll();
+      const gameExists = availableGames.some(
+        (game) => game.id === trimmedGameId,
+      );
+
+      setGames(availableGames.map(toLobbyGame));
+
+      if (!gameExists) {
+        setJoinError("Table not found");
+        return;
+      }
+
+      toggleJoinModal(false);
+      navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
+    } catch (error) {
+      console.error("Failed to validate table id:", error);
+      setJoinError("Could not validate table id. Please try again.");
+    } finally {
+      setIsJoiningGame(false);
+    }
   };
 
   const handleReturnToExistingGame = () => {
@@ -231,8 +273,10 @@ const LobbyPage = () => {
       <JoinGameModal
         isOpen={isOpenJoinModal}
         gameId={gameId}
-        toggleModal={toggleJoinModal}
-        onGameIdChange={setGameId}
+        joinError={joinError}
+        isJoining={isJoiningGame}
+        toggleModal={handleCloseJoinModal}
+        onGameIdChange={handleGameIdChange}
         onJoin={handleJoinGame}
         onCreateClick={handleOpenCreateModal}
       />
