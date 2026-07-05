@@ -7,6 +7,7 @@ import {
   FriendshipRequestAction,
   FriendshipStatus,
   FriendshipView,
+  UserId,
 } from "@exploding-cats/contracts";
 
 export class FriendsServiceError extends Error {
@@ -98,6 +99,30 @@ export async function listFriends(params: {
   });
 
   return filter(items, params.view);
+}
+
+export async function listFriendIds(userId: UserId): Promise<UserId[]> {
+  const friendships = await prisma.friendship.findMany({
+    where: {
+      OR: [
+        {
+          status: FriendshipStatus.ACCEPTED,
+          OR: [{ userLowId: userId }, { userHighId: userId }],
+        },
+        {
+          status: FriendshipStatus.PENDING,
+          requestedById: userId,
+        },
+      ],
+    },
+    select: { userLowId: true, userHighId: true },
+  });
+
+  return friendships.map((friendship) =>
+    friendship.userLowId === userId
+      ? friendship.userHighId
+      : friendship.userLowId,
+  );
 }
 
 export async function sendFriendRequest(params: {
