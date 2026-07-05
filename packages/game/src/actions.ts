@@ -12,7 +12,7 @@ export const GameActions = {
   SHUFFLE_PLAYERS: "shufflePlayers",
   CHANGE_TURN: "changeTurn",
   DRAW_CARD: "drawCard",
-  DROP_CARD: "dropCard",
+  PLAY_CARD: "playCard",
 } as const;
 
 export interface GameActionArgs {
@@ -155,8 +155,8 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
   };
 };
 
-export const dropCard = ({ context, event }: GameActionArgs) => {
-  if (event.type != GameEvents.DROP_CARD) return context;
+export const playCard = ({ context, event }: GameActionArgs) => {
+  if (event.type != GameEvents.PLAY_CARD) return context;
 
   const { playerId, cardId } = event;
   const players = context.players;

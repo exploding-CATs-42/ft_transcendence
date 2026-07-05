@@ -3,7 +3,7 @@ import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
 import { type Card } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
-import { dropCard } from "game/sockets";
+import { playCard } from "game/sockets";
 
 const CARD_WIDTH = 186 * 1.75;
 const CARD_HEIGHT = 260 * 1.75;
@@ -146,7 +146,7 @@ export class GraphicHand {
 
     this.#cards = this.#cards.filter((c) => c !== cardImage);
     cardImage.off("drop", () => {
-      dropCard(cardData.id);
+      playCard(cardData.id);
     });
 
     cardImage.disableInteractive();
@@ -168,7 +168,7 @@ export class GraphicHand {
     const cardImage = graphicCard.image;
 
     cardImage.on("drop", () => {
-      dropCard(cardData.id);
+      playCard(cardData.id);
     });
   }
 

@@ -13,7 +13,7 @@ import {
   fillDeck,
   removePlayer,
   removePlayerConfirmation,
-  dropCard,
+  playCard,
 } from "./actions";
 import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
@@ -51,7 +51,7 @@ export const gameMachine = setup({
     [GameActions.SHUFFLE_PLAYERS]: assign(shufflePlayers),
     [GameActions.CHANGE_TURN]: assign(changeTurn),
     [GameActions.DRAW_CARD]: assign(drawCard),
-    [GameActions.DROP_CARD]: assign(dropCard),
+    [GameActions.PLAY_CARD]: assign(playCard),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -145,8 +145,8 @@ export const gameMachine = setup({
               actions: GameActions.DRAW_CARD,
               target: GameStates.CHANGING_TURN,
             },
-            [GameEvents.DROP_CARD]: {
-              actions: GameActions.DROP_CARD,
+            [GameEvents.PLAY_CARD]: {
+              actions: GameActions.PLAY_CARD,
             },
           },
         },

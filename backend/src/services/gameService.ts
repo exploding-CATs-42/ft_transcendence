@@ -23,7 +23,7 @@ import { attachGameBroadcaster } from "sockets";
 import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
-import { DropCardParams } from "schemas/games/dropCardSchema";
+import { PLayCardParams } from "schemas/games/playCardSchema";
 
 function ensureGameExists(gameId: string) {
   const game = GameRepository.getGame(gameId);
@@ -288,11 +288,11 @@ export async function drawCard(input: DrawCardParams, userId: UserId) {
   return { playerId: player.id, card: lastDrawnCard };
 }
 
-export async function dropCard(input: DropCardParams, userId: UserId) {
+export async function playCard(input: PLayCardParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
 
   game.instance.send({
-    type: GameEvents.DROP_CARD,
+    type: GameEvents.PLAY_CARD,
     playerId: player.id,
     cardId: input.cardId,
   });

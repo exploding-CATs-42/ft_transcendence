@@ -5,7 +5,7 @@ import {
   cancelStart,
   confirmStart,
   drawCard,
-  dropCard,
+  playCard,
   joinGame,
   leaveGame,
   reconnectGame,
@@ -18,8 +18,8 @@ import {
   confirmStartSchema,
   DrawCardParams,
   drawCardSchema,
-  DropCardParams,
-  dropCardSchema,
+  PLayCardParams,
+  playCardSchema,
   JoinGameParams,
   joinGameSchema,
   LeaveGameParams,
@@ -161,13 +161,13 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
   );
 
   socket.on(
-    ClientEvents.DROP_CARD,
+    ClientEvents.PLAY_CARD,
     withErrorHandler(
-      dropCardSchema,
+      playCardSchema,
       socket,
-      ServerErrorEvents.DROP_CARD_ERROR,
-      async (parsed: DropCardParams) => {
-        const { playerId, card } = await dropCard(parsed, socket.data.user.id);
+      ServerErrorEvents.PLAY_CARD_ERROR,
+      async (parsed: PLayCardParams) => {
+        const { playerId, card } = await playCard(parsed, socket.data.user.id);
 
         const room = parsed.gameId;
         const cardRemovedPayload: CardRemovedPayload = {
