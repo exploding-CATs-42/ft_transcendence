@@ -32,6 +32,8 @@ import {
   PlayerSeat,
   Button,
   type GraphicCard,
+  Modal,
+  DefuseView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -150,6 +152,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
+
+    // -------------- REMOVE THIS LATER --------------
+    const modal = new Modal(this).setVisible(false);
+    const view = new DefuseView(this, "player1");
+    modal.setContent(view);
+
+    setTimeout(() => {
+      modal.setVisible(true);
+
+      setTimeout(() => {
+        modal.setVisible(false);
+      }, 2000);
+    }, 2000);
+    // -----------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
