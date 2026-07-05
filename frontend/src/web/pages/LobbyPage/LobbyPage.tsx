@@ -114,6 +114,16 @@ const LobbyPage = () => {
     toggleJoinModal(true);
   };
 
+  const handleOpenCreateModal = () => {
+    toggleJoinModal(false);
+    toggleCreateModal(true);
+  };
+
+  const handleOpenJoinModal = () => {
+    toggleCreateModal(false);
+    toggleJoinModal(true);
+  };
+
   const handleJoinGame = () => {
     const trimmedGameId = gameId.trim();
 
@@ -198,13 +208,13 @@ const LobbyPage = () => {
         />
 
         <div className={s.buttons}>
-          <Button className={s.button} onClick={() => toggleCreateModal(true)}>
+          <Button className={s.button} onClick={handleOpenCreateModal}>
             Create table
           </Button>
 
           <Button
             className={clsx(s.button, s.color)}
-            onClick={() => toggleJoinModal()}
+            onClick={handleOpenJoinModal}
           >
             Join table
           </Button>
@@ -215,6 +225,7 @@ const LobbyPage = () => {
         isOpen={isOpenCreateModal}
         toggleModal={() => toggleCreateModal(false)}
         onSubmit={handleCreateTable}
+        onJoinClick={handleOpenJoinModal}
       />
 
       <JoinGameModal
@@ -223,6 +234,7 @@ const LobbyPage = () => {
         toggleModal={toggleJoinModal}
         onGameIdChange={setGameId}
         onJoin={handleJoinGame}
+        onCreateClick={handleOpenCreateModal}
       />
 
       <ExistingGameModal
