@@ -151,14 +151,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createMyHand();
     this.fillMyHandWithCards(cards);
 
-    // -------------- REMOVE THIS LATER --------------
-    let i = 0;
-    this.#players.forEach((seat) => {
-      ++i;
-      if (i === 3) seat.setDead();
-    });
-    // -----------------------------------------------
-
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
