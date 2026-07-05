@@ -3,7 +3,12 @@ import { useEffect, useState } from "react";
 import api from "api";
 import { getErrorMessage } from "utils";
 import { toast } from "react-toastify";
-import type { FriendItem } from "@exploding-cats/contracts";
+import {
+  ServerPrivateEvents,
+  type FriendItem,
+  type FriendOnlineStatusChangedPayload,
+} from "@exploding-cats/contracts";
+import { socket } from "socket";
 
 interface Props {
   userId: string | undefined;
@@ -13,6 +18,16 @@ interface Props {
 export const useFriends = ({ userId, isMyProfile }: Props) => {
   const [friends, setFriends] = useState<FriendItem[]>([]);
   const [loading, setLoading] = useState(true);
+
+  const updateFriendsOnlineStatus = (
+    friends: FriendItem[],
+    payload: FriendOnlineStatusChangedPayload,
+  ): FriendItem[] =>
+    friends.map((friend) =>
+      friend.user.id === payload.userId
+        ? { ...friend, user: { ...friend.user, isOnline: payload.isOnline } }
+        : friend,
+    );
 
   useEffect(() => {
     const fetchFriends = async () => {
@@ -41,6 +56,26 @@ export const useFriends = ({ userId, isMyProfile }: Props) => {
     };
     fetchFriends();
   }, [isMyProfile, userId]);
+
+  useEffect(() => {
+    const handleFriendOnlineStatusChanged = (
+      payload: FriendOnlineStatusChangedPayload,
+    ) => {
+      setFriends((friends) => updateFriendsOnlineStatus(friends, payload));
+    };
+
+    socket.on(
+      ServerPrivateEvents.FRIEND_ONLINE_STATUS_CHANGED,
+      handleFriendOnlineStatusChanged,
+    );
+
+    return () => {
+      socket.off(
+        ServerPrivateEvents.FRIEND_ONLINE_STATUS_CHANGED,
+        handleFriendOnlineStatusChanged,
+      );
+    };
+  }, []);
 
   return {
     friends,
