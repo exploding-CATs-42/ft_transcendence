@@ -8,3 +8,4 @@ export { default as targetIcon } from "./target.png";
 export { default as cardTypeIcons } from "./card-types.png";
 export { default as attackIcon } from "./attack.png";
 export { default as shuffleSpritesheet } from "./cloud.png";
+export { default as dead } from "./dead.png";
