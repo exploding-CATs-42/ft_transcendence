@@ -113,6 +113,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   // is deferred to the next frame), when #players is still empty.
   // Save the turn here so create() can re-apply it once seats exist.
   #currentTurnPlayerId: string | null = null;
+  #drawPile: Phaser.GameObjects.Image | null = null;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -250,12 +251,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
   }
 
+  private updateDrawPileInteractivity() {
+    if (this.isMyTurn()) {
+      this.#drawPile?.setInteractive({ useHandCursor: true });
+    } else {
+      this.#drawPile?.disableInteractive(true);
+    }
+  }
+
   private createDrawPile() {
     const cardCover = this.textures.get(Textures.cardCover).get();
-    const drawPile = this.addCard(cardCover, DRAW_PILE_POSITION);
+    this.#drawPile = this.addCard(cardCover, DRAW_PILE_POSITION);
 
-    drawPile.setInteractive({ useHandCursor: true });
-    drawPile.on("pointerdown", this.drawCard);
+    this.#drawPile.on("pointerdown", this.drawCard);
+    this.updateDrawPileInteractivity();
   }
 
   private createDiscardPile() {
@@ -389,6 +398,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onTurnChanged = (payload: PlayerIdPayload) => {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
+    this.updateDrawPileInteractivity();
   };
 
   private drawCard = () => {
