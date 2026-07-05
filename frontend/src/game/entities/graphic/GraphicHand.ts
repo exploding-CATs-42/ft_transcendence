@@ -28,15 +28,18 @@ export class GraphicHand {
   #cardsData: Map<number, GraphicCard> = new Map();
   #cards: Phaser.GameObjects.Image[] = [];
   #onCardDropCallback: onCardDropCallback;
+  #isMyTurn: () => boolean;
 
   constructor(
     scene: Phaser.Scene,
     position: Point,
     onCardDropCallback: onCardDropCallback,
+    isMyTurn: () => boolean,
   ) {
     this.#scene = scene;
     this.#position = position;
     this.#onCardDropCallback = onCardDropCallback;
+    this.#isMyTurn = isMyTurn;
   }
 
   // -------------- Public API --------------
@@ -168,8 +171,14 @@ export class GraphicHand {
     const cardImage = graphicCard.image;
 
     cardImage.on("drop", () => {
-      playCard(cardData.id);
+      this.playCard(cardData.id);
     });
+  }
+
+  private playCard(cardId: number) {
+    if (this.#isMyTurn()) {
+      playCard(cardId);
+    }
   }
 
   private attachCardHoverHandler(cardImage: Phaser.GameObjects.Image) {

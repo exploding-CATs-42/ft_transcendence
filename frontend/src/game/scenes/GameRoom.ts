@@ -216,7 +216,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       console.log(card.data.type);
     };
 
-    this.#myHand = new GraphicHand(this, HAND_POSITION, onCardDrop);
+    this.#myHand = new GraphicHand(
+      this,
+      HAND_POSITION,
+      onCardDrop,
+      this.isMyTurn,
+    );
   }
 
   private fillMyHandWithCards(cards: Card[]) {
