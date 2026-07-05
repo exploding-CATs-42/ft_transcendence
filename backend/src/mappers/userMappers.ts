@@ -19,13 +19,13 @@ export function toProfileUser(user: {
   isOnline: boolean;
   lastSeenAt: Date | null;
 }): ProfileUser {
-  return {
+  return toUserWithOnlineStatus({
     id: user.id,
     username: user.username,
     avatarUrl: user.avatarUrl,
     isOnline: user.isOnline,
     lastSeenAt: user.lastSeenAt,
-  };
+  });
 }
 
 export function toSelfProfileUser(user: {
@@ -36,14 +36,14 @@ export function toSelfProfileUser(user: {
   isOnline: boolean;
   lastSeenAt: Date | null;
 }): MyProfileUser {
-  return {
+  return toUserWithOnlineStatus({
     id: user.id,
     email: user.email,
     username: user.username,
     avatarUrl: user.avatarUrl,
     isOnline: user.isOnline,
     lastSeenAt: user.lastSeenAt,
-  };
+  });
 }
 
 export function toProfileUserWithStats(
@@ -59,11 +59,11 @@ export function toProfileUserWithStats(
     wins: number;
   },
 ) {
-  return {
+  return toUserWithOnlineStatus({
     ...user,
     totalGames: stats.totalGames,
     wins: stats.wins,
-  };
+  });
 }
 
 export function toMyProfileUser(
@@ -73,9 +73,9 @@ export function toMyProfileUser(
     wins: number;
   },
 ) {
-  return {
+  return toUserWithOnlineStatus({
     ...user,
     totalGames: stats.totalGames,
     wins: stats.wins,
-  };
+  });
 }
