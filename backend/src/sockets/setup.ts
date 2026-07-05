@@ -2,6 +2,7 @@
 import { Server, Socket } from "socket.io";
 // Project level
 import { socketAuthMiddleware } from "middlewares";
+import { UserId } from "@exploding-cats/contracts";
 // Local level
 import { registerGameEventHandlers } from "./listeners";
 
@@ -10,6 +11,9 @@ export const initSockets = (io: Server) => {
 
   io.on("connection", (socket: Socket) => {
     console.log("User connected:", socket.id);
+    const userId: UserId = socket.data.user.id;
+
+    socket.join(userId);
 
     // Register feature-specific handlers
     registerGameEventHandlers(io, socket);
