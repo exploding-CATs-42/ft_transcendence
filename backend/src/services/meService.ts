@@ -3,7 +3,6 @@ import { ApiError } from "errors";
 import cloudinary from "lib/cloudinary/cloudinary";
 import { prisma, selfProfileSelect } from "lib/prisma";
 import { comparePassword, hashPassword } from "utils";
-import { toMyProfileUser, toSelfProfileUser } from "mappers";
 import {
   MyProfileUser,
   MyProfileUserWithStats,
@@ -110,7 +109,7 @@ export async function updateMe(
   });
 
   return {
-    user: toSelfProfileUser(updatedUser),
+    user: updatedUser,
   };
 }
 
@@ -128,7 +127,7 @@ export async function getMe(
 
   const stats = await getFinishedGamesStats(user.id);
   return {
-    user: toMyProfileUser(user, stats),
+    user: { ...user, ...stats },
   };
 }
 

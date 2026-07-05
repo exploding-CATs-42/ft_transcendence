@@ -1,7 +1,6 @@
 // Project level
 import { ProfileUserWithStats } from "@exploding-cats/contracts";
 import { prisma, publicProfileSelect } from "lib/prisma";
-import { toProfileUser, toProfileUserWithStats } from "mappers";
 import { UserGameHistoryItem } from "../../../packages/contracts/src/shared/users";
 
 export class UsersServiceError extends Error {
@@ -57,7 +56,7 @@ export async function getPublicUserById(
   }
 
   const stats = await getFinishedGamesStats(user.id);
-  return toProfileUserWithStats(user, stats);
+  return { ...user, ...stats };
 }
 
 export async function ensureUserExists(userId: string) {
@@ -91,7 +90,7 @@ export async function searchUsersByUsername(
   return Promise.all(
     users.map(async (user) => {
       const stats = await getFinishedGamesStats(user.id);
-      return toProfileUserWithStats(user, stats);
+      return { ...user, ...stats };
     }),
   );
 }
@@ -135,8 +134,8 @@ export async function getUserGames(
       gameName: membership.game.gameName,
       endedAt: membership.game.endedAt as Date,
       winnerId: membership.game.winnerUserId,
-      players: membership.game.memberships.map((gameMembership) =>
-        toProfileUser(gameMembership.user),
+      players: membership.game.memberships.map(
+        (gameMembership) => gameMembership.user,
       ),
     }))
     .sort((left, right) => {

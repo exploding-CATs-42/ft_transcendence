@@ -1,6 +1,5 @@
 // Project level
 import { publicProfileSelect, prisma } from "lib/prisma";
-import { toProfileUser } from "mappers";
 import {
   FriendItem,
   FriendshipDirection,
@@ -87,7 +86,7 @@ export async function listFriends(params: {
         : friendship.userLow;
 
     return {
-      user: toProfileUser(otherUser),
+      user: otherUser,
       status: friendship.status,
       direction: getDirection({
         currentUserId: params.currentUserId,
