@@ -18,6 +18,7 @@ export class GraphicPlayer implements Player {
   private label: Phaser.GameObjects.Text;
   private confirmedIcon: Phaser.GameObjects.Image;
   private spotlight: Phaser.GameObjects.Image;
+  #scene: Phaser.Scene;
 
   constructor(
     scene: Phaser.Scene,
@@ -25,6 +26,7 @@ export class GraphicPlayer implements Player {
     player: Player,
     labelConfig: LabelConfig,
   ) {
+    this.#scene = scene;
     this.id = player.id;
     this.name = player.name;
     this.avatarUrl = player.avatarUrl;
@@ -138,6 +140,15 @@ export class GraphicPlayer implements Player {
 
   setTurnActive(active: boolean) {
     this.spotlight.setVisible(active);
+  }
+
+  setDead() {
+    this.isAlive = false;
+
+    const textureKey = getRoundedAvatarTexture(this.#scene, Textures.dead);
+    this.avatar
+      .setTexture(textureKey)
+      .setDisplaySize(AVATAR_WIDTH, AVATAR_WIDTH);
   }
 
   moveTo(x: number, y: number) {
