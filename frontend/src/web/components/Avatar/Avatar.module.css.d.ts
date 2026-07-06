@@ -4,7 +4,10 @@ declare const styles: {
   readonly "avatarFriend": string;
   readonly "avatarGame": string;
   readonly "avatarProfile": string;
-  readonly "avatarSettings": string;
+  readonly "borderless": string;
+  readonly "container": string;
+  readonly "online": string;
+  readonly "onlineStatus": string;
 };
 export = styles;
 

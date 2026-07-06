@@ -1,16 +1,22 @@
+.container {
+  position: relative;
+  width: fit-content;
+}
+
 .avatar {
+  display: block;
   border-radius: 50%;
   object-fit: cover;
+  border: 3px solid var(--throw-throw-burrito);
+}
+
+.borderless {
+  border: none;
 }
 
 .avatarProfile {
   width: 45px;
   height: 45px;
-}
-
-.avatarSettings {
-  width: 100px;
-  height: 100px;
 }
 
 .avatarBadge {
@@ -21,11 +27,30 @@
 .avatarFriend {
   width: 45px;
   height: 45px;
+  border-width: 2px;
 }
 
 .avatarGame {
   width: 40px;
   height: 40px;
+  border-width: 2px;
+}
+
+.onlineStatus {
+  position: absolute;
+  box-sizing: border-box;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  background-color: var(--throw-throw-burrito);
+  border: 2px solid var(--throw-throw-burrito);
+  border-radius: 50%;
+}
+
+.avatarFriend + .onlineStatus,
+.avatarGame + .onlineStatus {
+  border-width: 3px;
 }
 
 @media only screen and (min-width: 768px) {
@@ -37,11 +62,39 @@
   .avatarProfile {
     width: 116px;
     height: 116px;
+    border-width: 5px;
   }
 
   .avatarFriend {
     width: 50px;
     height: 50px;
+    border-width: 4px;
+  }
+
+  .avatarGame {
+    border-width: 4px;
+  }
+
+  .avatarProfile + .onlineStatus {
+    width: 22px;
+    height: 22px;
+    bottom: 4px;
+    right: 11px;
+    border-width: 3px;
+  }
+
+  .avatarFriend + .onlineStatus {
+    width: 14px;
+    height: 14px;
+    bottom: 1px;
+    right: 2px;
+  }
+
+  .avatarGame + .onlineStatus {
+    width: 14px;
+    height: 14px;
+    bottom: 0px;
+    right: 0px;
   }
 }
 
@@ -65,16 +118,57 @@
     width: 60px;
     height: 60px;
   }
+
+  .avatarProfile + .onlineStatus {
+    width: 24px;
+    height: 24px;
+    bottom: 4px;
+    right: 14px;
+  }
+
+  .avatarFriend + .onlineStatus {
+    width: 18px;
+    height: 18px;
+    bottom: 3px;
+    right: 2px;
+  }
+
+  .avatarGame + .onlineStatus {
+    width: 16px;
+    height: 16px;
+    bottom: 3px;
+    right: 2px;
+  }
 }
 
 @media only screen and (min-width: 1920px) {
   .avatarProfile {
     width: 193px;
     height: 193px;
+    border-width: 5px;
+  }
+
+  .avatarProfile + .onlineStatus {
+    width: 30px;
+    height: 30px;
+    bottom: 8px;
+    right: 23px;
+    border-width: 4px;
   }
 
   .avatarFriend {
     width: 80px;
     height: 80px;
   }
+
+  .avatarFriend + .onlineStatus {
+    width: 18px;
+    height: 18px;
+    bottom: 5px;
+    right: 2px;
+  }
+}
+
+.online {
+  background-color: var(--green);
 }

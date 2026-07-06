@@ -5,11 +5,10 @@ import { Avatar as placeholder } from "assets";
 // Local level
 import s from "./Avatar.module.css";
 
-type Variant = "profile" | "settings" | "badge" | "friend" | "game";
+type Variant = "profile" | "badge" | "friend" | "game";
 
 const variantClass: Record<Variant, string> = {
   profile: s.avatarProfile,
-  settings: s.avatarSettings,
   badge: s.avatarBadge,
   friend: s.avatarFriend,
   game: s.avatarGame,
@@ -20,6 +19,8 @@ interface Props {
   variant?: Variant;
   src?: string | null;
   alt?: string;
+  showStatus?: boolean;
+  status?: boolean;
 }
 
 const Avatar = ({
@@ -27,15 +28,24 @@ const Avatar = ({
   variant = "profile",
   src,
   alt = "Fierce cat mascot logo in red and gold",
+  showStatus = true,
+  status = false,
 }: Props) => {
   const avatarSrc = src ?? placeholder;
 
   return (
-    <img
-      className={clsx(s.avatar, variantClass[variant], className)}
-      src={avatarSrc}
-      alt={alt}
-    />
+    <div className={clsx(s.container, className)}>
+      <img
+        className={clsx(
+          s.avatar,
+          variantClass[variant],
+          !showStatus && s.borderless,
+        )}
+        src={avatarSrc}
+        alt={alt}
+      />
+      {showStatus && <div className={clsx(s.onlineStatus, status && s.online)} />}
+    </div>
   );
 };
 
