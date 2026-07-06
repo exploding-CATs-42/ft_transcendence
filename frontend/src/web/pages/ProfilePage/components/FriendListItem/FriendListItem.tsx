@@ -27,6 +27,7 @@ const FriendListItem = ({ friend, friendActions }: Props) => {
             variant="friend"
             src={friend.user.avatarUrl}
             alt={`${friend.user.username} avatar`}
+            status={friend.user.isOnline}
           />
 
           <div className={s.infoContainer}>
