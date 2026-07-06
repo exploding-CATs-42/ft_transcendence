@@ -152,10 +152,11 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         const room = parsed.gameId;
 
-        const payload: CardPayload = { playerId, card };
+        const privatePayload: CardPayload = { playerId, card };
+        const publicPayload: PlayerIdPayload = { playerId };
 
-        socket.emit(ServerPrivateEvents.CARD_RECEIVED, payload);
-        io.to(room).emit(ServerPublicEvents.CARD_DRAWN);
+        socket.emit(ServerPrivateEvents.CARD_RECEIVED, privatePayload);
+        io.to(room).emit(ServerPublicEvents.CARD_DRAWN, publicPayload);
       },
     ),
   );

@@ -50,6 +50,13 @@ export class OpponentHand {
 
   // --------------- Public API ---------------
 
+  setCardCount(cardCount: number) {
+    const nextCardCount = Math.max(0, cardCount);
+
+    while (this.#cardCount < nextCardCount) this.addCard();
+    while (this.#cardCount > nextCardCount) this.removeCard();
+  }
+
   addCard() {
     this.#cardCount++;
     this.#amountLabel.setText(this.#cardCount.toString());

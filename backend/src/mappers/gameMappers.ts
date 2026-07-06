@@ -37,7 +37,7 @@ export const toGameStartedPayload = (
   ];
 
   return {
-    players: orderedPlayers.map((player) => toGamePlayerView(player)),
+    players: orderedPlayers.map((player) => toPublicPlayerView(player)),
     hand: players[playerIndex]!.hand,
   };
 };

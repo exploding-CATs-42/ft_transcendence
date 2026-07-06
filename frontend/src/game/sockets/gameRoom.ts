@@ -13,6 +13,7 @@ import { emit, leaveGame } from "./gameSession";
 
 export interface GameRoomHandlers {
   onCardReceived(card: CardPayload): void;
+  onCardDrawn(payload: PlayerIdPayload): void;
   onGameState(payload: GameStatePayload): void;
   onTurnChanged(payload: PlayerIdPayload): void;
   onCardRemoved(payload: CardRemovedPayload): void;
@@ -44,6 +45,7 @@ export function attachGameRoomSockets(
     handlers.onGameState(payload);
   const subscriptions = [
     [ServerPrivateEvents.CARD_RECEIVED, handlers.onCardReceived],
+    [ServerPublicEvents.CARD_DRAWN, handlers.onCardDrawn],
     [ServerPrivateEvents.GAME_STATE, onGameState],
     [ServerPublicEvents.TURN_CHANGED, handlers.onTurnChanged],
     [ServerPrivateEvents.CARD_REMOVED, handlers.onCardRemoved],

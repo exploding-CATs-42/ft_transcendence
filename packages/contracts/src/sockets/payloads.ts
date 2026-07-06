@@ -1,6 +1,5 @@
 import type { Card, CardType } from "@exploding-cats/game-core";
 import type {
-  GamePlayerView,
   PublicPlayerView,
   WaitingPlayerView,
   WaitingStateView,
@@ -24,7 +23,7 @@ export interface WaitingStatePayload {
 }
 
 export interface GameStartedPayload {
-  players: GamePlayerView[];
+  players: PublicPlayerView[];
   hand: Card[];
 }
 
