@@ -8,7 +8,7 @@ import {
   type FriendItem,
   type FriendOnlineStatusChangedPayload,
 } from "@exploding-cats/contracts";
-import { socket } from "socket";
+import { useSocket } from "hooks/sockets/useSocket";
 
 interface Props {
   userId: string | undefined;
@@ -18,6 +18,7 @@ interface Props {
 export const useFriends = ({ userId, isMyProfile }: Props) => {
   const [friends, setFriends] = useState<FriendItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const { socket } = useSocket();
 
   const updateFriendsOnlineStatus = (
     friends: FriendItem[],
@@ -75,7 +76,7 @@ export const useFriends = ({ userId, isMyProfile }: Props) => {
         handleFriendOnlineStatusChanged,
       );
     };
-  }, []);
+  }, [socket]);
 
   return {
     friends,
