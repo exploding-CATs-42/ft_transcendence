@@ -9,7 +9,12 @@ type Props = {
 export function AvatarWithAdd({ src, onClick }: Props) {
   return (
     <div className={s.wrapper} onClick={onClick}>
-      <Avatar className={s.avatar} variant="profile" src={src} />
+      <Avatar
+        className={s.avatar}
+        variant="profile"
+        src={src}
+        showStatus={false}
+      />
       <button type="button" className={s.plusButton} aria-label="Change avatar">
         +
       </button>
