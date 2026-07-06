@@ -5,6 +5,7 @@ import {
   ClientEvents,
   type GameRecord,
   ServerPrivateEvents,
+  ServerPublicEvents,
 } from "@exploding-cats/contracts";
 import api from "api";
 import { Section, Button, List, GameListItem } from "components";
@@ -98,6 +99,21 @@ const LobbyPage = () => {
       ignore = true;
     };
   }, [loadGames]);
+
+  useEffect(() => {
+    const handleLobbyGamesUpdated = () => {
+      void loadGames();
+    };
+
+    socket.on(ServerPublicEvents.LOBBY_GAMES_UPDATED, handleLobbyGamesUpdated);
+
+    return () => {
+      socket.off(
+        ServerPublicEvents.LOBBY_GAMES_UPDATED,
+        handleLobbyGamesUpdated,
+      );
+    };
+  }, [loadGames, socket]);
 
   useEffect(() => {
     let ignore = false;
