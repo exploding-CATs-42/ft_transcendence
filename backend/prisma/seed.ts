@@ -99,13 +99,11 @@ async function main() {
       update: {
         username: "alice",
         passwordHash,
-        isOnline: true,
       },
       create: {
         email: "alice@example.com",
         username: "alice",
         passwordHash,
-        isOnline: true,
       },
     }),
     prisma.user.upsert({
@@ -113,13 +111,11 @@ async function main() {
       update: {
         username: "bob",
         passwordHash,
-        isOnline: false,
       },
       create: {
         email: "bob@example.com",
         username: "bob",
         passwordHash,
-        isOnline: false,
       },
     }),
     prisma.user.upsert({
@@ -127,13 +123,11 @@ async function main() {
       update: {
         username: "carol",
         passwordHash,
-        isOnline: false,
       },
       create: {
         email: "carol@example.com",
         username: "carol",
         passwordHash,
-        isOnline: false,
       },
     }),
     prisma.user.upsert({
@@ -141,13 +135,11 @@ async function main() {
       update: {
         username: "dave",
         passwordHash,
-        isOnline: false,
       },
       create: {
         email: "dave@example.com",
         username: "dave",
         passwordHash,
-        isOnline: false,
       },
     }),
   ]);

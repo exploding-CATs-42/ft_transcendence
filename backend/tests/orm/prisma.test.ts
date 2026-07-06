@@ -28,13 +28,11 @@ describe("Prisma ORM smoke tests", () => {
         email: `orm-user-${suffix}@example.com`,
         username: `orm_user_${suffix.replace(/-/g, "").slice(0, 12)}`,
         passwordHash: "hashed-password",
-        isOnline: true,
       },
     });
 
     expect(user.id).toBeDefined();
     expect(user.email).toContain("@example.com");
-    expect(user.isOnline).toBe(true);
   });
 
   it("rejects duplicate email", async () => {
@@ -56,7 +54,7 @@ describe("Prisma ORM smoke tests", () => {
           username: `dup_b_${suffix.replace(/-/g, "").slice(0, 10)}`,
           passwordHash: "hashed-password",
         },
-      })
+      }),
     ).rejects.toThrow();
   });
 
