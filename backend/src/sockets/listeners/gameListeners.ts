@@ -67,6 +67,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
         socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+        io.emit(ServerPublicEvents.LOBBY_GAMES_UPDATED);
       },
     ),
   );
@@ -106,6 +107,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.LEFT_GAME);
         io.to(room).emit(ServerPublicEvents.PLAYER_LEFT, publicPayload);
+        io.emit(ServerPublicEvents.LOBBY_GAMES_UPDATED);
       },
     ),
   );
