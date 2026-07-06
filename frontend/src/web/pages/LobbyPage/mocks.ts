@@ -33,21 +33,25 @@ export const gamesMock: LobbyGame[] = [
   {
     gameId: "g-1",
     gameName: "Table 1",
+    maxPlayers: 4,
     players: [alice, bob],
   },
   {
     gameId: "g-2",
     gameName: "Table 2",
+    maxPlayers: 5,
     players: [charlie, diana, charlie],
   },
   {
     gameId: "g-3",
     gameName: "Table 3",
+    maxPlayers: 4,
     players: [alice, bob, charlie, diana],
   },
   {
     gameId: "g-4",
     gameName: "Table 4",
+    maxPlayers: 3,
     players: [alice, diana],
   },
 ];

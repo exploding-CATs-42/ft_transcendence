@@ -3,6 +3,7 @@ import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import { ClientEvents, ServerPrivateEvents } from "@exploding-cats/contracts";
 import api from "api";
+import type { GameInfo } from "api/games";
 import { Section, Button, List, GameListItem } from "components";
 import { useModal, useSocket } from "hooks";
 import type { LobbyGame } from "types";
@@ -54,10 +55,11 @@ const isTableNotFoundError = (error: unknown) => {
   return apiError.response?.status === 404;
 };
 
-const toLobbyGame = (game: { id: string; name: string }): LobbyGame => ({
+const toLobbyGame = (game: GameInfo): LobbyGame => ({
   gameId: game.id,
   gameName: game.name,
-  players: [],
+  maxPlayers: game.maxPlayers,
+  players: game.players,
 });
 
 const LobbyPage = () => {
@@ -212,13 +214,7 @@ const LobbyPage = () => {
         maxPlayers,
       });
 
-      const newGame: LobbyGame = {
-        gameId: createdGame.id,
-        gameName: createdGame.name,
-        players: [],
-      };
-
-      setGames((prevGames) => [newGame, ...prevGames]);
+      setGames((prevGames) => [toLobbyGame(createdGame), ...prevGames]);
       navigate(`/game?gameId=${encodeURIComponent(createdGame.id)}`);
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);

@@ -1,3 +1,4 @@
+import type { WaitingPlayerView } from "@exploding-cats/contracts";
 import { api } from "../axios";
 
 export type CreateGameReqBody = {
@@ -10,6 +11,7 @@ export type GameInfo = {
   name: string;
   maxPlayers: number;
   createdAt: number;
+  players: WaitingPlayerView[];
 };
 
 const create = async (body: CreateGameReqBody): Promise<GameInfo> => {
