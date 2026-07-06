@@ -31,13 +31,7 @@ const renderSlot = (slot: GameSlot, key: string) => {
 
   const item = (
     <li key={key} data-placeholder={isPlaceholder} className={s.item}>
-      {!isPlaceholder && (
-        <Avatar
-          className={s.avatar}
-          variant="game"
-          src={slot.player.avatarUrl}
-        />
-      )}
+      {!isPlaceholder && <Avatar variant="game" src={slot.player.avatarUrl} />}
     </li>
   );
 

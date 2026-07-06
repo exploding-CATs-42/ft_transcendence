@@ -29,10 +29,6 @@
   color: var(--black);
 }
 
-.avatar {
-  border: 2px solid var(--zombie-kittens);
-}
-
 @media only screen and (min-width: 420px) {
   .container {
     flex-direction: row;
