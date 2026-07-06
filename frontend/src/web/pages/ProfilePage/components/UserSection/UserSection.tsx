@@ -26,7 +26,7 @@ const UserSection = ({ user, updateUser, isMyProfile }: Props) => {
 
   return (
     <Section className={s.section}>
-      <Avatar className={s.avatar} variant="profile" src={user.avatarUrl} />
+      <Avatar className={s.avatar} variant="profile" src={user.avatarUrl} status={user.isOnline} />
 
       <div className={s.nameContainer}>
         <span>{user.username}</span>
