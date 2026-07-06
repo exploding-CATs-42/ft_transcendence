@@ -139,7 +139,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const graphicPlayers = this.createPlayers(players);
     this.createOpponentHands(graphicPlayers);
-    this.fillOpponentHands(cards.length);
+    this.fillOpponentHands(players);
     this.fillSeats(graphicPlayers);
 
     // Re-apply a turn that arrived before the scene existed
@@ -234,12 +234,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
   }
 
-  private fillOpponentHands(cardsPerPlayer: number) {
-    this.#opponents.forEach((opponentHand) => {
-      for (let i = 0; i < cardsPerPlayer; ++i) {
-        opponentHand.addCard();
-      }
-    });
+  private fillOpponentHands(players: GameRoomData["players"]) {
+    for (let i = 1; i < players.length; ++i) {
+      const player = players[i]!;
+      this.#opponents.get(player.id)?.setCardCount(player.handSize);
+    }
   }
 
   private createDrawPile() {
@@ -378,6 +377,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   };
 
+  onCardDrawn = (payload: PlayerIdPayload): void => {
+    this.#opponents.get(payload.playerId)?.addCard();
+  };
+
   onTurnChanged = (payload: PlayerIdPayload) => {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
@@ -388,6 +391,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardPlayed = (payload: CardPlayedPayload): void => {
+    this.#opponents.get(payload.playerId)?.removeCard();
+
     const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.cardType];
     const cardFrame = getCardFrame(this, frameIndex);
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
