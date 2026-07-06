@@ -1,8 +1,5 @@
 import bcrypt from "bcrypt";
-import {
-  PrismaClient,
-  FriendshipStatus,
-} from "../src/generated/prisma/client";
+import { PrismaClient, FriendshipStatus } from "../src/generated/prisma/client";
 import { PrismaPg } from "@prisma/adapter-pg";
 
 const connectionString = process.env.DATABASE_URL;
@@ -103,14 +100,12 @@ async function main() {
         username: "alice",
         passwordHash,
         isOnline: true,
-        lastSeenAt: new Date(),
       },
       create: {
         email: "alice@example.com",
         username: "alice",
         passwordHash,
         isOnline: true,
-        lastSeenAt: new Date(),
       },
     }),
     prisma.user.upsert({
@@ -119,14 +114,12 @@ async function main() {
         username: "bob",
         passwordHash,
         isOnline: false,
-        lastSeenAt: new Date(Date.now() - 1000 * 60 * 15),
       },
       create: {
         email: "bob@example.com",
         username: "bob",
         passwordHash,
         isOnline: false,
-        lastSeenAt: new Date(Date.now() - 1000 * 60 * 15),
       },
     }),
     prisma.user.upsert({
@@ -135,14 +128,12 @@ async function main() {
         username: "carol",
         passwordHash,
         isOnline: false,
-        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60),
       },
       create: {
         email: "carol@example.com",
         username: "carol",
         passwordHash,
         isOnline: false,
-        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60),
       },
     }),
     prisma.user.upsert({
@@ -151,14 +142,12 @@ async function main() {
         username: "dave",
         passwordHash,
         isOnline: false,
-        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
       },
       create: {
         email: "dave@example.com",
         username: "dave",
         passwordHash,
         isOnline: false,
-        lastSeenAt: new Date(Date.now() - 1000 * 60 * 60 * 24),
       },
     }),
   ]);

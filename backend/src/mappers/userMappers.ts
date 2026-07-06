@@ -17,14 +17,12 @@ export function toProfileUser(user: {
   username: string;
   avatarUrl: string | null;
   isOnline: boolean;
-  lastSeenAt: Date | null;
 }): ProfileUser {
   return toUserWithOnlineStatus({
     id: user.id,
     username: user.username,
     avatarUrl: user.avatarUrl,
     isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
   });
 }
 
@@ -34,7 +32,6 @@ export function toSelfProfileUser(user: {
   username: string;
   avatarUrl: string | null;
   isOnline: boolean;
-  lastSeenAt: Date | null;
 }): MyProfileUser {
   return toUserWithOnlineStatus({
     id: user.id,
@@ -42,7 +39,6 @@ export function toSelfProfileUser(user: {
     username: user.username,
     avatarUrl: user.avatarUrl,
     isOnline: user.isOnline,
-    lastSeenAt: user.lastSeenAt,
   });
 }
 
@@ -52,7 +48,6 @@ export function toProfileUserWithStats(
     username: string;
     avatarUrl: string | null;
     isOnline: boolean;
-    lastSeenAt: Date | null;
   },
   stats: {
     totalGames: number;

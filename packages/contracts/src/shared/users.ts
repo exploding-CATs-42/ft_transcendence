@@ -7,7 +7,6 @@ export interface GameStats {
 
 export interface OnlineStatus {
   isOnline: boolean;
-  lastSeenAt: Date | null;
 }
 
 export interface User {
