@@ -22,6 +22,7 @@ export const useUser = ({ userId, isMyProfile }: Props) => {
 
   useEffect(() => {
     const fetchUser = async () => {
+      setLoading(true);
       try {
         let data: ProfileUserWithStats | MyProfileUserWithStats | null = null;
 
