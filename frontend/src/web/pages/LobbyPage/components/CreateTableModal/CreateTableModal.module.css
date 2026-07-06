@@ -58,6 +58,7 @@
   line-height: 40px;
   text-align: center;
 
+  font-family: "Shantell Sans", sans-serif;
   text-shadow: 3px 3px 0 var(--throw-throw-burrito-hover);
 
   letter-spacing: 1px;
