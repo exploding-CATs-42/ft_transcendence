@@ -4,6 +4,7 @@ import {
   deleteGameController,
   getGamesController,
   getCurrentGameController,
+  getGameByIdController,
 } from "controllers";
 import { createAuthenticatedRouter, errorHandler } from "utils";
 
@@ -26,5 +27,6 @@ export const gamesRouter = createAuthenticatedRouter();
 
 gamesRouter.get("/", errorHandler(getGamesController));
 gamesRouter.get("/current", errorHandler(getCurrentGameController));
+gamesRouter.get("/:gameId", errorHandler(getGameByIdController));
 gamesRouter.post("/", errorHandler(createGameController));
 gamesRouter.delete("/:gameId", errorHandler(deleteGameController));

@@ -22,6 +22,13 @@ const getCurrent = async (): Promise<GameInfo | null> => {
   return result.data;
 };
 
+const getById = async (gameId: string): Promise<GameInfo> => {
+  const result = await api.get<GameInfo>(
+    `/games/${encodeURIComponent(gameId)}`,
+  );
+  return result.data;
+};
+
 const getAll = async (): Promise<GameInfo[]> => {
   const result = await api.get<GameInfo[]>("/games");
   return result.data;
@@ -30,5 +37,6 @@ const getAll = async (): Promise<GameInfo[]> => {
 export default {
   create,
   getCurrent,
+  getById,
   getAll,
 };
