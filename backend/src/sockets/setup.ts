@@ -6,6 +6,7 @@ import { UserId } from "@exploding-cats/contracts";
 // Local level
 import { registerGameEventHandlers } from "./listeners";
 import { broadcastOnlineStatusToFriends } from "./broadcasters";
+import { isUserOnline } from "./onlineUsers";
 
 export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);
@@ -14,16 +15,21 @@ export const initSockets = (io: Server) => {
     console.log("User connected:", socket.id);
     const userId: UserId = socket.data.user.id;
 
+    const cameOnline = !isUserOnline(userId);
     socket.join(userId);
-    broadcastOnlineStatusToFriends(userId, true);
+    if (cameOnline) {
+      broadcastOnlineStatusToFriends(userId, true);
+    }
 
     // Register feature-specific handlers
     registerGameEventHandlers(io, socket);
 
     socket.on("disconnect", () => {
       console.log("User disconnected:", socket.id);
-
-      broadcastOnlineStatusToFriends(userId, false);
+      const wentOffline = !isUserOnline(userId);
+      if (wentOffline) {
+        broadcastOnlineStatusToFriends(userId, false);
+      }
     });
   });
 };
