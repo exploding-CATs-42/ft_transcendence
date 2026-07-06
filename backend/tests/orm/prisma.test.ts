@@ -29,14 +29,12 @@ describe("Prisma ORM smoke tests", () => {
         username: `orm_user_${suffix.replace(/-/g, "").slice(0, 12)}`,
         passwordHash: "hashed-password",
         isOnline: true,
-        lastSeenAt: new Date(),
       },
     });
 
     expect(user.id).toBeDefined();
     expect(user.email).toContain("@example.com");
     expect(user.isOnline).toBe(true);
-    expect(user.lastSeenAt).not.toBeNull();
   });
 
   it("rejects duplicate email", async () => {

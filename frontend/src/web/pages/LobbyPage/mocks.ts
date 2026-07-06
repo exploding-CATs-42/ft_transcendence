@@ -6,7 +6,6 @@ const alice: ProfileUser = {
   username: "Alice",
   isOnline: true,
   avatarUrl: null,
-  lastSeenAt: new Date(),
 };
 
 const bob: ProfileUser = {
@@ -14,7 +13,6 @@ const bob: ProfileUser = {
   username: "Bob",
   isOnline: false,
   avatarUrl: null,
-  lastSeenAt: new Date("2026-06-02T18:30:00Z"),
 };
 
 const charlie: ProfileUser = {
@@ -22,7 +20,6 @@ const charlie: ProfileUser = {
   username: "Charlie",
   isOnline: true,
   avatarUrl: null,
-  lastSeenAt: new Date(),
 };
 
 const diana: ProfileUser = {
@@ -30,7 +27,6 @@ const diana: ProfileUser = {
   username: "Diana",
   isOnline: true,
   avatarUrl: null,
-  lastSeenAt: new Date(),
 };
 
 export const gamesMock: LobbyGame[] = [

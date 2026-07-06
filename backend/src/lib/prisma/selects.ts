@@ -6,7 +6,6 @@ export const publicProfileSelect = {
   username: true,
   avatarUrl: true,
   isOnline: true,
-  lastSeenAt: true,
 } satisfies Prisma.UserSelect;
 
 export const selfProfileSelect = {
@@ -15,5 +14,4 @@ export const selfProfileSelect = {
   username: true,
   avatarUrl: true,
   isOnline: true,
-  lastSeenAt: true,
 } satisfies Prisma.UserSelect;

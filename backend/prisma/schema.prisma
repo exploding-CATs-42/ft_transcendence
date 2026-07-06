@@ -26,7 +26,6 @@ model User {
   avatarUrl      String?   @map("avatar_url") @db.Text
   avatarPublicId String?   @map("avatar_public_id")
   isOnline       Boolean   @default(false) @map("is_online")
-  lastSeenAt     DateTime? @map("last_seen_at")
 
   sessions           UserSession[]
   friendshipsAsLow   Friendship[]  @relation("FriendshipLowUser")
