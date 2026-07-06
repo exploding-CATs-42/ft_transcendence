@@ -10,7 +10,7 @@ interface Props {
 }
 
 const GameListItem = ({ game }: Props) => {
-  const slots: GameSlot[] = createGameSlots(game.players);
+  const slots: GameSlot[] = createGameSlots(game.players, game.maxPlayers);
 
   return (
     <ListItem>
