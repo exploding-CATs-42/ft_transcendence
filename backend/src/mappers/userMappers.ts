@@ -1,4 +1,9 @@
-import { MyProfileUser, ProfileUser, User, UserId } from "@exploding-cats/contracts";
+import {
+  MyProfileUser,
+  ProfileUser,
+  User,
+  UserId,
+} from "@exploding-cats/contracts";
 import { isUserOnline } from "sockets/onlineUsers";
 
 // Project level

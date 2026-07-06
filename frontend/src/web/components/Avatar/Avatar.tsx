@@ -44,7 +44,9 @@ const Avatar = ({
         src={avatarSrc}
         alt={alt}
       />
-      {showStatus && <div className={clsx(s.onlineStatus, status && s.online)} />}
+      {showStatus && (
+        <div className={clsx(s.onlineStatus, status && s.online)} />
+      )}
     </div>
   );
 };
