@@ -25,7 +25,6 @@ model User {
   passwordHash   String    @map("password_hash") @db.VarChar(255)
   avatarUrl      String?   @map("avatar_url") @db.Text
   avatarPublicId String?   @map("avatar_public_id")
-  isOnline       Boolean   @default(false) @map("is_online")
 
   sessions           UserSession[]
   friendshipsAsLow   Friendship[]  @relation("FriendshipLowUser")

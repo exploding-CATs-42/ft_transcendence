@@ -1,4 +1,4 @@
-import { MyProfileUser, ProfileUser, UserId } from "@exploding-cats/contracts";
+import { MyProfileUser, ProfileUser, User, UserId } from "@exploding-cats/contracts";
 import { isUserOnline } from "sockets/onlineUsers";
 
 // Project level
@@ -16,13 +16,11 @@ export function toProfileUser(user: {
   id: string;
   username: string;
   avatarUrl: string | null;
-  isOnline: boolean;
 }): ProfileUser {
   return toUserWithOnlineStatus({
     id: user.id,
     username: user.username,
     avatarUrl: user.avatarUrl,
-    isOnline: user.isOnline,
   });
 }
 
@@ -31,14 +29,12 @@ export function toSelfProfileUser(user: {
   email: string;
   username: string;
   avatarUrl: string | null;
-  isOnline: boolean;
 }): MyProfileUser {
   return toUserWithOnlineStatus({
     id: user.id,
     email: user.email,
     username: user.username,
     avatarUrl: user.avatarUrl,
-    isOnline: user.isOnline,
   });
 }
 
@@ -47,7 +43,6 @@ export function toProfileUserWithStats(
     id: string;
     username: string;
     avatarUrl: string | null;
-    isOnline: boolean;
   },
   stats: {
     totalGames: number;
@@ -62,7 +57,7 @@ export function toProfileUserWithStats(
 }
 
 export function toMyProfileUser(
-  user: MyProfileUser,
+  user: User,
   stats: {
     totalGames: number;
     wins: number;
