@@ -4,16 +4,16 @@ import {
   UserId,
 } from "@exploding-cats/contracts";
 import { io } from "../../app";
-import { listFriendIds } from "services";
+import { listOnlineStatusRecipientIds } from "services";
 
 export async function broadcastOnlineStatusToFriends(
   userId: UserId,
   isOnline: boolean,
 ) {
-  const friendIds = await listFriendIds(userId);
+  const recipientIds = await listOnlineStatusRecipientIds(userId);
   const privatePayload: FriendOnlineStatusChangedPayload = { userId, isOnline };
 
-  friendIds.forEach((friendId) => {
+  recipientIds.forEach((friendId) => {
     io.to(friendId).emit(
       ServerPrivateEvents.FRIEND_ONLINE_STATUS_CHANGED,
       privatePayload,

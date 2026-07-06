@@ -101,7 +101,10 @@ export async function listFriends(params: {
   return filter(items, params.view);
 }
 
-export async function listFriendIds(userId: UserId): Promise<UserId[]> {
+/*
+  Mirrors the FRIENDS_AND_REQUESTS view from the receiving side: notify everyone whose friends tab currently displays this user — accepted friends, plus recipients of this user's pending requests. If the UI view logic changes, this filter must change with it.
+*/
+export async function listOnlineStatusRecipientIds(userId: UserId): Promise<UserId[]> {
   const friendships = await prisma.friendship.findMany({
     where: {
       OR: [
