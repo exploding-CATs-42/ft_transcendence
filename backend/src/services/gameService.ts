@@ -6,6 +6,7 @@ import {
   CreateGameRequestBody,
   DeleteGameParams,
   DrawCardParams,
+  GetGameParams,
   JoinGameParams,
   LeaveGameParams,
   ReconnectGameParams,
@@ -82,6 +83,15 @@ export async function getGames(userId: UserId): Promise<GameRecord[]> {
   return GameRepository.getAllGames().map((game) => {
     return toGameRecord(game);
   });
+}
+
+export async function getGameById(
+  userId: UserId,
+  input: GetGameParams,
+): Promise<GameRecord> {
+  await ensureUserExists(userId);
+
+  return toGameRecord(ensureGameExists(input.gameId));
 }
 
 export async function getCurrentGame(

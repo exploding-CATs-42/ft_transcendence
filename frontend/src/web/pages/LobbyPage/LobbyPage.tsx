@@ -32,6 +32,12 @@ type ApiConflictError = {
   };
 };
 
+type ApiError = {
+  response?: {
+    status?: number;
+  };
+};
+
 const getExistingGameIdFromError = (error: unknown) => {
   const apiError = error as ApiConflictError;
 
@@ -40,6 +46,12 @@ const getExistingGameIdFromError = (error: unknown) => {
   }
 
   return apiError.response.data?.details?.existingGameId ?? null;
+};
+
+const isTableNotFoundError = (error: unknown) => {
+  const apiError = error as ApiError;
+
+  return apiError.response?.status === 400 || apiError.response?.status === 404;
 };
 
 const toLobbyGame = (game: { id: string; name: string }): LobbyGame => ({
@@ -153,21 +165,16 @@ const LobbyPage = () => {
     setIsJoiningGame(true);
 
     try {
-      const availableGames = await api.games.getAll();
-      const gameExists = availableGames.some(
-        (game) => game.id === trimmedGameId,
-      );
-
-      setGames(availableGames.map(toLobbyGame));
-
-      if (!gameExists) {
-        setJoinError("Table not found");
-        return;
-      }
+      await api.games.getById(trimmedGameId);
 
       toggleJoinModal(false);
       navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
     } catch (error) {
+      if (isTableNotFoundError(error)) {
+        setJoinError("Table not found");
+        return;
+      }
+
       console.error("Failed to validate table id:", error);
       setJoinError("Could not validate table id. Please try again.");
     } finally {
