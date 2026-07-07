@@ -14,7 +14,7 @@ import {
   getGameParamsSchema,
 } from "schemas";
 import { AuthenticatedRequest } from "types";
-import { broadcastLobbyGamesUpdated } from "sockets/broadcasters/lobbyBroadcaster";
+import { broadcastLobbyGamesUpdated } from "sockets/broadcasters";
 import { validate } from "utils";
 
 export async function getGamesController(

@@ -41,6 +41,7 @@ import {
 } from "@exploding-cats/contracts";
 import { CardPayload } from "@exploding-cats/game-core";
 // Local level
+import { broadcastLobbyGamesUpdated } from "../broadcasters";
 import { socketsMap } from "../socketsMap";
 
 export const registerGameEventHandlers = (io: Server, socket: Socket) => {
@@ -67,7 +68,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
         socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
-        io.emit(ServerPublicEvents.LOBBY_GAMES_UPDATED);
+        broadcastLobbyGamesUpdated();
       },
     ),
   );
@@ -107,7 +108,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.LEFT_GAME);
         io.to(room).emit(ServerPublicEvents.PLAYER_LEFT, publicPayload);
-        io.emit(ServerPublicEvents.LOBBY_GAMES_UPDATED);
+        broadcastLobbyGamesUpdated();
       },
     ),
   );
