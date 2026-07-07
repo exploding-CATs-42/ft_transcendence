@@ -14,6 +14,7 @@ export type {
 
 export type { AccessToken } from "./tokens";
 export type { FriendItem } from "./friends";
+export type { GameRecord } from "./games";
 export {
   FriendshipDirection,
   FriendshipStatus,

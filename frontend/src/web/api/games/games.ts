@@ -1,4 +1,4 @@
-import type { WaitingPlayerView } from "@exploding-cats/contracts";
+import type { GameRecord } from "@exploding-cats/contracts";
 import { api } from "../axios";
 
 export type CreateGameReqBody = {
@@ -6,33 +6,25 @@ export type CreateGameReqBody = {
   maxPlayers: number;
 };
 
-export type GameInfo = {
-  id: string;
-  name: string;
-  maxPlayers: number;
-  createdAt: number;
-  players: WaitingPlayerView[];
-};
-
-const create = async (body: CreateGameReqBody): Promise<GameInfo> => {
-  const result = await api.post<GameInfo>("/games", body);
+const create = async (body: CreateGameReqBody): Promise<GameRecord> => {
+  const result = await api.post<GameRecord>("/games", body);
   return result.data;
 };
 
-const getCurrent = async (): Promise<GameInfo | null> => {
-  const result = await api.get<GameInfo | null>("/games/current");
+const getCurrent = async (): Promise<GameRecord | null> => {
+  const result = await api.get<GameRecord | null>("/games/current");
   return result.data;
 };
 
-const getById = async (gameId: string): Promise<GameInfo> => {
-  const result = await api.get<GameInfo>(
+const getById = async (gameId: string): Promise<GameRecord> => {
+  const result = await api.get<GameRecord>(
     `/games/${encodeURIComponent(gameId)}`,
   );
   return result.data;
 };
 
-const getAll = async (): Promise<GameInfo[]> => {
-  const result = await api.get<GameInfo[]>("/games");
+const getAll = async (): Promise<GameRecord[]> => {
+  const result = await api.get<GameRecord[]>("/games");
   return result.data;
 };
 

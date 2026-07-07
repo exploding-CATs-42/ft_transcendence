@@ -1,13 +1,10 @@
-import type { WaitingPlayerView } from "@exploding-cats/contracts";
+import type { GameRecord as SharedGameRecord } from "@exploding-cats/contracts";
 import { GameId } from "./GameId";
 
-export interface GameMetadata {
+export interface GameMetadata extends Omit<SharedGameRecord, "id" | "players"> {
   id: GameId;
-  name: string;
-  maxPlayers: number;
-  createdAt: number;
 }
 
 export interface GameRecord extends GameMetadata {
-  players: WaitingPlayerView[];
+  players: SharedGameRecord["players"];
 }
