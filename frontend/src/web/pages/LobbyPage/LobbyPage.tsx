@@ -51,7 +51,7 @@ const getExistingGameIdFromError = (error: unknown) => {
 const isTableNotFoundError = (error: unknown) => {
   const apiError = error as ApiError;
 
-  return apiError.response?.status === 400 || apiError.response?.status === 404;
+  return apiError.response?.status === 404;
 };
 
 const toLobbyGame = (game: { id: string; name: string }): LobbyGame => ({
