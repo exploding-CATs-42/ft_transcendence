@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
-import { ClientEvents, ServerPrivateEvents } from "@exploding-cats/contracts";
+import {
+  ClientEvents,
+  type GameRecord,
+  ServerPrivateEvents,
+} from "@exploding-cats/contracts";
 import api from "api";
-import type { GameInfo } from "api/games";
 import { Section, Button, List, GameListItem } from "components";
 import { useModal, useSocket } from "hooks";
 import type { LobbyGame } from "types";
@@ -55,7 +58,7 @@ const isTableNotFoundError = (error: unknown) => {
   return apiError.response?.status === 404;
 };
 
-const toLobbyGame = (game: GameInfo): LobbyGame => ({
+const toLobbyGame = (game: GameRecord): LobbyGame => ({
   gameId: game.id,
   gameName: game.name,
   maxPlayers: game.maxPlayers,

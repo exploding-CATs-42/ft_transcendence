@@ -1,19 +1,11 @@
+import type { ProfileUser } from "@exploding-cats/contracts";
 import type { GameSlot, LobbyPlayer } from "./types";
 
-const DEFAULT_MAX_PLAYERS = 5;
-
-const getSlotCount = (
-  players: LobbyPlayer[],
-  maxPlayers: number | undefined,
-): number => {
-  return Math.max(maxPlayers ?? DEFAULT_MAX_PLAYERS, players.length);
-};
-
 export const createGameSlots = (
-  players: LobbyPlayer[],
-  maxPlayers?: number,
+  players: Array<LobbyPlayer | ProfileUser>,
+  slotCount: number,
 ): GameSlot[] => {
-  return Array.from({ length: getSlotCount(players, maxPlayers) }, (_, id) =>
+  return Array.from({ length: Math.max(slotCount, players.length) }, (_, id) =>
     players[id]
       ? { id, kind: "real", player: players[id] }
       : { id, kind: "placeholder" },

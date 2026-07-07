@@ -3,12 +3,13 @@ import type { ProfileUser, UserId } from "@exploding-cats/contracts";
 export type LobbyPlayer = {
   id: string;
   avatarUrl: string | null;
+  isOnline?: boolean;
 };
 
 export type LobbyGame = {
   gameId: string;
   gameName: string;
-  maxPlayers?: number;
+  maxPlayers: number;
   players: LobbyPlayer[];
 };
 
@@ -21,7 +22,9 @@ export interface UserGameHistoryItem extends Omit<
   players: ProfileUser[];
 }
 
+export type GameListItemData = LobbyGame | UserGameHistoryItem;
+
 export type GameSlot = { id: number } & (
-  | { kind: "real"; player: LobbyPlayer }
+  | { kind: "real"; player: LobbyPlayer | ProfileUser }
   | { kind: "placeholder" }
 );
