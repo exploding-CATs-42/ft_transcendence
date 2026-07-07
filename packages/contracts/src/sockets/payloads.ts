@@ -1,4 +1,5 @@
 import type { Card, CardType } from "@exploding-cats/game-core";
+import type { GameRecord } from "../shared";
 import type {
   PublicPlayerView,
   WaitingPlayerView,
@@ -12,6 +13,14 @@ export interface PlayerIdPayload {
 
 export interface PlayerJoinedPayload {
   player: WaitingPlayerView;
+}
+
+export interface LobbyGameUpdatedPayload {
+  game: GameRecord;
+}
+
+export interface LobbyGameRemovedPayload {
+  gameId: string;
 }
 
 export interface CountdownStartedPayload {
