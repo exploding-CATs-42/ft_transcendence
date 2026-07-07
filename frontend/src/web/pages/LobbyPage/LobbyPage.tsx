@@ -176,7 +176,7 @@ const LobbyPage = () => {
       }
 
       console.error("Failed to validate table id:", error);
-      setJoinError("Could not validate table id. Please try again.");
+      setJoinError("Table not found");
     } finally {
       setIsJoiningGame(false);
     }
