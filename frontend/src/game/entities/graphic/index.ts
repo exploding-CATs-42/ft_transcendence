@@ -10,3 +10,4 @@ export { SeeTheFutureView } from "./SeeTheFutureView";
 export { AttackIndicator } from "./AttackIndicator";
 export { SkipView } from "./SkipView";
 export { DefuseView } from "./DefuseView";
+export { ChooseRandomCardView } from "./ChooseRandomCardView";
