@@ -106,6 +106,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
+  #cardDropZone!: Phaser.GameObjects.Zone;
   #detachSockets: CleanupFunction;
   #pendingGameState: GameStatePayload | null = null;
   #meId: string | null = null;
@@ -262,6 +263,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { x, y, width, height } = CARD_DROP_ZONE;
     const zone = this.add.zone(x, y, width, height).setOrigin(0, 0);
     zone.setRectangleDropZone(width, height);
+
+    this.#cardDropZone = zone;
   }
 
   // -------------------- UTILS --------------------
