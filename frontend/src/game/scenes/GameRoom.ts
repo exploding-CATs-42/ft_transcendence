@@ -33,7 +33,7 @@ import {
   Button,
   type GraphicCard,
   Modal,
-  DefuseView,
+  ChooseRandomCardView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -155,6 +155,21 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
+
+    // -------------- REMOVE THIS LATER --------------
+    const modal = new Modal(this).setVisible(false);
+    const view = new ChooseRandomCardView(this, 6);
+    view.onSelection = (cardIndex) => {
+      console.log(cardIndex);
+      modal.setVisible(false);
+      this.#cardDropZone.input!.dropZone = true;
+    };
+    modal.setContent(view);
+    this.#cardDropZone.input!.dropZone = false;
+    setTimeout(() => {
+      modal.setVisible(true);
+    }, 2000);
+    // -----------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
