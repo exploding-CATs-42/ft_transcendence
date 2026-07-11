@@ -305,4 +305,52 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       ease: "Back.Out",
     });
   }
+
+  // ==============================
+  // Card movement logic
+  // ==============================
+
+  private moveCard(scene: Phaser.Scene, cardPos: number, step: number) {
+    const targetPos = cardPos + step;
+
+    if (targetPos < 0 || targetPos >= this.#cards.length) {
+      return;
+    }
+
+    let currentCard = this.#cards[cardPos];
+    let targetCard = this.#cards[targetPos];
+
+    this.#cards[cardPos] = targetCard!;
+    this.#cards[targetPos] = currentCard!;
+
+    this.#explodingKittenPos = targetPos;
+    this.#cards[targetPos]?.setDepth(this.#cards.length - targetPos);
+
+    this.#labelScore.setText(`${targetPos + 1}/${this.#drawPileSize}`);
+    this.reflowCards(scene);
+  }
+
+  private startMoving(scene: Phaser.Scene, step: number) {
+    this.stopMoving();
+
+    this.#holding = true;
+    this.#moveTimer = scene.time.addEvent({
+      delay: 150,
+      callback: () => {
+        if (this.#holding) {
+          this.moveCard(scene, this.#explodingKittenPos, step);
+        }
+      },
+      loop: true,
+    });
+  }
+
+  private stopMoving() {
+    this.#holding = false;
+
+    if (this.#moveTimer) {
+      this.#moveTimer.remove();
+      this.#moveTimer = undefined;
+    }
+  }
 }
