@@ -60,7 +60,9 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.#drawPileSize = drawPileSize;
     this.createExplodingKitten(scene);
     this.createDrawPile(scene);
+    this.createControls(scene);
     this.createLabels(scene);
+    this.addConfirmationButton(scene);
   }
 
   // ==============================
@@ -352,5 +354,64 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       this.#moveTimer.remove();
       this.#moveTimer = undefined;
     }
+  }
+
+  // ==============================
+  // Controls
+  // ==============================
+
+  private addArrows(scene: Phaser.Scene) {
+    const container = scene.add.container();
+
+    const lineWidth = 1100;
+    const arrowOffset = lineWidth / 2 + 100;
+
+    const stopMoving = () => this.stopMoving();
+
+    const createArrow = (x: number, texture: string, direction: number) => {
+      const arrow = scene.add
+        .image(x, ARROW_LINE_POSITION_Y, texture)
+        .setDisplaySize(200, 200)
+        .setInteractive({ useHandCursor: true });
+
+      arrow.on("pointerdown", () => {
+        this.startMoving(scene, direction);
+      });
+
+      arrow.on("pointerup", stopMoving);
+      arrow.on("pointerout", stopMoving);
+      arrow.on("pointerupoutside", stopMoving);
+
+      return arrow;
+    };
+
+    const leftArrow = createArrow(-arrowOffset, Textures.arrowLeft, -1);
+
+    const rightArrow = createArrow(arrowOffset, Textures.arrowRight, 1);
+
+    const positionLine = scene.add
+      .rectangle(0, ARROW_LINE_POSITION_Y, lineWidth, 40, 0xffffff)
+      .setStrokeStyle(1, 0xffffff);
+
+    container.add([leftArrow, positionLine, rightArrow]);
+
+    return container;
+  }
+
+  private addConfirmationButton(scene: Phaser.Scene) {
+    const confirmationButton = scene.add
+      .image(0, ARROW_LINE_POSITION_Y + 100, Textures.confirmedIcon)
+      .setDisplaySize(100, 100)
+      .setInteractive({ useHandCursor: true });
+
+    confirmationButton.on("pointerdown", () => {
+      if (this.onConfirm) this.onConfirm();
+    });
+
+    this.add(confirmationButton);
+  }
+
+  private createControls(scene: Phaser.Scene): void {
+    this.add(this.addArrows(scene));
   }
 }
