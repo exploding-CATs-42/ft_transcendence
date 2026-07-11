@@ -25,6 +25,7 @@ export interface WaitingStatePayload {
 export interface GameStartedPayload {
   players: PublicPlayerView[];
   hand: Card[];
+  deckSize: number;
 }
 
 export interface CardPlayedPayload {
@@ -52,6 +53,7 @@ export interface GameStatePayload {
   players: PublicPlayerView[];
   hand: Card[];
   currentTurnPlayerId: string | null;
+  deckSize: number;
 }
 
 export interface FriendOnlineStatusChangedPayload {
