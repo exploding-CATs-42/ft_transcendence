@@ -1,11 +1,7 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import {
-  DEFAULT_GAME_RULES,
-  type Card,
-  type CardPayload,
-} from "@exploding-cats/game-core";
+import { type Card, type CardPayload } from "@exploding-cats/game-core";
 import type {
   CardPlayedPayload,
   CardRemovedPayload,
@@ -36,7 +32,6 @@ import {
   PlayerSeat,
   Button,
   type GraphicCard,
-  NopeButton,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -83,10 +78,10 @@ const CARD_DROP_ZONE = {
 //   y: DRAW_PILE_POSITION.y + 160,
 // };
 
-const NOPE_BUTTON_POSITION = {
-  x: 1700,
-  y: 800,
-};
+// const NOPE_BUTTON_POSITION = {
+//   x: 1700,
+//   y: 800,
+// };
 
 // -------------------- MY HAND --------------------
 const HAND_POSITION: Point = {
@@ -114,6 +109,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
+  //   #cardDropZone!: Phaser.GameObjects.Zone;
   #detachSockets: CleanupFunction;
   #pendingGameState: GameStatePayload | null = null;
   #meId: string | null = null;
@@ -162,20 +158,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
-
-    // -------------- REMOVE THIS LATER --------------
-    const nopeButton = new NopeButton(this, NOPE_BUTTON_POSITION);
-    nopeButton.onClick = () => {
-      clearInterval(intervalID);
-      nopeButton.hide();
-      console.log("someone just clicked me");
-    };
-
-    nopeButton.showAnimated();
-    const intervalID = setInterval(() => {
-      nopeButton.showAnimated();
-    }, DEFAULT_GAME_RULES.nopeWindowMs);
-    // -----------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -281,6 +263,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { x, y, width, height } = CARD_DROP_ZONE;
     const zone = this.add.zone(x, y, width, height).setOrigin(0, 0);
     zone.setRectangleDropZone(width, height);
+
+    // this.#cardDropZone = zone;
   }
 
   // -------------------- UTILS --------------------
