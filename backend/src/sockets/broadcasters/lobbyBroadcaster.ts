@@ -7,10 +7,6 @@ import { GameRepository, toGameRecord } from "data";
 import type { GameId } from "data/types";
 import { io } from "../../app";
 
-export function broadcastLobbyGamesUpdated() {
-  io.emit(ServerPublicEvents.LOBBY_GAMES_UPDATED);
-}
-
 export function broadcastLobbyGameChanged(gameId: GameId) {
   const game = GameRepository.getGame(gameId);
 

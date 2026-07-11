@@ -9,7 +9,6 @@ export const ClientEvents = {
 } as const;
 
 export const ServerPublicEvents = {
-  LOBBY_GAMES_UPDATED: "lobby-games-updated",
   LOBBY_GAME_UPDATED: "lobby-game-updated",
   LOBBY_GAME_REMOVED: "lobby-game-removed",
   PLAYER_JOINED: "player-joined",
