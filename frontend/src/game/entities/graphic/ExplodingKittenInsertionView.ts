@@ -60,6 +60,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.#drawPileSize = drawPileSize;
     this.createExplodingKitten(scene);
     this.createDrawPile(scene);
+    this.createLabels(scene);
   }
 
   // ==============================
@@ -160,5 +161,80 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     const startX = getHandStartX(cardCount, spacing, CARD_WIDTH, baseX);
 
     return { spacing, startX };
+  }
+
+  // ==============================
+  // Labels & UI updates
+  // ==============================
+
+  private addLabel(scene: Phaser.Scene, position: Point, text: string) {
+    const { x, y } = position;
+    const label = scene.add
+      .text(x, y, text, {
+        fontFamily: "Chewy",
+        fontSize: 44,
+        stroke: "black",
+        strokeThickness: 1,
+      })
+      .setOrigin(0.5, 1);
+    return label;
+  }
+
+  private createLabels(scene: Phaser.Scene): void {
+    this.#labelTop = this.createLabel(
+      scene,
+      { x: 0, y: LABEL_POSITION_Y },
+      "Top",
+    );
+
+    this.#labelBottom = this.createLabel(
+      scene,
+      { x: 0, y: LABEL_POSITION_Y },
+      "Bottom",
+    );
+
+    this.#labelScore = this.createLabel(
+      scene,
+      { x: 0, y: ARROW_LINE_POSITION_Y - 50 },
+      `${this.#explodingKittenPos + 1}/${this.#drawPileSize}`,
+    );
+
+    this.add([this.#labelTop, this.#labelBottom, this.#labelScore]);
+  }
+
+  private createLabel(
+    scene: Phaser.Scene,
+    position: { x: number; y: number },
+    text: string,
+  ): Phaser.GameObjects.Text {
+    return this.addLabel(scene, position, text).setAlpha(0);
+  }
+
+  private updateLabels(scene: Phaser.Scene): void {
+    const { spacing, startX } = this.getLayout();
+
+    const positions = {
+      top: startX + CARD_WIDTH / 2,
+      bottom: startX + spacing * (this.#cards.length - 1) + CARD_WIDTH / 2,
+      score: startX + spacing * (this.#cards.length / 2 - 1) + CARD_WIDTH / 2,
+    };
+
+    this.animateLabel(scene, this.#labelTop, positions.top);
+    this.animateLabel(scene, this.#labelBottom, positions.bottom);
+    this.animateLabel(scene, this.#labelScore, positions.score);
+  }
+
+  private animateLabel(
+    scene: Phaser.Scene,
+    label: Phaser.GameObjects.Text,
+    x: number,
+  ): void {
+    scene.tweens.add({
+      targets: label,
+      x,
+      alpha: 1,
+      duration: 250,
+      ease: "Back.Out",
+    });
   }
 }
