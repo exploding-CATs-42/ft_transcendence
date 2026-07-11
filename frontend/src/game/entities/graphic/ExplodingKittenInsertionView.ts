@@ -319,8 +319,8 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       return;
     }
 
-    let currentCard = this.#cards[cardPos];
-    let targetCard = this.#cards[targetPos];
+    const currentCard = this.#cards[cardPos];
+    const targetCard = this.#cards[targetPos];
 
     this.#cards[cardPos] = targetCard!;
     this.#cards[targetPos] = currentCard!;
