@@ -16,6 +16,8 @@ import {
   attackIcon,
   shuffleSpritesheet,
   dead,
+  arrowLeft,
+  arrowRight,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -57,6 +59,8 @@ export class Preloader extends Scene {
       endFrame: 23,
     });
     this.load.image(Textures.dead, dead);
+    this.load.image(Textures.arrowLeft, arrowLeft);
+    this.load.image(Textures.arrowRight, arrowRight);
   }
 
   create() {
