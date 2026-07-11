@@ -29,6 +29,7 @@ export const toPublicPlayerView = (p: Player): PublicPlayerView => ({
 export const toGameStartedPayload = (
   players: Player[],
   playerId: string,
+  deckSize: number,
 ): GameStartedPayload => {
   const playerIndex = players.findIndex((player) => player.id === playerId);
   const orderedPlayers = [
@@ -39,5 +40,6 @@ export const toGameStartedPayload = (
   return {
     players: orderedPlayers.map((player) => toPublicPlayerView(player)),
     hand: players[playerIndex]!.hand,
+    deckSize,
   };
 };

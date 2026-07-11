@@ -221,11 +221,12 @@ export async function reconnectGame(
 
   const orderedPlayers = orderPlayersForPlayer(players, player.id);
 
+  const gameContext = game.instance.getSnapshot().context;
   return {
     players: orderedPlayers.map(toPublicPlayerView),
     hand: player.hand,
-    currentTurnPlayerId:
-      game.instance.getSnapshot().context.currentTurnPlayerId,
+    currentTurnPlayerId: gameContext.currentTurnPlayerId,
+    deckSize: gameContext.deck.length,
   };
 }
 
