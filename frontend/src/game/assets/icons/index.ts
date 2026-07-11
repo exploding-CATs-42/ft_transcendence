@@ -8,3 +8,5 @@
 export const fullScreenToggle = "/game_assets/fullscreen-toggle.svg";
 export const confirmedIcon = "/game_assets/confirmed-icon.svg";
 export const playerSpotlight = "/game_assets/player-spotlight.png";
+export const arrowLeft = "/game_assets/arrow-left.svg";
+export const arrowRight = "/game_assets/arrow-right.svg";
