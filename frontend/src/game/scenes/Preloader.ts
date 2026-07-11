@@ -17,6 +17,8 @@ import {
   shuffleSpritesheet,
   dead,
   nopeSpritesheet,
+  arrowLeft,
+  arrowRight,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -62,6 +64,8 @@ export class Preloader extends Scene {
       frameWidth: 194,
       frameHeight: 194,
     });
+    this.load.image(Textures.arrowLeft, arrowLeft);
+    this.load.image(Textures.arrowRight, arrowRight);
   }
 
   create() {
