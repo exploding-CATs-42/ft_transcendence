@@ -32,6 +32,8 @@ import {
   PlayerSeat,
   Button,
   type GraphicCard,
+  Modal,
+  ExplodingKittenInsertionView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -118,6 +120,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   // Save the turn here so create() can re-apply it once seats exist.
   #currentTurnPlayerId: string | null = null;
   #drawPile: Phaser.GameObjects.Image | null = null;
+  #drawPileSize: number = 0;
+  #modal!: Modal;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -133,7 +137,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       throw new Error("Game room started without game data");
     }
 
-    const { players, hand: cards } = gameData;
+    const { players, hand: cards, deckSize } = gameData;
 
     if (hasTurnState(gameData)) {
       this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
@@ -153,11 +157,28 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.setCurrentTurn(this.#currentTurnPlayerId);
     }
 
+    this.#drawPileSize = deckSize;
+
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
+
+    // -------------- REMOVE THIS LATER --------------
+    this.#modal = new Modal(this).setVisible(false);
+    this.#players.forEach((p) => {
+      p.setAttackIndicatorVisible(true);
+      p.attackIndicator.setTurnsCount(6);
+    });
+
+    const view = new ExplodingKittenInsertionView(this, this.#drawPileSize);
+    this.#modal.setContent(view);
+    this.#modal.setVisible(true);
+    view.onConfirm = () => {
+      this.#modal.setVisible(false);
+    };
+    // -----------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -388,6 +409,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
     this.updateDrawPileInteractivity();
+    this.#drawPileSize--;
   };
 
   private drawCard = () => {
