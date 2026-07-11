@@ -106,6 +106,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
 
       onComplete: () => {
         this.#cards.splice(insertIndex, 0, image);
+        if (this.#cards.length > 1) this.reflowCards(scene);
       },
     });
     return image;
@@ -233,6 +234,73 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       targets: label,
       x,
       alpha: 1,
+      duration: 250,
+      ease: "Back.Out",
+    });
+  }
+
+  // ==============================
+  // Card positioning & animations
+  // ==============================
+
+  private reflowCards(scene: Phaser.Scene): void {
+    this.updateLabels(scene);
+    this.updateCardPositions(scene);
+  }
+
+  private updateCardPositions(scene: Phaser.Scene): void {
+    const { spacing, startX } = this.getLayout();
+
+    this.#cards.forEach((card, index) => {
+      this.sendToBack(card);
+
+      const isSelected = index === this.#explodingKittenPos;
+
+      const target = this.getCardTargetPosition(
+        startX,
+        spacing,
+        index,
+        isSelected,
+      );
+
+      this.animateCard(scene, card, target);
+    });
+  }
+
+  private getCardTargetPosition(
+    startX: number,
+    spacing: number,
+    index: number,
+    isSelected: boolean,
+  ): { x: number; y: number } {
+    const baseX = startX + spacing * index;
+
+    if (isSelected) {
+      return {
+        x: baseX,
+        y: DRAW_PILE_POSITION.y - HOVER_CONFIG.lift,
+      };
+    }
+
+    return {
+      x:
+        baseX +
+        (index < this.#explodingKittenPos
+          ? -HOVER_CONFIG.offset
+          : HOVER_CONFIG.offset),
+      y: DRAW_PILE_POSITION.y,
+    };
+  }
+
+  private animateCard(
+    scene: Phaser.Scene,
+    card: Phaser.GameObjects.Image,
+    target: { x: number; y: number },
+  ): void {
+    scene.tweens.add({
+      targets: card,
+      x: target.x,
+      y: target.y,
       duration: 250,
       ease: "Back.Out",
     });
