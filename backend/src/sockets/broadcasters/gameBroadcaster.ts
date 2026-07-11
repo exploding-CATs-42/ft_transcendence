@@ -22,6 +22,7 @@ export function attachGameBroadcaster(game: Game) {
       const payload: GameStartedPayload = toGameStartedPayload(
         players,
         player.id,
+        event.deckSize,
       );
 
       socket?.emit(ServerPrivateEvents.GAME_STARTED, payload);
