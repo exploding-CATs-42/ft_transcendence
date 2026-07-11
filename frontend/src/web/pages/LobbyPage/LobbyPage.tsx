@@ -4,6 +4,8 @@ import clsx from "clsx";
 import {
   ClientEvents,
   type GameRecord,
+  type LobbyGameRemovedPayload,
+  type LobbyGameUpdatedPayload,
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/contracts";
@@ -62,6 +64,25 @@ const sortGamesByCreatedAt = (games: GameRecord[]) => {
   return [...games].sort((left, right) => right.createdAt - left.createdAt);
 };
 
+const upsertLobbyGame = (
+  currentGames: GameRecord[],
+  updatedGame: GameRecord,
+) => {
+  const existingGameIndex = currentGames.findIndex(
+    (game) => game.id === updatedGame.id,
+  );
+
+  if (existingGameIndex === -1) {
+    return sortGamesByCreatedAt([updatedGame, ...currentGames]);
+  }
+
+  return sortGamesByCreatedAt(
+    currentGames.map((game, index) =>
+      index === existingGameIndex ? updatedGame : game,
+    ),
+  );
+};
+
 const LobbyPage = () => {
   const [games, setGames] = useState<GameRecord[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
@@ -101,19 +122,24 @@ const LobbyPage = () => {
   }, [loadGames]);
 
   useEffect(() => {
-    const handleLobbyGamesUpdated = () => {
-      void loadGames();
+    const handleLobbyGameUpdated = ({ game }: LobbyGameUpdatedPayload) => {
+      setGames((currentGames) => upsertLobbyGame(currentGames, game));
     };
 
-    socket.on(ServerPublicEvents.LOBBY_GAMES_UPDATED, handleLobbyGamesUpdated);
-
-    return () => {
-      socket.off(
-        ServerPublicEvents.LOBBY_GAMES_UPDATED,
-        handleLobbyGamesUpdated,
+    const handleLobbyGameRemoved = ({ gameId }: LobbyGameRemovedPayload) => {
+      setGames((currentGames) =>
+        currentGames.filter((game) => game.id !== gameId),
       );
     };
-  }, [loadGames, socket]);
+
+    socket.on(ServerPublicEvents.LOBBY_GAME_UPDATED, handleLobbyGameUpdated);
+    socket.on(ServerPublicEvents.LOBBY_GAME_REMOVED, handleLobbyGameRemoved);
+
+    return () => {
+      socket.off(ServerPublicEvents.LOBBY_GAME_UPDATED, handleLobbyGameUpdated);
+      socket.off(ServerPublicEvents.LOBBY_GAME_REMOVED, handleLobbyGameRemoved);
+    };
+  }, [socket]);
 
   useEffect(() => {
     let ignore = false;
@@ -214,7 +240,6 @@ const LobbyPage = () => {
 
     socket.once(ServerPrivateEvents.LEFT_GAME, () => {
       setExistingGame(null);
-      void loadGames();
     });
     socket.emit(ClientEvents.LEAVE_GAME, { gameId: existingGame.id });
   };
