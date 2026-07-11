@@ -33,7 +33,6 @@ import {
   Button,
   type GraphicCard,
   Modal,
-  DefuseView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -43,6 +42,7 @@ import {
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
+import { ExplodingKittenInsertionView } from "game/entities/graphic/ExplodingKittenInsertionView";
 
 // -------------------- OPPONENTS --------------------
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -114,6 +114,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   // Save the turn here so create() can re-apply it once seats exist.
   #currentTurnPlayerId: string | null = null;
   #drawPile: Phaser.GameObjects.Image | null = null;
+  #drawPileSize: number = 0;
+  #modal!: Modal;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -129,7 +131,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       throw new Error("Game room started without game data");
     }
 
-    const { players, hand: cards } = gameData;
+    const { players, hand: cards, deckSize } = gameData;
 
     if (hasTurnState(gameData)) {
       this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
@@ -149,29 +151,31 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.setCurrentTurn(this.#currentTurnPlayerId);
     }
 
+    this.#drawPileSize = deckSize;
+
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
 
-    // -------------- REMOVE THIS LATER --------------
-    const modal = new Modal(this).setVisible(false);
-    const view = new DefuseView(this, "player1");
-    modal.setContent(view);
+    this.#modal = new Modal(this).setVisible(false);
 
-    setTimeout(() => {
-      modal.setVisible(true);
-
-      setTimeout(() => {
-        modal.setVisible(false);
-      }, 2000);
-    }, 2000);
-    // -----------------------------------------------
+    // REMOVE THIS LATER
+    this.#players.forEach((p) => {
+      p.setAttackIndicatorVisible(true);
+      p.attackIndicator.setTurnsCount(6);
+    });
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
+    const view = new ExplodingKittenInsertionView(this, this.#drawPileSize);
+    this.#modal.setContent(view);
+    this.#modal.setVisible(true);
+    view.onConfirm = () => {
+      this.#modal.setVisible(false);
+    };
     EventBus.emit("scene-ready", this);
   }
 
@@ -399,6 +403,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
     this.updateDrawPileInteractivity();
+    this.#drawPileSize--;
   };
 
   private drawCard = () => {
