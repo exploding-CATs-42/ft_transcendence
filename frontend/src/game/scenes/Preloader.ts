@@ -16,6 +16,7 @@ import {
   attackIcon,
   shuffleSpritesheet,
   dead,
+  nopeSpritesheet,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -57,6 +58,10 @@ export class Preloader extends Scene {
       endFrame: 23,
     });
     this.load.image(Textures.dead, dead);
+    this.load.spritesheet(Textures.nope, nopeSpritesheet, {
+      frameWidth: 194,
+      frameHeight: 194,
+    });
   }
 
   create() {
