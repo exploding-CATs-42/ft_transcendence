@@ -1,9 +1,9 @@
-import type { WaitingPlayerView } from "../sockets";
+import type { ProfileUser } from "./users";
 
 export interface GameRecord {
   id: string;
   name: string;
   maxPlayers: number;
   createdAt: number;
-  players: WaitingPlayerView[];
+  players: ProfileUser[];
 }
