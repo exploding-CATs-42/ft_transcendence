@@ -1,7 +1,11 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import type { Card, CardPayload } from "@exploding-cats/game-core";
+import {
+  DEFAULT_GAME_RULES,
+  type Card,
+  type CardPayload,
+} from "@exploding-cats/game-core";
 import type {
   CardPlayedPayload,
   CardRemovedPayload,
@@ -32,6 +36,7 @@ import {
   PlayerSeat,
   Button,
   type GraphicCard,
+  NopeButton,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -77,6 +82,11 @@ const CARD_DROP_ZONE = {
 //   x: DRAW_PILE_POSITION.x + 110,
 //   y: DRAW_PILE_POSITION.y + 160,
 // };
+
+const NOPE_BUTTON_POSITION = {
+  x: 1700,
+  y: 800,
+};
 
 // -------------------- MY HAND --------------------
 const HAND_POSITION: Point = {
@@ -152,6 +162,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createDiscardPile();
     this.createMyHand();
     this.fillMyHandWithCards(cards);
+
+    // -------------- REMOVE THIS LATER --------------
+    const nopeButton = new NopeButton(this, NOPE_BUTTON_POSITION);
+    nopeButton.onClick = () => {
+      clearInterval(intervalID);
+      nopeButton.hide();
+      console.log("someone just clicked me");
+    };
+
+    nopeButton.showAnimated();
+    const intervalID = setInterval(() => {
+      nopeButton.showAnimated();
+    }, DEFAULT_GAME_RULES.nopeWindowMs);
+    // -----------------------------------------------
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
