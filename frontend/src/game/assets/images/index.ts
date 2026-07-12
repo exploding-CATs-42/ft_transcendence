@@ -9,3 +9,4 @@ export { default as cardTypeIcons } from "./card-types.png";
 export { default as attackIcon } from "./attack.png";
 export { default as shuffleSpritesheet } from "./cloud.png";
 export { default as dead } from "./dead.png";
+export { default as nopeSpritesheet } from "./nope.png";

@@ -13,6 +13,7 @@ export const Textures = {
   attackIcon: "attackIcon",
   shuffle: "shuffle",
   dead: "dead",
+  nope: "nope",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
