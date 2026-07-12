@@ -9,7 +9,6 @@ import {
 import api from "api";
 import { Section, Button, List, GameListItem } from "components";
 import { useModal, useSocket } from "hooks";
-import type { LobbyGame } from "types";
 import {
   CreateTableModal,
   type CreateTableFormValues,
@@ -58,15 +57,12 @@ const isTableNotFoundError = (error: unknown) => {
   return apiError.response?.status === 404;
 };
 
-const toLobbyGame = (game: GameRecord): LobbyGame => ({
-  gameId: game.id,
-  gameName: game.name,
-  maxPlayers: game.maxPlayers,
-  players: game.players,
-});
+const sortGamesByCreatedAt = (games: GameRecord[]) => {
+  return [...games].sort((left, right) => right.createdAt - left.createdAt);
+};
 
 const LobbyPage = () => {
-  const [games, setGames] = useState<LobbyGame[]>([]);
+  const [games, setGames] = useState<GameRecord[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
   const [isOpenJoinModal, toggleJoinModal] = useModal();
   const [gameId, setGameId] = useState("");
@@ -80,7 +76,7 @@ const LobbyPage = () => {
   const loadGames = useCallback(async () => {
     const games = await api.games.getAll();
 
-    setGames(games.map(toLobbyGame));
+    setGames(sortGamesByCreatedAt(games));
   }, []);
 
   useEffect(() => {
@@ -217,7 +213,9 @@ const LobbyPage = () => {
         maxPlayers,
       });
 
-      setGames((prevGames) => [toLobbyGame(createdGame), ...prevGames]);
+      setGames((prevGames) =>
+        sortGamesByCreatedAt([createdGame, ...prevGames]),
+      );
       navigate(`/game?gameId=${encodeURIComponent(createdGame.id)}`);
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);
@@ -242,12 +240,12 @@ const LobbyPage = () => {
       <Section className={s.listSection}>
         <List
           items={games}
-          getKey={(game) => game.gameId}
+          getKey={(game) => game.id}
           renderItem={(game) => (
             <button
               type="button"
               className={s.gameButton}
-              onClick={() => handleOpenJoinModalWithGameId(game.gameId)}
+              onClick={() => handleOpenJoinModalWithGameId(game.id)}
             >
               <GameListItem game={game} />
             </button>

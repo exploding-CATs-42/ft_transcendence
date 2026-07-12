@@ -16,6 +16,8 @@ const isLobbyGame = (game: GameListItemData): game is LobbyGame => {
 };
 
 const GameListItem = ({ game }: Props) => {
+  const gameId = isLobbyGame(game) ? game.id : game.gameId;
+  const gameName = isLobbyGame(game) ? game.name : game.gameName;
   const slotCount = isLobbyGame(game)
     ? game.maxPlayers
     : GAME_HISTORY_SLOT_COUNT;
@@ -24,11 +26,9 @@ const GameListItem = ({ game }: Props) => {
   return (
     <ListItem>
       <div className={s.container}>
-        <span className={s.title}>{game.gameName}</span>
+        <span className={s.title}>{gameName}</span>
         <ul className={s.items}>
-          {slots.map((slot, index) =>
-            renderSlot(slot, `${game.gameId}_${index}`),
-          )}
+          {slots.map((slot, index) => renderSlot(slot, `${gameId}_${index}`))}
         </ul>
       </div>
     </ListItem>
@@ -44,7 +44,7 @@ const renderSlot = (slot: GameSlot, key: string) => {
         <Avatar
           variant="game"
           src={slot.player.avatarUrl}
-          status={slot.player.isOnline ?? false}
+          status={slot.player.isOnline}
         />
       )}
     </li>
