@@ -111,6 +111,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     );
 
     this.#playersById.set(player.id, newPlayer);
+    this.#playersById.get(player.id)?.setConfirmed(player.isConfirmed);
     emptySeat.addPlayer(newPlayer);
   }
 
