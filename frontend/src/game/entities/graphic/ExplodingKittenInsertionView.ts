@@ -205,7 +205,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.#labelScore = this.createLabel(
       scene,
       { x: 0, y: LABEL_POSITION_Y },
-      `${this.#explodingKittenPos + 1}/${this.#drawPileSize}`,
+      `${this.#explodingKittenPos + 1}/${this.#drawPileSize + 1}`,
     );
 
     this.add([this.#labelTop, this.#labelBottom, this.#labelScore]);
@@ -334,7 +334,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.#explodingKittenPos = targetPos;
     this.#cards[targetPos]?.setDepth(this.#cards.length - targetPos);
 
-    this.#labelScore.setText(`${targetPos + 1}/${this.#drawPileSize}`);
+    this.#labelScore.setText(`${targetPos + 1}/${this.#drawPileSize + 1}`);
     this.reflowCards(scene);
   }
 
