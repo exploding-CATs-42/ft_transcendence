@@ -19,6 +19,7 @@ import {
   nopeSpritesheet,
   arrowLeft,
   arrowRight,
+  confirmedIconRoundedSquare,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -66,6 +67,10 @@ export class Preloader extends Scene {
     });
     this.load.image(Textures.arrowLeft, arrowLeft);
     this.load.image(Textures.arrowRight, arrowRight);
+    this.load.image(
+      Textures.confirmedIconRoundedSquare,
+      confirmedIconRoundedSquare,
+    );
   }
 
   create() {
