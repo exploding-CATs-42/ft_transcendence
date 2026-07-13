@@ -16,6 +16,7 @@ export const Textures = {
   nope: "nope",
   arrowLeft: "arrowLeft",
   arrowRight: "arrowRight",
+  confirmedIconRoundedSquare: "confirmedIconRoundedSquare",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
