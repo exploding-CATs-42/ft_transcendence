@@ -35,7 +35,7 @@ const HOVER_CONFIG = {
   offset: CARD_WIDTH / 4,
 } as const;
 
-const LABEL_POSITION_Y = (SCREEN_HEIGHT - CARD_HEIGHT) / 2 - CARD_HEIGHT / 4;
+const LABEL_POSITION_Y = (SCREEN_HEIGHT - CARD_HEIGHT) / 2 - 100;
 
 const ARROW_LINE_POSITION_Y = 900;
 
@@ -204,7 +204,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
 
     this.#labelScore = this.createLabel(
       scene,
-      { x: 0, y: ARROW_LINE_POSITION_Y - 50 },
+      { x: 0, y: LABEL_POSITION_Y },
       `${this.#explodingKittenPos + 1}/${this.#drawPileSize}`,
     );
 
@@ -225,7 +225,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     const positions = {
       top: startX + CARD_WIDTH / 2,
       bottom: startX + spacing * (this.#cards.length - 1) + CARD_WIDTH / 2,
-      score: startX + spacing * (this.#cards.length / 2 - 1) + CARD_WIDTH / 2,
+      score: startX + (spacing * (this.#cards.length - 1)) / 2 + CARD_WIDTH / 2,
     };
 
     this.animateLabel(scene, this.#labelTop, positions.top);
