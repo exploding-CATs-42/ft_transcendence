@@ -39,6 +39,9 @@ const LABEL_POSITION_Y = (SCREEN_HEIGHT - CARD_HEIGHT) / 2 - CARD_HEIGHT / 4;
 
 const ARROW_LINE_POSITION_Y = 900;
 
+const HOLD_REPEAT_DELAY = 400;
+const HOLD_REPEAT_INTERVAL = 150;
+
 export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
   onConfirm?: () => void;
 
@@ -53,6 +56,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
 
   #holding = false;
   #moveTimer?: Phaser.Time.TimerEvent | undefined;
+  #repeatDelay?: Phaser.Time.TimerEvent | undefined;
 
   constructor(scene: Phaser.Scene, drawPileSize: number) {
     super(scene);
@@ -336,24 +340,27 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.stopMoving();
 
     this.#holding = true;
-    this.#moveTimer = scene.time.addEvent({
-      delay: 150,
-      callback: () => {
-        if (this.#holding) {
-          this.moveCard(scene, this.#explodingKittenPos, step);
-        }
-      },
-      loop: true,
+    this.moveCard(scene, this.#explodingKittenPos, step);
+
+    this.#repeatDelay = scene.time.delayedCall(HOLD_REPEAT_DELAY, () => {
+      if (!this.#holding) return;
+
+      this.#moveTimer = scene.time.addEvent({
+        delay: HOLD_REPEAT_INTERVAL,
+        callback: () => this.moveCard(scene, this.#explodingKittenPos, step),
+        loop: true,
+      });
     });
   }
 
   private stopMoving() {
     this.#holding = false;
 
-    if (this.#moveTimer) {
-      this.#moveTimer.remove();
-      this.#moveTimer = undefined;
-    }
+    this.#repeatDelay?.remove();
+    this.#repeatDelay = undefined;
+
+    this.#moveTimer?.remove();
+    this.#moveTimer = undefined;
   }
 
   // ==============================
