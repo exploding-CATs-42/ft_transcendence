@@ -39,6 +39,8 @@ const LABEL_POSITION_Y = (SCREEN_HEIGHT - CARD_HEIGHT) / 2 - CARD_HEIGHT / 4;
 
 const ARROW_LINE_POSITION_Y = 900;
 
+const ARROW_OFFSET_X = 350;
+
 const HOLD_REPEAT_DELAY = 400;
 const HOLD_REPEAT_INTERVAL = 150;
 
@@ -370,9 +372,6 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
   private addArrows(scene: Phaser.Scene) {
     const container = scene.add.container();
 
-    const lineWidth = 1100;
-    const arrowOffset = lineWidth / 2 + 100;
-
     const stopMoving = () => this.stopMoving();
 
     const createArrow = (x: number, texture: string, direction: number) => {
@@ -392,23 +391,19 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       return arrow;
     };
 
-    const leftArrow = createArrow(-arrowOffset, Textures.arrowLeft, -1);
+    const leftArrow = createArrow(-ARROW_OFFSET_X, Textures.arrowLeft, -1);
 
-    const rightArrow = createArrow(arrowOffset, Textures.arrowRight, 1);
+    const rightArrow = createArrow(ARROW_OFFSET_X, Textures.arrowRight, 1);
 
-    const positionLine = scene.add
-      .rectangle(0, ARROW_LINE_POSITION_Y, lineWidth, 40, 0xffffff)
-      .setStrokeStyle(1, 0xffffff);
-
-    container.add([leftArrow, positionLine, rightArrow]);
+    container.add([leftArrow, rightArrow]);
 
     return container;
   }
 
   private addConfirmationButton(scene: Phaser.Scene) {
     const confirmationButton = scene.add
-      .image(0, ARROW_LINE_POSITION_Y + 100, Textures.confirmedIcon)
-      .setDisplaySize(100, 100)
+      .image(0, ARROW_LINE_POSITION_Y, Textures.confirmedIconRoundedSquare)
+      .setDisplaySize(190, 190)
       .setInteractive({ useHandCursor: true });
 
     confirmationButton.on("pointerdown", () => {
