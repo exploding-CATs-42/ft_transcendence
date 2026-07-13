@@ -59,7 +59,10 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         await socket.join(room);
         socketsMap.set(player.id, socket);
 
-        const privatePayload: WaitingStatePayload = { waitingState };
+        const privatePayload: WaitingStatePayload = {
+          waitingState,
+          meConfirmed: player.isConfirmed,
+        };
         const publicPayload: PlayerJoinedPayload = { player };
 
         socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
