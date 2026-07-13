@@ -220,6 +220,7 @@ export async function reconnectGame(
   }
 
   const orderedPlayers = orderPlayersForPlayer(players, player.id);
+  const context = game.instance.getSnapshot().context;
 
   const gameContext = game.instance.getSnapshot().context;
   return {
@@ -227,6 +228,7 @@ export async function reconnectGame(
     hand: player.hand,
     currentTurnPlayerId: gameContext.currentTurnPlayerId,
     deckSize: gameContext.deck.length,
+    lastPlayedCard: context.lastPlayedCard,
   };
 }
 

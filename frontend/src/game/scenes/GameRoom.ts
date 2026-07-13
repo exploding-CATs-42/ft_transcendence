@@ -161,7 +161,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.createCardDropZone();
     this.createDrawPile();
-    this.createDiscardPile();
+    this.createDiscardPile(
+      hasTurnState(gameData) ? gameData.lastPlayedCard : null,
+    );
     this.createMyHand();
     this.fillMyHandWithCards(cards);
 
@@ -276,9 +278,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.updateDrawPileInteractivity();
   }
 
-  private createDiscardPile() {
-    const cardFrame = this.textures.get(Textures.cards).get(0);
-    this.addCard(cardFrame, DISCARD_PILE_POSITION);
+  private createDiscardPile(lastPlayedCard: Card | null = null) {
+    let frame: Phaser.Textures.Frame;
+
+    if (lastPlayedCard) {
+      frame = getCardFrame(this, CARD_TYPE_TO_FRAME_INDEX[lastPlayedCard.type]);
+    } else {
+      frame = this.textures.get(Textures.cards).get(0);
+    }
+
+    this.addCard(frame, DISCARD_PILE_POSITION);
   }
 
   private createCardDropZone() {
