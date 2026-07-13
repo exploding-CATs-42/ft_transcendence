@@ -55,6 +55,8 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   #seats: PlayerSeat[] = [];
   #playersById = new Map<string, GraphicPlayer>();
   #waitingLabel!: Phaser.GameObjects.Text;
+  #readyButton!: Button;
+  #isReady = false;
   #countdownTimer: Phaser.Time.TimerEvent | null = null;
   #unsubscribe: (() => void) | null = null;
 
@@ -128,29 +130,34 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   }
 
   private addReadinessButton() {
-    let ready: boolean = false;
-    const onClick = (button: Button) => {
-      if (ready) {
-        ready = false;
-        button.setBackgroundColor(0x61c51b);
-        button.setText("Ready");
+    const onClick = () => {
+      if (this.#isReady) {
+        this.setReady(false);
         cancelStart();
       } else {
-        ready = true;
-        button.setBackgroundColor(0xff0000);
-        button.setText("Cancel");
+        this.setReady(true);
         confirmStart();
       }
     };
 
-    const button = new Button(
+    this.#readyButton = new Button(
       this,
       BUTTON_POSITION,
       BUTTON_SIZE,
       "Ready",
       onClick,
     );
-    return button;
+  }
+
+  private setReady(isReady: boolean) {
+    this.#isReady = isReady;
+    if (isReady) {
+      this.#readyButton.setBackgroundColor(0xff0000);
+      this.#readyButton.setText("Cancel");
+    } else {
+      this.#readyButton.setBackgroundColor(0x61c51b);
+      this.#readyButton.setText("Ready");
+    }
   }
 
   private addLeaveGameButton() {
@@ -179,8 +186,9 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
       .setOrigin(0.5, 0);
   }
 
-  onWaitingState = (players: WaitingPlayerView[]) => {
+  onWaitingState = (players: WaitingPlayerView[], isConfirmed: boolean) => {
     players.forEach((player) => this.addPlayer(player));
+    this.setReady(isConfirmed);
   };
 
   onPlayerJoined = (player: WaitingPlayerView) => {

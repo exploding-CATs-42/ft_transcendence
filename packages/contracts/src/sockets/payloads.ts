@@ -20,6 +20,7 @@ export interface CountdownStartedPayload {
 
 export interface WaitingStatePayload {
   waitingState: WaitingStateView;
+  meConfirmed: boolean;
 }
 
 export interface GameStartedPayload {
