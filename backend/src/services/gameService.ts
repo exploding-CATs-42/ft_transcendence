@@ -37,13 +37,7 @@ function ensureGameExists(gameId: string) {
 }
 
 function isGameInProgress(game: Game): boolean {
-  const { value } = game.instance.getSnapshot();
-
-  if (typeof value === "string") {
-    return value === GameStates.PLAYING;
-  }
-
-  return value !== null && GameStates.PLAYING in value;
+  return game.instance.getSnapshot().matches(GameStates.PLAYING);
 }
 
 function orderPlayersForPlayer(players: Player[], playerId: UserId): Player[] {
