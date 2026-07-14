@@ -1,15 +1,16 @@
 // Libraries
 import type { Socket } from "socket.io-client";
+import { toast } from "react-toastify";
 // Project level
 import { socket } from "socket";
-import { ClientEvents, ServerErrorEvents } from "@exploding-cats/contracts";
+import {
+  ClientEvents,
+  ServerErrorEvents,
+  SocketErrorCodes,
+  type SocketErrorPayload,
+} from "@exploding-cats/contracts";
 
 let gameId = "";
-const GAME_ALREADY_IN_PROGRESS_MESSAGE = "Game is already in progress";
-
-interface SocketErrorPayload {
-  message: string;
-}
 
 export const setGameId = (id: string) => {
   gameId = id;
@@ -25,8 +26,13 @@ export const leaveGame = () => {
 export function connectToGameSession(socket: Socket, gameId: string) {
   const join = () => socket.emit(ClientEvents.JOIN_GAME, { gameId });
   const reconnect = () => socket.emit(ClientEvents.RECONNECT_GAME, { gameId });
-  const onJoinGameError = ({ message }: SocketErrorPayload) => {
-    if (message === GAME_ALREADY_IN_PROGRESS_MESSAGE) reconnect();
+  const onJoinGameError = ({ code, message }: SocketErrorPayload) => {
+    if (code === SocketErrorCodes.RECONNECT_REQUIRED) {
+      reconnect();
+      return;
+    }
+
+    toast(message);
   };
   if (socket.connected) join();
   socket.on("connect", join);
