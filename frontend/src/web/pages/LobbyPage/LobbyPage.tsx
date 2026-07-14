@@ -8,6 +8,8 @@ import {
   type LobbyGameUpdatedPayload,
   ServerPrivateEvents,
   ServerPublicEvents,
+  type SocketAckPayload,
+  SocketErrorCodes,
 } from "@exploding-cats/contracts";
 import api from "api";
 import { Section, Button, List, GameListItem } from "components";
@@ -38,12 +40,6 @@ type ApiConflictError = {
   };
 };
 
-type ApiError = {
-  response?: {
-    status?: number;
-  };
-};
-
 const getExistingGameIdFromError = (error: unknown) => {
   const apiError = error as ApiConflictError;
 
@@ -52,12 +48,6 @@ const getExistingGameIdFromError = (error: unknown) => {
   }
 
   return apiError.response.data?.details?.existingGameId ?? null;
-};
-
-const isTableNotFoundError = (error: unknown) => {
-  const apiError = error as ApiError;
-
-  return apiError.response?.status === 404;
 };
 
 const sortGamesByCreatedAt = (games: GameRecord[]) => {
@@ -208,18 +198,23 @@ const LobbyPage = () => {
     setIsJoiningGame(true);
 
     try {
-      await api.games.getById(trimmedGameId);
+      const response: SocketAckPayload = await socket
+        .timeout(5000)
+        .emitWithAck(ClientEvents.JOIN_GAME, { gameId: trimmedGameId });
+
+      if (
+        !response.ok &&
+        response.code !== SocketErrorCodes.RECONNECT_REQUIRED
+      ) {
+        setJoinError(response.message);
+        return;
+      }
 
       toggleJoinModal(false);
       navigate(`/game?gameId=${encodeURIComponent(trimmedGameId)}`);
     } catch (error) {
-      if (isTableNotFoundError(error)) {
-        setJoinError("Table not found");
-        return;
-      }
-
-      console.error("Failed to validate table id:", error);
-      setJoinError("Table not found");
+      console.error("Failed to join game:", error);
+      setJoinError("Connection problem, please try again");
     } finally {
       setIsJoiningGame(false);
     }
