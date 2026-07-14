@@ -51,8 +51,7 @@ function filter(friendships: FriendItem[], view?: FriendshipView) {
       return friendships.filter(
         (f) =>
           f.status === FriendshipStatus.ACCEPTED ||
-          (f.status === FriendshipStatus.PENDING &&
-            f.direction === FriendshipDirection.INCOMING),
+          f.status === FriendshipStatus.PENDING,
       );
 
     default:
@@ -102,23 +101,19 @@ export async function listFriends(params: {
 }
 
 /*
-  Mirrors the FRIENDS_AND_REQUESTS view from the receiving side: notify everyone whose friends tab currently displays this user — accepted friends, plus recipients of this user's pending requests. If the UI view logic changes, this filter must change with it.
+  Mirrors the FRIENDS_AND_REQUESTS view: notify everyone whose friends tab
+  currently displays this user — accepted friends and either participant in a
+  pending friendship request.
 */
 export async function listOnlineStatusRecipientIds(
   userId: UserId,
 ): Promise<UserId[]> {
   const friendships = await prisma.friendship.findMany({
     where: {
-      OR: [
-        {
-          status: FriendshipStatus.ACCEPTED,
-          OR: [{ userLowId: userId }, { userHighId: userId }],
-        },
-        {
-          status: FriendshipStatus.PENDING,
-          requestedById: userId,
-        },
-      ],
+      status: {
+        in: [FriendshipStatus.ACCEPTED, FriendshipStatus.PENDING],
+      },
+      OR: [{ userLowId: userId }, { userHighId: userId }],
     },
     select: { userLowId: true, userHighId: true },
   });
