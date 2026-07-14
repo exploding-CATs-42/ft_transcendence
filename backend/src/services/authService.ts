@@ -18,13 +18,11 @@ import type {
   LoginRequestBody,
   User,
 } from "@exploding-cats/contracts";
+import { ApiError } from "errors";
 
-export class AuthServiceError extends Error {
-  public statusCode: number;
-
+export class AuthServiceError extends ApiError {
   constructor(message: string, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
+    super(message, statusCode);
   }
 }
 
