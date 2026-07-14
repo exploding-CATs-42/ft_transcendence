@@ -213,6 +213,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   };
 
   onCountdownStarted = (endsAt: number) => {
+    this.#countdownTimer?.remove();
     const tick = () => {
       const secondsLeft = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
       this.#waitingLabel.setText(`Game starts in ${secondsLeft}...`);
