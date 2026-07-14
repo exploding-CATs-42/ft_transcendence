@@ -45,7 +45,7 @@ const HOLD_REPEAT_DELAY = 400;
 const HOLD_REPEAT_INTERVAL = 150;
 
 export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
-  onConfirm?: () => void;
+  onConfirm?: (explodingKittenPos: number) => void;
 
   #cards: Phaser.GameObjects.Image[] = [];
 
@@ -407,7 +407,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       .setInteractive({ useHandCursor: true });
 
     confirmationButton.on("pointerdown", () => {
-      if (this.onConfirm) this.onConfirm();
+      if (this.onConfirm) this.onConfirm(this.#explodingKittenPos);
     });
 
     this.add(confirmationButton);
