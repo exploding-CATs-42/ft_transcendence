@@ -15,7 +15,11 @@ import { emit, leaveGame } from "./gameSession";
 import { hasCachedGameState } from "./gameRoom";
 
 export interface WaitingRoomHandlers {
-  onWaitingState(players: WaitingPlayerView[], isConfirmed: boolean): void;
+  onWaitingState(
+    players: WaitingPlayerView[],
+    isConfirmed: boolean,
+    countdownEndsAt: number | null,
+  ): void;
   onPlayerJoined(player: WaitingPlayerView): void;
   onPlayerLeft(playerId: string): void;
   onPlayerConfirmed(playerId: string): void;
@@ -42,7 +46,11 @@ export function subscribeWaitingRoom(
   handlers: WaitingRoomHandlers,
 ): () => void {
   const onWaitingState = (p: WaitingStatePayload) =>
-    handlers.onWaitingState(p.waitingState.players, p.meConfirmed);
+    handlers.onWaitingState(
+      p.waitingState.players,
+      p.meConfirmed,
+      p.countdownEndsAt,
+    );
   const onPlayerJoined = (p: PlayerJoinedPayload) =>
     handlers.onPlayerJoined(p.player);
   const onPlayerLeft = (p: PlayerIdPayload) =>
@@ -71,6 +79,7 @@ export function subscribeWaitingRoom(
     handlers.onWaitingState(
       lastWaitingState.waitingState.players,
       lastWaitingState.meConfirmed,
+      lastWaitingState.countdownEndsAt,
     );
   if (hasCachedGameState()) handlers.onGameStarted();
 
