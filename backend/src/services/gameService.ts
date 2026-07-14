@@ -15,6 +15,7 @@ import { GameEvents, GameStates, Player } from "@exploding-cats/game-core";
 import {
   GameStatePayload,
   PlayerIdPayload,
+  SocketErrorCodes,
   UserId,
 } from "@exploding-cats/contracts";
 import { Game, GameId, GameRecord } from "data/types";
@@ -155,11 +156,15 @@ export async function joinGame(
     player,
   } = await getGameContext(userId, input.gameId);
 
-  if (isGameInProgress(game)) {
-    throw new SocketError("Game is already in progress");
-  }
-
   if (player) {
+    if (isGameInProgress(game)) {
+      // My game is mid-play: the client must use RECONNECT_GAME
+      // to get the game state instead of the waiting room.
+      throw new SocketError("Reconnect required", {
+        code: SocketErrorCodes.RECONNECT_REQUIRED,
+      });
+    }
+
     const filteredPlayers = playersBefore.filter((p) => p.id !== player.id);
 
     return {
@@ -168,16 +173,25 @@ export async function joinGame(
     };
   }
 
+  if (isGameInProgress(game)) {
+    throw new SocketError("Game is already in progress", {
+      code: SocketErrorCodes.GAME_IN_PROGRESS,
+    });
+  }
+
   const currentGame = GameRepository.findCurrentGameByUserId(userId);
 
   if (currentGame && currentGame.id !== input.gameId) {
     throw new SocketError("Player already has an active or waiting game", {
-      existingGameId: currentGame.id,
+      code: SocketErrorCodes.ALREADY_IN_OTHER_GAME,
+      errors: { existingGameId: currentGame.id },
     });
   }
 
   if (playersBefore.length >= game.maxPlayers) {
-    throw new SocketError("Game is full");
+    throw new SocketError("Game is full", {
+      code: SocketErrorCodes.GAME_FULL,
+    });
   }
 
   const newPlayer: Player = {
