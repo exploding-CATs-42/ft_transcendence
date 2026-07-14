@@ -17,3 +17,11 @@
   line-height: 20px;
   background-color: var(--throw-throw-burrito);
 }
+
+.pending {
+  width: 80px;
+  font-size: 15px;
+  line-height: 20px;
+  text-align: center;
+  color: var(--dark-gray);
+}

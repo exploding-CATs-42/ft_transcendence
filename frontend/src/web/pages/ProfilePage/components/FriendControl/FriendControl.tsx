@@ -1,5 +1,10 @@
 //Project level
-import type { FriendItem, UserId } from "@exploding-cats/contracts";
+import {
+  FriendshipDirection,
+  FriendshipStatus,
+  type FriendItem,
+  type UserId,
+} from "@exploding-cats/contracts";
 import { Button, Icon } from "components";
 //Local level
 import s from "./FriendControl.module.css";
@@ -14,10 +19,14 @@ interface Props {
 }
 
 const FriendControl = ({ friend, friendActions }: Props) => {
+  const isOutgoingPendingRequest =
+    friend.status === FriendshipStatus.PENDING &&
+    friend.direction === FriendshipDirection.OUTGOING;
+
   return (
     <>
       <div className={s.rightContent}>
-        {friend.status === "ACCEPTED" ? (
+        {friend.status === FriendshipStatus.ACCEPTED ? (
           <Button
             className={s.closeButton}
             onClick={() => {
@@ -26,6 +35,8 @@ const FriendControl = ({ friend, friendActions }: Props) => {
           >
             <Icon name="cross" stroke="black" width={20} height={20} />
           </Button>
+        ) : isOutgoingPendingRequest ? (
+          <span className={s.pending}>Pending</span>
         ) : (
           <>
             <Button
