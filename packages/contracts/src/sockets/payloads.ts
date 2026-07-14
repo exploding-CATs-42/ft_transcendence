@@ -31,6 +31,7 @@ export interface CountdownStartedPayload {
 export interface WaitingStatePayload {
   waitingState: WaitingStateView;
   meConfirmed: boolean;
+  countdownEndsAt: number | null;
 }
 
 export interface GameStartedPayload {

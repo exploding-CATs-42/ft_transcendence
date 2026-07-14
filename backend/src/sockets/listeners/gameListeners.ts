@@ -52,7 +52,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
-        const { waitingState, player } = await joinGame(
+        const { waitingState, player, countdownEndsAt } = await joinGame(
           parsed,
           socket.data.user.id,
         );
@@ -63,6 +63,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const privatePayload: WaitingStatePayload = {
           waitingState,
           meConfirmed: player.isConfirmed,
+          countdownEndsAt,
         };
         const publicPayload: PlayerJoinedPayload = { player };
 

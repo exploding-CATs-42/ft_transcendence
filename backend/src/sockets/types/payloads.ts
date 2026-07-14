@@ -5,6 +5,7 @@ import { Card, PendingActionType } from "@exploding-cats/game-core";
 export interface JoinGameResult {
   player: WaitingPlayerView;
   waitingState: WaitingStateView;
+  countdownEndsAt: number | null;
 }
 
 export interface ComboPlayedPayload {
