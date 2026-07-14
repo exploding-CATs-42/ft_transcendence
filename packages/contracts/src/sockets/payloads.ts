@@ -5,6 +5,7 @@ import type {
   WaitingPlayerView,
   WaitingStateView,
 } from "./views";
+import type { SocketErrorCode } from "./errors";
 import type { UserId } from "../shared";
 
 export interface PlayerIdPayload {
@@ -71,3 +72,7 @@ export interface FriendOnlineStatusChangedPayload {
   userId: UserId;
   isOnline: boolean;
 }
+
+export type SocketAckPayload =
+  | { ok: true }
+  | { ok: false; code: SocketErrorCode; message: string };
