@@ -1,5 +1,4 @@
 // Local level
-import { START_GAME_COUNTDOWN_MS } from "./constants";
 import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
 import type { GameContext } from "./gameMachine";
 
@@ -8,9 +7,11 @@ type GameEmitterArgs = {
   event: GameEvent;
 };
 
-export const countdownStarted = (): GameOutEvent => ({
+export const countdownStarted = ({
+  context,
+}: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.COUNTDOWN_STARTED,
-  endsAt: Date.now() + START_GAME_COUNTDOWN_MS,
+  endsAt: context.countdownEndsAt!,
 });
 
 export const countdownCanceled = (): GameOutEvent => ({

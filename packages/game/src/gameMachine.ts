@@ -14,6 +14,8 @@ import {
   removePlayer,
   removePlayerConfirmation,
   playCard,
+  setCountdownEndsAt,
+  clearCountdownEndsAt,
 } from "./actions";
 import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
@@ -33,6 +35,7 @@ export interface GameContext {
   currentTurnPlayerId: string | null;
   lastDrawnCard: Card | null;
   lastPlayedCard: Card | null;
+  countdownEndsAt: number | null;
 }
 
 export const gameMachine = setup({
@@ -52,6 +55,8 @@ export const gameMachine = setup({
     [GameActions.CHANGE_TURN]: assign(changeTurn),
     [GameActions.DRAW_CARD]: assign(drawCard),
     [GameActions.PLAY_CARD]: assign(playCard),
+    [GameActions.SET_COUNTDOWN_ENDS_AT]: assign(setCountdownEndsAt),
+    [GameActions.CLEAR_COUNTDOWN_ENDS_AT]: assign(clearCountdownEndsAt),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -66,6 +71,7 @@ export const gameMachine = setup({
     currentTurnPlayerId: null,
     lastDrawnCard: null,
     lastPlayedCard: null,
+    countdownEndsAt: null,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -92,7 +98,8 @@ export const gameMachine = setup({
           },
         },
         [GameStates.WAITING_STARTING]: {
-          entry: emit(countdownStarted),
+          entry: [GameActions.SET_COUNTDOWN_ENDS_AT, emit(countdownStarted)],
+          exit: GameActions.CLEAR_COUNTDOWN_ENDS_AT,
           after: {
             [START_GAME_COUNTDOWN_MS]: {
               target: GameTargets.PLAYING,

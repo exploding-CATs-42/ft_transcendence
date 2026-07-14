@@ -1,6 +1,7 @@
 import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards, shuffle, drawOneCard } from "./utils";
+import { START_GAME_COUNTDOWN_MS } from "./constants";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -13,6 +14,8 @@ export const GameActions = {
   CHANGE_TURN: "changeTurn",
   DRAW_CARD: "drawCard",
   PLAY_CARD: "playCard",
+  SET_COUNTDOWN_ENDS_AT: "setCountdownEndsAt",
+  CLEAR_COUNTDOWN_ENDS_AT: "clearCountdownEndsAt",
 } as const;
 
 export interface GameActionArgs {
@@ -79,6 +82,14 @@ export const removePlayerConfirmation = ({
     ),
   };
 };
+
+export const setCountdownEndsAt = () => ({
+  countdownEndsAt: Date.now() + START_GAME_COUNTDOWN_MS,
+});
+
+export const clearCountdownEndsAt = () => ({
+  countdownEndsAt: null,
+});
 
 export const fillDeck = () => {
   const deck = createDeck();
