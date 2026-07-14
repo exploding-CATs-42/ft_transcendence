@@ -3,13 +3,11 @@ import { ProfileUserWithStats } from "@exploding-cats/contracts";
 import { prisma, publicProfileSelect } from "lib/prisma";
 import { toProfileUser, toProfileUserWithStats } from "mappers";
 import { UserGameHistoryItem } from "../../../packages/contracts/src/shared/users";
+import { ApiError } from "errors";
 
-export class UsersServiceError extends Error {
-  public statusCode: number;
-
+export class UsersServiceError extends ApiError {
   constructor(message: string, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
+    super(message, statusCode);
   }
 }
 

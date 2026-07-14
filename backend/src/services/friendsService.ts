@@ -9,13 +9,11 @@ import {
   FriendshipView,
   UserId,
 } from "@exploding-cats/contracts";
+import { ApiError } from "errors";
 
-export class FriendsServiceError extends Error {
-  public statusCode: number;
-
+export class FriendsServiceError extends ApiError {
   constructor(message: string, statusCode = 400) {
-    super(message);
-    this.statusCode = statusCode;
+    super(message, statusCode);
   }
 }
 
