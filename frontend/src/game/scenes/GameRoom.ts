@@ -175,8 +175,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const view = new ExplodingKittenInsertionView(this, this.#drawPileSize);
     this.#modal.setContent(view);
     this.#modal.setVisible(true);
-    view.onConfirm = () => {
+    view.onConfirm = (explodingKittenPos: number) => {
       this.#modal.setVisible(false);
+      console.log(explodingKittenPos);
     };
     // -----------------------------------------------
 
