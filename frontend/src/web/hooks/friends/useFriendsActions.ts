@@ -2,6 +2,7 @@
 import type { Dispatch, SetStateAction } from "react";
 // Project level
 import {
+  FriendshipView,
   FriendshipStatus,
   type FriendItem,
   type FriendshipRequestAction,
@@ -16,6 +17,11 @@ interface Props {
 export const useFriendsActions = ({ setFriends }: Props) => {
   const handleCreateFriendship = async (searchQuery: string) => {
     await api.friends.createFriendRequest({ userId: searchQuery });
+
+    const friends = await api.friends.getMeFriends({
+      view: FriendshipView.FRIENDS_AND_REQUESTS,
+    });
+    setFriends(friends);
   };
 
   const actionToStatus: Record<FriendshipRequestAction, FriendshipStatus> = {
