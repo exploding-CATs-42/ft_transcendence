@@ -186,9 +186,14 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
       .setOrigin(0.5, 0);
   }
 
-  onWaitingState = (players: WaitingPlayerView[], isConfirmed: boolean) => {
+  onWaitingState = (
+    players: WaitingPlayerView[],
+    isConfirmed: boolean,
+    countdownEndsAt: number | null,
+  ) => {
     players.forEach((player) => this.addPlayer(player));
     this.setReady(isConfirmed);
+    if (countdownEndsAt !== null) this.onCountdownStarted(countdownEndsAt);
   };
 
   onPlayerJoined = (player: WaitingPlayerView) => {
