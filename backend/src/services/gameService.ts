@@ -177,6 +177,7 @@ export async function joinGame(
     return {
       player: toWaitingPlayerView(player),
       waitingState: { players: filteredPlayers.map(toWaitingPlayerView) },
+      countdownEndsAt: game.instance.getSnapshot().context.countdownEndsAt,
     };
   }
 
@@ -218,6 +219,7 @@ export async function joinGame(
   return {
     player: toWaitingPlayerView(newPlayer),
     waitingState: { players: playersBefore.map(toWaitingPlayerView) },
+    countdownEndsAt: game.instance.getSnapshot().context.countdownEndsAt,
   };
 }
 
