@@ -254,9 +254,6 @@ const LobbyPage = () => {
         maxPlayers,
       });
 
-      setGames((prevGames) =>
-        sortGamesByCreatedAt([createdGame, ...prevGames]),
-      );
       navigate(`/game?gameId=${encodeURIComponent(createdGame.id)}`);
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);
