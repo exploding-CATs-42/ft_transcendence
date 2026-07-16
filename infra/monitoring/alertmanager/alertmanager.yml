@@ -8,7 +8,7 @@ route:
     - alertname
     - service
   group_wait: 10s
-  group_interval: 5m
+  group_interval: 30s
   repeat_interval: 4h
 
 receivers:
