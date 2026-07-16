@@ -32,6 +32,7 @@ import {
   PlayerSeat,
   Button,
   type GraphicCard,
+  type KindComboSelection,
   Modal,
   ExplodingKittenInsertionView,
 } from "../entities";
@@ -233,8 +234,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       HAND_POSITION,
       onCardDrop,
       this.isMyTurn,
+      {
+        onKindComboSelectionChange: this.emitKindComboSelectionChange,
+      },
     );
   }
+
+  private emitKindComboSelectionChange = (
+    selection: KindComboSelection | null,
+  ) => {
+    EventBus.emit("kind-combo-selection-change", selection);
+  };
 
   private fillMyHandWithCards(cards: Card[]) {
     cards.forEach((card) => {
