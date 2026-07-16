@@ -89,6 +89,25 @@ services:
     networks:
       - transcendence_net
     
+  alertmanager:
+    image: prom/alertmanager:v0.32.1
+    container_name: ft-alertmanager
+    profiles:
+      - alerts
+    command:
+      - "--config.file=/etc/alertmanager/alertmanager.yml"
+      - "--storage.path=/alertmanager"
+    expose:
+      - "9093"
+    volumes:
+      - alertmanager_data:/alertmanager
+      - ../monitoring/alertmanager/alertmanager.yml:/etc/alertmanager/alertmanager.yml:ro
+    secrets:
+      - telegram_bot_token
+      - telegram_chat_id
+    networks:
+      - transcendence_net
+
   grafana:
     image: grafana/grafana:11.3.1
     container_name: ft-grafana
@@ -126,6 +145,13 @@ volumes:
   frontend_node_modules:
   grafana_data:
   prometheus_data:
+  alertmanager_data:
+
+secrets:
+  telegram_bot_token:
+    file: ../secrets/telegram_bot_token
+  telegram_chat_id:
+    file: ../secrets/telegram_chat_id
 
 networks:
   transcendence_net:
