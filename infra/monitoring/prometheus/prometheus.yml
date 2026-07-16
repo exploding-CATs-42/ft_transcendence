@@ -19,3 +19,41 @@ scrape_configs:
   - job_name: "backend"
     static_configs:
       - targets: ["backend:3000"]
+
+  - job_name: "blackbox"
+    scrape_interval: 30s
+    metrics_path: /probe
+    static_configs:
+      - targets:
+          - "http://nginx/health"
+        labels:
+          service: "nginx"
+          module: "http_2xx"
+
+      - targets:
+          - "http://frontend:5173/"
+        labels:
+          service: "frontend"
+          module: "http_2xx"
+
+      - targets:
+          - "http://backend:3000/metrics"
+        labels:
+          service: "backend"
+          module: "http_2xx"
+
+      - targets:
+          - "postgres:5432"
+        labels:
+          service: "postgres"
+          module: "tcp_connect"
+
+    relabel_configs:
+      - source_labels: [__address__]
+        target_label: __param_target
+      - source_labels: [module]
+        target_label: __param_module
+      - source_labels: [__param_target]
+        target_label: instance
+      - target_label: __address__
+        replacement: "blackbox:9115"
