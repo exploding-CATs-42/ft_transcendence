@@ -108,6 +108,18 @@ services:
     networks:
       - transcendence_net
 
+  blackbox:
+    image: prom/blackbox-exporter:v0.28.0
+    container_name: ft-blackbox
+    command:
+      - "--config.file=/etc/blackbox_exporter/blackbox.yml"
+    expose:
+      - "9115"
+    volumes:
+      - ../monitoring/blackbox/blackbox.yml:/etc/blackbox_exporter/blackbox.yml:ro
+    networks:
+      - transcendence_net
+
   grafana:
     image: grafana/grafana:11.3.1
     container_name: ft-grafana
