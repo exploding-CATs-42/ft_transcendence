@@ -34,6 +34,7 @@ import {
   Modal,
   SkipView,
   type GraphicCard,
+  type KindComboSelection,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -229,8 +230,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       HAND_POSITION,
       onCardDrop,
       this.isMyTurn,
+      {
+        onKindComboSelectionChange: this.emitKindComboSelectionChange,
+      },
     );
   }
+
+  private emitKindComboSelectionChange = (
+    selection: KindComboSelection | null,
+  ) => {
+    EventBus.emit("kind-combo-selection-change", selection);
+  };
 
   private fillMyHandWithCards(cards: Card[]) {
     cards.forEach((card) => {
