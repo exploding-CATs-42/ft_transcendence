@@ -1,0 +1,26 @@
+global:
+  resolve_timeout: 5m
+  telegram_bot_token_file: /run/secrets/telegram_bot_token
+
+route:
+  receiver: telegram
+  group_by:
+    - alertname
+    - service
+  group_wait: 10s
+  group_interval: 5m
+  repeat_interval: 4h
+
+receivers:
+  - name: telegram
+    telegram_configs:
+      - chat_id_file: /run/secrets/telegram_chat_id
+        send_resolved: true
+        parse_mode: HTML
+        message: |-
+          {{ if eq .Status "firing" }}🚨 <b>Service unavailable</b>{{ else }}✅ <b>Service recovered</b>{{ end }}
+          {{ range .Alerts }}
+          <b>Service:</b> <code>{{ if .Labels.service }}{{ .Labels.service }}{{ else }}{{ .Labels.job }}{{ end }}</code>
+          <b>Alert:</b> <code>{{ .Labels.alertname }}</code>
+          {{ if eq .Status "firing" }}{{ .Annotations.description }}{{ else }}The service is available again.{{ end }}
+          {{ end }}
