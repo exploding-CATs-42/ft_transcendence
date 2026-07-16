@@ -4,6 +4,7 @@ import {
   ServerPublicEvents,
   type CardPlayedPayload,
   type CardRemovedPayload,
+  type ComboPlayedPayload,
   type GameStatePayload,
   type PlayerIdPayload,
 } from "@exploding-cats/contracts";
@@ -22,6 +23,7 @@ export interface GameRoomHandlers {
   onPlayerReconnected(payload: PlayerIdPayload): void;
   onDeckShuffled(): void;
   onTurnSkipped(payload: PlayerIdPayload): void;
+  onComboPlayed(payload: ComboPlayedPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -58,6 +60,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.PLAYER_RECONNECTED, handlers.onPlayerReconnected],
     [ServerPublicEvents.DECK_SHUFFLED, handlers.onDeckShuffled],
     [ServerPublicEvents.TURN_SKIPPED, handlers.onTurnSkipped],
+    [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
@@ -76,4 +79,6 @@ export function attachGameRoomSockets(
 export const drawCard = () => emit(ClientEvents.DRAW_CARD);
 export const playCard = (cardId: number) =>
   emit(ClientEvents.PLAY_CARD, { cardId });
+export const playCombo = (cardIds: number[]) =>
+  emit(ClientEvents.PLAY_COMBO, { cardIds });
 export const leaveCurrentGame = leaveGame;

@@ -18,6 +18,7 @@ import {
   clearCountdownEndsAt,
   shuffleDeck,
   skipTurn,
+  playCombo,
 } from "./actions";
 import { type Player, type Deck, type Card, CardType } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
@@ -70,6 +71,7 @@ export const gameMachine = setup({
     [GameActions.CLEAR_COUNTDOWN_ENDS_AT]: assign(clearCountdownEndsAt),
     [GameActions.SHUFFLE_DECK]: assign(shuffleDeck),
     [GameActions.SKIP_TURN]: assign(skipTurn),
+    [GameActions.PLAY_COMBO]: assign(playCombo),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -237,6 +239,9 @@ export const gameMachine = setup({
                 actions: GameActions.PLAY_CARD,
               },
             ],
+            [GameEvents.PLAY_COMBO]: {
+              actions: GameActions.PLAY_COMBO,
+            },
           },
         },
       },

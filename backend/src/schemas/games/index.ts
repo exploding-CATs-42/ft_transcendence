@@ -8,3 +8,4 @@ export * from "./confirmStartSchema";
 export * from "./cancelStartSchema";
 export * from "./drawCardSchema";
 export * from "./playCardSchema";
+export * from "./playComboSchema";

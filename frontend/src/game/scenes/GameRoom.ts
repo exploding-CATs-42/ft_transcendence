@@ -5,6 +5,7 @@ import { type Card, type CardPayload } from "@exploding-cats/game-core";
 import type {
   CardPlayedPayload,
   CardRemovedPayload,
+  ComboPlayedPayload,
   GameStartedPayload,
   GameStatePayload,
   PlayerIdPayload,
@@ -41,6 +42,7 @@ import {
   attachGameRoomSockets,
   drawCard,
   leaveCurrentGame,
+  playCombo,
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
@@ -115,7 +117,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
-  //   #cardDropZone!: Phaser.GameObjects.Zone;
   #detachSockets: CleanupFunction;
   #pendingGameState: GameStatePayload | null = null;
   #meId: string | null = null;
@@ -124,8 +125,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   // Save the turn here so create() can re-apply it once seats exist.
   #currentTurnPlayerId: string | null = null;
   #drawPile: Phaser.GameObjects.Image | null = null;
-  //   #drawPileSize: number = 0;
   #shuffleAnimation!: ShuffleAnimation;
+  #discardPile: Phaser.GameObjects.Image | null = null;
+  #cardDropZone: Phaser.GameObjects.Zone | null = null;
+  #selectedKindCombo: KindComboSelection | null = null;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -232,6 +235,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.isMyTurn,
       {
         onKindComboSelectionChange: this.emitKindComboSelectionChange,
+        onKindComboPlay: this.playSelectedKindCombo,
       },
     );
   }
@@ -239,6 +243,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private emitKindComboSelectionChange = (
     selection: KindComboSelection | null,
   ) => {
+    this.#selectedKindCombo = selection;
+    this.updateDiscardPileInteractivity();
     EventBus.emit("kind-combo-selection-change", selection);
   };
 
@@ -293,15 +299,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       frame = this.textures.get(Textures.cards).get(0);
     }
 
-    this.addCard(frame, DISCARD_PILE_POSITION);
+    this.#discardPile = this.addCard(frame, DISCARD_PILE_POSITION);
+    this.#discardPile.on("pointerdown", this.playSelectedKindCombo);
+    this.updateDiscardPileInteractivity();
   }
 
   private createCardDropZone() {
     const { x, y, width, height } = CARD_DROP_ZONE;
-    const zone = this.add.zone(x, y, width, height).setOrigin(0, 0);
-    zone.setRectangleDropZone(width, height);
-
-    // this.#cardDropZone = zone;
+    this.#cardDropZone = this.add.zone(x, y, width, height).setOrigin(0, 0);
+    this.#cardDropZone.setRectangleDropZone(width, height);
+    this.#cardDropZone.on("pointerdown", this.playSelectedKindCombo);
   }
 
   private addShuffleAnimationObject() {
@@ -432,13 +439,28 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
     this.updateDrawPileInteractivity();
-    // this.#drawPileSize--;
+    this.updateDiscardPileInteractivity();
   };
 
   private drawCard = () => {
     if (!this.isMyTurn()) return;
     drawCard();
   };
+
+  private playSelectedKindCombo = () => {
+    if (!this.isMyTurn() || !this.#selectedKindCombo) return;
+
+    playCombo(this.#selectedKindCombo.cardIds);
+  };
+
+  private updateDiscardPileInteractivity() {
+    if (this.isMyTurn() && this.#selectedKindCombo) {
+      this.#discardPile?.setInteractive({ useHandCursor: true });
+      return;
+    }
+
+    this.#discardPile?.disableInteractive(true);
+  }
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
     this.#myHand.removeCard(payload.cardId);
@@ -473,6 +495,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onDeckShuffled = (): void => {
     this.#shuffleAnimation.playAnimation();
+  };
+
+  onComboPlayed = (payload: ComboPlayedPayload): void => {
+    payload.cardTypes.forEach((cardType) => {
+      this.#opponents.get(payload.playerId)?.removeCard();
+
+      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[cardType];
+      const cardFrame = getCardFrame(this, frameIndex);
+      this.addCard(cardFrame, DISCARD_PILE_POSITION);
+    });
   };
 
   private cleanup = () => {

@@ -36,9 +36,11 @@ export interface KindComboSelection {
 type OnKindComboSelectionChange = (
   selection: KindComboSelection | null,
 ) => void;
+type OnKindComboPlay = () => void;
 
 interface GraphicHandOptions {
   onKindComboSelectionChange?: OnKindComboSelectionChange;
+  onKindComboPlay?: OnKindComboPlay;
 }
 
 export class GraphicHand {
@@ -50,6 +52,7 @@ export class GraphicHand {
   #hoveredCardImage: Phaser.GameObjects.Image | null = null;
   #onCardDropCallback: onCardDropCallback;
   #onKindComboSelectionChange: OnKindComboSelectionChange | null;
+  #onKindComboPlay: OnKindComboPlay | null;
   #isMyTurn: () => boolean;
 
   constructor(
@@ -64,6 +67,7 @@ export class GraphicHand {
     this.#onCardDropCallback = onCardDropCallback;
     this.#onKindComboSelectionChange =
       options.onKindComboSelectionChange ?? null;
+    this.#onKindComboPlay = options.onKindComboPlay ?? null;
     this.#isMyTurn = isMyTurn;
   }
 
@@ -124,7 +128,7 @@ export class GraphicHand {
       data,
     };
 
-    this.attachCardDragHandlers(newGraphicCard.image);
+    this.attachCardDragHandlers(newGraphicCard);
     this.attachCardDropHandler(newGraphicCard);
     this.attachCardHoverHandler(newGraphicCard.image);
     this.attachCardSelectionHandler(newGraphicCard);
@@ -134,14 +138,31 @@ export class GraphicHand {
 
   // -------------- Event handlers --------------
 
-  private attachCardDragHandlers(cardImage: Phaser.GameObjects.Image) {
-    let originX: number;
-    let originDepth: number;
+  private attachCardDragHandlers(graphicCard: GraphicCard) {
+    const cardImage = graphicCard.image;
+    let draggedCards: Phaser.GameObjects.Image[] = [];
+    let dragOrigins = new Map<
+      Phaser.GameObjects.Image,
+      { x: number; y: number; depth: number }
+    >();
 
     const onDragStart = () => {
-      originX = cardImage.x;
-      originDepth = cardImage.depth;
-      cardImage.setDepth(BIGGEST_DEPTH);
+      draggedCards = this.getCardsDraggedWith(graphicCard);
+      dragOrigins = new Map(
+        draggedCards.map((card) => [
+          card,
+          {
+            x: card.x,
+            y: card.y,
+            depth: card.depth,
+          },
+        ]),
+      );
+
+      this.#scene.tweens.killTweensOf(draggedCards);
+      draggedCards.forEach((card, index) => {
+        card.setDepth(BIGGEST_DEPTH + index);
+      });
     };
 
     const onDrag = (
@@ -149,20 +170,30 @@ export class GraphicHand {
       dragX: number,
       dragY: number,
     ) => {
-      cardImage.x = dragX;
-      cardImage.y = dragY;
+      const draggedCardOrigin = dragOrigins.get(cardImage);
+      if (!draggedCardOrigin) return;
+
+      const deltaX = dragX - draggedCardOrigin.x;
+      const deltaY = dragY - draggedCardOrigin.y;
+
+      draggedCards.forEach((card) => {
+        const origin = dragOrigins.get(card);
+        if (!origin) return;
+
+        card.x = origin.x + deltaX;
+        card.y = origin.y + deltaY;
+      });
     };
 
     const onDragEnd = () => {
-      cardImage.setDepth(originDepth);
-
-      this.#scene.tweens.add({
-        targets: cardImage,
-        x: originX,
-        y: this.#position.y,
-        duration: 300,
-        ease: "Back.Out",
+      draggedCards.forEach((card) => {
+        const origin = dragOrigins.get(card);
+        if (origin) card.setDepth(origin.depth);
       });
+
+      draggedCards = [];
+      dragOrigins.clear();
+      this.reflowCards();
     };
 
     cardImage.on("dragstart", onDragStart);
@@ -207,6 +238,11 @@ export class GraphicHand {
     const cardImage = graphicCard.image;
 
     cardImage.on("drop", () => {
+      if (this.canPlayKindComboWithCard(cardData.id)) {
+        this.playKindCombo();
+        return;
+      }
+
       this.playCard(cardData.id);
     });
   }
@@ -216,6 +252,10 @@ export class GraphicHand {
       playCard(cardId);
     }
   }
+
+  private playKindCombo = () => {
+    this.#onKindComboPlay?.();
+  };
 
   private attachCardSelectionHandler(graphicCard: GraphicCard) {
     let pointerDownPosition: Point | null = null;
@@ -398,7 +438,18 @@ export class GraphicHand {
   private updateCardsDraggability() {
     if (this.#cards.length === 0) return;
 
-    this.#scene.input.setDraggable(this.#cards, !this.hasKindComboSelection());
+    const selection = this.getKindComboSelection();
+    const selectedCardIds = new Set(this.#selectedCardIds);
+
+    this.#cardsData.forEach((card) => {
+      const isSelectedComboCard =
+        selection !== null && selectedCardIds.has(card.data.id);
+
+      this.#scene.input.setDraggable(
+        card.image,
+        !this.hasKindComboSelection() || isSelectedComboCard,
+      );
+    });
   }
 
   private getSelectedGraphicCards() {
@@ -441,6 +492,21 @@ export class GraphicHand {
   private getGraphicCardByImage(cardImage: Phaser.GameObjects.Image) {
     return [...this.#cardsData.values()].find(
       (card) => card.image === cardImage,
+    );
+  }
+
+  private getCardsDraggedWith(graphicCard: GraphicCard) {
+    if (!this.canPlayKindComboWithCard(graphicCard.data.id)) {
+      return [graphicCard.image];
+    }
+
+    return this.getSelectedGraphicCards().map((card) => card.image);
+  }
+
+  private canPlayKindComboWithCard(cardId: number) {
+    return (
+      this.getKindComboSelection() !== null &&
+      this.#selectedCardIds.includes(cardId)
     );
   }
 
