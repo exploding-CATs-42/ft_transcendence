@@ -1,47 +1,57 @@
 # Grafana Dashboards
 
-This directory contains Grafana dashboard JSON files.
+This directory contains Grafana dashboard JSON files provisioned by the local
+monitoring stack.
 
-Grafana reads this directory because it is referenced from:
+## Provisioning
+
+Grafana loads dashboards from this directory through:
 
 ```text
 infra/monitoring/grafana/provisioning/dashboards/dashboards.yml
 ```
 
-Inside the Grafana container, this directory is mounted as:
+The directory is mounted inside the Grafana container as:
 
 ```text
 /var/lib/grafana/dashboards
 ```
 
-## Current Status
-
-The backend metrics dashboard is added:
+The provisioned Prometheus datasource is defined in:
 
 ```text
-backend-api.json
+infra/monitoring/grafana/provisioning/datasources/prometheus.yml
 ```
 
-Provisioning is already prepared:
+Its stable UID is `prometheus`, which dashboard JSON files should use for panel
+queries.
 
-| File | Purpose |
-| --- | --- |
-| `../provisioning/datasources/prometheus.yml` | Adds Prometheus as a Grafana datasource |
-| `../provisioning/dashboards/dashboards.yml` | Tells Grafana to load dashboards from this directory |
+## Current Dashboard
 
-## Dashboards
-
-| Dashboard | Purpose | File |
+| Dashboard | File | Content |
 | --- | --- | --- |
-| Backend Metrics | Request rate, status codes, response time, slow routes, user operations, 5xx rate | `backend-api.json` |
+| Backend Metrics | `backend-api.json` | Request rate, status codes, response time, slow routes, 5xx responses, and user operations |
 
-## Planned Dashboards
+The dashboard visualizes backend application metrics collected from
+`backend:3000/metrics`.
 
-| Dashboard | Purpose |
-| --- | --- |
-| Auth and Users | Login/register/refresh/logout/profile/friend operation results |
-| Realtime | Socket.IO connections, events, and failures |
-| PostgreSQL | Availability, connections, query activity, locks |
-| Docker Infrastructure | CPU, memory, and network traffic per container |
+Service availability is checked by Blackbox Exporter and used by the
+`ServiceUnavailable` Prometheus alert. Availability can be inspected with the
+following Prometheus query and does not require a separate Grafana dashboard:
 
-Add exported Grafana dashboard JSON files directly into this directory.
+```promql
+probe_success{job="blackbox"}
+```
+
+## Updating a Dashboard
+
+Export the updated dashboard as JSON and replace the corresponding file in this
+directory. Keep the provisioned datasource UID as `prometheus`, then restart
+Grafana if the provisioned version is not refreshed automatically:
+
+```bash
+docker restart ft-grafana
+```
+
+Do not place credentials, tokens, user data, or environment-specific hostnames
+in dashboard JSON files.
