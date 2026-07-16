@@ -20,8 +20,22 @@ const BIGGEST_DEPTH = 100;
 const HOVER_LIFT = 75; // How many px the hovered card rises
 const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
 const SELECTED_CARD_LIFT = 52;
+
+const KIND_COMBO_DEPTH = BIGGEST_DEPTH + 1;
+const KIND_COMBO_LABEL_OFFSET = 68;
+const KIND_COMBO_LABEL_PADDING = {
+  x: 34,
+  y: 6,
+};
+const KIND_COMBO_LABEL_SKEW = 26;
 const CLICK_MAX_DISTANCE = 24;
 const LEFT_POINTER_BUTTON = 0;
+
+const SELECTED_CARD_GLOW_BY_COUNT = {
+  1: { color: 0xfff4a8, outerStrength: 2, distance: 8 },
+  2: { color: 0xffd45a, outerStrength: 4, distance: 11 },
+  3: { color: 0xffa52c, outerStrength: 6, distance: 14 },
+} as const;
 
 type onCardDropCallback = (card: GraphicCard) => void;
 type KindCombo = "two-of-a-kind" | "three-of-a-kind";
@@ -50,6 +64,9 @@ export class GraphicHand {
   #cards: Phaser.GameObjects.Image[] = [];
   #selectedCardIds: number[] = [];
   #hoveredCardImage: Phaser.GameObjects.Image | null = null;
+  #kindComboLabelBackground: Phaser.GameObjects.Graphics | null = null;
+  #kindComboLabel: Phaser.GameObjects.Text | null = null;
+  #kindComboPlayZone: Phaser.GameObjects.Zone | null = null;
   #onCardDropCallback: onCardDropCallback;
   #onKindComboSelectionChange: OnKindComboSelectionChange | null;
   #onKindComboPlay: OnKindComboPlay | null;
@@ -253,10 +270,6 @@ export class GraphicHand {
     }
   }
 
-  private playKindCombo = () => {
-    this.#onKindComboPlay?.();
-  };
-
   private attachCardSelectionHandler(graphicCard: GraphicCard) {
     let pointerDownPosition: Point | null = null;
 
@@ -314,6 +327,7 @@ export class GraphicHand {
 
   private syncKindComboSelection() {
     this.updateCardsDraggability();
+    this.updateCardSelectionStyles();
     this.reflowCards();
     this.#onKindComboSelectionChange?.(this.getKindComboSelection());
   }
@@ -376,7 +390,6 @@ export class GraphicHand {
       });
 
       card.setDepth(index + 1);
-
       this.#scene.tweens.add({
         targets: card,
         x: x,
@@ -385,6 +398,208 @@ export class GraphicHand {
         ease: "Back.Out",
       });
     });
+
+    if (this.hasKindComboSelection()) {
+      this.updateKindComboLabel();
+    } else {
+      this.hideKindComboLabel();
+    }
+  }
+
+  private updateKindComboLabel() {
+    const selection = this.getKindComboSelection();
+    if (!selection) {
+      this.hideKindComboLabel();
+      return;
+    }
+
+    const selectedCards = this.getSelectedGraphicCards();
+    const selectedBounds = this.getSelectedCardsBounds(selectedCards);
+    const x = (selectedBounds.left + selectedBounds.right) / 2;
+    const y = selectedBounds.top - KIND_COMBO_LABEL_OFFSET;
+
+    if (!this.#kindComboLabel) {
+      this.#kindComboLabel = this.#scene.add
+        .text(x, y, selection.label, {
+          color: "#ffffff",
+          fontFamily: "Chewy",
+          fontSize: "34px",
+          fontStyle: "bold",
+        })
+        .setOrigin(0.5, 0.5)
+        .setStroke("#190b04", 8)
+        .setShadow(3, 4, "#6b2600", 2)
+        .setDepth(KIND_COMBO_DEPTH + 10);
+    }
+
+    this.#kindComboLabel
+      .setText(selection.label.toUpperCase())
+      .setPosition(x, y)
+      .setVisible(true);
+
+    this.updateKindComboLabelBackground(x, y, this.#kindComboLabel);
+    this.updateKindComboPlayZone(x, y, this.#kindComboLabel);
+  }
+
+  private hideKindComboLabel() {
+    this.#kindComboLabelBackground?.setVisible(false);
+    this.#kindComboLabel?.setVisible(false);
+    this.#kindComboPlayZone?.disableInteractive();
+    this.#kindComboPlayZone?.setVisible(false);
+  }
+
+  private updateCardSelectionStyles() {
+    const selectedCardIds = new Set(this.#selectedCardIds);
+    const selectedCardsCount = Math.min(this.#selectedCardIds.length, 3);
+    const glowConfig =
+      selectedCardsCount > 0
+        ? SELECTED_CARD_GLOW_BY_COUNT[selectedCardsCount as 1 | 2 | 3]
+        : null;
+
+    this.#cardsData.forEach((card) => {
+      card.image.postFX.clear();
+
+      if (!selectedCardIds.has(card.data.id) || !glowConfig) return;
+
+      card.image.postFX.addGlow(
+        glowConfig.color,
+        glowConfig.outerStrength,
+        0,
+        false,
+        0.1,
+        glowConfig.distance,
+      );
+    });
+  }
+
+  private updateKindComboLabelBackground(
+    x: number,
+    y: number,
+    label: Phaser.GameObjects.Text,
+  ) {
+    if (!this.#kindComboLabelBackground) {
+      this.#kindComboLabelBackground = this.#scene.add
+        .graphics()
+        .setDepth(KIND_COMBO_DEPTH + 9);
+    }
+
+    const width = label.width + KIND_COMBO_LABEL_PADDING.x * 2;
+    const height = label.height + KIND_COMBO_LABEL_PADDING.y * 2;
+    const left = x - width / 2;
+    const top = y - height / 2;
+    const graphics = this.#kindComboLabelBackground;
+
+    graphics.clear();
+    this.drawKindComboLabelLayer(
+      graphics,
+      left - 46,
+      top - 22,
+      width + 92,
+      height + 44,
+      KIND_COMBO_LABEL_SKEW + 30,
+      0xfff000,
+      0.12,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left - 28,
+      top - 13,
+      width + 56,
+      height + 26,
+      KIND_COMBO_LABEL_SKEW + 18,
+      0xfff36b,
+      0.22,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left - 12,
+      top - 6,
+      width + 24,
+      height + 12,
+      KIND_COMBO_LABEL_SKEW + 8,
+      0xff8a00,
+      0.36,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left,
+      top,
+      width,
+      height,
+      KIND_COMBO_LABEL_SKEW,
+      0xffcf24,
+      0.92,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left + 8,
+      top + 5,
+      width - 18,
+      height * 0.38,
+      KIND_COMBO_LABEL_SKEW - 4,
+      0xffff9d,
+      0.42,
+    );
+
+    graphics
+      .lineStyle(3, 0x3a1600, 0.65)
+      .beginPath()
+      .moveTo(left + KIND_COMBO_LABEL_SKEW, top)
+      .lineTo(left + width, top)
+      .lineTo(left + width - KIND_COMBO_LABEL_SKEW, top + height)
+      .lineTo(left, top + height)
+      .closePath()
+      .strokePath()
+      .setVisible(true);
+  }
+
+  private updateKindComboPlayZone(
+    x: number,
+    y: number,
+    label: Phaser.GameObjects.Text,
+  ) {
+    const width = label.width + KIND_COMBO_LABEL_PADDING.x * 2 + 92;
+    const height = label.height + KIND_COMBO_LABEL_PADDING.y * 2 + 44;
+
+    if (!this.#kindComboPlayZone) {
+      this.#kindComboPlayZone = this.#scene.add
+        .zone(x, y, width, height)
+        .setOrigin(0.5)
+        .setDepth(KIND_COMBO_DEPTH + 11);
+
+      this.#kindComboPlayZone.on("pointerdown", this.playKindCombo);
+    }
+
+    this.#kindComboPlayZone
+      .setPosition(x, y)
+      .setSize(width, height)
+      .setInteractive({ useHandCursor: true })
+      .setVisible(true);
+  }
+
+  private playKindCombo = () => {
+    this.#onKindComboPlay?.();
+  };
+
+  private drawKindComboLabelLayer(
+    graphics: Phaser.GameObjects.Graphics,
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    skew: number,
+    color: number,
+    alpha: number,
+  ) {
+    graphics
+      .fillStyle(color, alpha)
+      .beginPath()
+      .moveTo(left + skew, top)
+      .lineTo(left + width, top)
+      .lineTo(left + width - skew, top + height)
+      .lineTo(left, top + height)
+      .closePath()
+      .fillPath();
   }
 
   private adjustDepthsForInsertion(insertIndex: number) {
@@ -461,6 +676,30 @@ export class GraphicHand {
           this.#cards.indexOf(firstCard.image) -
           this.#cards.indexOf(secondCard.image),
       );
+  }
+
+  private getSelectedCardsBounds(selectedCards: GraphicCard[]) {
+    const { spacing, startX } = this.getLayout();
+    const selectedPositions = selectedCards.map((card) => {
+      const index = this.#cards.indexOf(card.image);
+      return this.getKindComboLabelAnchorPosition(index, { spacing, startX });
+    });
+    const left = Math.min(...selectedPositions.map((position) => position.x));
+    const right =
+      Math.max(...selectedPositions.map((position) => position.x)) + CARD_WIDTH;
+    const top = Math.min(...selectedPositions.map((position) => position.y));
+
+    return { left, right, top };
+  }
+
+  private getKindComboLabelAnchorPosition(
+    index: number,
+    layout: { spacing: number; startX: number },
+  ) {
+    return {
+      x: layout.startX + layout.spacing * index,
+      y: this.#position.y - SELECTED_CARD_LIFT,
+    };
   }
 
   private getCardTargetPosition(
