@@ -16,6 +16,7 @@ export const GameActions = {
   PLAY_CARD: "playCard",
   SET_COUNTDOWN_ENDS_AT: "setCountdownEndsAt",
   CLEAR_COUNTDOWN_ENDS_AT: "clearCountdownEndsAt",
+  PLAY_COMBO: "playCombo",
 } as const;
 
 export interface GameActionArgs {
@@ -194,5 +195,31 @@ export const playCard = ({ context, event }: GameActionArgs) => {
   return {
     players: updatedPlayers,
     lastPlayedCard: playedCard!,
+  };
+};
+
+export const playCombo = ({ context, event }: GameActionArgs) => {
+  if (event.type != GameEvents.PLAY_COMBO) return context;
+
+  const { playerId, cardIds } = event;
+  const player = context.players.find((player) => player.id === playerId);
+  if (!player) return context;
+
+  const cardIdsSet = new Set(cardIds);
+  const updatedHand = player.hand.filter((card) => !cardIdsSet.has(card.id));
+
+  if (updatedHand.length !== player.hand.length - cardIdsSet.size) {
+    return {
+      lastPlayedCard: null,
+    };
+  }
+
+  const updatedPlayers = context.players.map((player) =>
+    player.id === playerId ? { ...player, hand: updatedHand } : player,
+  );
+
+  return {
+    players: updatedPlayers,
+    lastPlayedCard: null,
   };
 };

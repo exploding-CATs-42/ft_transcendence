@@ -46,6 +46,12 @@ export interface CardPlayedPayload {
   nopeWindowExpiresAt: number;
 }
 
+export interface ComboPlayedPayload {
+  playerId: string;
+  cardTypes: CardType[];
+  nopeWindowExpiresAt: number;
+}
+
 export const CardRemovalReason = {
   PLAYED: "PLAYED",
   STOLEN: "STOLEN",

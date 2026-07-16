@@ -6,6 +6,7 @@ import {
   confirmStart,
   drawCard,
   playCard,
+  playCombo,
   joinGame,
   leaveGame,
   reconnectGame,
@@ -20,6 +21,8 @@ import {
   drawCardSchema,
   PLayCardParams,
   playCardSchema,
+  PlayComboParams,
+  playComboSchema,
   JoinGameParams,
   joinGameSchema,
   LeaveGameParams,
@@ -30,6 +33,7 @@ import {
 import {
   CardPlayedPayload,
   CardRemovedPayload,
+  ComboPlayedPayload,
   ClientEvents,
   GameStatePayload,
   PlayerIdPayload,
@@ -191,6 +195,42 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
         socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.PLAY_COMBO,
+    withErrorHandler(
+      playComboSchema,
+      socket,
+      ServerErrorEvents.PLAY_COMBO_ERROR,
+      async (parsed: PlayComboParams) => {
+        const { playerId, cards } = await playCombo(
+          parsed,
+          socket.data.user.id,
+        );
+
+        const room = parsed.gameId;
+
+        cards.forEach((card) => {
+          const cardRemovedPayload: CardRemovedPayload = {
+            cardId: card.id,
+            reason: "PLAYED",
+          };
+
+          socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        });
+
+        const comboPlayedPayload: ComboPlayedPayload = {
+          playerId,
+          cardTypes: cards.map((card) => card.type),
+          nopeWindowExpiresAt: -1, // TODO: Replace with the real expiration timestamp.
+        };
+
+        socket
+          .to(room)
+          .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
       },
     ),
   );

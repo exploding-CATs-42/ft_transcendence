@@ -9,9 +9,16 @@ import {
   GetGameParams,
   JoinGameParams,
   LeaveGameParams,
+  PLayCardParams,
+  PlayComboParams,
   ReconnectGameParams,
 } from "schemas";
-import { GameEvents, GameStates, Player } from "@exploding-cats/game-core";
+import {
+  type Card,
+  GameEvents,
+  GameStates,
+  Player,
+} from "@exploding-cats/game-core";
 import {
   GameStatePayload,
   PlayerIdPayload,
@@ -25,7 +32,6 @@ import { attachGameBroadcaster } from "sockets";
 import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
-import { PLayCardParams } from "schemas/games/playCardSchema";
 
 function ensureGameExists(gameId: string) {
   const game = GameRepository.getGame(gameId);
@@ -77,6 +83,33 @@ async function requirePlayerInGame(userId: UserId, gameId: GameId) {
     ...context,
     player: context.player,
   };
+}
+
+function getComboCards(player: Player, cardIds: number[]) {
+  const uniqueCardIds = new Set(cardIds);
+  if (uniqueCardIds.size !== cardIds.length) {
+    throw new SocketError("Combo cards must be unique");
+  }
+
+  if (cardIds.length !== 2 && cardIds.length !== 3) {
+    throw new SocketError("Combo must contain two or three cards");
+  }
+
+  const cards = cardIds.map((cardId) =>
+    player.hand.find((card) => card.id === cardId),
+  );
+
+  if (cards.some((card) => !card)) {
+    throw new SocketError("Combo cards must be in your hand");
+  }
+
+  const comboCards = cards as Card[];
+  const comboCardType = comboCards[0]!.type;
+  if (comboCards.some((card) => card.type !== comboCardType)) {
+    throw new SocketError("Combo cards must have the same type");
+  }
+
+  return comboCards;
 }
 
 export async function getGames(userId: UserId): Promise<GameRecord[]> {
@@ -332,4 +365,30 @@ export async function playCard(input: PLayCardParams, userId: UserId) {
     throw new SocketError("Could not drop card");
   }
   return { playerId: player.id, card: lastPlayedCard };
+}
+
+export async function playCombo(input: PlayComboParams, userId: UserId) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  const cards = getComboCards(player, input.cardIds);
+
+  game.instance.send({
+    type: GameEvents.PLAY_COMBO,
+    playerId: player.id,
+    cardIds: cards.map((card) => card.id),
+  });
+
+  const playerAfterCombo = game.instance
+    .getSnapshot()
+    .context.players.find((snapshotPlayer) => snapshotPlayer.id === player.id);
+
+  if (
+    !playerAfterCombo ||
+    cards.some((card) =>
+      playerAfterCombo.hand.some((playerCard) => playerCard.id === card.id),
+    )
+  ) {
+    throw new SocketError("Could not play combo");
+  }
+
+  return { playerId: player.id, cards };
 }

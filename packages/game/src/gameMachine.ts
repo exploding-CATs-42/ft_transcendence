@@ -16,6 +16,7 @@ import {
   playCard,
   setCountdownEndsAt,
   clearCountdownEndsAt,
+  playCombo,
 } from "./actions";
 import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
@@ -57,6 +58,7 @@ export const gameMachine = setup({
     [GameActions.PLAY_CARD]: assign(playCard),
     [GameActions.SET_COUNTDOWN_ENDS_AT]: assign(setCountdownEndsAt),
     [GameActions.CLEAR_COUNTDOWN_ENDS_AT]: assign(clearCountdownEndsAt),
+    [GameActions.PLAY_COMBO]: assign(playCombo),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -154,6 +156,9 @@ export const gameMachine = setup({
             },
             [GameEvents.PLAY_CARD]: {
               actions: GameActions.PLAY_CARD,
+            },
+            [GameEvents.PLAY_COMBO]: {
+              actions: GameActions.PLAY_COMBO,
             },
           },
         },

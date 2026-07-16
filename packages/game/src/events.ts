@@ -9,6 +9,7 @@ export const GameEvents = {
   CANCEL_START: "CANCEL_START",
   DRAW_CARD: "DRAW_CARD",
   PLAY_CARD: "PLAY_CARD",
+  PLAY_COMBO: "PLAY_COMBO",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -23,6 +24,11 @@ export type GameEvent =
       type: typeof GameEvents.PLAY_CARD;
       playerId: Player["id"];
       cardId: number;
+    }
+  | {
+      type: typeof GameEvents.PLAY_COMBO;
+      playerId: Player["id"];
+      cardIds: number[];
     };
 
 // Events emitted FROM the machine
