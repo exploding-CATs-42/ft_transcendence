@@ -32,6 +32,19 @@ clean: ## Stop containers and prune Docker images/build cache
 	docker builder prune -f
 
 ## -------------------------
+## Monitoring
+## -------------------------
+
+alerts-up: ## Start Telegram alert notifications
+	$(COMPOSE) --profile alerts up -d alertmanager
+
+alerts-down: ## Stop Telegram alert notifications
+	$(COMPOSE) --profile alerts stop alertmanager
+
+alerts-status: ## Show Telegram alerts service status
+	$(COMPOSE) --profile alerts ps alertmanager
+
+## -------------------------
 ## Logs
 ## -------------------------
 
@@ -228,4 +241,4 @@ test-backend test-orm \
 format-check format-fix format-check-frontend format-fix-frontend format-check-backend format-fix-backend \
 lint-check lint-fix lint-check-frontend lint-fix-frontend lint-check-backend lint-fix-backend \
 typecheck typecheck-frontend typecheck-backend \
-code-quality-check code-quality-fix volumes
+code-quality-check code-quality-fix volumes alerts-up alerts-down alerts-status
