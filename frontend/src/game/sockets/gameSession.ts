@@ -23,7 +23,11 @@ export const leaveGame = () => {
   emit(ClientEvents.LEAVE_GAME);
 };
 
-export function connectToGameSession(socket: Socket, gameId: string) {
+export function connectToGameSession(
+  socket: Socket,
+  gameId: string,
+  onFatalError: () => void,
+) {
   const join = () => socket.emit(ClientEvents.JOIN_GAME, { gameId });
   const reconnect = () => socket.emit(ClientEvents.RECONNECT_GAME, { gameId });
   const onJoinGameError = ({ code, message }: SocketErrorPayload) => {
@@ -32,7 +36,9 @@ export function connectToGameSession(socket: Socket, gameId: string) {
       return;
     }
 
+    // Any other join error means we can't stay on this page: game doesn't exist, is full, already running, etc.
     toast(message);
+    onFatalError();
   };
   if (socket.connected) join();
   socket.on("connect", join);

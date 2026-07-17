@@ -21,7 +21,9 @@ export function useGameSession(gameId: string) {
     setGameId(gameId);
     const untrackWaitingState = trackWaitingState();
     const untrackGameState = trackGameState();
-    const cleanupGameSession = connectToGameSession(socket, gameId);
+    const cleanupGameSession = connectToGameSession(socket, gameId, () => {
+      navigate("/lobby", { replace: true });
+    });
     const handleLeftGame = () => {
       navigate("/lobby");
     };
