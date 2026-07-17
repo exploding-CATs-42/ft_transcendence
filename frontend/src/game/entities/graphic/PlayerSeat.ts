@@ -1,4 +1,5 @@
 import type { Point, Size } from "game/@types";
+import { ExplosionAnimation } from "game/animations/ExplosionAnimation";
 import { Textures } from "game/constants";
 import {
   type GraphicPlayer,
@@ -16,6 +17,11 @@ const ATTACK_INDICATOR_OFFSET: Point = TARGET_ICON_OFFSET;
 const HIT_BOX_SIZE: Size = {
   width: 240,
   height: 300,
+};
+
+const EXPLOSION_ANIMATION_POSITION: Point = {
+  x: 100,
+  y: 85,
 };
 
 export class PlayerSeat {
@@ -114,5 +120,23 @@ export class PlayerSeat {
     this.#container.add(attackIndicator);
 
     return attackIndicator;
+  }
+
+  explodePlayer(scene: Phaser.Scene) {
+    const explosionAnimation = new ExplosionAnimation(
+      scene,
+      EXPLOSION_ANIMATION_POSITION,
+    );
+    this.#container.add(explosionAnimation);
+    this.#container.bringToTop(explosionAnimation);
+
+    this.hand?.container.setVisible(false);
+    console.log(this);
+
+    explosionAnimation.playAnimation();
+
+    scene.time.delayedCall(1200, () => {
+      this.player?.setDead();
+    });
   }
 }
