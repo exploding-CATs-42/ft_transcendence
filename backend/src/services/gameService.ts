@@ -51,7 +51,14 @@ function orderPlayersForPlayer(players: Player[], playerId: UserId): Player[] {
 
 async function getGameContext(userId: UserId, gameId: GameId) {
   const user = await ensureUserExists(userId);
-  const game = ensureGameExists(gameId);
+  const game = GameRepository.getGame(gameId);
+
+  if (!game) {
+    throw new SocketError("Game not found", {
+      code: SocketErrorCodes.GAME_NOT_FOUND,
+    });
+  }
+
   const players = game.instance.getSnapshot().context.players;
 
   const player = players.find((p) => p.id === user.id);
