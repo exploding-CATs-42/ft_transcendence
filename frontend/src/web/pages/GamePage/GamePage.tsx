@@ -1,6 +1,6 @@
 // Libraries
 import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { Navigate, useSearchParams } from "react-router-dom";
 // Project level
 import { PhaserGame } from "components";
 import { useGameSession } from "hooks";
@@ -32,6 +32,8 @@ const GamePage = () => {
       main.style.overflow = prev.overflow;
     };
   }, []);
+
+  if (!gameId) return <Navigate to="/lobby" replace />;
 
   return <>{ready && <PhaserGame />}</>;
 };
