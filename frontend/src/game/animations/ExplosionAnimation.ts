@@ -28,6 +28,10 @@ export class ExplosionAnimation extends Phaser.GameObjects.Sprite {
   }
 
   private registerAnimationInsideScene(scene: Phaser.Scene): void {
+    if (scene.anims.exists("explosion")) {
+      return;
+    }
+
     scene.anims.create({
       key: "explosion",
       frames: scene.anims.generateFrameNumbers(Textures.boomExplosion),
