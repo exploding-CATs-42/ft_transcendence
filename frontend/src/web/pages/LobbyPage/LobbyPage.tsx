@@ -4,7 +4,10 @@ import clsx from "clsx";
 import {
   ClientEvents,
   type GameRecord,
+  type LobbyGameRemovedPayload,
+  type LobbyGameUpdatedPayload,
   ServerPrivateEvents,
+  ServerPublicEvents,
 } from "@exploding-cats/contracts";
 import api from "api";
 import { Section, Button, List, GameListItem } from "components";
@@ -61,6 +64,25 @@ const sortGamesByCreatedAt = (games: GameRecord[]) => {
   return [...games].sort((left, right) => right.createdAt - left.createdAt);
 };
 
+const upsertLobbyGame = (
+  currentGames: GameRecord[],
+  updatedGame: GameRecord,
+) => {
+  const existingGameIndex = currentGames.findIndex(
+    (game) => game.id === updatedGame.id,
+  );
+
+  if (existingGameIndex === -1) {
+    return sortGamesByCreatedAt([updatedGame, ...currentGames]);
+  }
+
+  return sortGamesByCreatedAt(
+    currentGames.map((game, index) =>
+      index === existingGameIndex ? updatedGame : game,
+    ),
+  );
+};
+
 const LobbyPage = () => {
   const [games, setGames] = useState<GameRecord[]>([]);
   const [isOpenCreateModal, toggleCreateModal] = useModal();
@@ -98,6 +120,26 @@ const LobbyPage = () => {
       ignore = true;
     };
   }, [loadGames]);
+
+  useEffect(() => {
+    const handleLobbyGameUpdated = ({ game }: LobbyGameUpdatedPayload) => {
+      setGames((currentGames) => upsertLobbyGame(currentGames, game));
+    };
+
+    const handleLobbyGameRemoved = ({ gameId }: LobbyGameRemovedPayload) => {
+      setGames((currentGames) =>
+        currentGames.filter((game) => game.id !== gameId),
+      );
+    };
+
+    socket.on(ServerPublicEvents.LOBBY_GAME_UPDATED, handleLobbyGameUpdated);
+    socket.on(ServerPublicEvents.LOBBY_GAME_REMOVED, handleLobbyGameRemoved);
+
+    return () => {
+      socket.off(ServerPublicEvents.LOBBY_GAME_UPDATED, handleLobbyGameUpdated);
+      socket.off(ServerPublicEvents.LOBBY_GAME_REMOVED, handleLobbyGameRemoved);
+    };
+  }, [socket]);
 
   useEffect(() => {
     let ignore = false;
@@ -198,7 +240,6 @@ const LobbyPage = () => {
 
     socket.once(ServerPrivateEvents.LEFT_GAME, () => {
       setExistingGame(null);
-      void loadGames();
     });
     socket.emit(ClientEvents.LEAVE_GAME, { gameId: existingGame.id });
   };
@@ -213,9 +254,6 @@ const LobbyPage = () => {
         maxPlayers,
       });
 
-      setGames((prevGames) =>
-        sortGamesByCreatedAt([createdGame, ...prevGames]),
-      );
       navigate(`/game?gameId=${encodeURIComponent(createdGame.id)}`);
     } catch (error) {
       const existingGameId = getExistingGameIdFromError(error);

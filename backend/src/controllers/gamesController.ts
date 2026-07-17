@@ -14,6 +14,7 @@ import {
   getGameParamsSchema,
 } from "schemas";
 import { AuthenticatedRequest } from "types";
+import { broadcastLobbyGameChanged } from "sockets/broadcasters";
 import { validate } from "utils";
 
 export async function getGamesController(
@@ -49,6 +50,7 @@ export async function createGameController(
   const parsed = validate(createGameSchema, req.body);
 
   const result = await createGame(req.user.id, parsed);
+  broadcastLobbyGameChanged(result.id);
   res.status(201).json(result);
 }
 
@@ -59,5 +61,6 @@ export async function deleteGameController(
   const parsed = validate(deleteGameParamsSchema, req.params);
 
   await deleteGame(req.user.id, parsed);
+  broadcastLobbyGameChanged(parsed.gameId);
   res.status(200).json({ message: "Game deleted" });
 }
