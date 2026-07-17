@@ -20,6 +20,7 @@ import {
   arrowLeft,
   arrowRight,
   confirmedIconRoundedSquare,
+  boomExplosionSpritesheet,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -71,6 +72,11 @@ export class Preloader extends Scene {
       Textures.confirmedIconRoundedSquare,
       confirmedIconRoundedSquare,
     );
+    this.load.image(Textures.dead, dead);
+    this.load.spritesheet(Textures.boomExplosion, boomExplosionSpritesheet, {
+      frameWidth: 266.6,
+      frameHeight: 300,
+    });
   }
 
   create() {
