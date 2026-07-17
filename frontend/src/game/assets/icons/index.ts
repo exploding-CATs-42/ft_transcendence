@@ -12,3 +12,4 @@ export const arrowLeft = "/game_assets/arrow-left.svg";
 export const arrowRight = "/game_assets/arrow-right.svg";
 export const confirmedIconRoundedSquare =
   "/game_assets/confirmed-icon-rounded-square.svg";
+export const boomExplosion = "/game_assets/boom-explosion.png";
