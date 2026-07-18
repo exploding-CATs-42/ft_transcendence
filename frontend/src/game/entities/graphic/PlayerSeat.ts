@@ -1,5 +1,5 @@
 import type { Point, Size } from "game/@types";
-import { ExplosionAnimation } from "game/animations/ExplosionAnimation";
+import { ExplosionAnimation } from "game/animations";
 import { Textures } from "game/constants";
 import {
   type GraphicPlayer,
