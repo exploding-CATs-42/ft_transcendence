@@ -35,7 +35,7 @@ export class ExplosionAnimation extends Phaser.GameObjects.Sprite {
     scene.anims.create({
       key: "explosion",
       frames: scene.anims.generateFrameNumbers(Textures.boomExplosion),
-      frameRate: 8,
+      frameRate: 10,
       repeat: 0,
     });
   }
