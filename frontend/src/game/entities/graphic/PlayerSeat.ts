@@ -135,7 +135,7 @@ export class PlayerSeat {
 
     explosionAnimation.playAnimation();
 
-    scene.time.delayedCall(1200, () => {
+    scene.time.delayedCall(1000, () => {
       this.player?.setDead();
     });
   }
