@@ -2,6 +2,7 @@ export interface PlayerView {
   id: string;
   name: string;
   avatarUrl: string | null;
+  isConnected: boolean;
 }
 
 export interface GamePlayerView extends PlayerView {
