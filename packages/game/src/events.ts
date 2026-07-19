@@ -1,4 +1,4 @@
-import type { Player } from "./types";
+import type { Card, Player } from "./types";
 import type { TurnChangedPayload } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -23,7 +23,7 @@ export type GameEvent =
   | {
       type: typeof GameEvents.PLAY_CARD;
       playerId: Player["id"];
-      cardId: number;
+      card: Card;
     }
   | {
       type: typeof GameEvents.PLAY_COMBO;
