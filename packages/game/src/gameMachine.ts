@@ -20,7 +20,7 @@ import {
 } from "./actions";
 import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
-import { GameGuards, hasEnoughCards, hasEnoughPlayers } from "./guards";
+import { GameGuards, hasEnoughPlayers, isEnoughCardsInDeck } from "./guards";
 import {
   countdownCanceled,
   countdownStarted,
@@ -62,7 +62,7 @@ export const gameMachine = setup({
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
-    [GameGuards.HAS_ENOUGH_CARDS]: hasEnoughCards,
+    [GameGuards.IS_ENOUGH_CARDS_IN_DECK]: isEnoughCardsInDeck,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -150,7 +150,7 @@ export const gameMachine = setup({
         [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
           on: {
             [GameEvents.DRAW_CARD]: {
-              guard: GameGuards.HAS_ENOUGH_CARDS,
+              guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
               actions: GameActions.DRAW_CARD,
               target: GameStates.CHANGING_TURN,
             },
