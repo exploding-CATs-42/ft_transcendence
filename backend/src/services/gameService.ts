@@ -11,7 +11,12 @@ import {
   LeaveGameParams,
   ReconnectGameParams,
 } from "schemas";
-import { GameEvents, GameStates, Player } from "@exploding-cats/game-core";
+import {
+  Card,
+  GameEvents,
+  GameStates,
+  Player,
+} from "@exploding-cats/game-core";
 import {
   GameStatePayload,
   PlayerIdPayload,
@@ -318,18 +323,22 @@ export async function drawCard(input: DrawCardParams, userId: UserId) {
   return { playerId: player.id, card: lastDrawnCard };
 }
 
+function getPlayableCard(player: Player, cardId: number): Card {
+  const card = player.hand.find((c) => c.id === cardId);
+  if (!card) throw new SocketError("Card is not in your hand");
+  if (!card.playable) throw new SocketError("Card cannot be played");
+  return card;
+}
+
 export async function playCard(input: PLayCardParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  const card = getPlayableCard(player, input.cardId);
 
   game.instance.send({
     type: GameEvents.PLAY_CARD,
     playerId: player.id,
-    cardId: input.cardId,
+    cardId: card.id,
   });
 
-  const lastPlayedCard = game.instance.getSnapshot().context.lastPlayedCard;
-  if (!lastPlayedCard) {
-    throw new SocketError("Could not drop card");
-  }
-  return { playerId: player.id, card: lastPlayedCard };
+  return { playerId: player.id, card };
 }
