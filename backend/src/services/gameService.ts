@@ -337,7 +337,7 @@ export async function playCard(input: PLayCardParams, userId: UserId) {
   game.instance.send({
     type: GameEvents.PLAY_CARD,
     playerId: player.id,
-    cardId: card.id,
+    card,
   });
 
   return { playerId: player.id, card };

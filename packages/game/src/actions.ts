@@ -169,7 +169,7 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
 export const playCard = ({ context, event }: GameActionArgs) => {
   if (event.type != GameEvents.PLAY_CARD) return context;
 
-  const { playerId, cardId } = event;
+  const { playerId, card } = event;
   const players = context.players;
 
   const player = players.find((player) => player.id === playerId);
@@ -177,7 +177,7 @@ export const playCard = ({ context, event }: GameActionArgs) => {
 
   const hand = player.hand;
 
-  const cardIndex = hand.findIndex((card) => card.id === cardId);
+  const cardIndex = hand.findIndex((c) => c.id === card.id);
   if (cardIndex === -1) {
     return {
       lastPlayedCard: null,
