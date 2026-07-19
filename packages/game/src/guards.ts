@@ -4,7 +4,7 @@ import { MIN_PLAYERS } from "./constants";
 
 export const GameGuards = {
   HAS_ENOUGH_PLAYERS: "hasEnoughPlayers",
-  HAS_ENOUGH_CARDS: "hasEnoughCards",
+  IS_ENOUGH_CARDS_IN_DECK: "isEnoughCardsInDeck",
 } as const;
 
 export interface GameGuardArgs {
@@ -18,6 +18,6 @@ export const hasEnoughPlayers = ({ context }: GameGuardArgs) => {
   );
 };
 
-export const hasEnoughCards = ({ context }: GameGuardArgs) => {
+export const isEnoughCardsInDeck = ({ context }: GameGuardArgs) => {
   return context.deck.length >= 1;
 };
