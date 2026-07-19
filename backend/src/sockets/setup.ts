@@ -5,7 +5,11 @@ import { socketAuthMiddleware } from "middlewares";
 import { UserId } from "@exploding-cats/contracts";
 // Local level
 import { registerGameEventHandlers } from "./listeners";
-import { broadcastOnlineStatusToFriends } from "./broadcasters";
+import {
+  broadcastOnlineStatusToFriends,
+  broadcastPlayerDisconnected,
+  broadcastPlayerReconnected,
+} from "./broadcasters";
 import { isUserOnline } from "./onlineUsers";
 
 export const initSockets = (io: Server) => {
@@ -19,6 +23,7 @@ export const initSockets = (io: Server) => {
     socket.join(userId);
     if (cameOnline) {
       broadcastOnlineStatusToFriends(userId, true);
+      broadcastPlayerReconnected(userId);
     }
 
     // Register feature-specific handlers
@@ -29,6 +34,7 @@ export const initSockets = (io: Server) => {
       const wentOffline = !isUserOnline(userId);
       if (wentOffline) {
         broadcastOnlineStatusToFriends(userId, false);
+        broadcastPlayerDisconnected(userId);
       }
     });
   });
