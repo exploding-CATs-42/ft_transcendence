@@ -13,6 +13,8 @@ export const ServerPublicEvents = {
   LOBBY_GAME_REMOVED: "lobby-game-removed",
   PLAYER_JOINED: "player-joined",
   PLAYER_LEFT: "player-left",
+  PLAYER_DISCONNECTED: "player-disconnected",
+  PLAYER_RECONNECTED: "player-reconnected",
   PLAYER_CONFIRMED: "player-confirmed",
   PLAYER_CANCELED: "player-canceled",
   COUNTDOWN_STARTED: "countdown-started",
