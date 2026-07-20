@@ -46,6 +46,12 @@ export interface CardPlayedPayload {
   nopeWindowExpiresAt: number;
 }
 
+export interface ComboPlayedPayload {
+  playerId: string;
+  cardTypes: CardType[];
+  nopeWindowExpiresAt: number;
+}
+
 export const CardRemovalReason = {
   PLAYED: "PLAYED",
   STOLEN: "STOLEN",
@@ -66,7 +72,7 @@ export interface GameStatePayload {
   hand: Card[];
   currentTurnPlayerId: string | null;
   deckSize: number;
-  lastPlayedCard: Card | null;
+  lastPlayedCards: Card[] | null;
 }
 
 export interface FriendOnlineStatusChangedPayload {

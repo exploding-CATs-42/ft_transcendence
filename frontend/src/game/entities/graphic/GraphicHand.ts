@@ -1,7 +1,7 @@
 import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
-import { type Card } from "@exploding-cats/game-core";
+import { type Card, type CardType } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
 import { playCard } from "game/sockets";
 
@@ -19,15 +19,57 @@ const BIGGEST_DEPTH = 100;
 
 const HOVER_LIFT = 75; // How many px the hovered card rises
 const HOVER_OFFSET = CARD_WIDTH / 4; // How many px surrounding cards move to the side
+const SELECTED_CARD_LIFT = 52;
+
+const KIND_COMBO_DEPTH = BIGGEST_DEPTH + 1;
+const KIND_COMBO_LABEL_OFFSET = 68;
+const KIND_COMBO_LABEL_PADDING = {
+  x: 34,
+  y: 6,
+};
+const KIND_COMBO_LABEL_SKEW = 26;
+const CLICK_MAX_DISTANCE = 24;
+const LEFT_POINTER_BUTTON = 0;
+
+const SELECTED_CARD_GLOW_BY_COUNT = {
+  1: { color: 0xfff4a8, outerStrength: 5, distance: 16 },
+  2: { color: 0xffd45a, outerStrength: 7, distance: 20 },
+  3: { color: 0xffa52c, outerStrength: 9, distance: 24 },
+} as const;
 
 type onCardDropCallback = (card: GraphicCard) => void;
+type KindCombo = "two-of-a-kind" | "three-of-a-kind";
+
+export interface KindComboSelection {
+  kind: KindCombo;
+  label: "two of a kind" | "three of a kind";
+  cardIds: number[];
+  cardType: CardType;
+}
+
+type OnKindComboSelectionChange = (
+  selection: KindComboSelection | null,
+) => void;
+type OnKindComboPlay = () => void;
+
+interface GraphicHandOptions {
+  onKindComboSelectionChange?: OnKindComboSelectionChange;
+  onKindComboPlay?: OnKindComboPlay;
+}
 
 export class GraphicHand {
   #scene: Phaser.Scene;
   #position: Point;
   #cardsData: Map<number, GraphicCard> = new Map();
   #cards: Phaser.GameObjects.Image[] = [];
+  #selectedCardIds: number[] = [];
+  #hoveredCardImage: Phaser.GameObjects.Image | null = null;
+  #kindComboLabelBackground: Phaser.GameObjects.Graphics | null = null;
+  #kindComboLabel: Phaser.GameObjects.Text | null = null;
+  #kindComboPlayZone: Phaser.GameObjects.Zone | null = null;
   #onCardDropCallback: onCardDropCallback;
+  #onKindComboSelectionChange: OnKindComboSelectionChange | null;
+  #onKindComboPlay: OnKindComboPlay | null;
   #isMyTurn: () => boolean;
 
   constructor(
@@ -35,10 +77,14 @@ export class GraphicHand {
     position: Point,
     onCardDropCallback: onCardDropCallback,
     isMyTurn: () => boolean,
+    options: GraphicHandOptions = {},
   ) {
     this.#scene = scene;
     this.#position = position;
     this.#onCardDropCallback = onCardDropCallback;
+    this.#onKindComboSelectionChange =
+      options.onKindComboSelectionChange ?? null;
+    this.#onKindComboPlay = options.onKindComboPlay ?? null;
     this.#isMyTurn = isMyTurn;
   }
 
@@ -65,6 +111,7 @@ export class GraphicHand {
       onComplete: () => {
         this.#cards.splice(insertIndex, 0, newGraphicCard.image);
         this.#cardsData.set(card.id, newGraphicCard);
+        this.updateCardsDraggability();
         if (this.#cards.length > 1) this.reflowCards();
       },
     });
@@ -72,6 +119,13 @@ export class GraphicHand {
 
   getCount() {
     return this.#cards.length;
+  }
+
+  clearKindComboSelection() {
+    if (!this.hasKindComboSelection()) return;
+
+    this.#selectedCardIds = [];
+    this.syncKindComboSelection();
   }
 
   // -------------- Card --------------
@@ -98,23 +152,41 @@ export class GraphicHand {
       data,
     };
 
-    this.attachCardDragHandlers(newGraphicCard.image);
+    this.attachCardDragHandlers(newGraphicCard);
     this.attachCardDropHandler(newGraphicCard);
     this.attachCardHoverHandler(newGraphicCard.image);
+    this.attachCardSelectionHandler(newGraphicCard);
 
     return newGraphicCard;
   }
 
   // -------------- Event handlers --------------
 
-  private attachCardDragHandlers(cardImage: Phaser.GameObjects.Image) {
-    let originX: number;
-    let originDepth: number;
+  private attachCardDragHandlers(graphicCard: GraphicCard) {
+    const cardImage = graphicCard.image;
+    let draggedCards: Phaser.GameObjects.Image[] = [];
+    let dragOrigins = new Map<
+      Phaser.GameObjects.Image,
+      { x: number; y: number; depth: number }
+    >();
 
     const onDragStart = () => {
-      originX = cardImage.x;
-      originDepth = cardImage.depth;
-      cardImage.setDepth(BIGGEST_DEPTH);
+      draggedCards = this.getCardsDraggedWith(graphicCard);
+      dragOrigins = new Map(
+        draggedCards.map((card) => [
+          card,
+          {
+            x: card.x,
+            y: card.y,
+            depth: card.depth,
+          },
+        ]),
+      );
+
+      this.#scene.tweens.killTweensOf(draggedCards);
+      draggedCards.forEach((card, index) => {
+        card.setDepth(BIGGEST_DEPTH + index);
+      });
     };
 
     const onDrag = (
@@ -122,20 +194,30 @@ export class GraphicHand {
       dragX: number,
       dragY: number,
     ) => {
-      cardImage.x = dragX;
-      cardImage.y = dragY;
+      const draggedCardOrigin = dragOrigins.get(cardImage);
+      if (!draggedCardOrigin) return;
+
+      const deltaX = dragX - draggedCardOrigin.x;
+      const deltaY = dragY - draggedCardOrigin.y;
+
+      draggedCards.forEach((card) => {
+        const origin = dragOrigins.get(card);
+        if (!origin) return;
+
+        card.x = origin.x + deltaX;
+        card.y = origin.y + deltaY;
+      });
     };
 
     const onDragEnd = () => {
-      cardImage.setDepth(originDepth);
-
-      this.#scene.tweens.add({
-        targets: cardImage,
-        x: originX,
-        y: this.#position.y,
-        duration: 300,
-        ease: "Back.Out",
+      draggedCards.forEach((card) => {
+        const origin = dragOrigins.get(card);
+        if (origin) card.setDepth(origin.depth);
       });
+
+      draggedCards = [];
+      dragOrigins.clear();
+      this.reflowCards();
     };
 
     cardImage.on("dragstart", onDragStart);
@@ -146,6 +228,8 @@ export class GraphicHand {
   removeCard(cardId: number) {
     const card = this.#cardsData.get(cardId)!;
     const cardImage = card.image;
+    const cardData = card.data;
+    const wasSelected = this.#selectedCardIds.includes(cardId);
 
     this.#cards = this.#cards.filter((c) => c !== cardImage);
     cardImage.off("drop", () => {
@@ -153,11 +237,18 @@ export class GraphicHand {
     });
 
     cardImage.disableInteractive();
+    cardImage.postFX.clear();
     cardImage.setDepth(0);
-    this.reflowCards();
 
-    const cardData = card.data;
     this.#cardsData.delete(cardId);
+    if (wasSelected) {
+      this.#selectedCardIds = this.#selectedCardIds.filter(
+        (id) => id !== cardId,
+      );
+      this.syncKindComboSelection();
+    } else {
+      this.reflowCards();
+    }
 
     const graphicCard: GraphicCard = {
       image: cardImage,
@@ -171,6 +262,11 @@ export class GraphicHand {
     const cardImage = graphicCard.image;
 
     cardImage.on("drop", () => {
+      if (this.canPlayKindComboWithCard(cardData.id)) {
+        this.playKindCombo();
+        return;
+      }
+
       this.playCard(cardData.id);
     });
   }
@@ -181,58 +277,100 @@ export class GraphicHand {
     }
   }
 
+  private attachCardSelectionHandler(graphicCard: GraphicCard) {
+    let pointerDownPosition: Point | null = null;
+
+    graphicCard.image.on("pointerdown", (pointer: Phaser.Input.Pointer) => {
+      if (pointer.button !== LEFT_POINTER_BUTTON) return;
+
+      pointerDownPosition = {
+        x: pointer.worldX,
+        y: pointer.worldY,
+      };
+    });
+
+    graphicCard.image.on("pointerup", (pointer: Phaser.Input.Pointer) => {
+      if (!pointerDownPosition) return;
+      if (pointer.button !== LEFT_POINTER_BUTTON) {
+        pointerDownPosition = null;
+        return;
+      }
+
+      const distance = Phaser.Math.Distance.Between(
+        pointerDownPosition.x,
+        pointerDownPosition.y,
+        pointer.worldX,
+        pointer.worldY,
+      );
+      pointerDownPosition = null;
+
+      if (distance > CLICK_MAX_DISTANCE) return;
+
+      this.toggleKindComboSelection(graphicCard);
+    });
+  }
+
+  private toggleKindComboSelection(graphicCard: GraphicCard) {
+    const cardId = graphicCard.data.id;
+    if (this.#selectedCardIds.includes(cardId)) {
+      this.#selectedCardIds = [];
+      this.syncKindComboSelection();
+      return;
+    }
+
+    const selectedCards = this.getSelectedGraphicCards();
+    const selectedType = selectedCards[0]?.data.type;
+    const isDifferentType =
+      selectedType && selectedType !== graphicCard.data.type;
+
+    if (isDifferentType) {
+      this.#selectedCardIds = [cardId];
+    } else if (this.#selectedCardIds.length < 3) {
+      this.#selectedCardIds = [...this.#selectedCardIds, cardId];
+    }
+
+    this.syncKindComboSelection();
+  }
+
+  private syncKindComboSelection() {
+    this.updateCardsDraggability();
+    this.updateCardSelectionStyles();
+    this.reflowCards();
+    this.#onKindComboSelectionChange?.(this.getKindComboSelection());
+  }
+
+  private getKindComboSelection(): KindComboSelection | null {
+    const selectedCards = this.getSelectedGraphicCards();
+    const selectedCardsAmount = selectedCards.length;
+
+    if (selectedCardsAmount !== 2 && selectedCardsAmount !== 3) return null;
+
+    const selectedCard = selectedCards[0]!;
+    const kind =
+      selectedCardsAmount === 2 ? "two-of-a-kind" : "three-of-a-kind";
+    const label =
+      selectedCardsAmount === 2 ? "two of a kind" : "three of a kind";
+
+    return {
+      kind,
+      label,
+      cardIds: selectedCards.map((card) => card.data.id),
+      cardType: selectedCard.data.type,
+    };
+  }
+
   private attachCardHoverHandler(cardImage: Phaser.GameObjects.Image) {
-    const tween = (target: Phaser.GameObjects.Image, props: object) => {
-      this.#scene.tweens.add({
-        targets: target,
-        duration: 120,
-        ease: "Power2",
-        ...props,
-      });
-    };
-
-    const applyHoverLayout = (hoveredIndex: number) => {
-      const { spacing, startX } = this.getLayout();
-
-      this.#cards.forEach((card, index) => {
-        if (index === hoveredIndex) return;
-
-        const offset = index < hoveredIndex ? -HOVER_OFFSET : HOVER_OFFSET;
-
-        const baseX = startX + spacing * index;
-        const targetX = baseX + offset;
-        tween(card, { x: targetX });
-      });
-    };
-
-    const resetLayout = () => {
-      const { spacing, startX } = this.getLayout();
-
-      this.#cards.forEach((c, index) => {
-        const baseX = startX + spacing * index;
-        tween(c, { x: baseX });
-      });
-    };
-
-    const liftCard = () => {
-      const targetY = this.#position.y - HOVER_LIFT;
-      tween(cardImage, { y: targetY });
-    };
-
-    const lowerCard = () => {
-      const baseY = this.#position.y;
-      tween(cardImage, { y: baseY });
-    };
-
     cardImage.on("pointerover", () => {
-      const hoveredIndex = this.#cards.indexOf(cardImage);
-      liftCard();
-      applyHoverLayout(hoveredIndex);
+      this.#hoveredCardImage = cardImage;
+      this.reflowCards();
     });
 
     cardImage.on("pointerout", () => {
-      lowerCard();
-      resetLayout();
+      if (this.#hoveredCardImage === cardImage) {
+        this.#hoveredCardImage = null;
+      }
+
+      this.reflowCards();
     });
   }
 
@@ -248,22 +386,227 @@ export class GraphicHand {
   }
 
   private reflowCards() {
+    this.#scene.tweens.killTweensOf(this.#cards);
+
     const { spacing, startX } = this.getLayout();
 
-    let x = startX;
     this.#cards.forEach((card, index) => {
-      card.setDepth(index + 1);
+      const { x, y } = this.getCardTargetPosition(card, index, {
+        spacing,
+        startX,
+      });
 
+      card.setDepth(index + 1);
       this.#scene.tweens.add({
         targets: card,
         x: x,
-        y: this.#position.y,
+        y,
         duration: 250,
         ease: "Back.Out",
       });
-
-      x += spacing;
     });
+
+    if (this.hasKindComboSelection()) {
+      this.updateKindComboLabel();
+    } else {
+      this.hideKindComboLabel();
+    }
+  }
+
+  private updateKindComboLabel() {
+    const selection = this.getKindComboSelection();
+    if (!selection) {
+      this.hideKindComboLabel();
+      return;
+    }
+
+    const selectedCards = this.getSelectedGraphicCards();
+    const selectedBounds = this.getSelectedCardsBounds(selectedCards);
+    const x = (selectedBounds.left + selectedBounds.right) / 2;
+    const y = selectedBounds.top - KIND_COMBO_LABEL_OFFSET;
+
+    if (!this.#kindComboLabel) {
+      this.#kindComboLabel = this.#scene.add
+        .text(x, y, selection.label, {
+          color: "#ffffff",
+          fontFamily: "Chewy",
+          fontSize: "34px",
+          fontStyle: "bold",
+        })
+        .setOrigin(0.5, 0.5)
+        .setStroke("#190b04", 8)
+        .setShadow(3, 4, "#6b2600", 2)
+        .setDepth(KIND_COMBO_DEPTH + 10);
+    }
+
+    this.#kindComboLabel
+      .setText(selection.label.toUpperCase())
+      .setPosition(x, y)
+      .setVisible(true);
+
+    this.updateKindComboLabelBackground(x, y, this.#kindComboLabel);
+    this.updateKindComboPlayZone(x, y, this.#kindComboLabel);
+  }
+
+  private hideKindComboLabel() {
+    this.#kindComboLabelBackground?.setVisible(false);
+    this.#kindComboLabel?.setVisible(false);
+    this.#kindComboPlayZone?.disableInteractive();
+    this.#kindComboPlayZone?.setVisible(false);
+  }
+
+  private updateCardSelectionStyles() {
+    const selectedCardIds = new Set(this.#selectedCardIds);
+    const selectedCardsCount = Math.min(this.#selectedCardIds.length, 3);
+    const glowConfig =
+      selectedCardsCount > 0
+        ? SELECTED_CARD_GLOW_BY_COUNT[selectedCardsCount as 1 | 2 | 3]
+        : null;
+
+    this.#cardsData.forEach((card) => {
+      card.image.postFX.clear();
+
+      if (!selectedCardIds.has(card.data.id) || !glowConfig) return;
+
+      card.image.postFX.addGlow(
+        glowConfig.color,
+        glowConfig.outerStrength,
+        0,
+        false,
+        0.1,
+        glowConfig.distance,
+      );
+    });
+  }
+
+  private updateKindComboLabelBackground(
+    x: number,
+    y: number,
+    label: Phaser.GameObjects.Text,
+  ) {
+    if (!this.#kindComboLabelBackground) {
+      this.#kindComboLabelBackground = this.#scene.add
+        .graphics()
+        .setDepth(KIND_COMBO_DEPTH + 9);
+    }
+
+    const width = label.width + KIND_COMBO_LABEL_PADDING.x * 2;
+    const height = label.height + KIND_COMBO_LABEL_PADDING.y * 2;
+    const left = x - width / 2;
+    const top = y - height / 2;
+    const graphics = this.#kindComboLabelBackground;
+
+    graphics.clear();
+    this.drawKindComboLabelLayer(
+      graphics,
+      left - 46,
+      top - 22,
+      width + 92,
+      height + 44,
+      KIND_COMBO_LABEL_SKEW + 30,
+      0xfff000,
+      0.12,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left - 28,
+      top - 13,
+      width + 56,
+      height + 26,
+      KIND_COMBO_LABEL_SKEW + 18,
+      0xfff36b,
+      0.22,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left - 12,
+      top - 6,
+      width + 24,
+      height + 12,
+      KIND_COMBO_LABEL_SKEW + 8,
+      0xff8a00,
+      0.36,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left,
+      top,
+      width,
+      height,
+      KIND_COMBO_LABEL_SKEW,
+      0xffcf24,
+      0.92,
+    );
+    this.drawKindComboLabelLayer(
+      graphics,
+      left + 8,
+      top + 5,
+      width - 18,
+      height * 0.38,
+      KIND_COMBO_LABEL_SKEW - 4,
+      0xffff9d,
+      0.42,
+    );
+
+    graphics
+      .lineStyle(3, 0x3a1600, 0.65)
+      .beginPath()
+      .moveTo(left + KIND_COMBO_LABEL_SKEW, top)
+      .lineTo(left + width, top)
+      .lineTo(left + width - KIND_COMBO_LABEL_SKEW, top + height)
+      .lineTo(left, top + height)
+      .closePath()
+      .strokePath()
+      .setVisible(true);
+  }
+
+  private updateKindComboPlayZone(
+    x: number,
+    y: number,
+    label: Phaser.GameObjects.Text,
+  ) {
+    const width = label.width + KIND_COMBO_LABEL_PADDING.x * 2 + 92;
+    const height = label.height + KIND_COMBO_LABEL_PADDING.y * 2 + 44;
+
+    if (!this.#kindComboPlayZone) {
+      this.#kindComboPlayZone = this.#scene.add
+        .zone(x, y, width, height)
+        .setOrigin(0.5)
+        .setDepth(KIND_COMBO_DEPTH + 11);
+
+      this.#kindComboPlayZone.on("pointerdown", this.playKindCombo);
+    }
+
+    this.#kindComboPlayZone
+      .setPosition(x, y)
+      .setSize(width, height)
+      .setInteractive({ useHandCursor: true })
+      .setVisible(true);
+  }
+
+  private playKindCombo = () => {
+    this.#onKindComboPlay?.();
+  };
+
+  private drawKindComboLabelLayer(
+    graphics: Phaser.GameObjects.Graphics,
+    left: number,
+    top: number,
+    width: number,
+    height: number,
+    skew: number,
+    color: number,
+    alpha: number,
+  ) {
+    graphics
+      .fillStyle(color, alpha)
+      .beginPath()
+      .moveTo(left + skew, top)
+      .lineTo(left + width, top)
+      .lineTo(left + width - skew, top + height)
+      .lineTo(left, top + height)
+      .closePath()
+      .fillPath();
   }
 
   private adjustDepthsForInsertion(insertIndex: number) {
@@ -308,5 +651,112 @@ export class GraphicHand {
     else targetX = startX + spacing * insertIndex - spacing / 2;
 
     return targetX;
+  }
+
+  private hasKindComboSelection() {
+    return this.#selectedCardIds.length > 0;
+  }
+
+  private updateCardsDraggability() {
+    if (this.#cards.length === 0) return;
+
+    const selectedCardIds = new Set(this.#selectedCardIds);
+
+    this.#cardsData.forEach((card) => {
+      const isSelectedCard = selectedCardIds.has(card.data.id);
+
+      this.#scene.input.setDraggable(
+        card.image,
+        !this.hasKindComboSelection() || isSelectedCard,
+      );
+    });
+  }
+
+  private getSelectedGraphicCards() {
+    return this.#selectedCardIds
+      .map((cardId) => this.#cardsData.get(cardId))
+      .filter((card): card is GraphicCard => Boolean(card))
+      .sort(
+        (firstCard, secondCard) =>
+          this.#cards.indexOf(firstCard.image) -
+          this.#cards.indexOf(secondCard.image),
+      );
+  }
+
+  private getSelectedCardsBounds(selectedCards: GraphicCard[]) {
+    const { spacing, startX } = this.getLayout();
+    const selectedPositions = selectedCards.map((card) => {
+      const index = this.#cards.indexOf(card.image);
+      return this.getKindComboLabelAnchorPosition(index, { spacing, startX });
+    });
+    const left = Math.min(...selectedPositions.map((position) => position.x));
+    const right =
+      Math.max(...selectedPositions.map((position) => position.x)) + CARD_WIDTH;
+    const top = Math.min(...selectedPositions.map((position) => position.y));
+
+    return { left, right, top };
+  }
+
+  private getKindComboLabelAnchorPosition(
+    index: number,
+    layout: { spacing: number; startX: number },
+  ) {
+    return {
+      x: layout.startX + layout.spacing * index,
+      y: this.#position.y - SELECTED_CARD_LIFT,
+    };
+  }
+
+  private getCardTargetPosition(
+    cardImage: Phaser.GameObjects.Image,
+    index: number,
+    layout: { spacing: number; startX: number },
+  ) {
+    const hoveredIndex = this.#hoveredCardImage
+      ? this.#cards.indexOf(this.#hoveredCardImage)
+      : -1;
+    const hoverOffset = this.getHoverOffset(index, hoveredIndex);
+    const x = layout.startX + layout.spacing * index + hoverOffset;
+    const y = this.#position.y - this.getCardLift(cardImage);
+
+    return { x, y };
+  }
+
+  private getCardLift(cardImage: Phaser.GameObjects.Image) {
+    if (cardImage === this.#hoveredCardImage) return HOVER_LIFT;
+
+    const cardData = this.getGraphicCardByImage(cardImage)?.data;
+    if (cardData && this.#selectedCardIds.includes(cardData.id)) {
+      return SELECTED_CARD_LIFT;
+    }
+
+    return 0;
+  }
+
+  private getGraphicCardByImage(cardImage: Phaser.GameObjects.Image) {
+    return [...this.#cardsData.values()].find(
+      (card) => card.image === cardImage,
+    );
+  }
+
+  private getCardsDraggedWith(graphicCard: GraphicCard) {
+    if (!this.canPlayKindComboWithCard(graphicCard.data.id)) {
+      return [graphicCard.image];
+    }
+
+    return this.getSelectedGraphicCards().map((card) => card.image);
+  }
+
+  private canPlayKindComboWithCard(cardId: number) {
+    return (
+      this.getKindComboSelection() !== null &&
+      this.#selectedCardIds.includes(cardId)
+    );
+  }
+
+  private getHoverOffset(index: number, hoveredIndex: number) {
+    if (hoveredIndex === -1 || index === hoveredIndex) return 0;
+
+    return index < hoveredIndex ? -HOVER_OFFSET : HOVER_OFFSET;
   }
 }

@@ -16,10 +16,17 @@ import {
   playCard,
   setCountdownEndsAt,
   clearCountdownEndsAt,
+  playCombo,
 } from "./actions";
+import { CardType } from "./types";
 import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
-import { GameGuards, hasEnoughCards, hasEnoughPlayers } from "./guards";
+import {
+  GameGuards,
+  hasEnoughPlayers,
+  isEnoughCardsInDeck,
+  isCardType,
+} from "./guards";
 import {
   countdownCanceled,
   countdownStarted,
@@ -34,7 +41,7 @@ export interface GameContext {
   deck: Deck;
   currentTurnPlayerId: string | null;
   lastDrawnCard: Card | null;
-  lastPlayedCard: Card | null;
+  lastPlayedCards: Card[] | null;
   countdownEndsAt: number | null;
 }
 
@@ -57,10 +64,12 @@ export const gameMachine = setup({
     [GameActions.PLAY_CARD]: assign(playCard),
     [GameActions.SET_COUNTDOWN_ENDS_AT]: assign(setCountdownEndsAt),
     [GameActions.CLEAR_COUNTDOWN_ENDS_AT]: assign(clearCountdownEndsAt),
+    [GameActions.PLAY_COMBO]: assign(playCombo),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
-    [GameGuards.HAS_ENOUGH_CARDS]: hasEnoughCards,
+    [GameGuards.IS_ENOUGH_CARDS_IN_DECK]: isEnoughCardsInDeck,
+    [GameGuards.IS_CARD_TYPE]: isCardType,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -70,7 +79,7 @@ export const gameMachine = setup({
     deck: [],
     currentTurnPlayerId: null,
     lastDrawnCard: null,
-    lastPlayedCard: null,
+    lastPlayedCards: null,
     countdownEndsAt: null,
   }),
   states: {
@@ -148,12 +157,54 @@ export const gameMachine = setup({
         [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
           on: {
             [GameEvents.DRAW_CARD]: {
-              guard: GameGuards.HAS_ENOUGH_CARDS,
+              guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
               actions: GameActions.DRAW_CARD,
               target: GameStates.CHANGING_TURN,
             },
-            [GameEvents.PLAY_CARD]: {
-              actions: GameActions.PLAY_CARD,
+            [GameEvents.PLAY_CARD]: [
+              {
+                guard: {
+                  type: GameGuards.IS_CARD_TYPE,
+                  params: { cardType: CardType.ATTACK },
+                },
+                actions: [GameActions.PLAY_CARD], // TODO: Apply attack effect
+                target: GameStates.CHANGING_TURN,
+              },
+              {
+                guard: {
+                  type: GameGuards.IS_CARD_TYPE,
+                  params: { cardType: CardType.SKIP },
+                },
+                actions: [GameActions.PLAY_CARD], // TODO: Skip turn immediately
+                target: GameStates.CHANGING_TURN,
+              },
+              {
+                guard: {
+                  type: GameGuards.IS_CARD_TYPE,
+                  params: { cardType: CardType.SHUFFLE },
+                },
+                actions: [GameActions.PLAY_CARD], // TODO: Add shuffle card action and emit GameOutEvent
+              },
+              {
+                guard: {
+                  type: GameGuards.IS_CARD_TYPE,
+                  params: { cardType: CardType.SEE_THE_FUTURE },
+                },
+                actions: [GameActions.PLAY_CARD], // TODO: Add action to pick top 3 cards and emit GameOutEvent
+              },
+              {
+                guard: {
+                  type: GameGuards.IS_CARD_TYPE,
+                  params: { cardType: CardType.FAVOR },
+                },
+                actions: GameActions.PLAY_CARD, // TODO: Implement new game state for waiting for favor
+              },
+              {
+                actions: GameActions.PLAY_CARD,
+              },
+            ],
+            [GameEvents.PLAY_COMBO]: {
+              actions: GameActions.PLAY_COMBO,
             },
           },
         },

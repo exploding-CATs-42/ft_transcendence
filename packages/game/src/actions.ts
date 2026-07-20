@@ -2,6 +2,7 @@ import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards, shuffle, drawOneCard } from "./utils";
 import { START_GAME_COUNTDOWN_MS } from "./constants";
+import type { Card } from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -16,6 +17,7 @@ export const GameActions = {
   PLAY_CARD: "playCard",
   SET_COUNTDOWN_ENDS_AT: "setCountdownEndsAt",
   CLEAR_COUNTDOWN_ENDS_AT: "clearCountdownEndsAt",
+  PLAY_COMBO: "playCombo",
 } as const;
 
 export interface GameActionArgs {
@@ -169,7 +171,7 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
 export const playCard = ({ context, event }: GameActionArgs) => {
   if (event.type != GameEvents.PLAY_CARD) return context;
 
-  const { playerId, cardId } = event;
+  const { playerId, card } = event;
   const players = context.players;
 
   const player = players.find((player) => player.id === playerId);
@@ -177,10 +179,10 @@ export const playCard = ({ context, event }: GameActionArgs) => {
 
   const hand = player.hand;
 
-  const cardIndex = hand.findIndex((card) => card.id === cardId);
+  const cardIndex = hand.findIndex((c) => c.id === card.id);
   if (cardIndex === -1) {
     return {
-      lastPlayedCard: null,
+      lastPlayedCards: null,
     };
   }
 
@@ -193,6 +195,48 @@ export const playCard = ({ context, event }: GameActionArgs) => {
 
   return {
     players: updatedPlayers,
-    lastPlayedCard: playedCard!,
+    lastPlayedCards: [playedCard!],
+  };
+};
+
+export const playCombo = ({ context, event }: GameActionArgs) => {
+  if (event.type != GameEvents.PLAY_COMBO) return context;
+
+  const { playerId, cardIds } = event;
+  const player = context.players.find((player) => player.id === playerId);
+  if (!player) return context;
+
+  const cardIdsSet = new Set(cardIds);
+  if (cardIdsSet.size !== cardIds.length) {
+    return {
+      lastPlayedCards: null,
+    };
+  }
+
+  const playedCards = cardIds.map((cardId) =>
+    player.hand.find((card) => card.id === cardId),
+  );
+
+  if (playedCards.some((card) => !card)) {
+    return {
+      lastPlayedCards: null,
+    };
+  }
+
+  const updatedHand = player.hand.filter((card) => !cardIdsSet.has(card.id));
+
+  if (updatedHand.length !== player.hand.length - cardIdsSet.size) {
+    return {
+      lastPlayedCards: null,
+    };
+  }
+
+  const updatedPlayers = context.players.map((player) =>
+    player.id === playerId ? { ...player, hand: updatedHand } : player,
+  );
+
+  return {
+    players: updatedPlayers,
+    lastPlayedCards: playedCards as Card[],
   };
 };

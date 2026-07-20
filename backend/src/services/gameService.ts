@@ -9,9 +9,16 @@ import {
   GetGameParams,
   JoinGameParams,
   LeaveGameParams,
+  PLayCardParams,
+  PlayComboParams,
   ReconnectGameParams,
 } from "schemas";
-import { GameEvents, GameStates, Player } from "@exploding-cats/game-core";
+import {
+  type Card,
+  GameEvents,
+  GameStates,
+  Player,
+} from "@exploding-cats/game-core";
 import {
   GameStatePayload,
   PlayerIdPayload,
@@ -25,7 +32,6 @@ import { attachGameBroadcaster } from "sockets";
 import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
-import { PLayCardParams } from "schemas/games/playCardSchema";
 
 function ensureGameExists(gameId: string) {
   const game = GameRepository.getGame(gameId);
@@ -77,6 +83,29 @@ async function requirePlayerInGame(userId: UserId, gameId: GameId) {
     ...context,
     player: context.player,
   };
+}
+
+function getComboCards(player: Player, cardIds: number[]) {
+  const uniqueCardIds = new Set(cardIds);
+  if (uniqueCardIds.size !== cardIds.length) {
+    throw new SocketError("Combo cards must be unique");
+  }
+
+  const cards = cardIds.map((cardId) =>
+    player.hand.find((card) => card.id === cardId),
+  );
+
+  if (cards.some((card) => !card)) {
+    throw new SocketError("Combo cards must be in your hand");
+  }
+
+  const comboCards = cards as Card[];
+  const comboCardType = comboCards[0]!.type;
+  if (comboCards.some((card) => card.type !== comboCardType)) {
+    throw new SocketError("Combo cards must have the same type");
+  }
+
+  return comboCards;
 }
 
 export async function getGames(userId: UserId): Promise<GameRecord[]> {
@@ -239,13 +268,12 @@ export async function reconnectGame(
   const orderedPlayers = orderPlayersForPlayer(players, player.id);
   const context = game.instance.getSnapshot().context;
 
-  const gameContext = game.instance.getSnapshot().context;
   return {
     players: orderedPlayers.map(toPublicPlayerView),
     hand: player.hand,
-    currentTurnPlayerId: gameContext.currentTurnPlayerId,
-    deckSize: gameContext.deck.length,
-    lastPlayedCard: context.lastPlayedCard,
+    currentTurnPlayerId: context.currentTurnPlayerId,
+    deckSize: context.deck.length,
+    lastPlayedCards: context.lastPlayedCards,
   };
 }
 
@@ -318,18 +346,51 @@ export async function drawCard(input: DrawCardParams, userId: UserId) {
   return { playerId: player.id, card: lastDrawnCard };
 }
 
+function getPlayableCard(player: Player, cardId: number): Card {
+  const card = player.hand.find((c) => c.id === cardId);
+  if (!card) throw new SocketError("Card is not in your hand");
+  if (!card.playable) throw new SocketError("Card cannot be played");
+  return card;
+}
+
 export async function playCard(input: PLayCardParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  const card = getPlayableCard(player, input.cardId);
 
   game.instance.send({
     type: GameEvents.PLAY_CARD,
     playerId: player.id,
-    cardId: input.cardId,
+    card,
   });
 
-  const lastPlayedCard = game.instance.getSnapshot().context.lastPlayedCard;
-  if (!lastPlayedCard) {
+  const lastPlayedCards = game.instance.getSnapshot().context.lastPlayedCards;
+  const lastPlayedCard = lastPlayedCards?.[0];
+  if (!lastPlayedCards || lastPlayedCards.length !== 1 || !lastPlayedCard) {
     throw new SocketError("Could not drop card");
   }
   return { playerId: player.id, card: lastPlayedCard };
+}
+
+export async function playCombo(input: PlayComboParams, userId: UserId) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  const cards = getComboCards(player, input.cardIds);
+
+  game.instance.send({
+    type: GameEvents.PLAY_COMBO,
+    playerId: player.id,
+    cardIds: cards.map((card) => card.id),
+  });
+
+  const lastPlayedCards = game.instance.getSnapshot().context.lastPlayedCards;
+  const lastPlayedCardIds = new Set(lastPlayedCards?.map((card) => card.id));
+
+  if (
+    !lastPlayedCards ||
+    lastPlayedCards.length !== cards.length ||
+    cards.some((card) => !lastPlayedCardIds.has(card.id))
+  ) {
+    throw new SocketError("Could not play combo");
+  }
+
+  return { playerId: player.id, cards: lastPlayedCards };
 }
