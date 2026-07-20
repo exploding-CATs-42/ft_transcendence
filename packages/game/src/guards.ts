@@ -1,7 +1,8 @@
 // Local level
 import type { GameContext } from "./gameMachine";
 import { MIN_PLAYERS } from "./constants";
-import { GameEvent, GameEvents } from "./events";
+import { GameEvents } from "./events";
+import type { GameEvent } from "./events";
 import { CardType } from "./types";
 
 export const GameGuards = {
