@@ -660,16 +660,14 @@ export class GraphicHand {
   private updateCardsDraggability() {
     if (this.#cards.length === 0) return;
 
-    const selection = this.getKindComboSelection();
     const selectedCardIds = new Set(this.#selectedCardIds);
 
     this.#cardsData.forEach((card) => {
-      const isSelectedComboCard =
-        selection !== null && selectedCardIds.has(card.data.id);
+      const isSelectedCard = selectedCardIds.has(card.data.id);
 
       this.#scene.input.setDraggable(
         card.image,
-        !this.hasKindComboSelection() || isSelectedComboCard,
+        !this.hasKindComboSelection() || isSelectedCard,
       );
     });
   }
