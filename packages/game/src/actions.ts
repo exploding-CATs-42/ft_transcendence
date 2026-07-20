@@ -2,6 +2,7 @@ import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards, shuffle, drawOneCard } from "./utils";
 import { START_GAME_COUNTDOWN_MS } from "./constants";
+import type { Card } from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -181,7 +182,7 @@ export const playCard = ({ context, event }: GameActionArgs) => {
   const cardIndex = hand.findIndex((card) => card.id === cardId);
   if (cardIndex === -1) {
     return {
-      lastPlayedCard: null,
+      lastPlayedCards: null,
     };
   }
 
@@ -194,7 +195,7 @@ export const playCard = ({ context, event }: GameActionArgs) => {
 
   return {
     players: updatedPlayers,
-    lastPlayedCard: playedCard!,
+    lastPlayedCards: [playedCard!],
   };
 };
 
@@ -206,11 +207,27 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
   if (!player) return context;
 
   const cardIdsSet = new Set(cardIds);
+  if (cardIdsSet.size !== cardIds.length) {
+    return {
+      lastPlayedCards: null,
+    };
+  }
+
+  const playedCards = cardIds.map((cardId) =>
+    player.hand.find((card) => card.id === cardId),
+  );
+
+  if (playedCards.some((card) => !card)) {
+    return {
+      lastPlayedCards: null,
+    };
+  }
+
   const updatedHand = player.hand.filter((card) => !cardIdsSet.has(card.id));
 
   if (updatedHand.length !== player.hand.length - cardIdsSet.size) {
     return {
-      lastPlayedCard: null,
+      lastPlayedCards: null,
     };
   }
 
@@ -220,6 +237,6 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
 
   return {
     players: updatedPlayers,
-    lastPlayedCard: null,
+    lastPlayedCards: playedCards as Card[],
   };
 };

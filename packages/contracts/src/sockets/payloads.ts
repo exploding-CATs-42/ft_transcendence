@@ -72,7 +72,7 @@ export interface GameStatePayload {
   hand: Card[];
   currentTurnPlayerId: string | null;
   deckSize: number;
-  lastPlayedCard: Card | null;
+  lastPlayedCards: Card[] | null;
 }
 
 export interface FriendOnlineStatusChangedPayload {

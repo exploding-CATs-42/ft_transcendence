@@ -99,6 +99,12 @@ type GameRoomData = GameStartedPayload | GameStatePayload;
 const hasTurnState = (data: GameRoomData): data is GameStatePayload =>
   "currentTurnPlayerId" in data;
 
+const getLastPlayedCard = (cards: Card[] | null) => {
+  if (!cards || cards.length === 0) return null;
+
+  return cards[cards.length - 1]!;
+};
+
 const LEAVE_BUTTON_SIZE = {
   width: 260,
   height: 72,
@@ -167,7 +173,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile(
-      hasTurnState(gameData) ? gameData.lastPlayedCard : null,
+      hasTurnState(gameData)
+        ? getLastPlayedCard(gameData.lastPlayedCards)
+        : null,
     );
     this.createMyHand();
     this.fillMyHandWithCards(cards);
@@ -392,6 +400,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardReceived = (payload: CardPayload): void => {
+    this.#myHand.clearKindComboSelection();
+
     // Generate random insert index
     const cardCount = this.#myHand.getCount();
     const insertIndex = Phaser.Math.Between(0, cardCount);

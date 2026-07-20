@@ -91,10 +91,6 @@ function getComboCards(player: Player, cardIds: number[]) {
     throw new SocketError("Combo cards must be unique");
   }
 
-  if (cardIds.length !== 2 && cardIds.length !== 3) {
-    throw new SocketError("Combo must contain two or three cards");
-  }
-
   const cards = cardIds.map((cardId) =>
     player.hand.find((card) => card.id === cardId),
   );
@@ -272,13 +268,12 @@ export async function reconnectGame(
   const orderedPlayers = orderPlayersForPlayer(players, player.id);
   const context = game.instance.getSnapshot().context;
 
-  const gameContext = game.instance.getSnapshot().context;
   return {
     players: orderedPlayers.map(toPublicPlayerView),
     hand: player.hand,
-    currentTurnPlayerId: gameContext.currentTurnPlayerId,
-    deckSize: gameContext.deck.length,
-    lastPlayedCard: context.lastPlayedCard,
+    currentTurnPlayerId: context.currentTurnPlayerId,
+    deckSize: context.deck.length,
+    lastPlayedCards: context.lastPlayedCards,
   };
 }
 
@@ -360,8 +355,9 @@ export async function playCard(input: PLayCardParams, userId: UserId) {
     cardId: input.cardId,
   });
 
-  const lastPlayedCard = game.instance.getSnapshot().context.lastPlayedCard;
-  if (!lastPlayedCard) {
+  const lastPlayedCards = game.instance.getSnapshot().context.lastPlayedCards;
+  const lastPlayedCard = lastPlayedCards?.[0];
+  if (!lastPlayedCards || lastPlayedCards.length !== 1 || !lastPlayedCard) {
     throw new SocketError("Could not drop card");
   }
   return { playerId: player.id, card: lastPlayedCard };
@@ -377,18 +373,16 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
     cardIds: cards.map((card) => card.id),
   });
 
-  const playerAfterCombo = game.instance
-    .getSnapshot()
-    .context.players.find((snapshotPlayer) => snapshotPlayer.id === player.id);
+  const lastPlayedCards = game.instance.getSnapshot().context.lastPlayedCards;
+  const lastPlayedCardIds = new Set(lastPlayedCards?.map((card) => card.id));
 
   if (
-    !playerAfterCombo ||
-    cards.some((card) =>
-      playerAfterCombo.hand.some((playerCard) => playerCard.id === card.id),
-    )
+    !lastPlayedCards ||
+    lastPlayedCards.length !== cards.length ||
+    cards.some((card) => !lastPlayedCardIds.has(card.id))
   ) {
     throw new SocketError("Could not play combo");
   }
 
-  return { playerId: player.id, cards };
+  return { playerId: player.id, cards: lastPlayedCards };
 }

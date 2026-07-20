@@ -35,7 +35,7 @@ export interface GameContext {
   deck: Deck;
   currentTurnPlayerId: string | null;
   lastDrawnCard: Card | null;
-  lastPlayedCard: Card | null;
+  lastPlayedCards: Card[] | null;
   countdownEndsAt: number | null;
 }
 
@@ -72,7 +72,7 @@ export const gameMachine = setup({
     deck: [],
     currentTurnPlayerId: null,
     lastDrawnCard: null,
-    lastPlayedCard: null,
+    lastPlayedCards: null,
     countdownEndsAt: null,
   }),
   states: {
