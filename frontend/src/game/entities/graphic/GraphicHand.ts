@@ -32,9 +32,9 @@ const CLICK_MAX_DISTANCE = 24;
 const LEFT_POINTER_BUTTON = 0;
 
 const SELECTED_CARD_GLOW_BY_COUNT = {
-  1: { color: 0xfff4a8, outerStrength: 2, distance: 8 },
-  2: { color: 0xffd45a, outerStrength: 4, distance: 11 },
-  3: { color: 0xffa52c, outerStrength: 6, distance: 14 },
+  1: { color: 0xfff4a8, outerStrength: 5, distance: 16 },
+  2: { color: 0xffd45a, outerStrength: 7, distance: 20 },
+  3: { color: 0xffa52c, outerStrength: 9, distance: 24 },
 } as const;
 
 type onCardDropCallback = (card: GraphicCard) => void;
@@ -119,6 +119,13 @@ export class GraphicHand {
 
   getCount() {
     return this.#cards.length;
+  }
+
+  clearKindComboSelection() {
+    if (!this.hasKindComboSelection()) return;
+
+    this.#selectedCardIds = [];
+    this.syncKindComboSelection();
   }
 
   // -------------- Card --------------

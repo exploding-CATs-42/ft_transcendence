@@ -45,7 +45,7 @@ export interface GameContext {
   deck: Deck;
   currentTurnPlayerId: string | null;
   lastDrawnCard: Card | null;
-  lastPlayedCard: Card | null;
+  lastPlayedCards: Card[] | null;
   countdownEndsAt: number | null;
   turnsCount: number;
 }
@@ -87,7 +87,7 @@ export const gameMachine = setup({
     deck: [],
     currentTurnPlayerId: null,
     lastDrawnCard: null,
-    lastPlayedCard: null,
+    lastPlayedCards: null,
     countdownEndsAt: null,
     turnsCount: 1,
   }),
