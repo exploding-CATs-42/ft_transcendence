@@ -18,6 +18,8 @@ export interface GameRoomHandlers {
   onTurnChanged(payload: PlayerIdPayload): void;
   onCardRemoved(payload: CardRemovedPayload): void;
   onCardPlayed(payload: CardPlayedPayload): void;
+  onPlayerDisconnected(payload: PlayerIdPayload): void;
+  onPlayerReconnected(payload: PlayerIdPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -50,6 +52,8 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.TURN_CHANGED, handlers.onTurnChanged],
     [ServerPrivateEvents.CARD_REMOVED, handlers.onCardRemoved],
     [ServerPublicEvents.CARD_PLAYED, handlers.onCardPlayed],
+    [ServerPublicEvents.PLAYER_DISCONNECTED, handlers.onPlayerDisconnected],
+    [ServerPublicEvents.PLAYER_RECONNECTED, handlers.onPlayerReconnected],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
