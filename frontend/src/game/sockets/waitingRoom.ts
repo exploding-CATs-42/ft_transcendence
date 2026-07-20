@@ -24,6 +24,8 @@ export interface WaitingRoomHandlers {
   onPlayerLeft(playerId: string): void;
   onPlayerConfirmed(playerId: string): void;
   onPlayerCanceled(playerId: string): void;
+  onPlayerDisconnected(playerId: string): void;
+  onPlayerReconnected(playerId: string): void;
   onCountdownStarted(endsAt: number): void;
   onCountdownCanceled(): void;
   onGameStarted(payload?: GameStartedPayload | GameStatePayload): void;
@@ -59,6 +61,10 @@ export function subscribeWaitingRoom(
     handlers.onPlayerConfirmed(p.playerId);
   const onPlayerCanceled = (p: PlayerIdPayload) =>
     handlers.onPlayerCanceled(p.playerId);
+  const onPlayerDisconnected = (p: PlayerIdPayload) =>
+    handlers.onPlayerDisconnected(p.playerId);
+  const onPlayerReconnected = (p: PlayerIdPayload) =>
+    handlers.onPlayerReconnected(p.playerId);
   const onCountdownStarted = (p: CountdownStartedPayload) =>
     handlers.onCountdownStarted(p.endsAt);
   const onCountdownCanceled = () => handlers.onCountdownCanceled();
@@ -71,6 +77,8 @@ export function subscribeWaitingRoom(
   socket.on(ServerPublicEvents.PLAYER_LEFT, onPlayerLeft);
   socket.on(ServerPublicEvents.PLAYER_CONFIRMED, onPlayerConfirmed);
   socket.on(ServerPublicEvents.PLAYER_CANCELED, onPlayerCanceled);
+  socket.on(ServerPublicEvents.PLAYER_DISCONNECTED, onPlayerDisconnected);
+  socket.on(ServerPublicEvents.PLAYER_RECONNECTED, onPlayerReconnected);
   socket.on(ServerPublicEvents.COUNTDOWN_STARTED, onCountdownStarted);
   socket.on(ServerPublicEvents.COUNTDOWN_CANCELED, onCountdownCanceled);
   socket.on(ServerPrivateEvents.GAME_STARTED, onGameStarted);
@@ -90,6 +98,8 @@ export function subscribeWaitingRoom(
     socket.off(ServerPublicEvents.PLAYER_LEFT, onPlayerLeft);
     socket.off(ServerPublicEvents.PLAYER_CONFIRMED, onPlayerConfirmed);
     socket.off(ServerPublicEvents.PLAYER_CANCELED, onPlayerCanceled);
+    socket.off(ServerPublicEvents.PLAYER_DISCONNECTED, onPlayerDisconnected);
+    socket.off(ServerPublicEvents.PLAYER_RECONNECTED, onPlayerReconnected);
     socket.off(ServerPublicEvents.COUNTDOWN_STARTED, onCountdownStarted);
     socket.off(ServerPublicEvents.COUNTDOWN_CANCELED, onCountdownCanceled);
     socket.off(ServerPrivateEvents.GAME_STARTED, onGameStarted);

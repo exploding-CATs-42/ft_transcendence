@@ -113,7 +113,8 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     );
 
     this.#playersById.set(player.id, newPlayer);
-    this.#playersById.get(player.id)?.setConfirmed(player.isConfirmed);
+    newPlayer.setConfirmed(player.isConfirmed);
+    newPlayer.setConnected(player.isConnected);
     emptySeat.addPlayer(newPlayer);
   }
 
@@ -210,6 +211,14 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
 
   onPlayerCanceled = (playerId: string) => {
     this.#playersById.get(playerId)?.setConfirmed(false);
+  };
+
+  onPlayerDisconnected = (playerId: string) => {
+    this.#playersById.get(playerId)?.setConnected(false);
+  };
+
+  onPlayerReconnected = (playerId: string) => {
+    this.#playersById.get(playerId)?.setConnected(true);
   };
 
   onCountdownStarted = (endsAt: number) => {
