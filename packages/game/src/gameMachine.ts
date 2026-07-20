@@ -20,7 +20,8 @@ import {
   skipTurn,
   playCombo,
 } from "./actions";
-import { type Player, type Deck, type Card, CardType } from "./types";
+import { CardType } from "./types";
+import type { Player, Deck, Card } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import {
   GameGuards,
