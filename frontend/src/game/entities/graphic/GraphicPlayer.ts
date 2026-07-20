@@ -17,6 +17,7 @@ export class GraphicPlayer implements Player {
   private avatar: Phaser.GameObjects.Image;
   private label: Phaser.GameObjects.Text;
   private confirmedIcon: Phaser.GameObjects.Image;
+  private disconnectedLabel: Phaser.GameObjects.Text;
   private spotlight: Phaser.GameObjects.Image;
   #scene: Phaser.Scene;
 
@@ -39,12 +40,14 @@ export class GraphicPlayer implements Player {
     this.spotlight = this.addSpotlight(scene);
     this.avatar = this.addAvatar(scene);
     this.label = this.addUsernameLabel(scene, player.name, labelConfig);
+    this.disconnectedLabel = this.addDisconnectedLabel(scene);
 
     this.container.add([
       this.spotlight,
       this.avatar,
       this.label,
       this.confirmedIcon,
+      this.disconnectedLabel,
     ]);
   }
 
@@ -134,8 +137,29 @@ export class GraphicPlayer implements Player {
     scene.load.start();
   }
 
+  private addDisconnectedLabel(scene: Phaser.Scene) {
+    const x = AVATAR_WIDTH / 2;
+    const y = AVATAR_WIDTH / 2;
+
+    return scene.add
+      .text(x, y, "disconnected", {
+        fontSize: 28,
+        fontFamily: "Chewy",
+        color: "#ffffff",
+        backgroundColor: "#c73535",
+        padding: { x: 12, y: 4 },
+      })
+      .setOrigin(0.5)
+      .setVisible(false);
+  }
+
   setConfirmed(confirmed: boolean) {
     this.confirmedIcon.setVisible(confirmed);
+  }
+
+  setConnected(connected: boolean) {
+    this.avatar.setAlpha(connected ? 1 : 0.4);
+    this.disconnectedLabel.setVisible(!connected);
   }
 
   setTurnActive(active: boolean) {
