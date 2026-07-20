@@ -148,6 +148,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.createOpponentHands(graphicPlayers);
     this.fillOpponentHands(players);
     this.fillSeats(graphicPlayers);
+    players.forEach((player) => {
+      this.#players.get(player.id)?.player?.setConnected(player.isConnected);
+    });
 
     // Re-apply a turn that arrived before the scene existed
     if (this.#currentTurnPlayerId) {
@@ -422,6 +425,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.cardType];
     const cardFrame = getCardFrame(this, frameIndex);
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
+  };
+
+  onPlayerDisconnected = (payload: PlayerIdPayload): void => {
+    this.#players.get(payload.playerId)?.player?.setConnected(false);
+  };
+
+  onPlayerReconnected = (payload: PlayerIdPayload): void => {
+    this.#players.get(payload.playerId)?.player?.setConnected(true);
   };
 
   private cleanup = () => {
