@@ -340,5 +340,9 @@ export async function playCard(input: PLayCardParams, userId: UserId) {
     card,
   });
 
-  return { playerId: player.id, card };
+  const lastPlayedCard = game.instance.getSnapshot().context.lastPlayedCard;
+  if (!lastPlayedCard) {
+    throw new SocketError("Could not play card");
+  }
+  return { playerId: player.id, card: lastPlayedCard };
 }
