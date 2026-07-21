@@ -157,11 +157,20 @@ export const gameMachine = setup({
         },
         [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
           on: {
-            [GameEvents.DRAW_CARD]: {
-              guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
-              actions: GameActions.DRAW_CARD,
-              target: GameStates.CHANGING_TURN,
-            },
+            [GameEvents.DRAW_CARD]: [
+              {
+                guard: and([
+                  GameGuards.IS_ENOUGH_CARDS_IN_DECK,
+                  GameGuards.HAS_REMAINING_TURNS,
+                ]),
+                actions: GameActions.DRAW_CARD,
+              },
+              {
+                guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
+                actions: GameActions.DRAW_CARD,
+                target: GameStates.CHANGING_TURN,
+              },
+            ],
             [GameEvents.PLAY_CARD]: [
               {
                 guard: {
