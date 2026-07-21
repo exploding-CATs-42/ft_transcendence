@@ -159,10 +159,12 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
         }
       : player,
   );
+
   return {
     deck,
     players: updatedPlayers,
     lastDrawnCard,
+    turnsCount: context.turnsCount - 1,
   };
 };
 
