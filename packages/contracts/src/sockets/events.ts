@@ -5,7 +5,7 @@ export const ClientEvents = {
   CONFIRM_START: "confirm-start",
   CANCEL_START: "cancel-start",
   DRAW_CARD: "draw-card",
-  PLAY_CARD: "drop-card",
+  PLAY_CARD: "play-card",
 } as const;
 
 export const ServerPublicEvents = {
@@ -57,5 +57,5 @@ export const ServerErrorEvents = {
   CONFIRM_START_ERROR: "confirm-start-error",
   CANCEL_START_ERROR: "cancel-start-error",
   DRAW_CARD_ERROR: "draw-card-error",
-  PLAY_CARD_ERROR: "drop-card-error",
+  PLAY_CARD_ERROR: "play-card-error",
 } as const;
