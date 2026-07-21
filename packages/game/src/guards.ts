@@ -9,6 +9,7 @@ export const GameGuards = {
   HAS_ENOUGH_CARDS: "hasEnoughCards",
   HAS_CARD_OF_TYPE: "hasCardOfType",
   IS_ENOUGH_CARDS_IN_DECK: "isEnoughCardsInDeck",
+  HAS_REMAINING_TURNS: "hasRemainingTurns",
 } as const;
 
 export interface GameGuardArgs {
@@ -41,4 +42,8 @@ export const hasCardOfType = (
 ) => {
   if (event.type !== GameEvents.PLAY_CARD) return false;
   return event.card.type === params.cardType;
+};
+
+export const hasRemainingTurns = ({ context }: GameGuardArgs) => {
+  return context.turnsCount > 1;
 };

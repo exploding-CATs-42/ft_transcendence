@@ -24,6 +24,7 @@ import {
   hasCardOfType,
   hasEnoughPlayers,
   isEnoughCardsInDeck,
+  hasRemainingTurns,
 } from "./guards";
 import {
   countdownCanceled,
@@ -68,6 +69,7 @@ export const gameMachine = setup({
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
     [GameGuards.IS_ENOUGH_CARDS_IN_DECK]: isEnoughCardsInDeck,
     [GameGuards.HAS_CARD_OF_TYPE]: hasCardOfType,
+    [GameGuards.HAS_REMAINING_TURNS]: hasRemainingTurns,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
