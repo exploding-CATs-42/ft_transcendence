@@ -1,5 +1,5 @@
 // Libraries
-import { assign, emit, setup } from "xstate";
+import { and, assign, emit, setup } from "xstate";
 // Local level
 import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
 import {
@@ -41,6 +41,7 @@ export interface GameContext {
   lastDrawnCard: Card | null;
   lastPlayedCard: Card | null;
   countdownEndsAt: number | null;
+  turnsCount: number;
 }
 
 export const gameMachine = setup({
@@ -78,6 +79,7 @@ export const gameMachine = setup({
     lastDrawnCard: null,
     lastPlayedCard: null,
     countdownEndsAt: null,
+    turnsCount: 1,
   }),
   states: {
     [GameStates.WAITING]: {
