@@ -135,7 +135,7 @@ export const changeTurn = ({ context }: GameActionArgs) => {
     const nextPlayer = players[(currentPlayerIndex + i) % players.length]!;
 
     if (nextPlayer.isAlive) {
-      return { currentTurnPlayerId: nextPlayer.id };
+      return { currentTurnPlayerId: nextPlayer.id, turnsCount: 1 };
     }
   }
 
@@ -159,10 +159,12 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
         }
       : player,
   );
+
   return {
     deck,
     players: updatedPlayers,
     lastDrawnCard,
+    turnsCount: context.turnsCount - 1,
   };
 };
 

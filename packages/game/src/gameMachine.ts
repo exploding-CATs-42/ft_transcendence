@@ -1,5 +1,5 @@
 // Libraries
-import { assign, emit, setup } from "xstate";
+import { and, assign, emit, setup } from "xstate";
 // Local level
 import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
 import {
@@ -24,6 +24,7 @@ import {
   hasCardOfType,
   hasEnoughPlayers,
   isEnoughCardsInDeck,
+  hasRemainingTurns,
 } from "./guards";
 import {
   countdownCanceled,
@@ -41,6 +42,7 @@ export interface GameContext {
   lastDrawnCard: Card | null;
   lastPlayedCard: Card | null;
   countdownEndsAt: number | null;
+  turnsCount: number;
 }
 
 export const gameMachine = setup({
@@ -67,6 +69,7 @@ export const gameMachine = setup({
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
     [GameGuards.IS_ENOUGH_CARDS_IN_DECK]: isEnoughCardsInDeck,
     [GameGuards.HAS_CARD_OF_TYPE]: hasCardOfType,
+    [GameGuards.HAS_REMAINING_TURNS]: hasRemainingTurns,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -78,6 +81,7 @@ export const gameMachine = setup({
     lastDrawnCard: null,
     lastPlayedCard: null,
     countdownEndsAt: null,
+    turnsCount: 1,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -153,11 +157,20 @@ export const gameMachine = setup({
         },
         [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
           on: {
-            [GameEvents.DRAW_CARD]: {
-              guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
-              actions: GameActions.DRAW_CARD,
-              target: GameStates.CHANGING_TURN,
-            },
+            [GameEvents.DRAW_CARD]: [
+              {
+                guard: and([
+                  GameGuards.IS_ENOUGH_CARDS_IN_DECK,
+                  GameGuards.HAS_REMAINING_TURNS,
+                ]),
+                actions: GameActions.DRAW_CARD,
+              },
+              {
+                guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
+                actions: GameActions.DRAW_CARD,
+                target: GameStates.CHANGING_TURN,
+              },
+            ],
             [GameEvents.PLAY_CARD]: [
               {
                 guard: {
