@@ -32,6 +32,7 @@ export const GameOutEvents = {
   COUNTDOWN_CANCELED: "COUNTDOWN_CANCELED",
   CARDS_DEALT: "CARDS_DEALT",
   TURN_CHANGED: "TURN_CHANGED",
+  DECK_SHUFFLED: "DECK_SHUFFLED",
 
   //   EXPLODING_KITTEN_DRAWN: "EXPLODING_KITTEN_DRAWN",
   //   COMBO_PLAYED: "COMBO_PLAYED",
@@ -53,4 +54,5 @@ export type GameOutEvent =
     }
   | { type: typeof GameOutEvents.COUNTDOWN_STARTED; endsAt: number }
   | { type: typeof GameOutEvents.COUNTDOWN_CANCELED }
-  | { type: typeof GameOutEvents.TURN_CHANGED; payload: TurnChangedPayload };
+  | { type: typeof GameOutEvents.TURN_CHANGED; payload: TurnChangedPayload }
+  | { type: typeof GameOutEvents.DECK_SHUFFLED };
