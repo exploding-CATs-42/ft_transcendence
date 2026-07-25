@@ -20,6 +20,7 @@ export interface GameRoomHandlers {
   onCardPlayed(payload: CardPlayedPayload): void;
   onPlayerDisconnected(payload: PlayerIdPayload): void;
   onPlayerReconnected(payload: PlayerIdPayload): void;
+  onDeckShuffled(): void;
 }
 
 export type CleanupFunction = () => void;
@@ -54,6 +55,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.CARD_PLAYED, handlers.onCardPlayed],
     [ServerPublicEvents.PLAYER_DISCONNECTED, handlers.onPlayerDisconnected],
     [ServerPublicEvents.PLAYER_RECONNECTED, handlers.onPlayerReconnected],
+    [ServerPublicEvents.DECK_SHUFFLED, handlers.onDeckShuffled],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
