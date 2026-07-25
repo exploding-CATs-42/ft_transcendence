@@ -44,6 +44,10 @@ export function attachGameBroadcaster(game: Game) {
 
     io.to(gameId).emit(ServerPublicEvents.TURN_CHANGED, payload);
   });
+
+  broadcaster.on(GameOutEvents.DECK_SHUFFLED, () => {
+    io.to(gameId).emit(ServerPublicEvents.DECK_SHUFFLED);
+  });
 }
 
 /* broadcaster - is a function that just repeats/broadcasts events
