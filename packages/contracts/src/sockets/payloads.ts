@@ -78,6 +78,7 @@ export interface GameStatePayload {
   currentTurnPlayerId: string | null;
   deckSize: number;
   lastPlayedCards: Card[] | null;
+  attackCount: number;
 }
 
 export interface FriendOnlineStatusChangedPayload {

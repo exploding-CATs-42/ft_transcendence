@@ -3,6 +3,7 @@ import type { Card } from "./types";
 
 export interface TurnChangedPayload {
   playerId: string;
+  attackCount: number;
 }
 
 export interface TurnSkippedPayload {
