@@ -16,6 +16,7 @@ import type {
   GameStatePayload,
   PlayerIdPayload,
   SeeTheFuturePeekPayload,
+  TurnChangedPayload,
 } from "@exploding-cats/contracts";
 // Local level
 import {
@@ -150,6 +151,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #selectedCardPlay: CardPlaySelection | null = null;
   #modal!: Modal;
   #drawPileSize: number = 0;
+  #attackCount = 1;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -169,6 +171,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (hasTurnState(gameData)) {
       this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
+      this.#attackCount = gameData.attackCount;
     }
 
     addBackgroundImage(this, Textures.gameRoomBg);
@@ -186,6 +189,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     // Re-apply a turn that arrived before the scene existed
     if (this.#currentTurnPlayerId) {
       this.setCurrentTurn(this.#currentTurnPlayerId);
+      this.updateAttackIndicator();
     }
 
     this.#drawPileSize = deckSize;
@@ -371,6 +375,19 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   }
 
+  private updateAttackIndicator() {
+    this.#players.forEach((seat, playerId) => {
+      const shouldShow =
+        playerId === this.#currentTurnPlayerId && this.#attackCount > 1;
+
+      if (shouldShow) {
+        seat.attackIndicator.setTurnsCount(this.#attackCount);
+      }
+
+      seat.setAttackIndicatorVisible(shouldShow);
+    });
+  }
+
   private buildCardConfig(frame: Phaser.Textures.Frame): CardConfig {
     return {
       frame: frame,
@@ -414,6 +431,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onGameState = (payload: GameStatePayload): void => {
     this.#pendingGameState = payload;
     this.#currentTurnPlayerId = payload.currentTurnPlayerId;
+    this.#attackCount = payload.attackCount;
   };
 
   onCardReceived = (payload: CardPayload): void => {
@@ -460,11 +478,22 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onCardDrawn = (payload: PlayerIdPayload): void => {
     this.#opponents.get(payload.playerId)?.addCard();
+
+    if (
+      payload.playerId === this.#currentTurnPlayerId &&
+      this.#attackCount > 1
+    ) {
+      this.#attackCount -= 1;
+      this.updateAttackIndicator();
+    }
   };
 
-  onTurnChanged = (payload: PlayerIdPayload) => {
+  onTurnChanged = (payload: TurnChangedPayload) => {
     this.#currentTurnPlayerId = payload.playerId;
+    this.#attackCount = payload.attackCount;
+
     this.setCurrentTurn(this.#currentTurnPlayerId);
+    this.updateAttackIndicator();
     this.updateDrawPileInteractivity();
     this.updateComboPlayInteractivity();
   };

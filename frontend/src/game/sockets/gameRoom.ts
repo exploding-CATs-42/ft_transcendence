@@ -9,6 +9,7 @@ import {
   type GameStatePayload,
   type PlayerIdPayload,
   type SeeTheFuturePeekPayload,
+  type TurnChangedPayload,
 } from "@exploding-cats/contracts";
 import type {
   CardPayload,
@@ -22,7 +23,7 @@ export interface GameRoomHandlers {
   onCardReceived(card: CardPayload): void;
   onCardDrawn(payload: PlayerIdPayload): void;
   onGameState(payload: GameStatePayload): void;
-  onTurnChanged(payload: PlayerIdPayload): void;
+  onTurnChanged(payload: TurnChangedPayload): void;
   onCardRemoved(payload: CardRemovedPayload): void;
   onCardPlayed(payload: CardPlayedPayload): void;
   onDefusePrompt(payload: DefusePromptPayload): void;
