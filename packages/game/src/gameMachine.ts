@@ -30,6 +30,7 @@ import {
 import {
   countdownCanceled,
   countdownStarted,
+  deckShuffled,
   gameStarted,
   turnChanged,
 } from "./emitters";
@@ -195,7 +196,11 @@ export const gameMachine = setup({
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.SHUFFLE },
                 },
-                actions: [GameActions.PLAY_CARD, GameActions.SHUFFLE_DECK], // TODO: emit GameOutEvent
+                actions: [
+                  GameActions.PLAY_CARD,
+                  GameActions.SHUFFLE_DECK,
+                  emit(deckShuffled),
+                ],
               },
               {
                 guard: {
