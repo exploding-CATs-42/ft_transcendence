@@ -286,6 +286,7 @@ export async function reconnectGame(
     currentTurnPlayerId: context.currentTurnPlayerId,
     deckSize: context.deck.length,
     lastPlayedCards: context.lastPlayedCards,
+    attackCount: context.turnsCount,
   };
 }
 

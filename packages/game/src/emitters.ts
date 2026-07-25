@@ -27,7 +27,10 @@ export const gameStarted = ({ context }: GameEmitterArgs): GameOutEvent => ({
 
 export const turnChanged = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.TURN_CHANGED,
-  payload: { playerId: context.currentTurnPlayerId! },
+  payload: {
+    playerId: context.currentTurnPlayerId!,
+    attackCount: context.turnsCount,
+  },
 });
 
 export const deckShuffled = (): GameOutEvent => ({
