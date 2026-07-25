@@ -67,6 +67,7 @@ export interface GameContext {
   lastPlayedCards: Card[] | null;
   countdownEndsAt: number | null;
   turnsCount: number;
+  isUnderAttack: boolean;
 }
 
 export const gameMachine = setup({
@@ -118,6 +119,7 @@ export const gameMachine = setup({
     lastPlayedCards: null,
     countdownEndsAt: null,
     turnsCount: 1,
+    isUnderAttack: false,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -213,7 +215,7 @@ export const gameMachine = setup({
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.ATTACK },
                 },
-                actions: [GameActions.PLAY_CARD], // TODO: Apply attack effect
+                actions: [GameActions.PLAY_CARD],
                 target: GameStates.CHANGING_TURN,
               },
               {

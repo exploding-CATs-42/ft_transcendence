@@ -130,7 +130,7 @@ export const shufflePlayers = ({ context }: GameActionArgs) => {
   return { players };
 };
 
-export const changeTurn = ({ context }: GameActionArgs) => {
+export const changeTurn = ({ context, event }: GameActionArgs) => {
   const { players, currentTurnPlayerId } = context;
 
   /*
@@ -138,6 +138,10 @@ export const changeTurn = ({ context }: GameActionArgs) => {
     Starting the loop at i = 1 makes (-1 + 1) % players.length === 0,
     so the first player in the array gets the first turn.
   */
+
+  const attackPlayed =
+    event.type === GameEvents.PLAY_CARD && event.card.type === CardType.ATTACK;
+
   const currentPlayerIndex = players.findIndex(
     (player) => player.id === currentTurnPlayerId,
   );
@@ -147,7 +151,16 @@ export const changeTurn = ({ context }: GameActionArgs) => {
     const nextPlayer = players[(currentPlayerIndex + i) % players.length]!;
 
     if (nextPlayer.isAlive) {
-      return { currentTurnPlayerId: nextPlayer.id, turnsCount: 1 };
+      const turnsCount = attackPlayed
+        ? context.isUnderAttack
+          ? context.turnsCount + 2
+          : 2
+        : 1;
+      return {
+        currentTurnPlayerId: nextPlayer.id,
+        turnsCount,
+        isUnderAttack: attackPlayed,
+      };
     }
   }
 
