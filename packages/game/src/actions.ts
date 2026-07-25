@@ -16,6 +16,7 @@ export const GameActions = {
   PLAY_CARD: "playCard",
   SET_COUNTDOWN_ENDS_AT: "setCountdownEndsAt",
   CLEAR_COUNTDOWN_ENDS_AT: "clearCountdownEndsAt",
+  SHUFFLE_DECK: "shuffleDeck",
 } as const;
 
 export interface GameActionArgs {
@@ -197,4 +198,10 @@ export const playCard = ({ context, event }: GameActionArgs) => {
     players: updatedPlayers,
     lastPlayedCard: playedCard!,
   };
+};
+
+export const shuffleDeck = ({ context }: GameActionArgs) => {
+  const deck = context.deck.slice();
+  shuffle(deck);
+  return { deck };
 };
