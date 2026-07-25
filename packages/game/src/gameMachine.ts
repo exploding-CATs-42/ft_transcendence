@@ -16,6 +16,7 @@ import {
   playCard,
   setCountdownEndsAt,
   clearCountdownEndsAt,
+  shuffleDeck,
 } from "./actions";
 import { type Player, type Deck, type Card, CardType } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
@@ -64,6 +65,7 @@ export const gameMachine = setup({
     [GameActions.PLAY_CARD]: assign(playCard),
     [GameActions.SET_COUNTDOWN_ENDS_AT]: assign(setCountdownEndsAt),
     [GameActions.CLEAR_COUNTDOWN_ENDS_AT]: assign(clearCountdownEndsAt),
+    [GameActions.SHUFFLE_DECK]: assign(shuffleDeck),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -193,7 +195,7 @@ export const gameMachine = setup({
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.SHUFFLE },
                 },
-                actions: [GameActions.PLAY_CARD], // TODO: Add shuffle card action and emit GameOutEvent
+                actions: [GameActions.PLAY_CARD, GameActions.SHUFFLE_DECK], // TODO: emit GameOutEvent
               },
               {
                 guard: {
