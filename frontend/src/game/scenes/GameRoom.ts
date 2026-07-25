@@ -41,6 +41,7 @@ import {
   type CleanupFunction,
   type GameRoomHandlers,
 } from "../sockets";
+import { ShuffleAnimation } from "../animations";
 
 // -------------------- OPPONENTS --------------------
 const NAME_LABEL_CONFIG: LabelConfig = {
@@ -73,10 +74,10 @@ const CARD_DROP_ZONE = {
   height: 540,
 };
 
-// const SHUFFLE_ANIMATION_POSITION = {
-//   x: DRAW_PILE_POSITION.x + 110,
-//   y: DRAW_PILE_POSITION.y + 160,
-// };
+const SHUFFLE_ANIMATION_POSITION = {
+  x: DRAW_PILE_POSITION.x + 110,
+  y: DRAW_PILE_POSITION.y + 160,
+};
 
 // const NOPE_BUTTON_POSITION = {
 //   x: 1700,
@@ -119,6 +120,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #currentTurnPlayerId: string | null = null;
   #drawPile: Phaser.GameObjects.Image | null = null;
   //   #drawPileSize: number = 0;
+  #shuffleAnimation!: ShuffleAnimation;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -166,6 +168,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     );
     this.createMyHand();
     this.fillMyHandWithCards(cards);
+
+    this.addShuffleAnimationObject();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -284,6 +288,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     zone.setRectangleDropZone(width, height);
 
     // this.#cardDropZone = zone;
+  }
+
+  private addShuffleAnimationObject() {
+    this.#shuffleAnimation = new ShuffleAnimation(
+      this,
+      SHUFFLE_ANIMATION_POSITION,
+    );
   }
 
   // -------------------- UTILS --------------------
