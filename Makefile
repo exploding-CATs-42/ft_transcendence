@@ -134,6 +134,13 @@ test-orm: ## Run backend ORM tests
 	$(COMPOSE) exec $(BACKEND_WD) backend pnpm test:orm
 
 ## -------------------------
+## Game tests
+## -------------------------
+
+test-attack: ## Run Attack card tests
+	pnpm --filter @exploding-cats/game-core exec vitest run tests/attack.test.ts --reporter=verbose
+
+## -------------------------
 ## Formatting
 ## -------------------------
 
@@ -237,7 +244,7 @@ logs logs-backend logs-frontend logs-nginx logs-postgres \
 backend-shell frontend-shell db-shell \
 deps deps-backend deps-frontend \
 prisma-format prisma-validate prisma-generate prisma-migrate prisma-deploy prisma-reset seed \
-test-backend test-orm \
+test-backend test-orm test-attack \
 format-check format-fix format-check-frontend format-fix-frontend format-check-backend format-fix-backend \
 lint-check lint-fix lint-check-frontend lint-fix-frontend lint-check-backend lint-fix-backend \
 typecheck typecheck-frontend typecheck-backend \
