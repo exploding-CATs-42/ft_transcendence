@@ -446,6 +446,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#players.get(payload.playerId)?.player?.setConnected(true);
   };
 
+  onDeckShuffled = (): void => {
+    this.#shuffleAnimation.playAnimation();
+  };
+
   private cleanup = () => {
     this.#detachSockets();
 
