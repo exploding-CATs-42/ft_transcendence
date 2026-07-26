@@ -57,6 +57,7 @@ import {
   isNoped,
   canPlayNope,
   hasRemainingTurns,
+  lastPlayedCardOfType,
 } from "./guards";
 import {
   countdownCanceled,
@@ -138,6 +139,7 @@ export const gameMachine = setup({
     [GameGuards.IS_NOPED]: isNoped,
     [GameGuards.CAN_PLAY_NOPE]: canPlayNope,
     [GameGuards.HAS_REMAINING_TURNS]: hasRemainingTurns,
+    [GameGuards.LAST_PLAYED_CARD_OF_TYPE]: lastPlayedCardOfType,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -413,6 +415,10 @@ export const gameMachine = setup({
         [GameStates.WAITING_FOR_CARD_SELECTION]: {
           on: {
             [GameEvents.PASS_CARD_BY_ID]: {
+              guard: {
+                type: GameGuards.LAST_PLAYED_CARD_OF_TYPE,
+                params: { cardType: CardType.FAVOR },
+              },
               actions: GameActions.PASS_CARD_BY_ID,
             },
           },
