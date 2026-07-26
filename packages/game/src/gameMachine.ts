@@ -32,6 +32,7 @@ import {
   setNopeWindow,
   clearNopeWindow,
   addNope,
+  selectPlayer,
 } from "./actions";
 import {
   type Player,
@@ -120,6 +121,7 @@ export const gameMachine = setup({
     [GameActions.SET_NOPE_WINDOW]: assign(setNopeWindow),
     [GameActions.CLEAR_NOPE_WINDOW]: assign(clearNopeWindow),
     [GameActions.ADD_NOPE]: assign(addNope),
+    [GameActions.SELECT_PLAYER]: assign(selectPlayer),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -398,7 +400,13 @@ export const gameMachine = setup({
             },
           ],
         },
-        [GameStates.SELECTING_PLAYER]: {},
+        [GameStates.SELECTING_PLAYER]: {
+          on: {
+            [GameEvents.SELECT_PLAYER]: {
+              actions: GameActions.SELECT_PLAYER,
+            },
+          },
+        },
         [GameStates.WAITING_FOR_CARD_SELECTION]: {},
       },
     },
