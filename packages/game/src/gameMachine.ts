@@ -35,6 +35,7 @@ import {
   countdownStarted,
   deckShuffled,
   gameStarted,
+  showedTopThreeCards,
   turnChanged,
   turnSkipped,
 } from "./emitters";
@@ -227,7 +228,7 @@ export const gameMachine = setup({
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.SEE_THE_FUTURE },
                 },
-                actions: [GameActions.PLAY_CARD], // TODO: Add action to pick top 3 cards and emit GameOutEvent
+                actions: [GameActions.PLAY_CARD, emit(showedTopThreeCards)],
               },
               {
                 guard: {
