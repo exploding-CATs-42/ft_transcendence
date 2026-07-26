@@ -33,6 +33,7 @@ import {
   clearNopeWindow,
   addNope,
   selectPlayer,
+  passCardById,
 } from "./actions";
 import {
   type Player,
@@ -122,6 +123,7 @@ export const gameMachine = setup({
     [GameActions.CLEAR_NOPE_WINDOW]: assign(clearNopeWindow),
     [GameActions.ADD_NOPE]: assign(addNope),
     [GameActions.SELECT_PLAYER]: assign(selectPlayer),
+    [GameActions.PASS_CARD_BY_ID]: assign(passCardById),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -408,7 +410,13 @@ export const gameMachine = setup({
             },
           },
         },
-        [GameStates.WAITING_FOR_CARD_SELECTION]: {},
+        [GameStates.WAITING_FOR_CARD_SELECTION]: {
+          on: {
+            [GameEvents.PASS_CARD_BY_ID]: {
+              actions: GameActions.PASS_CARD_BY_ID,
+            },
+          },
+        },
       },
     },
     [GameStates.GAME_OVER]: {
