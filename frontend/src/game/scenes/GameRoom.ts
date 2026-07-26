@@ -136,6 +136,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #discardPile: Phaser.GameObjects.Image | null = null;
   #cardDropZone: Phaser.GameObjects.Zone | null = null;
   #selectedKindCombo: KindComboSelection | null = null;
+  #modal!: Modal;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -187,6 +188,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.fillMyHandWithCards(cards);
 
     this.addShuffleAnimationObject();
+    this.addModalWindowObject();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -326,6 +328,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this,
       SHUFFLE_ANIMATION_POSITION,
     );
+  }
+
+  private addModalWindowObject() {
+    this.#modal = new Modal(this).setVisible(false);
   }
 
   // -------------------- UTILS --------------------
