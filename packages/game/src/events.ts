@@ -22,6 +22,7 @@ export const GameEvents = {
   PLAY_DEFUSE: "PLAY_DEFUSE",
   INSERT_KITTEN: "INSERT_KITTEN",
   PLAY_NOPE: "PLAY_NOPE",
+  SELECT_PLAYER: "SELECT_PLAYER",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -54,7 +55,8 @@ export type GameEvent =
       type: typeof GameEvents.PLAY_NOPE;
       playerId: Player["id"];
       card: Card;
-    };
+    }
+  | { type: typeof GameEvents.SELECT_PLAYER; playerId: Player["id"] };
 
 // Events emitted FROM the machine
 export const GameOutEvents = {
