@@ -221,6 +221,7 @@ export const gameMachine = setup({
             ],
             [GameEvents.PLAY_CARD]: {
               guard: GameGuards.IS_PLAYERS_TURN,
+              actions: [GameActions.PLAY_CARD],
             },
             [GameEvents.PLAY_COMBO]: {
               actions: GameActions.PLAY_COMBO,
