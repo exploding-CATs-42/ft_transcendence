@@ -21,6 +21,7 @@ export interface GameRoomHandlers {
   onPlayerDisconnected(payload: PlayerIdPayload): void;
   onPlayerReconnected(payload: PlayerIdPayload): void;
   onDeckShuffled(): void;
+  onTurnSkipped(payload: PlayerIdPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -56,6 +57,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.PLAYER_DISCONNECTED, handlers.onPlayerDisconnected],
     [ServerPublicEvents.PLAYER_RECONNECTED, handlers.onPlayerReconnected],
     [ServerPublicEvents.DECK_SHUFFLED, handlers.onDeckShuffled],
+    [ServerPublicEvents.TURN_SKIPPED, handlers.onTurnSkipped],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
