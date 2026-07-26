@@ -8,6 +8,7 @@ import type {
   KittenInsertedPayload,
   PlayerEliminatedPayload,
   GameOverPayload,
+  PlayerSelectedPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -82,6 +83,7 @@ export const GameOutEvents = {
   PLAYER_ELIMINATED: "PLAYER_ELIMINATED",
   GAME_OVER: "GAME_OVER",
   NOPE_WINDOW_RESOLVED: "NOPE_WINDOW_RESOLVED",
+  PLAYER_SELECTED: "PLAYER_SELECTED",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -130,4 +132,8 @@ export type GameOutEvent =
   | {
       type: typeof GameOutEvents.GAME_OVER;
       payload: GameOverPayload;
+    }
+  | {
+      type: typeof GameOutEvents.PLAYER_SELECTED;
+      payload: PlayerSelectedPayload;
     };
