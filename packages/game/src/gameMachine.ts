@@ -5,6 +5,7 @@ import {
   GAME_MACHINE_ID,
   START_GAME_COUNTDOWN_MS,
   WAIT_FOR_DEFUSE_TIMEOUT,
+  NOPE_WINDOW_MS,
 } from "./constants";
 import {
   GameActions,
@@ -281,7 +282,11 @@ export const gameMachine = setup({
             },
           },
         },
-        [GameStates.WAITING_FOR_NOPES]: {},
+        [GameStates.WAITING_FOR_NOPES]: {
+          after: {
+            [NOPE_WINDOW_MS]: {},
+          },
+        },
         [GameStates.CHECKING_DRAWN_CARD]: {
           always: [
             {
