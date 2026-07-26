@@ -85,6 +85,7 @@ export interface GameContext {
   turnsCount: number;
   isUnderAttack: boolean;
   nopeWindow: NopeWindow | null;
+  selectedPlayerId: string | null;
 }
 
 export const gameMachine = setup({
@@ -147,6 +148,7 @@ export const gameMachine = setup({
     turnsCount: 1,
     isUnderAttack: false,
     nopeWindow: null,
+    selectedPlayerId: null,
   }),
   states: {
     [GameStates.WAITING]: {
