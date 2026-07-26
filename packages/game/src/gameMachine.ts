@@ -26,6 +26,7 @@ import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import {
   GameGuards,
   hasCardOfType,
+  hasDefuseCard,
   hasEnoughPlayers,
   isEnoughCardsInDeck,
   hasExtraTurns,
@@ -37,6 +38,7 @@ import {
   deckShuffled,
   gameStarted,
   showedTopThreeCards,
+  kittenDrawn,
   turnChanged,
   turnSkipped,
 } from "./emitters";
@@ -81,6 +83,7 @@ export const gameMachine = setup({
     [GameGuards.IS_ENOUGH_CARDS_IN_DECK]: isEnoughCardsInDeck,
     [GameGuards.HAS_CARD_OF_TYPE]: hasCardOfType,
     [GameGuards.HAS_EXTRA_TURNS]: hasExtraTurns,
+    [GameGuards.HAS_DEFUSE_CARD]: hasDefuseCard,
     [GameGuards.IS_EXPLODING_KITTEN_DRAWN]: isExplodingKittenDrawn,
   },
 }).createMachine({
@@ -259,7 +262,20 @@ export const gameMachine = setup({
             },
           ],
         },
-        [GameStates.EXPLODING_KITTEN_DRAWN]: {},
+        [GameStates.EXPLODING_KITTEN_DRAWN]: {
+          entry: emit(kittenDrawn),
+          always: [
+            {
+              guard: GameGuards.HAS_DEFUSE_CARD,
+              target: GameTargets.WAITING_FOR_DEFUSE_CARD,
+            },
+            {
+              target: GameTargets.EXPLODING_PLAYER,
+            },
+          ],
+        },
+        [GameStates.WAITING_FOR_DEFUSE_CARD]: {},
+        [GameStates.EXPLODING_PLAYER]: {},
       },
     },
   },
