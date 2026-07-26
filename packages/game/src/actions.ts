@@ -2,7 +2,7 @@ import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards, shuffle, drawOneCard } from "./utils";
 import { START_GAME_COUNTDOWN_MS, WAIT_FOR_DEFUSE_TIMEOUT } from "./constants";
-import type { Card } from "./types";
+import { type Card, CardType } from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -21,6 +21,7 @@ export const GameActions = {
   SHUFFLE_DECK: "shuffleDeck",
   SKIP_TURN: "skipTurn",
   PLAY_COMBO: "playCombo",
+  DEFUSE_KITTEN: "defuseExplodingKitten",
 } as const;
 
 export interface GameActionArgs {
@@ -257,5 +258,35 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
   return {
     players: updatedPlayers,
     lastPlayedCards: playedCards as Card[],
+  };
+};
+
+export const defuseExplodingKitten = ({ context, event }: GameActionArgs) => {
+  if (event.type != GameEvents.PLAY_DEFUSE) return context;
+
+  const { playerId } = event;
+  const players = context.players;
+
+  const player = players.find((player) => player.id === playerId);
+  if (!player) return context;
+
+  const hand = player.hand;
+  const defuseIndex = hand.findIndex((card) => card.type === CardType.DEFUSE);
+  if (defuseIndex === -1) {
+    return {
+      lastPlayedCard: null,
+    };
+  }
+
+  const defuseCard = hand[defuseIndex];
+  const updatedHand = hand.filter((_, i) => i !== defuseIndex);
+
+  const updatedPlayers = players.map((player) =>
+    player.id === playerId ? { ...player, hand: updatedHand } : player,
+  );
+
+  return {
+    players: updatedPlayers,
+    lastPlayedCard: defuseCard!,
   };
 };
