@@ -63,6 +63,10 @@ export function attachGameBroadcaster(game: Game) {
     const socket = socketsMap.get(event.payload.playerId)!;
     socket.emit(ServerPrivateEvents.SEE_THE_FUTURE_PEEK, event.payload);
   });
+
+  broadcaster.on(GameOutEvents.EXPLODING_KITTEN_DRAWN, () => {
+    io.to(gameId).emit(ServerPublicEvents.EXPLODING_KITTEN_DRAWN);
+  });
 }
 
 /* broadcaster - is a function that just repeats/broadcasts events
