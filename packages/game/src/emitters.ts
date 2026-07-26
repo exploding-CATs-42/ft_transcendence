@@ -50,6 +50,10 @@ export const showedTopThreeCards = ({
   };
 };
 
+export const kittenDrawn = (): GameOutEvent => ({
+  type: GameOutEvents.EXPLODING_KITTEN_DRAWN,
+});
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,
