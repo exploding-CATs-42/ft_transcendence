@@ -1,4 +1,8 @@
-import type { Card, CardType } from "@exploding-cats/game-core";
+import type {
+  Card,
+  CardType,
+  ShowedCardsToPlayerPayload,
+} from "@exploding-cats/game-core";
 import type { GameRecord } from "../shared";
 import type {
   PublicPlayerView,
@@ -83,3 +87,5 @@ export interface FriendOnlineStatusChangedPayload {
 export type SocketAckPayload =
   | { ok: true }
   | { ok: false; code: SocketErrorCode; message: string };
+
+export type SeeTheFuturePeekPayload = ShowedCardsToPlayerPayload;
