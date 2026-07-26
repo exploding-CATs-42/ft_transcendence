@@ -29,6 +29,7 @@ import {
   explodePlayer,
   insertKitten,
   setNopeWindow,
+  clearNopeWindow,
 } from "./actions";
 import {
   type Player,
@@ -109,6 +110,7 @@ export const gameMachine = setup({
     [GameActions.INSERT_KITTEN]: assign(insertKitten),
     [GameActions.EXPLODE_PLAYER]: assign(explodePlayer),
     [GameActions.SET_NOPE_WINDOW]: assign(setNopeWindow),
+    [GameActions.CLEAR_NOPE_WINDOW]: assign(clearNopeWindow),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -241,7 +243,7 @@ export const gameMachine = setup({
                   type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.ATTACK },
                 },
-                actions: [], // TODO: Apply attack effect
+                actions: [GameActions.CLEAR_NOPE_WINDOW], // TODO: Apply attack effect
                 target: GameStates.CHANGING_TURN,
               },
               {
@@ -252,7 +254,11 @@ export const gameMachine = setup({
                   },
                   GameGuards.HAS_EXTRA_TURNS,
                 ]),
-                actions: [GameActions.SKIP_TURN, emit(turnSkipped)],
+                actions: [
+                  GameActions.SKIP_TURN,
+                  emit(turnSkipped),
+                  GameActions.CLEAR_NOPE_WINDOW,
+                ],
                 target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
               {
@@ -260,7 +266,7 @@ export const gameMachine = setup({
                   type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.SKIP },
                 },
-                actions: [emit(turnSkipped)],
+                actions: [emit(turnSkipped), GameActions.CLEAR_NOPE_WINDOW],
                 target: GameStates.CHANGING_TURN,
               },
               {
@@ -268,7 +274,11 @@ export const gameMachine = setup({
                   type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.SHUFFLE },
                 },
-                actions: [GameActions.SHUFFLE_DECK, emit(deckShuffled)],
+                actions: [
+                  GameActions.SHUFFLE_DECK,
+                  emit(deckShuffled),
+                  GameActions.CLEAR_NOPE_WINDOW,
+                ],
                 target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
               {
@@ -276,7 +286,10 @@ export const gameMachine = setup({
                   type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.SEE_THE_FUTURE },
                 },
-                actions: [emit(showedTopThreeCards)],
+                actions: [
+                  emit(showedTopThreeCards),
+                  GameActions.CLEAR_NOPE_WINDOW,
+                ],
                 target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
               {
@@ -284,7 +297,7 @@ export const gameMachine = setup({
                   type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.FAVOR },
                 },
-                actions: [], // TODO: Implement new game state for waiting for favor
+                actions: [GameActions.CLEAR_NOPE_WINDOW], // TODO: Implement new game state for waiting for favor
                 target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
             ],
