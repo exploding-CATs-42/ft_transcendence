@@ -46,6 +46,7 @@ import {
   hasExtraTurns,
   isExplodingKittenDrawn,
   isOnlyOnePlayerLeftAlive,
+  isPlayersTurn,
 } from "./guards";
 import {
   countdownCanceled,
@@ -114,6 +115,7 @@ export const gameMachine = setup({
     [GameGuards.HAS_DEFUSE_CARD]: hasDefuseCard,
     [GameGuards.IS_EXPLODING_KITTEN_DRAWN]: isExplodingKittenDrawn,
     [GameGuards.IS_ONLY_ONE_PLAYER_LEFT_ALIVE]: isOnlyOnePlayerLeftAlive,
+    [GameGuards.IS_PLAYERS_TURN]: isPlayersTurn,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -217,7 +219,9 @@ export const gameMachine = setup({
                 target: GameStates.CHECKING_DRAWN_CARD,
               },
             ],
-            [GameEvents.PLAY_CARD]: {},
+            [GameEvents.PLAY_CARD]: {
+              guard: GameGuards.IS_PLAYERS_TURN,
+            },
             [GameEvents.PLAY_COMBO]: {
               actions: GameActions.PLAY_COMBO,
             },
