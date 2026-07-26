@@ -5,7 +5,11 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
 } from "@exploding-cats/contracts";
-import { GameOutEvents, TurnChangedPayload } from "@exploding-cats/game-core";
+import {
+  GameOutEvents,
+  TurnChangedPayload,
+  TurnSkippedPayload,
+} from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
@@ -47,6 +51,12 @@ export function attachGameBroadcaster(game: Game) {
 
   broadcaster.on(GameOutEvents.DECK_SHUFFLED, () => {
     io.to(gameId).emit(ServerPublicEvents.DECK_SHUFFLED);
+  });
+
+  broadcaster.on(GameOutEvents.TURN_SKIPPED, (event) => {
+    const payload: TurnSkippedPayload = event.payload;
+
+    io.to(gameId).emit(ServerPublicEvents.TURN_SKIPPED, payload);
   });
 }
 
