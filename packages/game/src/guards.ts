@@ -11,6 +11,7 @@ export const GameGuards = {
   HAS_CARD_OF_TYPE: "hasCardOfType",
   IS_ENOUGH_CARDS_IN_DECK: "isEnoughCardsInDeck",
   HAS_EXTRA_TURNS: "hasExtraTurns",
+  HAS_DEFUSE_CARD: "hasDefuseCard",
   IS_EXPLODING_KITTEN_DRAWN: "isExplodingKittenDrawn",
 } as const;
 
@@ -48,6 +49,14 @@ export const hasCardOfType = (
 
 export const hasExtraTurns = ({ context }: GameGuardArgs) => {
   return context.turnsCount > 1;
+};
+
+export const hasDefuseCard = ({ context }: GameGuardArgs) => {
+  const player = context.players.find(
+    (player) => player.id === context.currentTurnPlayerId,
+  );
+
+  return player?.hand.some((card) => card.type === CardType.DEFUSE) ?? false;
 };
 
 export const isExplodingKittenDrawn = ({ context }: GameGuardArgs) => {
