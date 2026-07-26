@@ -32,6 +32,7 @@ export const GameActions = {
   SET_NOPE_WINDOW: "setNopeWindow",
   CLEAR_NOPE_WINDOW: "clearNopeWindow",
   ADD_NOPE: "addNope",
+  SELECT_PLAYER: "selectPlayer",
 } as const;
 
 export interface GameActionArgs {
@@ -411,4 +412,9 @@ export const addNope = ({ context, event }: GameActionArgs) => {
   };
 
   return { nopeWindow };
+};
+
+export const selectPlayer = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.SELECT_PLAYER) return context;
+  return { selectedPlayerId: event.playerId };
 };
