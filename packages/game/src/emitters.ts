@@ -122,6 +122,11 @@ export const nopeWindowResolved = (): GameOutEvent => ({
   type: GameOutEvents.NOPE_WINDOW_RESOLVED,
 });
 
+export const playerSelected = ({ context }: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.PLAYER_SELECTED,
+  payload: { playerId: context.selectedPlayerId! },
+});
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,
