@@ -14,4 +14,5 @@ export const GameStates = {
   WAITING_FOR_NOPES: "waitingForNopes",
   RESOLVING_NOPES: "resolvingNopes",
   CHECKING_REMAINING_TURNS: "checkingExtraTurns",
+  SELECTING_PLAYER: "selectingPlayer",
 } as const;

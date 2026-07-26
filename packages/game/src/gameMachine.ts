@@ -397,6 +397,7 @@ export const gameMachine = setup({
             },
           ],
         },
+        [GameStates.SELECTING_PLAYER]: {},
       },
     },
     [GameStates.GAME_OVER]: {
