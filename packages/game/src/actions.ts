@@ -1,8 +1,12 @@
 import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards, shuffle, drawOneCard } from "./utils";
-import { START_GAME_COUNTDOWN_MS, WAIT_FOR_DEFUSE_TIMEOUT } from "./constants";
-import { type Card, CardType } from "./types";
+import {
+  START_GAME_COUNTDOWN_MS,
+  WAIT_FOR_DEFUSE_TIMEOUT,
+  NOPE_WINDOW_MS,
+} from "./constants";
+import { type Card, CardType, type NopeWindow } from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -24,6 +28,7 @@ export const GameActions = {
   DEFUSE_KITTEN: "defuseExplodingKitten",
   EXPLODE_PLAYER: "explodePlayer",
   INSERT_KITTEN: "insertKitten",
+  SET_NOPE_WINDOW: "setNopeWindow",
 } as const;
 
 export interface GameActionArgs {
@@ -353,4 +358,17 @@ export const insertKitten = ({ context, event }: GameActionArgs) => {
     deck,
     players: updatedPlayers,
   };
+};
+
+export const setNopeWindow = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.PLAY_CARD) return context;
+
+  const nopeWindow: NopeWindow = {
+    card: event.card,
+    lastPlayerId: event.playerId,
+    nopeCount: 0,
+    endsAt: Date.now() + NOPE_WINDOW_MS,
+  };
+
+  return { nopeWindow };
 };
