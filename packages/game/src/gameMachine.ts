@@ -17,6 +17,7 @@ import {
   setCountdownEndsAt,
   clearCountdownEndsAt,
   shuffleDeck,
+  skipTurn,
 } from "./actions";
 import { type Player, type Deck, type Card, CardType } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
@@ -33,6 +34,7 @@ import {
   deckShuffled,
   gameStarted,
   turnChanged,
+  turnSkipped,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -67,6 +69,7 @@ export const gameMachine = setup({
     [GameActions.SET_COUNTDOWN_ENDS_AT]: assign(setCountdownEndsAt),
     [GameActions.CLEAR_COUNTDOWN_ENDS_AT]: assign(clearCountdownEndsAt),
     [GameActions.SHUFFLE_DECK]: assign(shuffleDeck),
+    [GameActions.SKIP_TURN]: assign(skipTurn),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -184,11 +187,25 @@ export const gameMachine = setup({
                 target: GameStates.CHANGING_TURN,
               },
               {
+                guard: and([
+                  {
+                    type: GameGuards.HAS_CARD_OF_TYPE,
+                    params: { cardType: CardType.SKIP },
+                  },
+                  GameGuards.HAS_EXTRA_TURNS,
+                ]),
+                actions: [
+                  GameActions.PLAY_CARD,
+                  GameActions.SKIP_TURN,
+                  emit(turnSkipped),
+                ],
+              },
+              {
                 guard: {
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.SKIP },
                 },
-                actions: [GameActions.PLAY_CARD], // TODO: Skip turn immediately
+                actions: [GameActions.PLAY_CARD, emit(turnSkipped)],
                 target: GameStates.CHANGING_TURN,
               },
               {
