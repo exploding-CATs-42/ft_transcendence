@@ -11,6 +11,7 @@ export const GameGuards = {
   HAS_CARD_OF_TYPE: "hasCardOfType",
   IS_ENOUGH_CARDS_IN_DECK: "isEnoughCardsInDeck",
   HAS_EXTRA_TURNS: "hasExtraTurns",
+  IS_EXPLODING_KITTEN_DRAWN: "isExplodingKittenDrawn",
 } as const;
 
 export interface GameGuardArgs {
@@ -47,4 +48,8 @@ export const hasCardOfType = (
 
 export const hasExtraTurns = ({ context }: GameGuardArgs) => {
   return context.turnsCount > 1;
+};
+
+export const isExplodingKittenDrawn = ({ context }: GameGuardArgs) => {
+  return context.lastDrawnCard?.type === CardType.EXPLODING_KITTEN;
 };
