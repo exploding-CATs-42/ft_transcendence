@@ -23,4 +23,24 @@ export const GameTargets = {
     GameStates.PLAYING,
     GameStates.WAITING_FOR_PLAYER_ACTIONS,
   ),
+  CHECKING_DRAWN_CARD: getStatePath(
+    GameStates.PLAYING,
+    GameStates.CHECKING_DRAWN_CARD,
+  ),
+  EXPLODING_KITTEN_DRAWN: getStatePath(
+    GameStates.PLAYING,
+    GameStates.EXPLODING_KITTEN_DRAWN,
+  ),
+  WAITING_FOR_DEFUSE_CARD: getStatePath(
+    GameStates.PLAYING,
+    GameStates.WAITING_FOR_DEFUSE_CARD,
+  ),
+  WAITING_FOR_KITTEN_INSERTION: getStatePath(
+    GameStates.PLAYING,
+    GameStates.WAITING_FOR_KITTEN_INSERTION,
+  ),
+  EXPLODING_PLAYER: getStatePath(
+    GameStates.PLAYING,
+    GameStates.EXPLODING_PLAYER,
+  ),
 } as const;
