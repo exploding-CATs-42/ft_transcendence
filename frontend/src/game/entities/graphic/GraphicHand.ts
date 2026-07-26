@@ -232,9 +232,7 @@ export class GraphicHand {
     const wasSelected = this.#selectedCardIds.includes(cardId);
 
     this.#cards = this.#cards.filter((c) => c !== cardImage);
-    cardImage.off("drop", () => {
-      playCard(cardData.id);
-    });
+    cardImage.off("drop");
 
     cardImage.disableInteractive();
     cardImage.postFX.clear();
