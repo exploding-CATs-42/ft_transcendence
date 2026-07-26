@@ -252,7 +252,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     selection: KindComboSelection | null,
   ) => {
     this.#selectedKindCombo = selection;
-    this.updateDiscardPileInteractivity();
+    this.updateComboPlayInteractivity();
     EventBus.emit("kind-combo-selection-change", selection);
   };
 
@@ -309,7 +309,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.#discardPile = this.addCard(frame, DISCARD_PILE_POSITION);
     this.#discardPile.on("pointerdown", this.playSelectedKindCombo);
-    this.updateDiscardPileInteractivity();
+    this.updateComboPlayInteractivity();
   }
 
   private createCardDropZone() {
@@ -317,6 +317,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#cardDropZone = this.add.zone(x, y, width, height).setOrigin(0, 0);
     this.#cardDropZone.setRectangleDropZone(width, height);
     this.#cardDropZone.on("pointerdown", this.playSelectedKindCombo);
+    this.updateComboPlayInteractivity();
   }
 
   private addShuffleAnimationObject() {
@@ -449,7 +450,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#currentTurnPlayerId = payload.playerId;
     this.setCurrentTurn(this.#currentTurnPlayerId);
     this.updateDrawPileInteractivity();
-    this.updateDiscardPileInteractivity();
+    this.updateComboPlayInteractivity();
   };
 
   private drawCard = () => {
@@ -463,13 +464,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     playCombo(this.#selectedKindCombo.cardIds);
   };
 
-  private updateDiscardPileInteractivity() {
-    if (this.isMyTurn() && this.#selectedKindCombo) {
+  private updateComboPlayInteractivity() {
+    const canPlaySelectedCombo = this.isMyTurn() && this.#selectedKindCombo;
+
+    if (canPlaySelectedCombo) {
       this.#discardPile?.setInteractive({ useHandCursor: true });
+      this.#cardDropZone?.setInteractive({ useHandCursor: true });
       return;
     }
 
     this.#discardPile?.disableInteractive(true);
+    this.#cardDropZone?.disableInteractive(true);
   }
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
