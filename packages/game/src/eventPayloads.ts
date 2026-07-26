@@ -5,6 +5,10 @@ export interface TurnChangedPayload {
   playerId: string;
 }
 
+export interface TurnSkippedPayload {
+  playerId: string;
+}
+
 export interface CardPayload {
   playerId: string;
   card: Card;
