@@ -28,8 +28,13 @@ import {
   explodePlayer,
   insertKitten,
 } from "./actions";
-import { CardType } from "./types";
-import type { Player, Deck, Card } from "./types";
+import {
+  type Player,
+  type Deck,
+  type Card,
+  type NopeWindow,
+  CardType,
+} from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import {
   GameGuards,
@@ -68,6 +73,7 @@ export interface GameContext {
   countdownEndsAt: number | null;
   turnsCount: number;
   isUnderAttack: boolean;
+  nopeWindow: NopeWindow | null;
 }
 
 export const gameMachine = setup({
@@ -120,6 +126,7 @@ export const gameMachine = setup({
     countdownEndsAt: null,
     turnsCount: 1,
     isUnderAttack: false,
+    nopeWindow: null,
   }),
   states: {
     [GameStates.WAITING]: {
