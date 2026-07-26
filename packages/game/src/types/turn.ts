@@ -1,5 +1,12 @@
 import { type Card, CardType } from "./card";
 
+export interface NopeWindow {
+  card: Card;
+  lastPlayerId: string;
+  nopeCount: number;
+  endsAt: number;
+}
+
 export const TurnPhase = {
   ACTION: "ACTION",
   NOPE_WINDOW: "NOPE_WINDOW",
