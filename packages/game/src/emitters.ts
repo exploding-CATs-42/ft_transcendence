@@ -33,6 +33,11 @@ export const deckShuffled = (): GameOutEvent => ({
   type: GameOutEvents.DECK_SHUFFLED,
 });
 
+export const turnSkipped = ({ context }: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.TURN_SKIPPED,
+  payload: { playerId: context.currentTurnPlayerId! },
+});
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,
