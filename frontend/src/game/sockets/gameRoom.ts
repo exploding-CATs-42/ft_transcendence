@@ -114,4 +114,7 @@ export const insertKitten = (explodingKittenPosition: number) =>
   emit(ClientEvents.INSERT_KITTEN, { explodingKittenPosition });
 export const playNope = (cardId: number) =>
   emit(ClientEvents.PLAY_NOPE, { cardId });
+export const selectPlayer = (playerId: string) =>
+  emit(ClientEvents.SELECT_PLAYER, { playerId });
+
 export const leaveCurrentGame = leaveGame;
