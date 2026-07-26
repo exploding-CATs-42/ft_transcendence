@@ -48,4 +48,9 @@ export const GameTargets = {
     GameStates.PLAYING,
     GameStates.CHECKING_REMAINING_TURNS,
   ),
-} as const;
+  WAITING_FOR_NOPES: getStatePath(
+    GameStates.PLAYING,
+    GameStates.WAITING_FOR_NOPES,
+  ),
+  RESOLVING_NOPES: getStatePath(GameStates.PLAYING, GameStates.RESOLVING_NOPES),
+} as const satisfies Record<keyof typeof GameStates, string>;
