@@ -53,4 +53,8 @@ export const GameTargets = {
     GameStates.WAITING_FOR_NOPES,
   ),
   RESOLVING_NOPES: getStatePath(GameStates.PLAYING, GameStates.RESOLVING_NOPES),
+  SELECTING_PLAYER: getStatePath(
+    GameStates.PLAYING,
+    GameStates.SELECTING_PLAYER,
+  ),
 } as const satisfies Record<keyof typeof GameStates, string>;
