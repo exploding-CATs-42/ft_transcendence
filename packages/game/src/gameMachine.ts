@@ -400,6 +400,7 @@ export const gameMachine = setup({
           ],
         },
         [GameStates.SELECTING_PLAYER]: {},
+        [GameStates.WAITING_FOR_CARD_SELECTION]: {},
       },
     },
     [GameStates.GAME_OVER]: {
