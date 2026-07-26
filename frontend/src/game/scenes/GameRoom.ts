@@ -37,6 +37,7 @@ import {
   SkipView,
   type GraphicCard,
   type KindComboSelection,
+  SeeTheFutureView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -529,9 +530,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   };
 
-  onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void {
-    console.log(payload);
-  }
+  onSeeTheFuturePeek = (payload: SeeTheFuturePeekPayload): void => {
+    const threeCards = payload.cards;
+    const view = new SeeTheFutureView(this, threeCards);
+    view.onConfirm = () => {
+      this.#modal.setVisible(false);
+    };
+
+    this.#modal.setContent(view);
+    this.#modal.setVisible(true);
+  };
 
   private cleanup = () => {
     this.#detachSockets();
