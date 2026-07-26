@@ -11,4 +11,5 @@ export const GameStates = {
   WAITING_FOR_KITTEN_INSERTION: "waitingForKittenInsertion",
   EXPLODING_PLAYER: "explodingPlayer",
   GAME_OVER: "gameOver",
+  WAITING_FOR_NOPES: "waitingForNopes",
 } as const;

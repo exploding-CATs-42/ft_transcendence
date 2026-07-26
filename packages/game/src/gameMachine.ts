@@ -281,6 +281,7 @@ export const gameMachine = setup({
             },
           },
         },
+        [GameStates.WAITING_FOR_NOPES]: {},
         [GameStates.CHECKING_DRAWN_CARD]: {
           always: [
             {
