@@ -740,7 +740,15 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onPlayerSelected = (payload: PlayerSelectedPayload): void => {
-    console.log(payload);
+    const { playerId } = payload;
+
+    const players = [...this.#players.values()];
+    for (let i = 1; i < players.length; ++i) {
+      const seat = players[i]!;
+      seat.onClick = null;
+      seat.setCursorPointer(false);
+      if (seat.player?.id != playerId) players[i]?.setTargetIconVisible(false);
+    }
   };
 
   private cleanup = () => {
