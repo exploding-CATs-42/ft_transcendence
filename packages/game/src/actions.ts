@@ -17,6 +17,7 @@ export const GameActions = {
   SET_COUNTDOWN_ENDS_AT: "setCountdownEndsAt",
   CLEAR_COUNTDOWN_ENDS_AT: "clearCountdownEndsAt",
   SHUFFLE_DECK: "shuffleDeck",
+  SKIP_TURN: "skipTurn",
 } as const;
 
 export interface GameActionArgs {
@@ -204,4 +205,8 @@ export const shuffleDeck = ({ context }: GameActionArgs) => {
   const deck = context.deck.slice();
   shuffle(deck);
   return { deck };
+};
+
+export const skipTurn = ({ context }: GameActionArgs) => {
+  return { turnsCount: context.turnsCount - 1 };
 };
