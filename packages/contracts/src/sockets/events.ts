@@ -69,4 +69,5 @@ export const ServerErrorEvents = {
   PLAY_DEFUSE_ERROR: "play-defuse-error",
   INSERT_KITTEN_ERROR: "insert-kitten-error",
   PLAY_NOPE_ERROR: "play-nope-error",
+  SELECT_PLAYER_ERROR: "select-player-error",
 } as const;
