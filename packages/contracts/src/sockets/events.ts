@@ -38,6 +38,7 @@ export const ServerPublicEvents = {
   DECK_SHUFFLED: "DECK_SHUFFLED",
   TURN_SKIPPED: "TURN_SKIPPED",
   GAME_OVER: "GAME_OVER",
+  PLAYER_SELECTED: "PLAYER_SELECTED",
 } as const;
 
 export const ServerPrivateEvents = {
