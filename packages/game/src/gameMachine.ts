@@ -28,6 +28,7 @@ import {
   defuseExplodingKitten,
   explodePlayer,
   insertKitten,
+  setNopeWindow,
 } from "./actions";
 import {
   type Player,
@@ -106,6 +107,7 @@ export const gameMachine = setup({
     [GameActions.DEFUSE_KITTEN]: assign(defuseExplodingKitten),
     [GameActions.INSERT_KITTEN]: assign(insertKitten),
     [GameActions.EXPLODE_PLAYER]: assign(explodePlayer),
+    [GameActions.SET_NOPE_WINDOW]: assign(setNopeWindow),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -221,7 +223,7 @@ export const gameMachine = setup({
             ],
             [GameEvents.PLAY_CARD]: {
               guard: GameGuards.IS_PLAYERS_TURN,
-              actions: [GameActions.PLAY_CARD],
+              actions: [GameActions.PLAY_CARD, GameActions.SET_NOPE_WINDOW],
             },
             [GameEvents.PLAY_COMBO]: {
               actions: GameActions.PLAY_COMBO,
