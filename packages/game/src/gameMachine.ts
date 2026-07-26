@@ -236,7 +236,7 @@ export const gameMachine = setup({
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.ATTACK },
                 },
-                actions: [GameActions.PLAY_CARD],
+                actions: [], // TODO: Apply attack effect
                 target: GameStates.CHANGING_TURN,
               },
               {
@@ -247,18 +247,14 @@ export const gameMachine = setup({
                   },
                   GameGuards.HAS_EXTRA_TURNS,
                 ]),
-                actions: [
-                  GameActions.PLAY_CARD,
-                  GameActions.SKIP_TURN,
-                  emit(turnSkipped),
-                ],
+                actions: [GameActions.SKIP_TURN, emit(turnSkipped)],
               },
               {
                 guard: {
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.SKIP },
                 },
-                actions: [GameActions.PLAY_CARD, emit(turnSkipped)],
+                actions: [emit(turnSkipped)],
                 target: GameStates.CHANGING_TURN,
               },
               {
@@ -266,28 +262,21 @@ export const gameMachine = setup({
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.SHUFFLE },
                 },
-                actions: [
-                  GameActions.PLAY_CARD,
-                  GameActions.SHUFFLE_DECK,
-                  emit(deckShuffled),
-                ],
+                actions: [GameActions.SHUFFLE_DECK, emit(deckShuffled)],
               },
               {
                 guard: {
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.SEE_THE_FUTURE },
                 },
-                actions: [GameActions.PLAY_CARD, emit(showedTopThreeCards)],
+                actions: [emit(showedTopThreeCards)],
               },
               {
                 guard: {
                   type: GameGuards.HAS_CARD_OF_TYPE,
                   params: { cardType: CardType.FAVOR },
                 },
-                actions: GameActions.PLAY_CARD, // TODO: Implement new game state for waiting for favor
-              },
-              {
-                actions: GameActions.PLAY_CARD,
+                actions: [], // TODO: Implement new game state for waiting for favor
               },
             ],
           },
