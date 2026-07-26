@@ -1,7 +1,7 @@
 import type { GameContext } from "./gameMachine";
 import { type GameEvent, GameEvents } from "./events";
 import { createDeck, dealInitialCards, shuffle, drawOneCard } from "./utils";
-import { START_GAME_COUNTDOWN_MS } from "./constants";
+import { START_GAME_COUNTDOWN_MS, WAIT_FOR_DEFUSE_TIMEOUT } from "./constants";
 import type { Card } from "./types";
 
 export const GameActions = {
@@ -16,6 +16,7 @@ export const GameActions = {
   DRAW_CARD: "drawCard",
   PLAY_CARD: "playCard",
   SET_COUNTDOWN_ENDS_AT: "setCountdownEndsAt",
+  SET_DEFUSE_COUNTDOWN_ENDS_AT: "setDefuseCountdownEndsAt",
   CLEAR_COUNTDOWN_ENDS_AT: "clearCountdownEndsAt",
   SHUFFLE_DECK: "shuffleDeck",
   SKIP_TURN: "skipTurn",
@@ -89,6 +90,10 @@ export const removePlayerConfirmation = ({
 
 export const setCountdownEndsAt = () => ({
   countdownEndsAt: Date.now() + START_GAME_COUNTDOWN_MS,
+});
+
+export const setDefuseCountdownEndsAt = () => ({
+  countdownEndsAt: Date.now() + WAIT_FOR_DEFUSE_TIMEOUT,
 });
 
 export const clearCountdownEndsAt = () => ({
