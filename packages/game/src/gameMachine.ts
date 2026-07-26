@@ -217,7 +217,15 @@ export const gameMachine = setup({
                 target: GameStates.CHECKING_DRAWN_CARD,
               },
             ],
-            [GameEvents.PLAY_CARD]: [
+            [GameEvents.PLAY_CARD]: {},
+            [GameEvents.PLAY_COMBO]: {
+              actions: GameActions.PLAY_COMBO,
+            },
+          },
+        },
+        [GameStates.WAITING_FOR_NOPES]: {
+          after: {
+            [NOPE_WINDOW_MS]: [
               {
                 guard: {
                   type: GameGuards.HAS_CARD_OF_TYPE,
@@ -277,14 +285,6 @@ export const gameMachine = setup({
                 actions: GameActions.PLAY_CARD,
               },
             ],
-            [GameEvents.PLAY_COMBO]: {
-              actions: GameActions.PLAY_COMBO,
-            },
-          },
-        },
-        [GameStates.WAITING_FOR_NOPES]: {
-          after: {
-            [NOPE_WINDOW_MS]: {},
           },
         },
         [GameStates.CHECKING_DRAWN_CARD]: {
