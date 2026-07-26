@@ -15,6 +15,7 @@ export const GameGuards = {
   IS_EXPLODING_KITTEN_DRAWN: "isExplodingKittenDrawn",
   IS_ONLY_ONE_PLAYER_LEFT_ALIVE: "isOnlyOnePlayerLeftAlive",
   IS_PLAYERS_TURN: "isPlayersTurn",
+  IS_WINDOW_CARD_OF_TYPE: "isWindowCardOfType",
 } as const;
 
 export interface GameGuardArgs {
@@ -74,4 +75,11 @@ export const isPlayersTurn = ({ context, event }: GameGuardArgs) => {
   if (event.type !== GameEvents.PLAY_CARD) return false;
 
   return context.currentTurnPlayerId === event.playerId;
+};
+
+export const isWindowCardOfType = (
+  { context }: GameGuardArgs,
+  params: { cardType: CardType },
+) => {
+  return context.nopeWindow?.card.type === params.cardType;
 };
