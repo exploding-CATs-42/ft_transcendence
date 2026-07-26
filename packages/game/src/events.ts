@@ -1,5 +1,5 @@
 import type { Card, Player } from "./types";
-import type { TurnChangedPayload } from "./eventPayloads";
+import type { TurnChangedPayload, TurnSkippedPayload } from "./eventPayloads";
 
 // Events sent TO the machine
 export const GameEvents = {
@@ -33,6 +33,7 @@ export const GameOutEvents = {
   CARDS_DEALT: "CARDS_DEALT",
   TURN_CHANGED: "TURN_CHANGED",
   DECK_SHUFFLED: "DECK_SHUFFLED",
+  TURN_SKIPPED: "TURN_SKIPPED",
 
   //   EXPLODING_KITTEN_DRAWN: "EXPLODING_KITTEN_DRAWN",
   //   COMBO_PLAYED: "COMBO_PLAYED",
@@ -55,4 +56,5 @@ export type GameOutEvent =
   | { type: typeof GameOutEvents.COUNTDOWN_STARTED; endsAt: number }
   | { type: typeof GameOutEvents.COUNTDOWN_CANCELED }
   | { type: typeof GameOutEvents.TURN_CHANGED; payload: TurnChangedPayload }
-  | { type: typeof GameOutEvents.DECK_SHUFFLED };
+  | { type: typeof GameOutEvents.DECK_SHUFFLED }
+  | { type: typeof GameOutEvents.TURN_SKIPPED; payload: TurnSkippedPayload };
