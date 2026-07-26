@@ -404,6 +404,7 @@ export const gameMachine = setup({
           on: {
             [GameEvents.SELECT_PLAYER]: {
               actions: GameActions.SELECT_PLAYER,
+              target: GameTargets.WAITING_FOR_CARD_SELECTION,
             },
           },
         },
