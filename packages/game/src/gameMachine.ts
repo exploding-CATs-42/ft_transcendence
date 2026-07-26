@@ -253,6 +253,7 @@ export const gameMachine = setup({
                   GameGuards.HAS_EXTRA_TURNS,
                 ]),
                 actions: [GameActions.SKIP_TURN, emit(turnSkipped)],
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
               {
                 guard: {
@@ -268,6 +269,7 @@ export const gameMachine = setup({
                   params: { cardType: CardType.SHUFFLE },
                 },
                 actions: [GameActions.SHUFFLE_DECK, emit(deckShuffled)],
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
               {
                 guard: {
@@ -275,6 +277,7 @@ export const gameMachine = setup({
                   params: { cardType: CardType.SEE_THE_FUTURE },
                 },
                 actions: [emit(showedTopThreeCards)],
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
               {
                 guard: {
@@ -282,6 +285,7 @@ export const gameMachine = setup({
                   params: { cardType: CardType.FAVOR },
                 },
                 actions: [], // TODO: Implement new game state for waiting for favor
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
             ],
           },
