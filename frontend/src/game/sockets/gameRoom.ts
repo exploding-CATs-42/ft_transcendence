@@ -18,6 +18,7 @@ import type {
   GameOverPayload,
   KittenInsertedPayload,
   PlayerDefusedPayload,
+  PlayerSelectedPayload,
 } from "@exploding-cats/game-core";
 import { socket } from "socket";
 import { emit, leaveGame } from "./gameSession";
@@ -43,6 +44,7 @@ export interface GameRoomHandlers {
   onGameOver(payload: GameOverPayload): void;
   onNopePlayed(payload: NopePlayedPayload): void;
   onNopeWindowResolved(): void;
+  onPlayerSelected(payload: PlayerSelectedPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -89,6 +91,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.GAME_OVER, handlers.onGameOver],
     [ServerPublicEvents.NOPE_PLAYED, handlers.onNopePlayed],
     [ServerPublicEvents.NOPE_WINDOW_RESOLVED, handlers.onNopeWindowResolved],
+    [ServerPublicEvents.PLAYER_SELECTED, handlers.onPlayerSelected],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {

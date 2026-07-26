@@ -2,12 +2,13 @@
 import { Scene } from "phaser";
 // Project level
 import {
+  CardType,
   type Card,
   type CardPayload,
   type GameOverPayload,
   type KittenInsertedPayload,
   type PlayerDefusedPayload,
-  CardType,
+  type PlayerSelectedPayload,
 } from "@exploding-cats/game-core";
 import type {
   CardPlayedPayload,
@@ -736,6 +737,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.#modal.setContent(view);
     this.#modal.setVisible(true);
+  };
+
+  onPlayerSelected = (payload: PlayerSelectedPayload): void => {
+    console.log(payload);
   };
 
   private cleanup = () => {
