@@ -62,6 +62,7 @@ import {
   playCard,
   playCombo,
   playNope,
+  selectPlayer,
   type CleanupFunction,
   type GameRoomHandlers,
   insertKitten,
@@ -426,18 +427,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private selectOpponent = (playerId: string) => {
-    /* eslint-disable @typescript-eslint/no-unused-vars */
-    // @ts-expect-error remove this comment later
-    let selectedOpponent;
-
     const players = [...this.#players.values()];
     for (let i = 1; i < players.length; ++i) {
       const seat = players[i]!;
       seat.onClick = null;
       seat.setCursorPointer(false);
-      if (seat.player?.id != playerId) players[i]?.setTargetIconVisible(false);
-      else selectedOpponent = players[i]!;
     }
+
+    selectPlayer(playerId);
   };
 
   // -------------------- SOCKETS --------------------
