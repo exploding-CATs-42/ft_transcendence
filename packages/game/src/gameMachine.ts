@@ -29,6 +29,7 @@ import {
   hasEnoughPlayers,
   isEnoughCardsInDeck,
   hasExtraTurns,
+  isExplodingKittenDrawn,
 } from "./guards";
 import {
   countdownCanceled,
@@ -80,6 +81,7 @@ export const gameMachine = setup({
     [GameGuards.IS_ENOUGH_CARDS_IN_DECK]: isEnoughCardsInDeck,
     [GameGuards.HAS_CARD_OF_TYPE]: hasCardOfType,
     [GameGuards.HAS_EXTRA_TURNS]: hasExtraTurns,
+    [GameGuards.IS_EXPLODING_KITTEN_DRAWN]: isExplodingKittenDrawn,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -178,7 +180,7 @@ export const gameMachine = setup({
               {
                 guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
                 actions: GameActions.DRAW_CARD,
-                target: GameStates.CHANGING_TURN,
+                target: GameStates.CHECKING_DRAWN_CARD,
               },
             ],
             [GameEvents.PLAY_CARD]: [
@@ -246,6 +248,18 @@ export const gameMachine = setup({
             },
           },
         },
+        [GameStates.CHECKING_DRAWN_CARD]: {
+          always: [
+            {
+              guard: GameGuards.IS_EXPLODING_KITTEN_DRAWN,
+              target: GameTargets.EXPLODING_KITTEN_DRAWN,
+            },
+            {
+              target: GameTargets.CHANGING_TURN,
+            },
+          ],
+        },
+        [GameStates.EXPLODING_KITTEN_DRAWN]: {},
       },
     },
   },
