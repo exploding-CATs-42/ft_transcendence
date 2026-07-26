@@ -51,3 +51,7 @@ export interface WinnerView {
 export interface GameOverPayload {
   winner: WinnerView;
 }
+
+export interface PlayerSelectedPayload {
+  playerId: string;
+}
