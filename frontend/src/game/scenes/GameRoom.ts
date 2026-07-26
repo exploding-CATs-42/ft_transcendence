@@ -9,6 +9,7 @@ import type {
   GameStartedPayload,
   GameStatePayload,
   PlayerIdPayload,
+  SeeTheFuturePeekPayload,
 } from "@exploding-cats/contracts";
 // Local level
 import {
@@ -521,6 +522,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.addCard(cardFrame, DISCARD_PILE_POSITION);
     });
   };
+
+  onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void {
+    console.log(payload);
+  }
 
   private cleanup = () => {
     this.#detachSockets();
