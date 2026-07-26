@@ -19,6 +19,7 @@ export const GameGuards = {
   IS_NOPED: "isNoped",
   CAN_PLAY_NOPE: "canPlayNope",
   HAS_REMAINING_TURNS: "hasRemainingTurns",
+  LAST_PLAYED_CARD_OF_TYPE: "lastPlayedCardOfType",
 } as const;
 
 export interface GameGuardArgs {
@@ -118,4 +119,12 @@ export const canPlayNope = ({ context, event }: GameGuardArgs) => {
   const player = players.find((p) => p.id === event.playerId);
 
   return player?.isAlive ?? false;
+};
+
+export const lastPlayedCardOfType = (
+  { context }: GameGuardArgs,
+  params: { cardType: CardType },
+) => {
+  const cards = context.lastPlayedCards!;
+  return cards[0]?.type === params.cardType;
 };
