@@ -164,6 +164,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #modal!: Modal;
   #attackCount = 1;
   #nopeButton!: NopeButton;
+  #lastPlayedCard: Card | null = null;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -260,6 +261,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         duration: CARD_TO_DISCARD_DURATION_MS,
         ease: CARD_TO_DISCARD_EASE,
       });
+
+      this.#lastPlayedCard = card.data;
     };
 
     this.#myHand = new GraphicHand(
