@@ -48,6 +48,7 @@ import {
   isExplodingKittenDrawn,
   isOnlyOnePlayerLeftAlive,
   isPlayersTurn,
+  isWindowCardOfType,
 } from "./guards";
 import {
   countdownCanceled,
@@ -113,6 +114,7 @@ export const gameMachine = setup({
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
     [GameGuards.IS_ENOUGH_CARDS_IN_DECK]: isEnoughCardsInDeck,
     [GameGuards.HAS_CARD_OF_TYPE]: hasCardOfType,
+    [GameGuards.IS_WINDOW_CARD_OF_TYPE]: isWindowCardOfType,
     [GameGuards.HAS_EXTRA_TURNS]: hasExtraTurns,
     [GameGuards.HAS_DEFUSE_CARD]: hasDefuseCard,
     [GameGuards.IS_EXPLODING_KITTEN_DRAWN]: isExplodingKittenDrawn,
@@ -236,7 +238,7 @@ export const gameMachine = setup({
             [NOPE_WINDOW_MS]: [
               {
                 guard: {
-                  type: GameGuards.HAS_CARD_OF_TYPE,
+                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.ATTACK },
                 },
                 actions: [], // TODO: Apply attack effect
@@ -245,7 +247,7 @@ export const gameMachine = setup({
               {
                 guard: and([
                   {
-                    type: GameGuards.HAS_CARD_OF_TYPE,
+                    type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                     params: { cardType: CardType.SKIP },
                   },
                   GameGuards.HAS_EXTRA_TURNS,
@@ -254,7 +256,7 @@ export const gameMachine = setup({
               },
               {
                 guard: {
-                  type: GameGuards.HAS_CARD_OF_TYPE,
+                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.SKIP },
                 },
                 actions: [emit(turnSkipped)],
@@ -262,21 +264,21 @@ export const gameMachine = setup({
               },
               {
                 guard: {
-                  type: GameGuards.HAS_CARD_OF_TYPE,
+                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.SHUFFLE },
                 },
                 actions: [GameActions.SHUFFLE_DECK, emit(deckShuffled)],
               },
               {
                 guard: {
-                  type: GameGuards.HAS_CARD_OF_TYPE,
+                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.SEE_THE_FUTURE },
                 },
                 actions: [emit(showedTopThreeCards)],
               },
               {
                 guard: {
-                  type: GameGuards.HAS_CARD_OF_TYPE,
+                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                   params: { cardType: CardType.FAVOR },
                 },
                 actions: [], // TODO: Implement new game state for waiting for favor
