@@ -70,6 +70,7 @@ import {
   kittenDrawn,
   kittenInserted,
   playerDefused,
+  playerSelected,
   turnChanged,
   turnSkipped,
   playerEliminated,
@@ -407,7 +408,7 @@ export const gameMachine = setup({
         [GameStates.SELECTING_PLAYER]: {
           on: {
             [GameEvents.SELECT_PLAYER]: {
-              actions: GameActions.SELECT_PLAYER,
+              actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
               target: GameTargets.WAITING_FOR_CARD_SELECTION,
             },
           },
