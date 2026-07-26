@@ -31,6 +31,8 @@ import {
   OpponentHand,
   PlayerSeat,
   Button,
+  Modal,
+  SkipView,
   type GraphicCard,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
@@ -78,6 +80,8 @@ const SHUFFLE_ANIMATION_POSITION = {
   x: DRAW_PILE_POSITION.x + 110,
   y: DRAW_PILE_POSITION.y + 160,
 };
+
+const SKIP_VIEW_DURATION_MS = 2000;
 
 // const NOPE_BUTTON_POSITION = {
 //   x: 1700,
@@ -436,6 +440,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.cardType];
     const cardFrame = getCardFrame(this, frameIndex);
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
+  };
+
+  onTurnSkipped = (payload: PlayerIdPayload): void => {
+    const playerName = this.#players.get(payload.playerId)?.player?.name;
+    if (!playerName) return;
+
+    const modal = new Modal(this);
+    const view = new SkipView(this, playerName);
+    modal.setContent(view);
+
+    this.time.delayedCall(SKIP_VIEW_DURATION_MS, () => modal.destroy());
   };
 
   onPlayerDisconnected = (payload: PlayerIdPayload): void => {
