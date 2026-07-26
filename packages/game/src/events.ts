@@ -45,8 +45,8 @@ export const GameOutEvents = {
   DECK_SHUFFLED: "DECK_SHUFFLED",
   TURN_SKIPPED: "TURN_SKIPPED",
   SHOWED_TOP_CARDS: "SHOWED_TOP_CARDS",
+  EXPLODING_KITTEN_DRAWN: "EXPLODING_KITTEN_DRAWN",
 
-  //   EXPLODING_KITTEN_DRAWN: "EXPLODING_KITTEN_DRAWN",
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
   //   PLAYER_DEFUSED: "PLAYER_DEFUSED",
@@ -72,4 +72,5 @@ export type GameOutEvent =
   | {
       type: typeof GameOutEvents.SHOWED_TOP_CARDS;
       payload: ShowedCardsToPlayerPayload;
-    };
+    }
+  | { type: typeof GameOutEvents.EXPLODING_KITTEN_DRAWN };
