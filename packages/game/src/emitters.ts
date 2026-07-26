@@ -38,6 +38,18 @@ export const turnSkipped = ({ context }: GameEmitterArgs): GameOutEvent => ({
   payload: { playerId: context.currentTurnPlayerId! },
 });
 
+export const showedTopThreeCards = ({
+  context,
+}: GameEmitterArgs): GameOutEvent => {
+  const topThreeCards = context.deck.slice(0, 3);
+  const playerId = context.currentTurnPlayerId!;
+
+  return {
+    type: GameOutEvents.SHOWED_TOP_CARDS,
+    payload: { playerId, cards: topThreeCards },
+  };
+};
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,
