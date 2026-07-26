@@ -29,6 +29,7 @@ export const GameActions = {
   EXPLODE_PLAYER: "explodePlayer",
   INSERT_KITTEN: "insertKitten",
   SET_NOPE_WINDOW: "setNopeWindow",
+  CLEAR_NOPE_WINDOW: "clearNopeWindow",
 } as const;
 
 export interface GameActionArgs {
@@ -371,4 +372,8 @@ export const setNopeWindow = ({ context, event }: GameActionArgs) => {
   };
 
   return { nopeWindow };
+};
+
+export const clearNopeWindow = () => {
+  return { nopeWindow: null };
 };
