@@ -13,3 +13,8 @@ export interface CardPayload {
   playerId: string;
   card: Card;
 }
+
+export interface ShowedCardsToPlayerPayload {
+  playerId: string;
+  cards: Card[];
+}
