@@ -7,6 +7,7 @@ import {
   type ComboPlayedPayload,
   type GameStatePayload,
   type PlayerIdPayload,
+  type SeeTheFuturePeekPayload,
 } from "@exploding-cats/contracts";
 import type { CardPayload } from "@exploding-cats/game-core";
 import { socket } from "socket";
@@ -24,6 +25,7 @@ export interface GameRoomHandlers {
   onDeckShuffled(): void;
   onTurnSkipped(payload: PlayerIdPayload): void;
   onComboPlayed(payload: ComboPlayedPayload): void;
+  onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -61,6 +63,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.DECK_SHUFFLED, handlers.onDeckShuffled],
     [ServerPublicEvents.TURN_SKIPPED, handlers.onTurnSkipped],
     [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
+    [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
