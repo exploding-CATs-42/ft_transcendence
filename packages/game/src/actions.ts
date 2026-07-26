@@ -33,6 +33,7 @@ export const GameActions = {
   CLEAR_NOPE_WINDOW: "clearNopeWindow",
   ADD_NOPE: "addNope",
   SELECT_PLAYER: "selectPlayer",
+  PASS_CARD_BY_ID: "passCardById",
 } as const;
 
 export interface GameActionArgs {
@@ -417,4 +418,30 @@ export const addNope = ({ context, event }: GameActionArgs) => {
 export const selectPlayer = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.SELECT_PLAYER) return context;
   return { selectedPlayerId: event.playerId };
+};
+
+export const passCardById = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.PASS_CARD_BY_ID) return context;
+
+  const players = context.players.slice();
+  let playerFrom;
+  let playerTo;
+  for (let i = 0; i < players.length; ++i) {
+    if (players[i]?.id === event.playerIdFrom) playerFrom = players[i];
+    else if (players[i]?.id === event.playerIdTo) playerTo = players[i];
+  }
+
+  if (!playerFrom) throw Error("playerFrom is undefined");
+  if (!playerTo) throw Error("playerTo is undefined");
+
+  const cardIndex = playerFrom.hand.findIndex(
+    (card) => card.id === event.cardId,
+  );
+  const card = playerFrom.hand.splice(cardIndex, 1)[0];
+  if (!card) throw Error("playerFrom doesn't have the card");
+
+  const randomIndex = Math.floor(Math.random() * (playerTo.hand.length + 1));
+  playerTo.hand.splice(randomIndex, 0, card);
+
+  return { players };
 };
