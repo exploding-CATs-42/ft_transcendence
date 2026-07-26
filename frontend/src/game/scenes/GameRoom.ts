@@ -415,7 +415,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   // -------------------- ACTIONS --------------------
 
-  // @ts-expect-error remove this comment later
   private showOpponentTargetIcons() {
     const players = [...this.#players.values()];
     for (let i = 1; i < players.length; ++i) {
@@ -590,6 +589,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
     this.#myHand.removeCard(payload.cardId);
+
+    if (this.#lastPlayedCard?.type === CardType.FAVOR) {
+      this.showOpponentTargetIcons();
+    }
   };
 
   private discardOpponentCard(playerId: string, cardType: CardType) {
