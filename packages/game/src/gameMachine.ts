@@ -1,7 +1,11 @@
 // Libraries
 import { and, assign, emit, setup } from "xstate";
 // Local level
-import { GAME_MACHINE_ID, START_GAME_COUNTDOWN_MS } from "./constants";
+import {
+  GAME_MACHINE_ID,
+  START_GAME_COUNTDOWN_MS,
+  WAIT_FOR_DEFUSE_TIMEOUT,
+} from "./constants";
 import {
   GameActions,
   addPlayer,
@@ -19,6 +23,8 @@ import {
   shuffleDeck,
   skipTurn,
   playCombo,
+  setDefuseCountdownEndsAt,
+  defuseExplodingKitten,
 } from "./actions";
 import { CardType } from "./types";
 import type { Player, Deck, Card } from "./types";
@@ -36,9 +42,11 @@ import {
   countdownCanceled,
   countdownStarted,
   deckShuffled,
+  defusePrompt,
   gameStarted,
   showedTopThreeCards,
   kittenDrawn,
+  playerDefused,
   turnChanged,
   turnSkipped,
 } from "./emitters";
@@ -77,6 +85,10 @@ export const gameMachine = setup({
     [GameActions.SHUFFLE_DECK]: assign(shuffleDeck),
     [GameActions.SKIP_TURN]: assign(skipTurn),
     [GameActions.PLAY_COMBO]: assign(playCombo),
+    [GameActions.SET_DEFUSE_COUNTDOWN_ENDS_AT]: assign(
+      setDefuseCountdownEndsAt,
+    ),
+    [GameActions.DEFUSE_KITTEN]: assign(defuseExplodingKitten),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -274,7 +286,23 @@ export const gameMachine = setup({
             },
           ],
         },
-        [GameStates.WAITING_FOR_DEFUSE_CARD]: {},
+        [GameStates.WAITING_FOR_DEFUSE_CARD]: {
+          entry: [GameActions.SET_DEFUSE_COUNTDOWN_ENDS_AT, emit(defusePrompt)],
+          exit: GameActions.CLEAR_COUNTDOWN_ENDS_AT,
+          after: {
+            [WAIT_FOR_DEFUSE_TIMEOUT]: {
+              target: GameTargets.EXPLODING_PLAYER,
+            },
+          },
+          on: {
+            [GameEvents.PLAY_DEFUSE]: {
+              guard: GameGuards.HAS_DEFUSE_CARD,
+              actions: [GameActions.DEFUSE_KITTEN, emit(playerDefused)],
+              target: GameTargets.WAITING_FOR_KITTEN_INSERTION,
+            },
+          },
+        },
+        [GameStates.WAITING_FOR_KITTEN_INSERTION]: {},
         [GameStates.EXPLODING_PLAYER]: {},
       },
     },
