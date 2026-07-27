@@ -14,6 +14,7 @@ import {
   reconnectGame,
   playNope,
   selectPlayer,
+  giveCard,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -41,8 +42,11 @@ import {
   PlayNopeParams,
   SelectPlayerPayload,
   selectPlayerSchema,
+  giveCardSchema,
+  GiveCardPayload,
 } from "schemas";
 import {
+  CardGivenPayload,
   CardPlayedPayload,
   CardRemovedPayload,
   ComboPlayedPayload,
@@ -345,6 +349,43 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await selectPlayer(parsed, socket.data.user.id);
         const room = parsed.gameId;
         io.to(room).emit(ServerPublicEvents.PLAYER_SELECTED, { playerId });
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.GIVE_CARD,
+    withErrorHandler(
+      giveCardSchema,
+      socket,
+      ServerErrorEvents.SELECT_PLAYER_ERROR,
+      async (parsed: GiveCardPayload) => {
+        const { card } = await giveCard(parsed, socket.data.user.id);
+        const { playerIdFrom, playerIdTo, cardId } = parsed;
+
+        const socketPlayerFrom = socketsMap.get(playerIdFrom);
+        const cardRemovedPayload: CardRemovedPayload = {
+          cardId,
+          reason: "GIVEN_AWAY",
+        };
+        socketPlayerFrom?.emit(
+          ServerPrivateEvents.CARD_REMOVED,
+          cardRemovedPayload,
+        );
+
+        const socketPlayerTo = socketsMap.get(playerIdTo);
+        const cardReceivedPayload: CardPayload = { card, playerId: playerIdTo };
+        socketPlayerTo?.emit(
+          ServerPrivateEvents.CARD_RECEIVED,
+          cardReceivedPayload,
+        );
+
+        const room = parsed.gameId;
+        const cardGivenPayload: CardGivenPayload = {
+          playerIdFrom,
+          playerIdTo,
+        };
+        io.to(room).emit(ServerPublicEvents.CARD_GIVEN, cardGivenPayload);
       },
     ),
   );
