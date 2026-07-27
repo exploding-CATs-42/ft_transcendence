@@ -50,6 +50,7 @@ import {
   isOnlyOnePlayerLeftAlive,
   isPlayersTurn,
   isWindowCardOfType,
+  isNoped,
 } from "./guards";
 import {
   countdownCanceled,
@@ -122,6 +123,7 @@ export const gameMachine = setup({
     [GameGuards.IS_EXPLODING_KITTEN_DRAWN]: isExplodingKittenDrawn,
     [GameGuards.IS_ONLY_ONE_PLAYER_LEFT_ALIVE]: isOnlyOnePlayerLeftAlive,
     [GameGuards.IS_PLAYERS_TURN]: isPlayersTurn,
+    [GameGuards.IS_NOPED]: isNoped,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -238,6 +240,11 @@ export const gameMachine = setup({
         [GameStates.WAITING_FOR_NOPES]: {
           after: {
             [NOPE_WINDOW_MS]: [
+              {
+                guard: GameGuards.IS_NOPED,
+                actions: [GameActions.CLEAR_NOPE_WINDOW],
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+              },
               {
                 guard: {
                   type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
