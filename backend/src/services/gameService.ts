@@ -10,7 +10,7 @@ import {
   InsertKittenParams,
   JoinGameParams,
   LeaveGameParams,
-  PLayCardParams,
+  PlayCardParams,
   PlayComboParams,
   PlayDefuseParams,
   ReconnectGameParams,
@@ -356,7 +356,7 @@ function getPlayableCard(player: Player, cardId: number): Card {
   return card;
 }
 
-export async function playCard(input: PLayCardParams, userId: UserId) {
+export async function playCard(input: PlayCardParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
   const card = getPlayableCard(player, input.cardId);
 

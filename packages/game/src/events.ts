@@ -4,9 +4,9 @@ import type {
   TurnChangedPayload,
   TurnSkippedPayload,
   DefusePromptPayload,
-  PLayerDefusedPayload,
+  PlayerDefusedPayload,
   KittenInsertedPayload,
-  PLayerEliminatedPayload,
+  PlayerEliminatedPayload,
   GameOverPayload,
 } from "./eventPayloads";
 
@@ -96,11 +96,11 @@ export type GameOutEvent =
   | { type: typeof GameOutEvents.EXPLODING_KITTEN_DRAWN }
   | {
       type: typeof GameOutEvents.PLAYER_ELIMINATED;
-      payload: PLayerEliminatedPayload;
+      payload: PlayerEliminatedPayload;
     }
   | {
       type: typeof GameOutEvents.PLAYER_DEFUSED;
-      payload: PLayerDefusedPayload;
+      payload: PlayerDefusedPayload;
     }
   | {
       type: typeof GameOutEvents.DEFUSE_PROMPT;

@@ -21,7 +21,7 @@ import {
   confirmStartSchema,
   DrawCardParams,
   drawCardSchema,
-  PLayCardParams,
+  PlayCardParams,
   playCardSchema,
   PlayComboParams,
   playComboSchema,
@@ -184,7 +184,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       playCardSchema,
       socket,
       ServerErrorEvents.PLAY_CARD_ERROR,
-      async (parsed: PLayCardParams) => {
+      async (parsed: PlayCardParams) => {
         const { playerId, card } = await playCard(parsed, socket.data.user.id);
 
         const room = parsed.gameId;

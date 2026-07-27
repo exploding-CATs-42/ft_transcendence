@@ -10,9 +10,9 @@ import {
   GameOutEvents,
   TurnChangedPayload,
   TurnSkippedPayload,
-  PLayerDefusedPayload,
+  PlayerDefusedPayload,
   KittenInsertedPayload,
-  PLayerEliminatedPayload,
+  PlayerEliminatedPayload,
   GameOverPayload,
 } from "@exploding-cats/game-core";
 import { Game } from "data/types";
@@ -82,7 +82,7 @@ export function attachGameBroadcaster(game: Game) {
   });
 
   broadcaster.on(GameOutEvents.PLAYER_DEFUSED, (event) => {
-    const payload: PLayerDefusedPayload = event.payload;
+    const payload: PlayerDefusedPayload = event.payload;
 
     io.to(gameId).emit(ServerPublicEvents.PLAYER_DEFUSED, payload);
   });
@@ -94,7 +94,7 @@ export function attachGameBroadcaster(game: Game) {
   });
 
   broadcaster.on(GameOutEvents.PLAYER_ELIMINATED, (event) => {
-    const payload: PLayerEliminatedPayload = event.payload;
+    const payload: PlayerEliminatedPayload = event.payload;
 
     io.to(gameId).emit(ServerPublicEvents.PLAYER_ELIMINATED, payload);
   });

@@ -19,7 +19,7 @@ export interface ShowedCardsToPlayerPayload {
   cards: Card[];
 }
 
-export interface PLayerDefusedPayload {
+export interface PlayerDefusedPayload {
   playerId: string;
 }
 
@@ -35,7 +35,7 @@ export interface KittenInsertedPayload {
   cardId: number;
 }
 
-export interface PLayerEliminatedPayload {
+export interface PlayerEliminatedPayload {
   playerId: string;
 }
 

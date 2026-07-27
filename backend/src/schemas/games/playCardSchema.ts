@@ -6,4 +6,4 @@ export const playCardSchema = z.object({
   cardId: z.coerce.number().min(0).max(55),
 });
 
-export type PLayCardParams = z.infer<typeof playCardSchema>;
+export type PlayCardParams = z.infer<typeof playCardSchema>;
