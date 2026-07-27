@@ -94,6 +94,15 @@ export const playerEliminated = ({
   payload: { playerId: context.currentTurnPlayerId! },
 });
 
+export const gameOver = ({ context }: GameEmitterArgs): GameOutEvent => {
+  const winner = context.players.find((player) => player.isAlive)!;
+
+  return {
+    type: GameOutEvents.GAME_OVER,
+    payload: { winner },
+  };
+};
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,
