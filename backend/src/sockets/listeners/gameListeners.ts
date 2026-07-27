@@ -13,6 +13,7 @@ import {
   leaveGame,
   reconnectGame,
   playNope,
+  selectPlayer,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -38,6 +39,8 @@ import {
   reconnectGameSchema,
   playNopeSchema,
   PlayNopeParams,
+  SelectPlayerPayload,
+  selectPlayerSchema,
 } from "schemas";
 import {
   CardPlayedPayload,
@@ -328,6 +331,20 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           reason: "INSERTED_INTO_DECK",
         };
         socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.SELECT_PLAYER,
+    withErrorHandler(
+      selectPlayerSchema,
+      socket,
+      ServerErrorEvents.SELECT_PLAYER_ERROR,
+      async (parsed: SelectPlayerPayload) => {
+        const { playerId } = await selectPlayer(parsed, socket.data.user.id);
+        const room = parsed.gameId;
+        io.to(room).emit(ServerPublicEvents.PLAYER_SELECTED, { playerId });
       },
     ),
   );
