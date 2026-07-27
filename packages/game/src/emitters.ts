@@ -1,6 +1,7 @@
 // Local level
 import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
 import type { GameContext } from "./gameMachine";
+import { CardType } from "./types";
 
 type GameEmitterArgs = {
   context: GameContext;
@@ -53,6 +54,30 @@ export const showedTopThreeCards = ({
 export const kittenDrawn = (): GameOutEvent => ({
   type: GameOutEvents.EXPLODING_KITTEN_DRAWN,
 });
+
+export const playerDefused = ({ context }: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.PLAYER_DEFUSED,
+  payload: { playerId: context.currentTurnPlayerId! },
+});
+
+export const defusePrompt = ({ context }: GameEmitterArgs): GameOutEvent => {
+  const player = context.players.find(
+    (p) => p.id === context.currentTurnPlayerId,
+  );
+
+  const canDefuse =
+    player?.hand.some((card) => card.type === CardType.DEFUSE) ?? false;
+
+  return {
+    type: GameOutEvents.DEFUSE_PROMPT,
+    payload: {
+      playerId: context.currentTurnPlayerId!,
+      card: context.lastDrawnCard!,
+      endsAt: context.countdownEndsAt!,
+      canDefuse,
+    },
+  };
+};
 
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
