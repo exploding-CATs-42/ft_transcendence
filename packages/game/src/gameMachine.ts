@@ -39,6 +39,7 @@ import {
   isEnoughCardsInDeck,
   hasExtraTurns,
   isExplodingKittenDrawn,
+  isOnlyOnePlayerLeftAlive,
 } from "./guards";
 import {
   countdownCanceled,
@@ -53,6 +54,7 @@ import {
   turnChanged,
   turnSkipped,
   playerEliminated,
+  gameOver,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -103,6 +105,7 @@ export const gameMachine = setup({
     [GameGuards.HAS_EXTRA_TURNS]: hasExtraTurns,
     [GameGuards.HAS_DEFUSE_CARD]: hasDefuseCard,
     [GameGuards.IS_EXPLODING_KITTEN_DRAWN]: isExplodingKittenDrawn,
+    [GameGuards.IS_ONLY_ONE_PLAYER_LEFT_ALIVE]: isOnlyOnePlayerLeftAlive,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -318,7 +321,23 @@ export const gameMachine = setup({
         },
         [GameStates.EXPLODING_PLAYER]: {
           entry: [GameActions.EXPLODE_PLAYER, emit(playerEliminated)],
-          target: GameTargets.CHANGING_TURN,
+          always: [
+            {
+              guard: GameGuards.IS_ONLY_ONE_PLAYER_LEFT_ALIVE,
+              target: GameTargets.GAME_OVER,
+            },
+            {
+              target: GameTargets.CHANGING_TURN,
+            },
+          ],
+        },
+      },
+    },
+    [GameStates.GAME_OVER]: {
+      entry: [emit(gameOver)],
+      on: {
+        [GameEvents.LEAVE_GAME]: {
+          actions: GameActions.REMOVE_PLAYER,
         },
       },
     },
