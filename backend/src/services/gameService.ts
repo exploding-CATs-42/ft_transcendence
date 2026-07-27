@@ -18,6 +18,7 @@ import {
 import {
   type Card,
   CardType,
+  GameContext,
   GameEvents,
   GameStates,
   type Player,
@@ -86,6 +87,14 @@ async function requirePlayerInGame(userId: UserId, gameId: GameId) {
     ...context,
     player: context.player,
   };
+}
+
+function ensurePlayersTurn(context: GameContext, player: Player) {
+  if (context.currentTurnPlayerId !== player.id) {
+    throw new SocketError("Not your turn", {
+      code: SocketErrorCodes.NOT_YOUR_TURN,
+    });
+  }
 }
 
 function getComboCards(player: Player, cardIds: number[]) {
@@ -335,6 +344,7 @@ export async function cancelStart(
 
 export async function drawCard(input: DrawCardParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  ensurePlayersTurn(game.instance.getSnapshot().context, player);
 
   game.instance.send({
     type: GameEvents.DRAW_CARD,
@@ -358,6 +368,8 @@ function getPlayableCard(player: Player, cardId: number): Card {
 
 export async function playCard(input: PlayCardParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  ensurePlayersTurn(game.instance.getSnapshot().context, player);
+
   const card = getPlayableCard(player, input.cardId);
 
   game.instance.send({
@@ -376,6 +388,8 @@ export async function playCard(input: PlayCardParams, userId: UserId) {
 
 export async function playCombo(input: PlayComboParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  ensurePlayersTurn(game.instance.getSnapshot().context, player);
+
   const cards = getComboCards(player, input.cardIds);
 
   game.instance.send({
@@ -400,6 +414,7 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
 
 export async function playDefuse(input: PlayDefuseParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  ensurePlayersTurn(game.instance.getSnapshot().context, player);
 
   const defuseBefore = player.hand.find(
     (card) => card.type === CardType.DEFUSE,
@@ -430,6 +445,7 @@ export async function playDefuse(input: PlayDefuseParams, userId: UserId) {
 
 export async function insertKitten(input: InsertKittenParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  ensurePlayersTurn(game.instance.getSnapshot().context, player);
 
   game.instance.send({
     type: GameEvents.INSERT_KITTEN,
