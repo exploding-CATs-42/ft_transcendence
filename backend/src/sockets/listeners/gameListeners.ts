@@ -8,6 +8,7 @@ import {
   playCard,
   playCombo,
   playDefuse,
+  insertKitten,
   joinGame,
   leaveGame,
   reconnectGame,
@@ -26,6 +27,8 @@ import {
   playComboSchema,
   PlayDefuseParams,
   playDefuseSchema,
+  InsertKittenParams,
+  insertKittenSchema,
   JoinGameParams,
   joinGameSchema,
   LeaveGameParams,
@@ -267,6 +270,27 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
         socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.INSERT_KITTEN,
+    withErrorHandler(
+      insertKittenSchema,
+      socket,
+      ServerErrorEvents.INSERT_KITTEN_ERROR,
+      async (parsed: InsertKittenParams) => {
+        // The machine broadcasts KITTEN_INSERTED (and the subsequent
+        // TURN_CHANGED) via the game broadcaster in response to INSERT_KITTEN;
+        // here we only forward the chosen position into the machine and remove.
+        const { card } = await insertKitten(parsed, socket.data.user.id);
+
+        const cardRemovedPayload: CardRemovedPayload = {
+          cardId: card.id,
+          reason: "INSERTED_INTO_DECK",
+        };
+        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
       },
     ),
   );
