@@ -8,6 +8,7 @@ import {
   DrawCardParams,
   GetGameParams,
   InsertKittenParams,
+  GiveCardPayload,
   JoinGameParams,
   LeaveGameParams,
   PlayCardParams,
@@ -387,6 +388,21 @@ export async function selectPlayer(input: SelectPlayerPayload, userId: UserId) {
   });
 
   return { playerId: input.playerId };
+}
+
+export async function giveCard(input: GiveCardPayload, userId: UserId) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  await requirePlayerInGame(input.playerIdTo, input.gameId);
+
+  const card = player.hand.find((c) => c.id === input.cardId);
+  if (!card) throw new SocketError("Card is not in your hand");
+
+  game.instance.send({
+    type: GameEvents.PASS_CARD_BY_ID,
+    ...input,
+  });
+
+  return { card };
 }
 
 function getPlayableCard(player: Player, cardId: number): Card {
