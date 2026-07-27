@@ -313,7 +313,11 @@ export const insertKitten = ({ context, event }: GameActionArgs) => {
 
   // Insert exploding kitten back to deck
   const deck = [...context.deck];
-  deck.splice(event.explodingKittenPosition, 0, lastDrawnCard);
+  const position = Math.min(
+    Math.max(0, event.explodingKittenPosition),
+    deck.length,
+  );
+  deck.splice(position, 0, lastDrawnCard);
 
   // Remove exploding kitten from current player hand
   const players = context.players;
