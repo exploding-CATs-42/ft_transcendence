@@ -18,3 +18,4 @@ export { ChooseRandomCardView } from "./ChooseRandomCardView";
 export { NopeButton } from "./NopeButton";
 export { ExplodingKittenInsertionView } from "./ExplodingKittenInsertionView";
 export { ExplodingKittenDrawnView } from "./ExplodingKittenDrawnView";
+export { PlayerIsDeadView } from "./PlayerIsDeadView";
