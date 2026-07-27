@@ -379,12 +379,16 @@ export async function playCard(input: PlayCardParams, userId: UserId) {
     card,
   });
 
-  const lastPlayedCards = game.instance.getSnapshot().context.lastPlayedCards;
+  const { lastPlayedCards, nopeWindow } = game.instance.getSnapshot().context;
   const lastPlayedCard = lastPlayedCards?.[0];
   if (!lastPlayedCards || lastPlayedCards.length !== 1 || !lastPlayedCard) {
     throw new SocketError("Could not play card");
   }
-  return { playerId: player.id, card: lastPlayedCard };
+  return {
+    playerId: player.id,
+    card: lastPlayedCard,
+    nopeWindowExpiresAt: nopeWindow?.endsAt ?? 0,
+  };
 }
 
 export async function playCombo(input: PlayComboParams, userId: UserId) {

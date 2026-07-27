@@ -185,7 +185,10 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.PLAY_CARD_ERROR,
       async (parsed: PlayCardParams) => {
-        const { playerId, card } = await playCard(parsed, socket.data.user.id);
+        const { playerId, card, nopeWindowExpiresAt } = await playCard(
+          parsed,
+          socket.data.user.id,
+        );
 
         const room = parsed.gameId;
         const cardRemovedPayload: CardRemovedPayload = {
@@ -196,7 +199,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const cardPlayedPayload: CardPlayedPayload = {
           playerId,
           cardType: card.type,
-          nopeWindowExpiresAt: -1, // TODO: Replace with the real expiration timestamp.
+          nopeWindowExpiresAt,
         };
 
         socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
