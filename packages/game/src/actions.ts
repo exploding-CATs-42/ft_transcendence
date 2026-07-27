@@ -276,7 +276,7 @@ export const defuseExplodingKitten = ({ context, event }: GameActionArgs) => {
   const defuseIndex = hand.findIndex((card) => card.type === CardType.DEFUSE);
   if (defuseIndex === -1) {
     return {
-      lastPlayedCard: null,
+      lastPlayedCards: null,
     };
   }
 
@@ -289,7 +289,7 @@ export const defuseExplodingKitten = ({ context, event }: GameActionArgs) => {
 
   return {
     players: updatedPlayers,
-    lastPlayedCard: defuseCard!,
+    lastPlayedCards: [defuseCard!],
   };
 };
 
