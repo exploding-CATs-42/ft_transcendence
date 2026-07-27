@@ -11,6 +11,7 @@ import {
   type PlayerSelectedPayload,
 } from "@exploding-cats/game-core";
 import type {
+  CardGivenPayload,
   CardPlayedPayload,
   CardRemovedPayload,
   ComboPlayedPayload,
@@ -751,6 +752,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       else players[i]?.setTargetIconVisible(true);
     }
   };
+
+  onCardGiven(payload: CardGivenPayload): void {
+    console.log(payload);
+  }
 
   private cleanup = () => {
     this.#detachSockets();
