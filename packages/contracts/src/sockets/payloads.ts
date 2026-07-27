@@ -61,6 +61,7 @@ export const CardRemovalReason = {
   STOLEN: "STOLEN",
   GIVEN_AWAY: "GIVEN_AWAY",
   EXPLODED: "EXPLODED",
+  INSERTED_INTO_DECK: "INSERTED_INTO_DECK",
 } as const;
 
 export type CardRemovalReason =
