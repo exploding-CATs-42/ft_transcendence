@@ -13,6 +13,7 @@ import {
   PLayerDefusedPayload,
   KittenInsertedPayload,
   PLayerEliminatedPayload,
+  GameOverPayload,
 } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
@@ -96,6 +97,12 @@ export function attachGameBroadcaster(game: Game) {
     const payload: PLayerEliminatedPayload = event.payload;
 
     io.to(gameId).emit(ServerPublicEvents.PLAYER_ELIMINATED, payload);
+  });
+
+  broadcaster.on(GameOutEvents.GAME_OVER, (event) => {
+    const payload: GameOverPayload = event.payload;
+
+    io.to(gameId).emit(ServerPublicEvents.GAME_OVER, payload);
   });
 }
 
