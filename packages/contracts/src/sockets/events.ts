@@ -11,6 +11,7 @@ export const ClientEvents = {
   INSERT_KITTEN: "insert-kitten",
   PLAY_NOPE: "play-nope",
   SELECT_PLAYER: "select-player",
+  GIVE_CARD: "give-card",
 } as const;
 
 export const ServerPublicEvents = {
