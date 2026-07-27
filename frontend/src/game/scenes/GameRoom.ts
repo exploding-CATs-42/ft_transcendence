@@ -506,6 +506,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.time.delayedCall(SKIP_VIEW_DURATION_MS, () => modal.destroy());
   };
 
+  onKittenDrawn = (): void => {
+    console.log("EXPLODING KITTEN DRAWN");
+  };
+
   onPlayerDisconnected = (payload: PlayerIdPayload): void => {
     this.#players.get(payload.playerId)?.player?.setConnected(false);
   };
