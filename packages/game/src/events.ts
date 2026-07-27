@@ -5,6 +5,7 @@ import type {
   TurnSkippedPayload,
   DefusePromptPayload,
   PLayerDefusedPayload,
+  KittenInsertedPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -17,6 +18,7 @@ export const GameEvents = {
   PLAY_CARD: "PLAY_CARD",
   PLAY_COMBO: "PLAY_COMBO",
   PLAY_DEFUSE: "PLAY_DEFUSE",
+  INSERT_KITTEN: "INSERT_KITTEN",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -40,6 +42,10 @@ export type GameEvent =
   | {
       type: typeof GameEvents.PLAY_DEFUSE;
       playerId: Player["id"];
+    }
+  | {
+      type: typeof GameEvents.INSERT_KITTEN;
+      explodingKittenPosition: number;
     };
 
 // Events emitted FROM the machine
@@ -55,6 +61,7 @@ export const GameOutEvents = {
   EXPLODING_KITTEN_DRAWN: "EXPLODING_KITTEN_DRAWN",
   PLAYER_DEFUSED: "PLAYER_DEFUSED",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
+  KITTEN_INSERTED: "KITTEN_INSERTED",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -90,4 +97,8 @@ export type GameOutEvent =
   | {
       type: typeof GameOutEvents.DEFUSE_PROMPT;
       payload: DefusePromptPayload;
+    }
+  | {
+      type: typeof GameOutEvents.KITTEN_INSERTED;
+      payload: KittenInsertedPayload;
     };
