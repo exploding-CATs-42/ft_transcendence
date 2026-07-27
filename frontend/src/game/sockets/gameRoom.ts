@@ -2,6 +2,7 @@ import {
   ClientEvents,
   ServerPrivateEvents,
   ServerPublicEvents,
+  type CardGivenPayload,
   type CardPlayedPayload,
   type CardRemovedPayload,
   type ComboPlayedPayload,
@@ -45,6 +46,7 @@ export interface GameRoomHandlers {
   onNopePlayed(payload: NopePlayedPayload): void;
   onNopeWindowResolved(): void;
   onPlayerSelected(payload: PlayerSelectedPayload): void;
+  onCardGiven(payload: CardGivenPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -92,6 +94,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.NOPE_PLAYED, handlers.onNopePlayed],
     [ServerPublicEvents.NOPE_WINDOW_RESOLVED, handlers.onNopeWindowResolved],
     [ServerPublicEvents.PLAYER_SELECTED, handlers.onPlayerSelected],
+    [ServerPublicEvents.CARD_GIVEN, handlers.onCardGiven],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
