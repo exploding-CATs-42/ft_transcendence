@@ -16,6 +16,7 @@ export const GameGuards = {
   IS_ONLY_ONE_PLAYER_LEFT_ALIVE: "isOnlyOnePlayerLeftAlive",
   IS_PLAYERS_TURN: "isPlayersTurn",
   IS_WINDOW_CARD_OF_TYPE: "isWindowCardOfType",
+  IS_NOPED: "isNoped",
 } as const;
 
 export interface GameGuardArgs {
@@ -82,4 +83,10 @@ export const isWindowCardOfType = (
   params: { cardType: CardType },
 ) => {
   return context.nopeWindow?.card.type === params.cardType;
+};
+
+export const isNoped = ({ context }: GameGuardArgs) => {
+  const nopeCount = context.nopeWindow?.nopeCount ?? 0;
+
+  return nopeCount % 2 === 1;
 };
