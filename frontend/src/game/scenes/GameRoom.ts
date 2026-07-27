@@ -417,6 +417,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardReceived = (payload: CardPayload): void => {
+    if (!this.#myHand) return;
+
     this.#myHand.clearKindComboSelection();
 
     // Generate random insert index
