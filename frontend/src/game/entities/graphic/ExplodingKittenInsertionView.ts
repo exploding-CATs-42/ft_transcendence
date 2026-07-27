@@ -45,7 +45,7 @@ const HOLD_REPEAT_DELAY = 400;
 const HOLD_REPEAT_INTERVAL = 150;
 
 export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
-  onConfirm?: (explodingKittenPos: number) => void;
+  onConfirm?: (explodingKittenPosition: number) => void;
 
   #cards: Phaser.GameObjects.Image[] = [];
 
@@ -53,7 +53,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
   #labelBottom!: Phaser.GameObjects.Text;
   #labelScore!: Phaser.GameObjects.Text;
 
-  #explodingKittenPos: number = 0;
+  #explodingKittenPosition: number = 0;
   #drawPileSize: number = 0;
 
   #holding = false;
@@ -205,7 +205,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.#labelScore = this.createLabel(
       scene,
       { x: 0, y: LABEL_POSITION_Y },
-      `${this.#explodingKittenPos + 1}/${this.#drawPileSize + 1}`,
+      `${this.#explodingKittenPosition + 1}/${this.#drawPileSize + 1}`,
     );
 
     this.add([this.#labelTop, this.#labelBottom, this.#labelScore]);
@@ -262,7 +262,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.#cards.forEach((card, index) => {
       this.sendToBack(card);
 
-      const isSelected = index === this.#explodingKittenPos;
+      const isSelected = index === this.#explodingKittenPosition;
 
       const target = this.getCardTargetPosition(
         startX,
@@ -293,7 +293,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     return {
       x:
         baseX +
-        (index < this.#explodingKittenPos
+        (index < this.#explodingKittenPosition
           ? -HOVER_CONFIG.offset
           : HOVER_CONFIG.offset),
       y: DRAW_PILE_POSITION.y,
@@ -331,7 +331,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.#cards[cardPos] = targetCard!;
     this.#cards[targetPos] = currentCard!;
 
-    this.#explodingKittenPos = targetPos;
+    this.#explodingKittenPosition = targetPos;
     this.#cards[targetPos]?.setDepth(this.#cards.length - targetPos);
 
     this.#labelScore.setText(`${targetPos + 1}/${this.#drawPileSize + 1}`);
@@ -342,14 +342,15 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     this.stopMoving();
 
     this.#holding = true;
-    this.moveCard(scene, this.#explodingKittenPos, step);
+    this.moveCard(scene, this.#explodingKittenPosition, step);
 
     this.#repeatDelay = scene.time.delayedCall(HOLD_REPEAT_DELAY, () => {
       if (!this.#holding) return;
 
       this.#moveTimer = scene.time.addEvent({
         delay: HOLD_REPEAT_INTERVAL,
-        callback: () => this.moveCard(scene, this.#explodingKittenPos, step),
+        callback: () =>
+          this.moveCard(scene, this.#explodingKittenPosition, step),
         loop: true,
       });
     });
@@ -407,7 +408,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       .setInteractive({ useHandCursor: true });
 
     confirmationButton.on("pointerdown", () => {
-      if (this.onConfirm) this.onConfirm(this.#explodingKittenPos);
+      if (this.onConfirm) this.onConfirm(this.#explodingKittenPosition);
     });
 
     this.add(confirmationButton);
