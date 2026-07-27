@@ -12,6 +12,7 @@ import {
 } from "@exploding-cats/contracts";
 import type {
   CardPayload,
+  GameOverPayload,
   KittenInsertedPayload,
 } from "@exploding-cats/game-core";
 import { socket } from "socket";
@@ -35,6 +36,7 @@ export interface GameRoomHandlers {
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
   onKittenDrawn(): void;
   onKittenInserted(payload: KittenInsertedPayload): void;
+  onGameOver(payload: GameOverPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -78,6 +80,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.TURN_SKIPPED, handlers.onTurnSkipped],
     [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
     [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
+    [ServerPublicEvents.GAME_OVER, handlers.onGameOver],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
