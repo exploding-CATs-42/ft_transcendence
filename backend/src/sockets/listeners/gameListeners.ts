@@ -7,6 +7,7 @@ import {
   drawCard,
   playCard,
   playCombo,
+  playDefuse,
   joinGame,
   leaveGame,
   reconnectGame,
@@ -23,6 +24,8 @@ import {
   playCardSchema,
   PlayComboParams,
   playComboSchema,
+  PlayDefuseParams,
+  playDefuseSchema,
   JoinGameParams,
   joinGameSchema,
   LeaveGameParams,
@@ -231,6 +234,39 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         socket
           .to(room)
           .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.PLAY_DEFUSE,
+    withErrorHandler(
+      playDefuseSchema,
+      socket,
+      ServerErrorEvents.PLAY_DEFUSE_ERROR,
+      async (parsed: PlayDefuseParams) => {
+        // The machine broadcasts PLAYER_DEFUSED via the game broadcaster in
+        // response to the PLAY_DEFUSE event; here we only need to privately
+        // remove the consumed Defuse card from the drawing player's hand.
+        const { playerId, card } = await playDefuse(
+          parsed,
+          socket.data.user.id,
+        );
+
+        const cardRemovedPayload: CardRemovedPayload = {
+          cardId: card.id,
+          reason: "PLAYED",
+        };
+
+        const room = parsed.gameId;
+        const cardPlayedPayload: CardPlayedPayload = {
+          playerId,
+          cardType: card.type,
+          nopeWindowExpiresAt: -1, // TODO: Replace with the real expiration timestamp.
+        };
+
+        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
       },
     ),
   );
