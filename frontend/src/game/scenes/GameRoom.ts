@@ -321,7 +321,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#cardDropZone = this.add.zone(x, y, width, height).setOrigin(0, 0);
     this.#cardDropZone.setRectangleDropZone(width, height);
     this.#cardDropZone.on("pointerdown", this.playSelectedKindCombo);
-    this.updateComboPlayInteractivity();
   }
 
   private addShuffleAnimationObject() {
@@ -482,7 +481,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
 
     this.#discardPile?.disableInteractive(true);
-    this.#cardDropZone?.disableInteractive(true);
   }
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
