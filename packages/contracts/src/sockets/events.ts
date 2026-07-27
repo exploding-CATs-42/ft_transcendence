@@ -66,4 +66,5 @@ export const ServerErrorEvents = {
   PLAY_COMBO_ERROR: "play-combo-error",
   PLAY_DEFUSE_ERROR: "play-defuse-error",
   INSERT_KITTEN_ERROR: "insert-kitten-error",
+  PLAY_NOPE_ERROR: "play-nope-error",
 } as const;
