@@ -5,6 +5,7 @@ import {
   type CardPlayedPayload,
   type CardRemovedPayload,
   type ComboPlayedPayload,
+  type DefusePromptPayload,
   type GameStatePayload,
   type PlayerIdPayload,
   type SeeTheFuturePeekPayload,
@@ -20,6 +21,7 @@ export interface GameRoomHandlers {
   onTurnChanged(payload: PlayerIdPayload): void;
   onCardRemoved(payload: CardRemovedPayload): void;
   onCardPlayed(payload: CardPlayedPayload): void;
+  onDefusePrompt(payload: DefusePromptPayload): void;
   onPlayerDisconnected(payload: PlayerIdPayload): void;
   onPlayerReconnected(payload: PlayerIdPayload): void;
   onDeckShuffled(): void;
@@ -59,6 +61,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.TURN_CHANGED, handlers.onTurnChanged],
     [ServerPrivateEvents.CARD_REMOVED, handlers.onCardRemoved],
     [ServerPublicEvents.CARD_PLAYED, handlers.onCardPlayed],
+    [ServerPrivateEvents.DEFUSE_PROMPT, handlers.onDefusePrompt],
     [ServerPublicEvents.EXPLODING_KITTEN_DRAWN, handlers.onKittenDrawn],
     [ServerPublicEvents.PLAYER_DISCONNECTED, handlers.onPlayerDisconnected],
     [ServerPublicEvents.PLAYER_RECONNECTED, handlers.onPlayerReconnected],
