@@ -43,4 +43,5 @@ export const GameTargets = {
     GameStates.PLAYING,
     GameStates.EXPLODING_PLAYER,
   ),
+  GAME_OVER: getStatePath(GameStates.GAME_OVER),
 } as const;
