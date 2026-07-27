@@ -12,6 +12,7 @@ import {
   TurnSkippedPayload,
   PLayerDefusedPayload,
   KittenInsertedPayload,
+  PLayerEliminatedPayload,
 } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
@@ -89,6 +90,12 @@ export function attachGameBroadcaster(game: Game) {
     const payload: KittenInsertedPayload = event.payload;
 
     io.to(gameId).emit(ServerPublicEvents.KITTEN_INSERTED, payload);
+  });
+
+  broadcaster.on(GameOutEvents.PLAYER_ELIMINATED, (event) => {
+    const payload: PLayerEliminatedPayload = event.payload;
+
+    io.to(gameId).emit(ServerPublicEvents.PLAYER_ELIMINATED, payload);
   });
 }
 
