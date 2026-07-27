@@ -11,10 +11,12 @@ import {
   LeaveGameParams,
   PLayCardParams,
   PlayComboParams,
+  PlayDefuseParams,
   ReconnectGameParams,
 } from "schemas";
 import {
   type Card,
+  CardType,
   GameEvents,
   GameStates,
   type Player,
@@ -393,4 +395,34 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
   }
 
   return { playerId: player.id, cards: lastPlayedCards };
+}
+
+export async function playDefuse(input: PlayDefuseParams, userId: UserId) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+
+  const defuseBefore = player.hand.find(
+    (card) => card.type === CardType.DEFUSE,
+  );
+
+  game.instance.send({
+    type: GameEvents.PLAY_DEFUSE,
+    playerId: player.id,
+  });
+
+  // The machine immutably rebuilds the players array, so re-read the player to
+  // learn whether the defuse card was actually consumed by the transition.
+  const updatedPlayer = game.instance
+    .getSnapshot()
+    .context.players.find((p) => p.id === player.id);
+
+  const defuseConsumed =
+    defuseBefore !== undefined &&
+    !updatedPlayer?.hand.some((card) => card.id === defuseBefore.id);
+
+  const card = defuseConsumed ? defuseBefore : null;
+  if (!card) {
+    throw new SocketError("Could not play defuse");
+  }
+
+  return { playerId: player.id, card };
 }
