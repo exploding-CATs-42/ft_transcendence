@@ -66,7 +66,7 @@ const createContext = (overrides: Partial<GameContext> = {}): GameContext => ({
   deck: [DRAW_PILE_CARD],
   currentTurnPlayerId: "1",
   lastDrawnCard: null,
-  lastPlayedCard: null,
+  lastPlayedCards: null,
   countdownEndsAt: null,
   turnsCount: 1,
   isUnderAttack: false,
@@ -100,7 +100,7 @@ describe("Attack card", () => {
     expect(result.isUnderAttack).toBe(true);
     expect(result.deck).toEqual(deckBeforeAttack);
     expect(result.players[0]?.hand).not.toContainEqual(ATTACK_CARD);
-    expect(result.lastPlayedCard).toEqual(ATTACK_CARD);
+    expect(result.lastPlayedCards).toEqual([ATTACK_CARD]);
   });
 
   it("stacks 2 additional draws onto 2 remaining draws", () => {
