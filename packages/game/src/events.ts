@@ -72,6 +72,7 @@ export const GameOutEvents = {
   KITTEN_INSERTED: "KITTEN_INSERTED",
   PLAYER_ELIMINATED: "PLAYER_ELIMINATED",
   GAME_OVER: "GAME_OVER",
+  NOPE_WINDOW_RESOLVED: "NOPE_WINDOW_RESOLVED",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -95,6 +96,7 @@ export type GameOutEvent =
   | { type: typeof GameOutEvents.TURN_CHANGED; payload: TurnChangedPayload }
   | { type: typeof GameOutEvents.DECK_SHUFFLED }
   | { type: typeof GameOutEvents.TURN_SKIPPED; payload: TurnSkippedPayload }
+  | { type: typeof GameOutEvents.NOPE_WINDOW_RESOLVED }
   | {
       type: typeof GameOutEvents.SHOWED_TOP_CARDS;
       payload: ShowedCardsToPlayerPayload;
