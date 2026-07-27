@@ -201,7 +201,11 @@ export const drawCard = ({ context, event }: GameActionArgs) => {
 };
 
 export const playCard = ({ context, event }: GameActionArgs) => {
-  if (event.type != GameEvents.PLAY_CARD) return context;
+  if (
+    event.type !== GameEvents.PLAY_CARD &&
+    event.type !== GameEvents.PLAY_NOPE
+  )
+    return context;
 
   const { playerId, card } = event;
   const players = context.players;
