@@ -548,6 +548,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#opponents.get(payload.playerId)?.removeCard();
   };
 
+  onPlayerEliminated = (payload: PlayerIdPayload): void => {
+    if (payload.playerId === this.#meId) {
+      this.cleanModal();
+    }
+    this.#players.get(payload.playerId)?.explodePlayer(this);
+  };
+
   onKittenDrawn = (): void => {
     console.log("EXPLODING KITTEN DRAWN");
   };
