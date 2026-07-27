@@ -1,6 +1,10 @@
 export { GraphicPlayer } from "./GraphicPlayer";
 export { OpponentHand } from "./OpponentHand";
-export { GraphicHand, type KindComboSelection } from "./GraphicHand";
+export {
+  GraphicHand,
+  type CardPlaySelection,
+  type KindComboSelection,
+} from "./GraphicHand";
 export { PlayerSeat } from "./PlayerSeat";
 export { Button } from "./Button";
 export type { GraphicCard } from "./GraphicCard";

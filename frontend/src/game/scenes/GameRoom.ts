@@ -36,7 +36,7 @@ import {
   Modal,
   SkipView,
   type GraphicCard,
-  type KindComboSelection,
+  type CardPlaySelection,
   SeeTheFutureView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
@@ -44,6 +44,7 @@ import {
   attachGameRoomSockets,
   drawCard,
   leaveCurrentGame,
+  playCard,
   playCombo,
   type CleanupFunction,
   type GameRoomHandlers,
@@ -136,7 +137,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #shuffleAnimation!: ShuffleAnimation;
   #discardPile: Phaser.GameObjects.Image | null = null;
   #cardDropZone: Phaser.GameObjects.Zone | null = null;
-  #selectedKindCombo: KindComboSelection | null = null;
+  #selectedCardPlay: CardPlaySelection | null = null;
   #modal!: Modal;
 
   constructor() {
@@ -253,9 +254,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private emitKindComboSelectionChange = (
-    selection: KindComboSelection | null,
+    selection: CardPlaySelection | null,
   ) => {
-    this.#selectedKindCombo = selection;
+    this.#selectedCardPlay = selection;
     this.updateComboPlayInteractivity();
     EventBus.emit("kind-combo-selection-change", selection);
   };
@@ -320,7 +321,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { x, y, width, height } = CARD_DROP_ZONE;
     this.#cardDropZone = this.add.zone(x, y, width, height).setOrigin(0, 0);
     this.#cardDropZone.setRectangleDropZone(width, height);
-    this.#cardDropZone.on("pointerdown", this.playSelectedKindCombo);
     this.updateComboPlayInteractivity();
   }
 
@@ -467,22 +467,25 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   private playSelectedKindCombo = () => {
-    if (!this.isMyTurn() || !this.#selectedKindCombo) return;
+    if (!this.isMyTurn() || !this.#selectedCardPlay) return;
 
-    playCombo(this.#selectedKindCombo.cardIds);
+    if (this.#selectedCardPlay.kind === "single-card") {
+      playCard(this.#selectedCardPlay.cardId);
+      return;
+    }
+
+    playCombo(this.#selectedCardPlay.cardIds);
   };
 
   private updateComboPlayInteractivity() {
-    const canPlaySelectedCombo = this.isMyTurn() && this.#selectedKindCombo;
+    const canPlaySelectedCards = this.isMyTurn() && this.#selectedCardPlay;
 
-    if (canPlaySelectedCombo) {
+    if (canPlaySelectedCards) {
       this.#discardPile?.setInteractive({ useHandCursor: true });
-      this.#cardDropZone?.setInteractive({ useHandCursor: true });
       return;
     }
 
     this.#discardPile?.disableInteractive(true);
-    this.#cardDropZone?.disableInteractive(true);
   }
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
