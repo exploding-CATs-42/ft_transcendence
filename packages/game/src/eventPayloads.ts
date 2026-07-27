@@ -8,6 +8,7 @@ export interface TurnChangedPayload {
 
 export interface TurnSkippedPayload {
   playerId: string;
+  attackCount: number;
 }
 
 export interface CardPayload {

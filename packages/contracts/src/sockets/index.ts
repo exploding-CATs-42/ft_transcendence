@@ -5,4 +5,5 @@ export * from "./payloads";
 export type {
   TurnChangedPayload,
   DefusePromptPayload,
+  TurnSkippedPayload,
 } from "@exploding-cats/game-core";
