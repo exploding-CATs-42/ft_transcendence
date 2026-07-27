@@ -17,6 +17,7 @@ import type {
   PlayerIdPayload,
   SeeTheFuturePeekPayload,
   TurnChangedPayload,
+  TurnSkippedPayload,
 } from "@exploding-cats/contracts";
 // Local level
 import {
@@ -537,7 +538,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
   };
 
-  onTurnSkipped = (payload: PlayerIdPayload): void => {
+  onTurnSkipped = (payload: TurnSkippedPayload): void => {
+    this.#attackCount = payload.attackCount;
+    this.updateAttackIndicator();
+
     const playerName = this.#players.get(payload.playerId)?.player?.name;
     if (!playerName) return;
 
