@@ -86,4 +86,5 @@ export const playCard = (cardId: number) =>
   emit(ClientEvents.PLAY_CARD, { cardId });
 export const playCombo = (cardIds: number[]) =>
   emit(ClientEvents.PLAY_COMBO, { cardIds });
+export const playDefuse = () => emit(ClientEvents.PLAY_DEFUSE);
 export const leaveCurrentGame = leaveGame;
