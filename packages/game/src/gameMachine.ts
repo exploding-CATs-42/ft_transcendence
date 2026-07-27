@@ -30,6 +30,7 @@ import {
   insertKitten,
   setNopeWindow,
   clearNopeWindow,
+  addNope,
 } from "./actions";
 import {
   type Player,
@@ -51,6 +52,7 @@ import {
   isPlayersTurn,
   isWindowCardOfType,
   isNoped,
+  canPlayNope,
 } from "./guards";
 import {
   countdownCanceled,
@@ -112,6 +114,7 @@ export const gameMachine = setup({
     [GameActions.EXPLODE_PLAYER]: assign(explodePlayer),
     [GameActions.SET_NOPE_WINDOW]: assign(setNopeWindow),
     [GameActions.CLEAR_NOPE_WINDOW]: assign(clearNopeWindow),
+    [GameActions.ADD_NOPE]: assign(addNope),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -124,6 +127,7 @@ export const gameMachine = setup({
     [GameGuards.IS_ONLY_ONE_PLAYER_LEFT_ALIVE]: isOnlyOnePlayerLeftAlive,
     [GameGuards.IS_PLAYERS_TURN]: isPlayersTurn,
     [GameGuards.IS_NOPED]: isNoped,
+    [GameGuards.CAN_PLAY_NOPE]: canPlayNope,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -308,6 +312,14 @@ export const gameMachine = setup({
                 target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
               },
             ],
+          },
+          on: {
+            [GameEvents.PLAY_NOPE]: {
+              guard: GameGuards.CAN_PLAY_NOPE,
+              actions: [GameActions.PLAY_CARD, GameActions.ADD_NOPE],
+              target: GameStates.WAITING_FOR_NOPES,
+              reenter: true,
+            },
           },
         },
         [GameStates.CHECKING_DRAWN_CARD]: {
