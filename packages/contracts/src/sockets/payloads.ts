@@ -96,3 +96,8 @@ export type SocketAckPayload =
   | { ok: false; code: SocketErrorCode; message: string };
 
 export type SeeTheFuturePeekPayload = ShowedCardsToPlayerPayload;
+
+export interface CardGivenPayload {
+  playerIdFrom: string;
+  playerIdTo: string;
+}
