@@ -1,7 +1,11 @@
 // Libraries
 import { Scene } from "phaser";
 // Project level
-import { type Card, type CardPayload } from "@exploding-cats/game-core";
+import {
+  type Card,
+  type CardPayload,
+  type KittenInsertedPayload,
+} from "@exploding-cats/game-core";
 import type {
   CardPlayedPayload,
   CardRemovedPayload,
@@ -537,6 +541,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         insertKitten(explodingKittenPosition);
       };
     }
+  };
+
+  onKittenInserted = (payload: KittenInsertedPayload): void => {
+    console.log("EXPLODING KITTEN INSERTED");
+    this.#opponents.get(payload.playerId)?.removeCard();
   };
 
   onKittenDrawn = (): void => {
