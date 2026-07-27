@@ -5,7 +5,9 @@ import {
   type GraphicPlayer,
   type OpponentHand,
   AttackIndicator,
+  Modal,
 } from "game/entities/graphic";
+import { PlayerIsDeadView } from "./PlayerIsDeadView";
 
 const TARGET_ICON_OFFSET: Point = {
   x: 30,
@@ -122,6 +124,16 @@ export class PlayerSeat {
     return attackIndicator;
   }
 
+  private addPlayerExplodedLabel(scene: Phaser.Scene) {
+    const playerName = this.player?.name;
+    if (!playerName) return;
+
+    const modal = new Modal(scene);
+    const view = new PlayerIsDeadView(scene, playerName);
+    modal.setContent(view);
+    scene.time.delayedCall(3000, () => modal.destroy());
+  }
+
   explodePlayer(scene: Phaser.Scene) {
     const explosionAnimation = new ExplosionAnimation(
       scene,
@@ -135,6 +147,10 @@ export class PlayerSeat {
 
     scene.time.delayedCall(1000, () => {
       this.player?.setDead();
+    });
+
+    scene.time.delayedCall(2000, () => {
+      this.addPlayerExplodedLabel(scene);
     });
   }
 }
