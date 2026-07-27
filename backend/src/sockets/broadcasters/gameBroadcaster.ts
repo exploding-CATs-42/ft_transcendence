@@ -1,6 +1,7 @@
 // Project level
 import {
   CountdownStartedPayload,
+  DefusePromptPayload,
   GameStartedPayload,
   ServerPrivateEvents,
   ServerPublicEvents,
@@ -9,6 +10,7 @@ import {
   GameOutEvents,
   TurnChangedPayload,
   TurnSkippedPayload,
+  PLayerDefusedPayload,
 } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
@@ -66,6 +68,20 @@ export function attachGameBroadcaster(game: Game) {
 
   broadcaster.on(GameOutEvents.EXPLODING_KITTEN_DRAWN, () => {
     io.to(gameId).emit(ServerPublicEvents.EXPLODING_KITTEN_DRAWN);
+  });
+
+  broadcaster.on(GameOutEvents.DEFUSE_PROMPT, (event) => {
+    const { playerId } = event.payload;
+    const payload: DefusePromptPayload = event.payload;
+
+    const socket = socketsMap.get(playerId);
+    socket?.emit(ServerPrivateEvents.DEFUSE_PROMPT, payload);
+  });
+
+  broadcaster.on(GameOutEvents.PLAYER_DEFUSED, (event) => {
+    const payload: PLayerDefusedPayload = event.payload;
+
+    io.to(gameId).emit(ServerPublicEvents.PLAYER_DEFUSED, payload);
   });
 }
 
