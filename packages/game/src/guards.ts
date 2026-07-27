@@ -17,6 +17,7 @@ export const GameGuards = {
   IS_PLAYERS_TURN: "isPlayersTurn",
   IS_WINDOW_CARD_OF_TYPE: "isWindowCardOfType",
   IS_NOPED: "isNoped",
+  CAN_PLAY_NOPE: "canPlayNope",
 } as const;
 
 export interface GameGuardArgs {
@@ -89,4 +90,16 @@ export const isNoped = ({ context }: GameGuardArgs) => {
   const nopeCount = context.nopeWindow?.nopeCount ?? 0;
 
   return nopeCount % 2 === 1;
+};
+
+export const canPlayNope = ({ context, event }: GameGuardArgs) => {
+  const { nopeWindow, players } = context;
+
+  if (event.type !== GameEvents.PLAY_NOPE || !nopeWindow) return false;
+  if (event.card.type !== CardType.NOPE) return false;
+  if (event.playerId === nopeWindow.lastPlayerId) return false;
+
+  const player = players.find((p) => p.id === event.playerId);
+
+  return player?.isAlive ?? false;
 };
