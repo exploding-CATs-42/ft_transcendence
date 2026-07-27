@@ -7,6 +7,7 @@ import type {
   PLayerDefusedPayload,
   KittenInsertedPayload,
   PLayerEliminatedPayload,
+  GameOverPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -64,6 +65,7 @@ export const GameOutEvents = {
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   KITTEN_INSERTED: "KITTEN_INSERTED",
   PLAYER_ELIMINATED: "PLAYER_ELIMINATED",
+  GAME_OVER: "GAME_OVER",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -107,4 +109,8 @@ export type GameOutEvent =
   | {
       type: typeof GameOutEvents.KITTEN_INSERTED;
       payload: KittenInsertedPayload;
+    }
+  | {
+      type: typeof GameOutEvents.GAME_OVER;
+      payload: GameOverPayload;
     };
