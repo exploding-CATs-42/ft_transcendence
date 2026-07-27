@@ -79,6 +79,14 @@ export const defusePrompt = ({ context }: GameEmitterArgs): GameOutEvent => {
   };
 };
 
+export const kittenInserted = ({ context }: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.KITTEN_INSERTED,
+  payload: {
+    cardId: context.lastDrawnCard!.id,
+    playerId: context.currentTurnPlayerId!,
+  },
+});
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,
