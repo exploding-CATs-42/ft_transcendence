@@ -13,6 +13,7 @@ export const GameGuards = {
   HAS_EXTRA_TURNS: "hasExtraTurns",
   HAS_DEFUSE_CARD: "hasDefuseCard",
   IS_EXPLODING_KITTEN_DRAWN: "isExplodingKittenDrawn",
+  IS_ONLY_ONE_PLAYER_LEFT_ALIVE: "isOnlyOnePlayerLeftAlive",
 } as const;
 
 export interface GameGuardArgs {
@@ -61,4 +62,9 @@ export const hasDefuseCard = ({ context }: GameGuardArgs) => {
 
 export const isExplodingKittenDrawn = ({ context }: GameGuardArgs) => {
   return context.lastDrawnCard?.type === CardType.EXPLODING_KITTEN;
+};
+
+export const isOnlyOnePlayerLeftAlive = ({ context }: GameGuardArgs) => {
+  const aliveCount = context.players.filter((player) => player.isAlive).length;
+  return aliveCount === 1;
 };
