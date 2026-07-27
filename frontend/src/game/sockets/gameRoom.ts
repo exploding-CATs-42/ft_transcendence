@@ -26,6 +26,7 @@ export interface GameRoomHandlers {
   onCardPlayed(payload: CardPlayedPayload): void;
   onDefusePrompt(payload: DefusePromptPayload): void;
   onPlayerDefused(payload: PlayerIdPayload): void;
+  onPlayerEliminated(payload: PlayerIdPayload): void;
   onPlayerDisconnected(payload: PlayerIdPayload): void;
   onPlayerReconnected(payload: PlayerIdPayload): void;
   onDeckShuffled(): void;
@@ -68,6 +69,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.CARD_PLAYED, handlers.onCardPlayed],
     [ServerPrivateEvents.DEFUSE_PROMPT, handlers.onDefusePrompt],
     [ServerPublicEvents.PLAYER_DEFUSED, handlers.onPlayerDefused],
+    [ServerPublicEvents.PLAYER_ELIMINATED, handlers.onPlayerEliminated],
     [ServerPublicEvents.KITTEN_INSERTED, handlers.onKittenInserted],
     [ServerPublicEvents.EXPLODING_KITTEN_DRAWN, handlers.onKittenDrawn],
     [ServerPublicEvents.PLAYER_DISCONNECTED, handlers.onPlayerDisconnected],
