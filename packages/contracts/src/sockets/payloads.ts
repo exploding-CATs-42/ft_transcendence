@@ -50,6 +50,11 @@ export interface CardPlayedPayload {
   nopeWindowExpiresAt: number;
 }
 
+export interface NopePlayedPayload {
+  playerId: string;
+  nopeWindowExpiresAt: number;
+}
+
 export interface ComboPlayedPayload {
   playerId: string;
   cardTypes: CardType[];
