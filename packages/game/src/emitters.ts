@@ -39,7 +39,10 @@ export const deckShuffled = (): GameOutEvent => ({
 
 export const turnSkipped = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.TURN_SKIPPED,
-  payload: { playerId: context.currentTurnPlayerId! },
+  payload: {
+    playerId: context.currentTurnPlayerId!,
+    attackCount: context.turnsCount,
+  },
 });
 
 export const showedTopThreeCards = ({
