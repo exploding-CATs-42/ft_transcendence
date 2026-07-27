@@ -6,6 +6,7 @@ import type {
   CardPlayedPayload,
   CardRemovedPayload,
   ComboPlayedPayload,
+  DefusePromptPayload,
   GameStartedPayload,
   GameStatePayload,
   PlayerIdPayload,
@@ -38,11 +39,13 @@ import {
   type GraphicCard,
   type CardPlaySelection,
   SeeTheFutureView,
+  ExplodingKittenDrawnView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
   attachGameRoomSockets,
   drawCard,
+  playDefuse,
   leaveCurrentGame,
   playCard,
   playCombo,
@@ -506,9 +509,25 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.time.delayedCall(SKIP_VIEW_DURATION_MS, () => modal.destroy());
   };
 
+  onDefusePrompt = (payload: DefusePromptPayload): void => {
+    this.cleanModal();
+    const view = new ExplodingKittenDrawnView(
+      this,
+      payload.endsAt,
+      payload.canDefuse,
+    );
+    this.#modal!.setContent(view);
+    this.#modal!.setVisible(true);
+    view.onDefuse = () => playDefuse();
+  };
+
   onKittenDrawn = (): void => {
     console.log("EXPLODING KITTEN DRAWN");
   };
+
+  private cleanModal() {
+    this.#modal?.setVisible(false);
+  }
 
   onPlayerDisconnected = (payload: PlayerIdPayload): void => {
     this.#players.get(payload.playerId)?.player?.setConnected(false);
