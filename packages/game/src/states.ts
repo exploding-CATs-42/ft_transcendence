@@ -10,5 +10,5 @@ export const GameStates = {
   WAITING_FOR_DEFUSE_CARD: "waitingForDefuseCard",
   WAITING_FOR_KITTEN_INSERTION: "waitingForKittenInsertion",
   EXPLODING_PLAYER: "explodingPlayer",
-  GAME_OVER: "GAME_OVER",
+  GAME_OVER: "gameOver",
 } as const;
