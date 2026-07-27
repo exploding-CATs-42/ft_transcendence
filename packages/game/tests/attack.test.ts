@@ -5,7 +5,9 @@ import {
   GameOutEvents,
   changeTurn,
   playCard,
+  skipTurn,
   turnChanged,
+  turnSkipped,
   type Card,
   type GameContext,
   type Player,
@@ -167,6 +169,38 @@ describe("Attack card", () => {
       payload: {
         playerId: "2",
         attackCount: 4,
+      },
+    });
+  });
+
+  it("reduces the remaining attack count after Skip", () => {
+    const context = createContext({
+      turnsCount: 2,
+      isUnderAttack: true,
+    });
+
+    const result = {
+      ...context,
+      ...skipTurn({
+        context,
+        event: ATTACK_EVENT,
+      }),
+    };
+
+    expect(result.currentTurnPlayerId).toBe("1");
+    expect(result.turnsCount).toBe(1);
+    expect(result.isUnderAttack).toBe(true);
+
+    expect(
+      turnSkipped({
+        context: result,
+        event: ATTACK_EVENT,
+      }),
+    ).toEqual({
+      type: GameOutEvents.TURN_SKIPPED,
+      payload: {
+        playerId: "1",
+        attackCount: 1,
       },
     });
   });
