@@ -38,3 +38,13 @@ export interface KittenInsertedPayload {
 export interface PLayerEliminatedPayload {
   playerId: string;
 }
+
+export interface WinnerView {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+}
+
+export interface GameOverPayload {
+  winner: WinnerView;
+}
