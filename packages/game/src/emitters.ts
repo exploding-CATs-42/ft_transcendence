@@ -99,7 +99,13 @@ export const gameOver = ({ context }: GameEmitterArgs): GameOutEvent => {
 
   return {
     type: GameOutEvents.GAME_OVER,
-    payload: { winner },
+    payload: {
+      winner: {
+        id: winner.id,
+        name: winner.name,
+        avatarUrl: winner.avatarUrl,
+      },
+    },
   };
 };
 
