@@ -21,6 +21,7 @@ export const GameEvents = {
   PLAY_COMBO: "PLAY_COMBO",
   PLAY_DEFUSE: "PLAY_DEFUSE",
   INSERT_KITTEN: "INSERT_KITTEN",
+  PLAY_NOPE: "PLAY_NOPE",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -48,6 +49,11 @@ export type GameEvent =
   | {
       type: typeof GameEvents.INSERT_KITTEN;
       explodingKittenPosition: number;
+    }
+  | {
+      type: typeof GameEvents.PLAY_NOPE;
+      playerId: Player["id"];
+      card: Card;
     };
 
 // Events emitted FROM the machine
