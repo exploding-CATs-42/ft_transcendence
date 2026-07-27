@@ -40,6 +40,7 @@ import {
   type CardPlaySelection,
   SeeTheFutureView,
   ExplodingKittenDrawnView,
+  ExplodingKittenInsertionView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -51,6 +52,7 @@ import {
   playCombo,
   type CleanupFunction,
   type GameRoomHandlers,
+  insertKitten,
 } from "../sockets";
 import { ShuffleAnimation } from "../animations";
 
@@ -142,6 +144,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #cardDropZone: Phaser.GameObjects.Zone | null = null;
   #selectedCardPlay: CardPlaySelection | null = null;
   #modal!: Modal;
+  #drawPileSize: number = 0;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -157,7 +160,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       throw new Error("Game room started without game data");
     }
 
-    const { players, hand: cards } = gameData;
+    const { players, hand: cards, deckSize } = gameData;
 
     if (hasTurnState(gameData)) {
       this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
@@ -180,7 +183,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.setCurrentTurn(this.#currentTurnPlayerId);
     }
 
-    // this.#drawPileSize = deckSize;
+    this.#drawPileSize = deckSize;
 
     this.createCardDropZone();
     this.createDrawPile();
@@ -519,6 +522,21 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#modal!.setContent(view);
     this.#modal!.setVisible(true);
     view.onDefuse = () => playDefuse();
+  };
+
+  onPlayerDefused = (payload: PlayerIdPayload): void => {
+    if (payload.playerId === this.#meId) {
+      this.cleanModal();
+      const view = new ExplodingKittenInsertionView(this, this.#drawPileSize);
+      this.time.delayedCall(1300, () => {
+        this.#modal!.setContent(view);
+        this.#modal!.setVisible(true);
+      });
+      view.onConfirm = (explodingKittenPosition: number) => {
+        this.cleanModal();
+        insertKitten(explodingKittenPosition);
+      };
+    }
   };
 
   onKittenDrawn = (): void => {
