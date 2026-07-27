@@ -7,6 +7,7 @@ export const ClientEvents = {
   DRAW_CARD: "draw-card",
   PLAY_CARD: "play-card",
   PLAY_COMBO: "play-combo",
+  PLAY_DEFUSE: "play-defuse",
 } as const;
 
 export const ServerPublicEvents = {
@@ -61,4 +62,5 @@ export const ServerErrorEvents = {
   DRAW_CARD_ERROR: "draw-card-error",
   PLAY_CARD_ERROR: "play-card-error",
   PLAY_COMBO_ERROR: "play-combo-error",
+  PLAY_DEFUSE_ERROR: "play-defuse-error",
 } as const;
