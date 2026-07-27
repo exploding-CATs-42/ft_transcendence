@@ -22,6 +22,7 @@ export const GameActions = {
   SKIP_TURN: "skipTurn",
   PLAY_COMBO: "playCombo",
   DEFUSE_KITTEN: "defuseExplodingKitten",
+  INSERT_KITTEN: "insertKitten",
 } as const;
 
 export interface GameActionArgs {
@@ -288,5 +289,38 @@ export const defuseExplodingKitten = ({ context, event }: GameActionArgs) => {
   return {
     players: updatedPlayers,
     lastPlayedCard: defuseCard!,
+  };
+};
+
+export const insertKitten = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.INSERT_KITTEN) return context;
+
+  const lastDrawnCard = context.lastDrawnCard;
+  if (!lastDrawnCard) return context;
+
+  // Insert exploding kitten back to deck
+  const deck = [...context.deck];
+  deck.splice(event.explodingKittenPosition, 0, lastDrawnCard);
+
+  // Remove exploding kitten from current player hand
+  const players = context.players;
+  const player = players.find(
+    (player) => player.id === context.currentTurnPlayerId,
+  );
+  if (!player) return context;
+
+  const updatedHand = player.hand.filter(
+    (card) => card.id !== lastDrawnCard.id,
+  );
+
+  const updatedPlayers = players.map((player) =>
+    player.id !== context.currentTurnPlayerId
+      ? player
+      : { ...player, hand: updatedHand },
+  );
+
+  return {
+    deck,
+    players: updatedPlayers,
   };
 };
