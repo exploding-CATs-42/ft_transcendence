@@ -131,8 +131,6 @@ export class PlayerSeat {
     this.#container.bringToTop(explosionAnimation);
 
     this.hand?.container.setVisible(false);
-    console.log(this);
-
     explosionAnimation.playAnimation();
 
     scene.time.delayedCall(1000, () => {
