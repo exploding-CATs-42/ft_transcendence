@@ -86,8 +86,6 @@ export class ExplodingKittenDrawnView extends Phaser.GameObjects.Container {
     if (canDefuse) this.add(this.buildButton(scene));
     this.add(this.buildHelper(scene));
 
-    scene.add.existing(this);
-
     this.playEntranceAnimation(scene, card);
     this.startCountdown(scene);
   }
