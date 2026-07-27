@@ -26,6 +26,7 @@ export interface GameRoomHandlers {
   onTurnSkipped(payload: PlayerIdPayload): void;
   onComboPlayed(payload: ComboPlayedPayload): void;
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
+  onKittenDrawn(): void;
 }
 
 export type CleanupFunction = () => void;
@@ -58,6 +59,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.TURN_CHANGED, handlers.onTurnChanged],
     [ServerPrivateEvents.CARD_REMOVED, handlers.onCardRemoved],
     [ServerPublicEvents.CARD_PLAYED, handlers.onCardPlayed],
+    [ServerPublicEvents.EXPLODING_KITTEN_DRAWN, handlers.onKittenDrawn],
     [ServerPublicEvents.PLAYER_DISCONNECTED, handlers.onPlayerDisconnected],
     [ServerPublicEvents.PLAYER_RECONNECTED, handlers.onPlayerReconnected],
     [ServerPublicEvents.DECK_SHUFFLED, handlers.onDeckShuffled],
