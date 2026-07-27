@@ -12,6 +12,7 @@ import {
   joinGame,
   leaveGame,
   reconnectGame,
+  playNope,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -35,6 +36,8 @@ import {
   leaveGameSchema,
   ReconnectGameParams,
   reconnectGameSchema,
+  playNopeSchema,
+  PlayNopeParams,
 } from "schemas";
 import {
   CardPlayedPayload,
@@ -48,6 +51,7 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
   WaitingStatePayload,
+  NopePlayedPayload,
 } from "@exploding-cats/contracts";
 import { CardPayload } from "@exploding-cats/game-core";
 // Local level
@@ -204,6 +208,36 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
         socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.PLAY_NOPE,
+    withErrorHandler(
+      playNopeSchema,
+      socket,
+      ServerErrorEvents.PLAY_NOPE_ERROR,
+      async (parsed: PlayNopeParams) => {
+        const { playerId, card, nopeWindowExpiresAt } = await playNope(
+          parsed,
+          socket.data.user.id,
+        );
+
+        const room = parsed.gameId;
+
+        const cardRemovedPayload: CardRemovedPayload = {
+          cardId: card.id,
+          reason: "PLAYED",
+        };
+
+        const nopePlayedPayload: NopePlayedPayload = {
+          playerId,
+          nopeWindowExpiresAt,
+        };
+
+        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        socket.to(room).emit(ServerPublicEvents.NOPE_PLAYED, nopePlayedPayload);
       },
     ),
   );
