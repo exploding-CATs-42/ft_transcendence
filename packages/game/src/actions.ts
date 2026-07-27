@@ -30,6 +30,7 @@ export const GameActions = {
   INSERT_KITTEN: "insertKitten",
   SET_NOPE_WINDOW: "setNopeWindow",
   CLEAR_NOPE_WINDOW: "clearNopeWindow",
+  ADD_NOPE: "addNope",
 } as const;
 
 export interface GameActionArgs {
@@ -376,4 +377,18 @@ export const setNopeWindow = ({ context, event }: GameActionArgs) => {
 
 export const clearNopeWindow = () => {
   return { nopeWindow: null };
+};
+
+export const addNope = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.PLAY_NOPE || !context.nopeWindow)
+    return context;
+
+  const nopeWindow: NopeWindow = {
+    ...context.nopeWindow,
+    nopeCount: context.nopeWindow.nopeCount + 1,
+    lastPlayerId: event.playerId,
+    endsAt: Date.now() + NOPE_WINDOW_MS,
+  };
+
+  return { nopeWindow };
 };
