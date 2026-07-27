@@ -4,6 +4,7 @@ import { Scene } from "phaser";
 import {
   type Card,
   type CardPayload,
+  type GameOverPayload,
   type KittenInsertedPayload,
 } from "@exploding-cats/game-core";
 import type {
@@ -557,6 +558,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onKittenDrawn = (): void => {
     console.log("EXPLODING KITTEN DRAWN");
+  };
+
+  onGameOver = (payload: GameOverPayload): void => {
+    console.log(`Game over, winner is ${payload.winner.name}`);
   };
 
   private cleanModal() {
