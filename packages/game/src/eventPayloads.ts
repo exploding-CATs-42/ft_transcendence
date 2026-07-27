@@ -18,3 +18,14 @@ export interface ShowedCardsToPlayerPayload {
   playerId: string;
   cards: Card[];
 }
+
+export interface PLayerDefusedPayload {
+  playerId: string;
+}
+
+export interface DefusePromptPayload {
+  playerId: string;
+  card: Card;
+  endsAt: number;
+  canDefuse: boolean;
+}
