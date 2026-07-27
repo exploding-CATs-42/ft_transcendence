@@ -6,6 +6,7 @@ import type {
   DefusePromptPayload,
   PLayerDefusedPayload,
   KittenInsertedPayload,
+  PLayerEliminatedPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -62,6 +63,7 @@ export const GameOutEvents = {
   PLAYER_DEFUSED: "PLAYER_DEFUSED",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
   KITTEN_INSERTED: "KITTEN_INSERTED",
+  PLAYER_ELIMINATED: "PLAYER_ELIMINATED",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -90,6 +92,10 @@ export type GameOutEvent =
       payload: ShowedCardsToPlayerPayload;
     }
   | { type: typeof GameOutEvents.EXPLODING_KITTEN_DRAWN }
+  | {
+      type: typeof GameOutEvents.PLAYER_ELIMINATED;
+      payload: PLayerEliminatedPayload;
+    }
   | {
       type: typeof GameOutEvents.PLAYER_DEFUSED;
       payload: PLayerDefusedPayload;
