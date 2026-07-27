@@ -37,6 +37,7 @@ import { attachGameBroadcaster } from "sockets";
 import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
+import { SelectPlayerPayload } from "schemas/games/selectPlayerSchema";
 
 function ensureGameExists(gameId: string) {
   const game = GameRepository.getGame(gameId);
@@ -374,6 +375,18 @@ export async function drawCard(input: DrawCardParams, userId: UserId) {
   }
 
   return { playerId: player.id, card: lastDrawnCardAfter };
+}
+
+export async function selectPlayer(input: SelectPlayerPayload, userId: UserId) {
+  const { game } = await requirePlayerInGame(userId, input.gameId);
+  await requirePlayerInGame(input.playerId, input.gameId);
+
+  game.instance.send({
+    type: GameEvents.SELECT_PLAYER,
+    playerId: input.playerId,
+  });
+
+  return { playerId: input.playerId };
 }
 
 function getPlayableCard(player: Player, cardId: number): Card {
