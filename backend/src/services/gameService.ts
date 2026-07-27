@@ -389,10 +389,11 @@ export async function playCard(input: PlayCardParams, userId: UserId) {
   ) {
     throw new SocketError("Could not play card");
   }
+
   return {
     playerId: player.id,
     card: lastPlayedCard,
-    nopeWindowExpiresAt: nopeWindow?.endsAt ?? 0,
+    nopeWindowExpiresAt: nopeWindow.endsAt,
   };
 }
 
