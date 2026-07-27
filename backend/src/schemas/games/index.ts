@@ -13,3 +13,4 @@ export * from "./playDefuseSchema";
 export * from "./insertKittenSchema";
 export * from "./playNopeSchema";
 export * from "./selectPlayerSchema";
+export * from "./giveCardSchema";
