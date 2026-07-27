@@ -74,7 +74,7 @@
     "name": "Nope",
     "description": "Stop any action except an Exploding Kitten or a Defuse. Can be played at any time before an action resolves, even on another player's turn. A Nope can be Noped to create a Yup, and so on.",
     "count": 5,
-    "playable": true,
+    "playable": false,
     "targetRequired": false,
     "comboEligible": true,
     "playableOutOfTurn": true
