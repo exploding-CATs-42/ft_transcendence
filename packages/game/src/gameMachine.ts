@@ -25,6 +25,7 @@ import {
   playCombo,
   setDefuseCountdownEndsAt,
   defuseExplodingKitten,
+  insertKitten,
 } from "./actions";
 import { CardType } from "./types";
 import type { Player, Deck, Card } from "./types";
@@ -46,6 +47,7 @@ import {
   gameStarted,
   showedTopThreeCards,
   kittenDrawn,
+  kittenInserted,
   playerDefused,
   turnChanged,
   turnSkipped,
@@ -89,6 +91,7 @@ export const gameMachine = setup({
       setDefuseCountdownEndsAt,
     ),
     [GameActions.DEFUSE_KITTEN]: assign(defuseExplodingKitten),
+    [GameActions.INSERT_KITTEN]: assign(insertKitten),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -302,7 +305,14 @@ export const gameMachine = setup({
             },
           },
         },
-        [GameStates.WAITING_FOR_KITTEN_INSERTION]: {},
+        [GameStates.WAITING_FOR_KITTEN_INSERTION]: {
+          on: {
+            [GameEvents.INSERT_KITTEN]: {
+              actions: [GameActions.INSERT_KITTEN, emit(kittenInserted)],
+              target: GameTargets.CHANGING_TURN,
+            },
+          },
+        },
         [GameStates.EXPLODING_PLAYER]: {},
       },
     },
