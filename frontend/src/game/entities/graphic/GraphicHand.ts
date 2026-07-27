@@ -40,6 +40,12 @@ const SELECTED_CARD_GLOW_BY_COUNT = {
 type onCardDropCallback = (card: GraphicCard) => void;
 type KindCombo = "two-of-a-kind" | "three-of-a-kind";
 
+export interface SingleCardSelection {
+  kind: "single-card";
+  cardId: number;
+  cardType: CardType;
+}
+
 export interface KindComboSelection {
   kind: KindCombo;
   label: "two of a kind" | "three of a kind";
@@ -47,9 +53,9 @@ export interface KindComboSelection {
   cardType: CardType;
 }
 
-type OnKindComboSelectionChange = (
-  selection: KindComboSelection | null,
-) => void;
+export type CardPlaySelection = SingleCardSelection | KindComboSelection;
+
+type OnKindComboSelectionChange = (selection: CardPlaySelection | null) => void;
 type OnKindComboPlay = () => void;
 
 interface GraphicHandOptions {
@@ -334,7 +340,7 @@ export class GraphicHand {
     this.updateCardsDraggability();
     this.updateCardSelectionStyles();
     this.reflowCards();
-    this.#onKindComboSelectionChange?.(this.getKindComboSelection());
+    this.#onKindComboSelectionChange?.(this.getCardPlaySelection());
   }
 
   private getKindComboSelection(): KindComboSelection | null {
@@ -355,6 +361,22 @@ export class GraphicHand {
       cardIds: selectedCards.map((card) => card.data.id),
       cardType: selectedCard.data.type,
     };
+  }
+
+  private getCardPlaySelection(): CardPlaySelection | null {
+    const selectedCards = this.getSelectedGraphicCards();
+
+    if (selectedCards.length === 1) {
+      const selectedCard = selectedCards[0]!;
+
+      return {
+        kind: "single-card",
+        cardId: selectedCard.data.id,
+        cardType: selectedCard.data.type,
+      };
+    }
+
+    return this.getKindComboSelection();
   }
 
   private attachCardHoverHandler(cardImage: Phaser.GameObjects.Image) {
