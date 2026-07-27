@@ -382,7 +382,11 @@ export async function playCard(input: PlayCardParams, userId: UserId) {
 
   const { lastPlayedCards, nopeWindow } = game.instance.getSnapshot().context;
   const lastPlayedCard = lastPlayedCards?.[0];
-  if (!lastPlayedCards || lastPlayedCards.length !== 1 || !lastPlayedCard) {
+  if (
+    lastPlayedCards?.length !== 1 ||
+    lastPlayedCard?.id !== card.id ||
+    !nopeWindow
+  ) {
     throw new SocketError("Could not play card");
   }
   return {
