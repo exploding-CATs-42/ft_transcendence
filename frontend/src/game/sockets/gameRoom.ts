@@ -10,7 +10,10 @@ import {
   type PlayerIdPayload,
   type SeeTheFuturePeekPayload,
 } from "@exploding-cats/contracts";
-import type { CardPayload } from "@exploding-cats/game-core";
+import type {
+  CardPayload,
+  KittenInsertedPayload,
+} from "@exploding-cats/game-core";
 import { socket } from "socket";
 import { emit, leaveGame } from "./gameSession";
 
@@ -30,6 +33,7 @@ export interface GameRoomHandlers {
   onComboPlayed(payload: ComboPlayedPayload): void;
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
   onKittenDrawn(): void;
+  onKittenInserted(payload: KittenInsertedPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -64,6 +68,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.CARD_PLAYED, handlers.onCardPlayed],
     [ServerPrivateEvents.DEFUSE_PROMPT, handlers.onDefusePrompt],
     [ServerPublicEvents.PLAYER_DEFUSED, handlers.onPlayerDefused],
+    [ServerPublicEvents.KITTEN_INSERTED, handlers.onKittenInserted],
     [ServerPublicEvents.EXPLODING_KITTEN_DRAWN, handlers.onKittenDrawn],
     [ServerPublicEvents.PLAYER_DISCONNECTED, handlers.onPlayerDisconnected],
     [ServerPublicEvents.PLAYER_RECONNECTED, handlers.onPlayerReconnected],
