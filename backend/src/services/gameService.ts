@@ -7,6 +7,7 @@ import {
   DeleteGameParams,
   DrawCardParams,
   GetGameParams,
+  InsertKittenParams,
   JoinGameParams,
   LeaveGameParams,
   PLayCardParams,
@@ -425,4 +426,20 @@ export async function playDefuse(input: PlayDefuseParams, userId: UserId) {
   }
 
   return { playerId: player.id, card };
+}
+
+export async function insertKitten(input: InsertKittenParams, userId: UserId) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+
+  game.instance.send({
+    type: GameEvents.INSERT_KITTEN,
+    explodingKittenPosition: input.explodingKittenPosition,
+  });
+
+  const lastDrawnCard = game.instance.getSnapshot().context.lastDrawnCard;
+  if (!lastDrawnCard) {
+    throw new SocketError("Could not remove exploding kitten from hand");
+  }
+
+  return { playerId: player.id, card: lastDrawnCard };
 }
