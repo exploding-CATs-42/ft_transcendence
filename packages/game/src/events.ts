@@ -3,6 +3,8 @@ import type {
   ShowedCardsToPlayerPayload,
   TurnChangedPayload,
   TurnSkippedPayload,
+  DefusePromptPayload,
+  PLayerDefusedPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -51,6 +53,8 @@ export const GameOutEvents = {
   TURN_SKIPPED: "TURN_SKIPPED",
   SHOWED_TOP_CARDS: "SHOWED_TOP_CARDS",
   EXPLODING_KITTEN_DRAWN: "EXPLODING_KITTEN_DRAWN",
+  PLAYER_DEFUSED: "PLAYER_DEFUSED",
+  DEFUSE_PROMPT: "DEFUSE_PROMPT",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -78,4 +82,12 @@ export type GameOutEvent =
       type: typeof GameOutEvents.SHOWED_TOP_CARDS;
       payload: ShowedCardsToPlayerPayload;
     }
-  | { type: typeof GameOutEvents.EXPLODING_KITTEN_DRAWN };
+  | { type: typeof GameOutEvents.EXPLODING_KITTEN_DRAWN }
+  | {
+      type: typeof GameOutEvents.PLAYER_DEFUSED;
+      payload: PLayerDefusedPayload;
+    }
+  | {
+      type: typeof GameOutEvents.DEFUSE_PROMPT;
+      payload: DefusePromptPayload;
+    };
