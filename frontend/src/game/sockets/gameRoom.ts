@@ -90,4 +90,7 @@ export const playCard = (cardId: number) =>
 export const playCombo = (cardIds: number[]) =>
   emit(ClientEvents.PLAY_COMBO, { cardIds });
 export const playDefuse = () => emit(ClientEvents.PLAY_DEFUSE);
+export const insertKitten = (explodingKittenPosition: number) =>
+  emit(ClientEvents.INSERT_KITTEN, { explodingKittenPosition });
+
 export const leaveCurrentGame = leaveGame;
