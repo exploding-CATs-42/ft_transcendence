@@ -87,6 +87,13 @@ export const kittenInserted = ({ context }: GameEmitterArgs): GameOutEvent => ({
   },
 });
 
+export const playerEliminated = ({
+  context,
+}: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.PLAYER_ELIMINATED,
+  payload: { playerId: context.currentTurnPlayerId! },
+});
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,
