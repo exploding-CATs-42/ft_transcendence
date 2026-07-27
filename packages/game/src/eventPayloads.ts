@@ -34,3 +34,7 @@ export interface KittenInsertedPayload {
   playerId: string;
   cardId: number;
 }
+
+export interface PLayerEliminatedPayload {
+  playerId: string;
+}
