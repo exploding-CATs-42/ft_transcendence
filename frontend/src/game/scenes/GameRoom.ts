@@ -216,11 +216,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const opponentSeat = new PlayerSeat(this, GAME_ROOM_SEATS[i]!);
       opponentSeat.addPlayer(opponent);
       opponentSeat.addHand(this.#opponents.get(opponent.id)!);
-
-      // -------------- REMOVE THIS LATER --------------
-      opponentSeat.explodePlayer(this);
-      // -----------------------------------------------
-
       this.#players.set(opponent.id, opponentSeat);
     }
   }
