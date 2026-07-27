@@ -754,7 +754,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardGiven(payload: CardGivenPayload): void {
-    console.log(payload);
+    const { playerIdFrom, playerIdTo } = payload;
+
+    if (this.#meId === playerIdFrom || this.#meId === playerIdTo) return;
+
+    this.#opponents.get(playerIdFrom)?.removeCard();
+    this.#opponents.get(playerIdTo)?.addCard();
   }
 
   private cleanup = () => {
