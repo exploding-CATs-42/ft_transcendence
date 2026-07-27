@@ -11,3 +11,4 @@ export * from "./playCardSchema";
 export * from "./playComboSchema";
 export * from "./playDefuseSchema";
 export * from "./insertKittenSchema";
+export * from "./playNopeSchema";
