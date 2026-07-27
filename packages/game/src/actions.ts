@@ -22,6 +22,7 @@ export const GameActions = {
   SKIP_TURN: "skipTurn",
   PLAY_COMBO: "playCombo",
   DEFUSE_KITTEN: "defuseExplodingKitten",
+  EXPLODE_PLAYER: "explodePlayer",
   INSERT_KITTEN: "insertKitten",
 } as const;
 
@@ -290,6 +291,18 @@ export const defuseExplodingKitten = ({ context, event }: GameActionArgs) => {
     players: updatedPlayers,
     lastPlayedCard: defuseCard!,
   };
+};
+
+export const explodePlayer = ({ context }: GameActionArgs) => {
+  const players = context.players.map((player) =>
+    player.id !== context.currentTurnPlayerId
+      ? player
+      : {
+          ...player,
+          isAlive: false,
+        },
+  );
+  return { players };
 };
 
 export const insertKitten = ({ context, event }: GameActionArgs) => {
