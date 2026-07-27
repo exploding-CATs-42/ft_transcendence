@@ -9,6 +9,7 @@ export const ClientEvents = {
   PLAY_COMBO: "play-combo",
   PLAY_DEFUSE: "play-defuse",
   INSERT_KITTEN: "insert-kitten",
+  PLAY_NOPE: "play-nope",
 } as const;
 
 export const ServerPublicEvents = {
