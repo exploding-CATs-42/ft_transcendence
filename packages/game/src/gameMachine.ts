@@ -25,6 +25,7 @@ import {
   playCombo,
   setDefuseCountdownEndsAt,
   defuseExplodingKitten,
+  explodePlayer,
   insertKitten,
 } from "./actions";
 import { CardType } from "./types";
@@ -51,6 +52,7 @@ import {
   playerDefused,
   turnChanged,
   turnSkipped,
+  playerEliminated,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -92,6 +94,7 @@ export const gameMachine = setup({
     ),
     [GameActions.DEFUSE_KITTEN]: assign(defuseExplodingKitten),
     [GameActions.INSERT_KITTEN]: assign(insertKitten),
+    [GameActions.EXPLODE_PLAYER]: assign(explodePlayer),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -313,7 +316,10 @@ export const gameMachine = setup({
             },
           },
         },
-        [GameStates.EXPLODING_PLAYER]: {},
+        [GameStates.EXPLODING_PLAYER]: {
+          entry: [GameActions.EXPLODE_PLAYER, emit(playerEliminated)],
+          target: GameTargets.CHANGING_TURN,
+        },
       },
     },
   },
