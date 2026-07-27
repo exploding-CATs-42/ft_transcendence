@@ -445,17 +445,32 @@ export async function playDefuse(input: PlayDefuseParams, userId: UserId) {
 
 export async function insertKitten(input: InsertKittenParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
-  ensurePlayersTurn(game.instance.getSnapshot().context, player);
+
+  const beforeContext = game.instance.getSnapshot().context;
+  ensurePlayersTurn(beforeContext, player);
+
+  const card = beforeContext.lastDrawnCard;
+  if (!card || card.type !== CardType.EXPLODING_KITTEN) {
+    throw new SocketError("No exploding kitten to insert");
+  }
+  const deckSizeBefore = beforeContext.deck.length;
 
   game.instance.send({
     type: GameEvents.INSERT_KITTEN,
     explodingKittenPosition: input.explodingKittenPosition,
   });
 
-  const lastDrawnCard = game.instance.getSnapshot().context.lastDrawnCard;
-  if (!lastDrawnCard) {
-    throw new SocketError("Could not remove exploding kitten from hand");
+  const afterContext = game.instance.getSnapshot().context;
+  const updatedPlayer = afterContext.players.find((p) => p.id === player.id);
+
+  const wasRemovedFromHand =
+    updatedPlayer !== undefined &&
+    !updatedPlayer.hand.some((c) => c.id === card.id);
+
+  const wasInsertedIntoDeck = afterContext.deck.length === deckSizeBefore + 1;
+  if (!wasRemovedFromHand || !wasInsertedIntoDeck) {
+    throw new SocketError("Could not insert exploding kitten");
   }
 
-  return { playerId: player.id, card: lastDrawnCard };
+  return { playerId: player.id, card };
 }
