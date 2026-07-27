@@ -29,3 +29,8 @@ export interface DefusePromptPayload {
   endsAt: number;
   canDefuse: boolean;
 }
+
+export interface KittenInsertedPayload {
+  playerId: string;
+  cardId: number;
+}
