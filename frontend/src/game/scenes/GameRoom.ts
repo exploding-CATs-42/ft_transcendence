@@ -48,6 +48,7 @@ import {
   SeeTheFutureView,
   ExplodingKittenDrawnView,
   ExplodingKittenInsertionView,
+  NopeButton,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -101,10 +102,10 @@ const SHUFFLE_ANIMATION_POSITION = {
 
 const SKIP_VIEW_DURATION_MS = 2000;
 
-// const NOPE_BUTTON_POSITION = {
-//   x: 1700,
-//   y: 800,
-// };
+const NOPE_BUTTON_POSITION = {
+  x: 1700,
+  y: 800,
+};
 
 // -------------------- MY HAND --------------------
 const HAND_POSITION: Point = {
@@ -153,6 +154,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #modal!: Modal;
   #drawPileSize: number = 0;
   #attackCount = 1;
+  #nopeButton!: NopeButton;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -178,6 +180,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
     this.addLeaveGameButton();
+    this.#nopeButton = new NopeButton(this, NOPE_BUTTON_POSITION);
 
     const graphicPlayers = this.createPlayers(players);
     this.createOpponentHands(graphicPlayers);
@@ -526,6 +529,22 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#discardPile?.disableInteractive(true);
   }
 
+  private startNopeWindow = (
+    lastPlayerId: string,
+    nopeWindowExpiresAt: number,
+  ) => {
+    const durationMs = nopeWindowExpiresAt - Date.now();
+    if (durationMs <= 0) return;
+
+    if (lastPlayerId !== this.#meId) {
+      this.#nopeButton.showAnimated();
+    }
+
+    this.time.delayedCall(durationMs, () => {
+      this.#nopeButton.hide();
+    });
+  };
+
   onCardRemoved = (payload: CardRemovedPayload): void => {
     this.#myHand.removeCard(payload.cardId);
   };
@@ -536,6 +555,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.cardType];
     const cardFrame = getCardFrame(this, frameIndex);
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
+    this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
   };
 
   onTurnSkipped = (payload: TurnSkippedPayload): void => {
