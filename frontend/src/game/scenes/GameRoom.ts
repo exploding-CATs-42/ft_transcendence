@@ -548,12 +548,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (lastPlayerId !== this.#meId && myNopeCardId !== null) {
       this.#nopeButton.onClick = () => this.playNope(myNopeCardId);
-      this.#nopeButton.showAnimated();
+      this.#nopeButton.showAnimated(durationMs);
     }
-
-    this.time.delayedCall(durationMs, () => {
-      this.#nopeButton.hide();
-    });
   };
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
