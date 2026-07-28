@@ -1,9 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { createActor } from "xstate";
+import { describe, expect, it, vi } from "vitest";
 import {
   CardType,
   GameEvents,
   GameOutEvents,
+  GameStates,
+  NOPE_WINDOW_MS,
   changeTurn,
+  changeTurnUnderAttack,
+  gameMachine,
   playCard,
   skipTurn,
   turnChanged,
@@ -72,6 +77,7 @@ const createContext = (overrides: Partial<GameContext> = {}): GameContext => ({
   countdownEndsAt: null,
   turnsCount: 1,
   isUnderAttack: false,
+  nopeWindow: null,
   ...overrides,
 });
 
@@ -83,7 +89,7 @@ const applyAttack = (context: GameContext): GameContext => {
 
   return {
     ...contextAfterPlaying,
-    ...changeTurn({
+    ...changeTurnUnderAttack({
       context: contextAfterPlaying,
       event: ATTACK_EVENT,
     }),
@@ -91,6 +97,40 @@ const applyAttack = (context: GameContext): GameContext => {
 };
 
 describe("Attack card", () => {
+  it("applies the effect after the Nope window resolves", () => {
+    vi.useFakeTimers();
+
+    const snapshot = gameMachine.resolveState({
+      value: {
+        [GameStates.PLAYING]: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+      },
+      context: createContext(),
+    });
+    const actor = createActor(gameMachine, { snapshot });
+    let emittedAttackCount: number | null = null;
+
+    actor.on(GameOutEvents.TURN_CHANGED, (event) => {
+      emittedAttackCount = event.payload.attackCount;
+    });
+
+    try {
+      actor.start();
+      actor.send(ATTACK_EVENT);
+      vi.advanceTimersByTime(NOPE_WINDOW_MS);
+
+      const context = actor.getSnapshot().context;
+
+      expect(context.currentTurnPlayerId).toBe("2");
+      expect(context.turnsCount).toBe(2);
+      expect(context.isUnderAttack).toBe(true);
+      expect(context.nopeWindow).toBeNull();
+      expect(emittedAttackCount).toBe(2);
+    } finally {
+      actor.stop();
+      vi.useRealTimers();
+    }
+  });
+
   it("ends the turn without drawing and gives the next player 2 draws", () => {
     const context = createContext();
     const deckBeforeAttack = [...context.deck];
