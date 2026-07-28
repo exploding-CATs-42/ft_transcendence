@@ -558,10 +558,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
   };
 
+  onNopeWindowResolved = (): void => {
+    this.#nopeButton.hide();
+  };
+
   onTurnSkipped = (payload: TurnSkippedPayload): void => {
     this.#attackCount = payload.attackCount;
     this.updateAttackIndicator();
-
     const playerName = this.#players.get(payload.playerId)?.player?.name;
     if (!playerName) return;
 
