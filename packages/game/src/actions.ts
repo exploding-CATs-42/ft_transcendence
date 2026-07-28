@@ -367,10 +367,19 @@ export const insertKitten = ({ context, event }: GameActionArgs) => {
 };
 
 export const setNopeWindow = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEvents.PLAY_CARD) return context;
+  if (
+    event.type !== GameEvents.PLAY_CARD &&
+    event.type !== GameEvents.PLAY_COMBO
+  ) {
+    return context;
+  }
+
+  const lastPlayedCards = context.lastPlayedCards;
+
+  if (!lastPlayedCards?.length) return context;
 
   const nopeWindow: NopeWindow = {
-    card: event.card,
+    cards: lastPlayedCards,
     lastPlayerId: event.playerId,
     nopeCount: 0,
     endsAt: Date.now() + NOPE_WINDOW_MS,

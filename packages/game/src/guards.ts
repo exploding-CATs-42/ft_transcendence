@@ -74,7 +74,12 @@ export const isOnlyOnePlayerLeftAlive = ({ context }: GameGuardArgs) => {
 };
 
 export const isPlayersTurn = ({ context, event }: GameGuardArgs) => {
-  if (event.type !== GameEvents.PLAY_CARD) return false;
+  if (
+    event.type !== GameEvents.PLAY_CARD &&
+    event.type !== GameEvents.PLAY_COMBO
+  ) {
+    return false;
+  }
 
   return context.currentTurnPlayerId === event.playerId;
 };
@@ -83,7 +88,12 @@ export const isWindowCardOfType = (
   { context }: GameGuardArgs,
   params: { cardType: CardType },
 ) => {
-  return context.nopeWindow?.card.type === params.cardType;
+  const cards = context.nopeWindow?.cards;
+
+  // Only a single card can match a type, combos (e.g. two Skips) must not trigger single-card transitions.
+  if (cards?.length !== 1) return false;
+
+  return cards[0]!.type === params.cardType;
 };
 
 export const isNoped = ({ context }: GameGuardArgs) => {

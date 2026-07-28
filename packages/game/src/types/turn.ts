@@ -1,7 +1,7 @@
 import { type Card, CardType } from "./card";
 
 export interface NopeWindow {
-  card: Card;
+  cards: Card[];
   lastPlayerId: string;
   nopeCount: number;
   endsAt: number;
