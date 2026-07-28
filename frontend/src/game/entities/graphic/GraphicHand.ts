@@ -78,6 +78,8 @@ export class GraphicHand {
   #onKindComboSelectionChange: OnKindComboSelectionChange | null;
   #onKindComboPlay: OnKindComboPlay | null;
   #isMyTurn: () => boolean;
+  #isFavorModeActive: () => boolean;
+  #giveCard: (cardId: number) => void;
 
   constructor(
     scene: Phaser.Scene,
@@ -85,6 +87,8 @@ export class GraphicHand {
     onCardDropCallback: onCardDropCallback,
     isMyTurn: () => boolean,
     options: GraphicHandOptions = {},
+    isFavorModeActive: () => boolean,
+    giveCard: (cardId: number) => void,
   ) {
     this.#scene = scene;
     this.#position = position;
@@ -93,6 +97,8 @@ export class GraphicHand {
       options.onKindComboSelectionChange ?? null;
     this.#onKindComboPlay = options.onKindComboPlay ?? null;
     this.#isMyTurn = isMyTurn;
+    this.#isFavorModeActive = isFavorModeActive;
+    this.#giveCard = giveCard;
   }
 
   // -------------- Public API --------------
@@ -255,7 +261,6 @@ export class GraphicHand {
   removeCard(cardId: number) {
     const card = this.#cardsData.get(cardId)!;
     const cardImage = card.image;
-    const cardData = card.data;
     const wasSelected = this.#selectedCardIds.includes(cardId);
 
     this.#cards = this.#cards.filter((c) => c !== cardImage);
@@ -274,11 +279,8 @@ export class GraphicHand {
       this.reflowCards();
     }
 
-    const graphicCard: GraphicCard = {
-      image: cardImage,
-      data: cardData,
-    };
-    this.#onCardDropCallback(graphicCard);
+    this.#onCardDropCallback(card);
+    return card;
   }
 
   private attachCardDropHandler(graphicCard: GraphicCard) {
@@ -286,12 +288,16 @@ export class GraphicHand {
     const cardImage = graphicCard.image;
 
     cardImage.on("drop", () => {
-      if (this.canPlayKindComboWithCard(cardData.id)) {
-        this.playKindCombo();
-        return;
-      }
+      if (this.#isFavorModeActive()) {
+        this.#giveCard(graphicCard.data.id);
+      } else {
+        if (this.canPlayKindComboWithCard(cardData.id)) {
+          this.playKindCombo();
+          return;
+        }
 
-      this.playCard(cardData.id);
+        this.playCard(cardData.id);
+      }
     });
   }
 

@@ -124,3 +124,8 @@ export const selectPlayer = (playerId: string) =>
   emit(ClientEvents.SELECT_PLAYER, { playerId });
 
 export const leaveCurrentGame = leaveGame;
+export const giveCard = (
+  playerIdFrom: string,
+  playerIdTo: string,
+  cardId: number,
+) => emit(ClientEvents.GIVE_CARD, { playerIdFrom, playerIdTo, cardId });

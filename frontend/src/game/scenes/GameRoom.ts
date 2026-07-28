@@ -60,6 +60,7 @@ import {
   attachGameRoomSockets,
   drawCard,
   playDefuse,
+  giveCard,
   leaveCurrentGame,
   playCard,
   playCombo,
@@ -147,6 +148,15 @@ const LEAVE_BUTTON_POSITION: Point = {
   y: 24,
 };
 
+// -------------------- FAVOR --------------------
+
+const FAVOR_CARD_DROP_ZONE = {
+  x: HAND_POSITION.x - CARD_WIDTH / 2,
+  y: PILES_Y,
+  width: CARD_WIDTH,
+  height: CARD_HEIGHT,
+};
+
 // -------------------- GAME ROOM --------------------
 export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
@@ -167,7 +177,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #modal!: Modal;
   #attackCount = 1;
   #nopeButton!: NopeButton;
-  #lastPlayedCard: Card | null = null;
+  #favorCardDropZone!: Phaser.GameObjects.Graphics;
+  #favorModeActive: boolean = false;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -221,6 +232,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.addShuffleAnimationObject();
     this.addModalWindowObject();
+    this.createFavorCardDropZone();
+    this.hideFavorUI();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -251,21 +264,44 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private isMyTurn = () => this.#meId === this.#currentTurnPlayerId;
+  private isFavorModeActive = () => this.#favorModeActive;
+
+  private giveCard = (cardId: number) => {
+    giveCard(this.#meId!, this.#currentTurnPlayerId!, cardId);
+  };
 
   private createMyHand() {
     const onCardDrop = (card: GraphicCard) => {
-      // move it to the discard pile and shrink it down to pile size
-      this.tweens.add({
-        targets: card.image,
-        x: DISCARD_PILE_POSITION.x,
-        y: DISCARD_PILE_POSITION.y,
-        displayWidth: CARD_WIDTH,
-        displayHeight: CARD_HEIGHT,
-        duration: CARD_TO_DISCARD_DURATION_MS,
-        ease: CARD_TO_DISCARD_EASE,
-      });
-
-      this.#lastPlayedCard = card.data;
+      if (this.#favorModeActive) {
+        this.tweens.add({
+          targets: card.image,
+          x: FAVOR_CARD_DROP_ZONE.x,
+          y: FAVOR_CARD_DROP_ZONE.y,
+          displayWidth: CARD_WIDTH,
+          displayHeight: CARD_HEIGHT,
+          duration: 300,
+          ease: "Back.Out",
+          onComplete: () => {
+            card.image.destroy();
+            this.hideFavorUI();
+          },
+        });
+      } else {
+        // move it to the discard pile and shrink it down to pile size
+        this.tweens.add({
+          targets: card.image,
+          x: DISCARD_PILE_POSITION.x,
+          y: DISCARD_PILE_POSITION.y,
+          displayWidth: CARD_WIDTH,
+          displayHeight: CARD_HEIGHT,
+          duration: CARD_TO_DISCARD_DURATION_MS,
+          ease: CARD_TO_DISCARD_EASE,
+          onComplete: () => {
+            this.#discardPile?.destroy();
+            this.#discardPile = card.image;
+          },
+        });
+      }
     };
 
     this.#myHand = new GraphicHand(
@@ -277,6 +313,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         onKindComboSelectionChange: this.emitKindComboSelectionChange,
         onKindComboPlay: this.playSelectedKindCombo,
       },
+      this.isFavorModeActive,
+      this.giveCard,
     );
   }
 
@@ -362,6 +400,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#modal = new Modal(this).setVisible(false);
   }
 
+  private createFavorCardDropZone() {
+    const { x, y, width, height } = FAVOR_CARD_DROP_ZONE;
+
+    const outline = this.add.graphics();
+    outline.lineStyle(4, 0xffffff, 1);
+    outline.strokeRoundedRect(x, y, width, height, CARD_BORDER_RADIUS);
+
+    this.#favorCardDropZone = outline;
+  }
+
   // -------------------- UTILS --------------------
 
   private addCard(frame: Phaser.Textures.Frame, position: Point) {
@@ -438,6 +486,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     selectPlayer(playerId);
   };
 
+  private hideFavorUI() {
+    this.#favorModeActive = false;
+    this.#favorCardDropZone.setVisible(false);
+    this.#discardPile?.setVisible(true);
+    this.#drawPile?.setVisible(true);
+  }
+
+  private showFavorUI() {
+    this.#favorModeActive = true;
+    this.#favorCardDropZone.setVisible(true);
+    this.#discardPile?.setVisible(false);
+    this.#drawPile?.setVisible(false);
+  }
+
   // -------------------- SOCKETS --------------------
 
   onGameState = (payload: GameStatePayload): void => {
@@ -463,29 +525,38 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     if (cardCount === 0) targetX = HAND_POSITION.x;
     else targetX = startX + spacing * insertIndex - spacing / 2;
 
-    // Create face down card
-    const cardCover = this.textures.get(Textures.cardCover).get();
-    const faceDownCard = this.addCard(cardCover, DRAW_PILE_POSITION);
+    if (!this.#favorModeActive) {
+      // Create face down card
+      const cardCover = this.textures.get(Textures.cardCover).get();
+      const faceDownCard = this.addCard(cardCover, DRAW_PILE_POSITION);
 
-    // and move it below the screen
-    // at the x position calculated earlier
-    this.tweens.add({
-      targets: faceDownCard,
-      x: targetX,
-      y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
-      duration: CARD_FROM_DRAW_PILE_DURATION_MS,
-      ease: CARD_FROM_DRAW_PILE_EASE,
+      // and move it below the screen
+      // at the x position calculated earlier
+      this.tweens.add({
+        targets: faceDownCard,
+        x: targetX,
+        y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
+        duration: CARD_FROM_DRAW_PILE_DURATION_MS,
+        ease: CARD_FROM_DRAW_PILE_EASE,
 
-      onComplete: () => {
-        // then destroy it
-        faceDownCard.destroy();
+        onComplete: () => {
+          // then destroy it
+          faceDownCard.destroy();
 
-        // and spawn the real card into player's hand
-        const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
-        const frame = getCardFrame(this, frameIndex);
-        this.#myHand.addCard(payload.card, frame, insertIndex);
-      },
-    });
+          // and spawn the real card into player's hand
+          const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
+          const frame = getCardFrame(this, frameIndex);
+          this.#myHand.addCard(payload.card, frame, insertIndex);
+        },
+      });
+    } else {
+      this.#favorModeActive = false;
+
+      // spawn the card into player's hand
+      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
+      const frame = getCardFrame(this, frameIndex);
+      this.#myHand.addCard(payload.card, frame, insertIndex);
+    }
   };
 
   private drawOpponentCard(playerId: string) {
@@ -590,9 +661,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
-    this.#myHand.removeCard(payload.cardId);
+    const card = this.#myHand.removeCard(payload.cardId);
 
-    if (this.#lastPlayedCard?.type === CardType.FAVOR) {
+    if (this.isMyTurn() && card.data.type === CardType.FAVOR) {
+      this.#favorModeActive = true;
       this.showOpponentTargetIcons();
     }
   };
@@ -621,6 +693,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       displayHeight: CARD_HEIGHT,
       duration: CARD_TO_DISCARD_DURATION_MS,
       ease: CARD_TO_DISCARD_EASE,
+      onComplete: () => {
+        this.#discardPile?.destroy();
+        this.#discardPile = flyingCard;
+      },
     });
   }
 
@@ -751,16 +827,28 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       if (seat.player?.id !== playerId) players[i]?.setTargetIconVisible(false);
       else players[i]?.setTargetIconVisible(true);
     }
+
+    if (playerId === this.#meId) this.showFavorUI();
   };
 
-  onCardGiven(payload: CardGivenPayload): void {
+  onCardGiven = (payload: CardGivenPayload): void => {
+    const players = [...this.#players.values()];
+    for (let i = 0; i < players.length; ++i) {
+      const seat = players[i]!;
+      seat.setTargetIconVisible(false);
+    }
+
     const { playerIdFrom, playerIdTo } = payload;
 
-    if (this.#meId === playerIdFrom || this.#meId === playerIdTo) return;
-
-    this.#opponents.get(playerIdFrom)?.removeCard();
-    this.#opponents.get(playerIdTo)?.addCard();
-  }
+    if (this.#meId === playerIdFrom) {
+      this.#opponents.get(playerIdTo)?.addCard();
+    } else if (this.#meId === playerIdTo) {
+      this.#opponents.get(playerIdFrom)?.removeCard();
+    } else {
+      this.#opponents.get(playerIdFrom)?.removeCard();
+      this.#opponents.get(playerIdTo)?.addCard();
+    }
+  };
 
   private cleanup = () => {
     this.#detachSockets();

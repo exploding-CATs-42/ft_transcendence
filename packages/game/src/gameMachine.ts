@@ -421,6 +421,7 @@ export const gameMachine = setup({
                 params: { cardType: CardType.FAVOR },
               },
               actions: GameActions.PASS_CARD_BY_ID,
+              target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
             },
           },
         },

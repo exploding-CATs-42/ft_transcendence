@@ -76,7 +76,7 @@ services:
       retries: 10
     networks:
       - transcendence_net
-    
+
   prometheus:
     image: prom/prometheus:v2.55.1
     container_name: ft-prometheus
@@ -135,6 +135,7 @@ services:
       - prometheus
     networks:
       - transcendence_net
+
   libraries:
     build:
       context: ../..
