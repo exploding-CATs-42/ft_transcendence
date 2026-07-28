@@ -12,4 +12,5 @@ export const GameStates = {
   EXPLODING_PLAYER: "explodingPlayer",
   GAME_OVER: "gameOver",
   WAITING_FOR_NOPES: "waitingForNopes",
+  RESOLVING_NOPES: "resolvingNopes",
 } as const;
