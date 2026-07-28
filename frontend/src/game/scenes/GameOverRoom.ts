@@ -20,6 +20,8 @@ const LEAVE_BUTTON_POSITION: Point = {
   y: 24,
 };
 
+const BACKDROP_ALPHA = 0.35;
+
 export class GameOverRoom extends Scene implements GameOverRoomHandlers {
   constructor() {
     super(Scenes.GameOverRoom);
@@ -27,9 +29,23 @@ export class GameOverRoom extends Scene implements GameOverRoomHandlers {
 
   create() {
     this.addExplosionBackground();
+    this.addBackdrop();
 
     addFullscreenToggle(this);
     this.addLeaveGameButton();
+  }
+
+  private addBackdrop() {
+    this.add
+      .rectangle(
+        CENTER_X,
+        SCREEN_HEIGHT / 2,
+        SCREEN_WIDTH,
+        SCREEN_HEIGHT,
+        0x000000,
+        BACKDROP_ALPHA,
+      )
+      .setOrigin(0.5);
   }
 
   private addLeaveGameButton() {
