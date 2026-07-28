@@ -443,18 +443,23 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
     cardIds: cards.map((card) => card.id),
   });
 
-  const lastPlayedCards = game.instance.getSnapshot().context.lastPlayedCards;
+  const { lastPlayedCards, nopeWindow } = game.instance.getSnapshot().context;
   const lastPlayedCardIds = new Set(lastPlayedCards?.map((card) => card.id));
 
   if (
     !lastPlayedCards ||
     lastPlayedCards.length !== cards.length ||
-    cards.some((card) => !lastPlayedCardIds.has(card.id))
+    cards.some((card) => !lastPlayedCardIds.has(card.id)) ||
+    !nopeWindow
   ) {
     throw new SocketError("Could not play combo");
   }
 
-  return { playerId: player.id, cards: lastPlayedCards };
+  return {
+    playerId: player.id,
+    cards: lastPlayedCards,
+    nopeWindowExpiresAt: nopeWindow.endsAt,
+  };
 }
 
 export async function playDefuse(input: PlayDefuseParams, userId: UserId) {

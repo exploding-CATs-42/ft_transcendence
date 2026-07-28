@@ -249,7 +249,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.PLAY_COMBO_ERROR,
       async (parsed: PlayComboParams) => {
-        const { playerId, cards } = await playCombo(
+        const { playerId, cards, nopeWindowExpiresAt } = await playCombo(
           parsed,
           socket.data.user.id,
         );
@@ -268,7 +268,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const comboPlayedPayload: ComboPlayedPayload = {
           playerId,
           cardTypes: cards.map((card) => card.type),
-          nopeWindowExpiresAt: -1, // TODO: Replace with the real expiration timestamp.
+          nopeWindowExpiresAt,
         };
 
         socket

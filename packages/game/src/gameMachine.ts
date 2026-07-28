@@ -238,7 +238,9 @@ export const gameMachine = setup({
               target: GameStates.WAITING_FOR_NOPES,
             },
             [GameEvents.PLAY_COMBO]: {
-              actions: GameActions.PLAY_COMBO,
+              guard: GameGuards.IS_PLAYERS_TURN,
+              actions: [GameActions.PLAY_COMBO, GameActions.SET_NOPE_WINDOW],
+              target: GameStates.WAITING_FOR_NOPES,
             },
           },
         },
