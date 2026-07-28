@@ -71,6 +71,10 @@ export class GameOverRoom extends Scene implements GameOverRoomHandlers {
     this.addLeaveGameButton();
   }
 
+  // ---------------------------------------------------------------------------
+  // UI
+  // ---------------------------------------------------------------------------
+
   private addWinnerLabel() {
     const nameText = this.add.text(0, 0, this.#winnerName, {
       ...WINNER_LABEL_STYLE,
@@ -157,6 +161,10 @@ export class GameOverRoom extends Scene implements GameOverRoomHandlers {
 
     explosion.playAnimation();
   }
+
+  // ---------------------------------------------------------------------------
+  // Actions
+  // ---------------------------------------------------------------------------
 
   private leaveGame = () => {
     leaveFinishedGame();
