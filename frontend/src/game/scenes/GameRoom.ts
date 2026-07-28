@@ -663,6 +663,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const cardFrame = getCardFrame(this, frameIndex);
       this.addCard(cardFrame, DISCARD_PILE_POSITION);
     });
+
+    this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
   };
 
   onSeeTheFuturePeek = (payload: SeeTheFuturePeekPayload): void => {
