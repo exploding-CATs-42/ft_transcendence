@@ -2,7 +2,7 @@
 import { Scene } from "phaser";
 // Local level
 import { leaveFinishedGame, type GameOverRoomHandlers } from "game/sockets";
-import { Scenes, SCREEN_HEIGHT, SCREEN_WIDTH } from "game/constants";
+import { Scenes, SCREEN_HEIGHT, SCREEN_WIDTH, Textures } from "game/constants";
 import { Button } from "game/entities";
 import type { Point, Size } from "game/@types";
 import { addFullscreenToggle } from "game/utils";
@@ -22,6 +22,16 @@ const LEAVE_BUTTON_POSITION: Point = {
 
 const BACKDROP_ALPHA = 0.35;
 
+const CAT_SIZE: Size = {
+  width: 700,
+  height: 700,
+};
+
+const CAT_POSITION: Point = {
+  x: CENTER_X + 220,
+  y: SCREEN_HEIGHT - 330,
+};
+
 export class GameOverRoom extends Scene implements GameOverRoomHandlers {
   constructor() {
     super(Scenes.GameOverRoom);
@@ -30,9 +40,27 @@ export class GameOverRoom extends Scene implements GameOverRoomHandlers {
   create() {
     this.addExplosionBackground();
     this.addBackdrop();
+    this.addCoolCat();
 
     addFullscreenToggle(this);
     this.addLeaveGameButton();
+  }
+
+  private addCoolCat() {
+    const { width, height } = CAT_SIZE;
+
+    const cat = this.add
+      .image(CAT_POSITION.x, CAT_POSITION.y, Textures.coolCat)
+      .setOrigin(0.5)
+      .setDisplaySize(width, height);
+
+    this.tweens.add({
+      targets: cat,
+      displayWidth: { from: 0, to: width },
+      displayHeight: { from: 0, to: height },
+      ease: "Back.easeOut",
+      duration: 600,
+    });
   }
 
   private addBackdrop() {
