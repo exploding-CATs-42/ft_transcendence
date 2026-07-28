@@ -22,6 +22,8 @@ import {
   confirmedIconRoundedSquare,
   boomExplosionSpritesheet,
   fireSpriteSheet,
+  nuclearSpritesheet,
+  coolCat,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -82,6 +84,11 @@ export class Preloader extends Scene {
       frameWidth: 512,
       frameHeight: 288,
     });
+    this.load.spritesheet(Textures.nuclear, nuclearSpritesheet, {
+      frameWidth: 560,
+      frameHeight: 420,
+    });
+    this.load.image(Textures.coolCat, coolCat);
   }
 
   create() {
