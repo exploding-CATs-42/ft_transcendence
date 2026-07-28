@@ -246,91 +246,9 @@ export const gameMachine = setup({
         },
         [GameStates.WAITING_FOR_NOPES]: {
           after: {
-            [NOPE_WINDOW_MS]: [
-              {
-                guard: GameGuards.IS_NOPED,
-                actions: [
-                  emit(nopeWindowResolved),
-                  GameActions.CLEAR_NOPE_WINDOW,
-                ],
-                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-              },
-              {
-                guard: {
-                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
-                  params: { cardType: CardType.ATTACK },
-                },
-                actions: [
-                  emit(nopeWindowResolved),
-                  GameActions.CLEAR_NOPE_WINDOW,
-                ], // TODO: Apply attack effect
-                target: GameStates.CHANGING_TURN,
-              },
-              {
-                guard: and([
-                  {
-                    type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
-                    params: { cardType: CardType.SKIP },
-                  },
-                  GameGuards.HAS_EXTRA_TURNS,
-                ]),
-                actions: [
-                  emit(nopeWindowResolved),
-                  GameActions.SKIP_TURN,
-                  emit(turnSkipped),
-                  GameActions.CLEAR_NOPE_WINDOW,
-                ],
-                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-              },
-              {
-                guard: {
-                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
-                  params: { cardType: CardType.SKIP },
-                },
-                actions: [
-                  emit(nopeWindowResolved),
-                  emit(turnSkipped),
-                  GameActions.CLEAR_NOPE_WINDOW,
-                ],
-                target: GameStates.CHANGING_TURN,
-              },
-              {
-                guard: {
-                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
-                  params: { cardType: CardType.SHUFFLE },
-                },
-                actions: [
-                  emit(nopeWindowResolved),
-                  GameActions.SHUFFLE_DECK,
-                  emit(deckShuffled),
-                  GameActions.CLEAR_NOPE_WINDOW,
-                ],
-                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-              },
-              {
-                guard: {
-                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
-                  params: { cardType: CardType.SEE_THE_FUTURE },
-                },
-                actions: [
-                  emit(nopeWindowResolved),
-                  emit(showedTopThreeCards),
-                  GameActions.CLEAR_NOPE_WINDOW,
-                ],
-                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-              },
-              {
-                guard: {
-                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
-                  params: { cardType: CardType.FAVOR },
-                },
-                actions: [
-                  emit(nopeWindowResolved),
-                  GameActions.CLEAR_NOPE_WINDOW,
-                ], // TODO: Implement new game state for waiting for favor
-                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-              },
-            ],
+            [NOPE_WINDOW_MS]: {
+              target: GameStates.RESOLVING_NOPES,
+            },
           },
           on: {
             [GameEvents.PLAY_NOPE]: {
@@ -340,6 +258,67 @@ export const gameMachine = setup({
               reenter: true,
             },
           },
+        },
+        [GameStates.RESOLVING_NOPES]: {
+          entry: emit(nopeWindowResolved),
+          exit: GameActions.CLEAR_NOPE_WINDOW,
+          always: [
+            {
+              guard: GameGuards.IS_NOPED,
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+            {
+              guard: {
+                type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
+                params: { cardType: CardType.ATTACK },
+              },
+              actions: [], // TODO: Apply attack effect
+              target: GameStates.CHANGING_TURN,
+            },
+            {
+              guard: and([
+                {
+                  type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
+                  params: { cardType: CardType.SKIP },
+                },
+                GameGuards.HAS_EXTRA_TURNS,
+              ]),
+              actions: [GameActions.SKIP_TURN, emit(turnSkipped)],
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+            {
+              guard: {
+                type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
+                params: { cardType: CardType.SKIP },
+              },
+              actions: [emit(turnSkipped)],
+              target: GameStates.CHANGING_TURN,
+            },
+            {
+              guard: {
+                type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
+                params: { cardType: CardType.SHUFFLE },
+              },
+              actions: [GameActions.SHUFFLE_DECK, emit(deckShuffled)],
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+            {
+              guard: {
+                type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
+                params: { cardType: CardType.SEE_THE_FUTURE },
+              },
+              actions: [emit(showedTopThreeCards)],
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+            {
+              guard: {
+                type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
+                params: { cardType: CardType.FAVOR },
+              },
+              actions: [], // TODO: Implement new game state for waiting for favor
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+          ],
         },
         [GameStates.CHECKING_DRAWN_CARD]: {
           always: [
