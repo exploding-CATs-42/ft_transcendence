@@ -1,5 +1,5 @@
 import { Game } from "phaser";
-import { Boot, Preloader, WaitingRoom, GameRoom } from "./scenes";
+import { Boot, Preloader, WaitingRoom, GameRoom, GameOverRoom } from "./scenes";
 import { SCREEN_HEIGHT, SCREEN_WIDTH } from "./constants";
 
 //  Find out more information about the Game Config at:
@@ -12,7 +12,7 @@ const config: Phaser.Types.Core.GameConfig = {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
   },
-  scene: [Boot, Preloader, WaitingRoom, GameRoom],
+  scene: [Boot, Preloader, WaitingRoom, GameRoom, GameOverRoom],
 };
 
 const StartGame = (parent: HTMLDivElement) => {
