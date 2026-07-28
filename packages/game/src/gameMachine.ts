@@ -12,6 +12,7 @@ import {
   addPlayer,
   addPlayerConfirmation,
   changeTurn,
+  changeTurnUnderAttack,
   shufflePlayers,
   dealCards,
   drawCard,
@@ -100,6 +101,7 @@ export const gameMachine = setup({
     [GameActions.DEAL_CARDS]: assign(dealCards),
     [GameActions.SHUFFLE_PLAYERS]: assign(shufflePlayers),
     [GameActions.CHANGE_TURN]: assign(changeTurn),
+    [GameActions.CHANGE_TURN_UNDER_ATTACK]: assign(changeTurnUnderAttack),
     [GameActions.DRAW_CARD]: assign(drawCard),
     [GameActions.PLAY_CARD]: assign(playCard),
     [GameActions.SET_COUNTDOWN_ENDS_AT]: assign(setCountdownEndsAt),
@@ -272,8 +274,11 @@ export const gameMachine = setup({
                 type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                 params: { cardType: CardType.ATTACK },
               },
-              actions: [], // TODO: Apply attack effect
-              target: GameStates.CHANGING_TURN,
+              actions: [
+                GameActions.CHANGE_TURN_UNDER_ATTACK,
+                emit(turnChanged),
+              ],
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
             },
             {
               guard: and([
