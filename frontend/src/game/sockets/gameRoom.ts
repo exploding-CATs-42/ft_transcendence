@@ -7,6 +7,7 @@ import {
   type ComboPlayedPayload,
   type DefusePromptPayload,
   type GameStatePayload,
+  type NopePlayedPayload,
   type PlayerIdPayload,
   type SeeTheFuturePeekPayload,
   type TurnChangedPayload,
@@ -39,6 +40,7 @@ export interface GameRoomHandlers {
   onKittenDrawn(): void;
   onKittenInserted(payload: KittenInsertedPayload): void;
   onGameOver(payload: GameOverPayload): void;
+  onNopePlayed(payload: NopePlayedPayload): void;
   onNopeWindowResolved(): void;
 }
 
@@ -84,6 +86,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
     [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
     [ServerPublicEvents.GAME_OVER, handlers.onGameOver],
+    [ServerPublicEvents.NOPE_PLAYED, handlers.onNopePlayed],
     [ServerPublicEvents.NOPE_WINDOW_RESOLVED, handlers.onNopeWindowResolved],
   ] as const;
 
