@@ -104,6 +104,10 @@ export function attachGameBroadcaster(game: Game) {
 
     io.to(gameId).emit(ServerPublicEvents.GAME_OVER, payload);
   });
+
+  broadcaster.on(GameOutEvents.NOPE_WINDOW_RESOLVED, () => {
+    io.to(gameId).emit(ServerPublicEvents.NOPE_WINDOW_RESOLVED);
+  });
 }
 
 /* broadcaster - is a function that just repeats/broadcasts events
