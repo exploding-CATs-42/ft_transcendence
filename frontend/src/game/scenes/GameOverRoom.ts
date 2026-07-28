@@ -5,6 +5,7 @@ import { leaveFinishedGame, type GameOverRoomHandlers } from "game/sockets";
 import { Scenes, SCREEN_WIDTH } from "game/constants";
 import { Button } from "game/entities";
 import type { Point, Size } from "game/@types";
+import { addFullscreenToggle } from "game/utils";
 
 const LEAVE_BUTTON_SIZE: Size = {
   width: 260,
@@ -22,6 +23,7 @@ export class GameOverRoom extends Scene implements GameOverRoomHandlers {
   }
 
   create() {
+    addFullscreenToggle(this);
     this.addLeaveGameButton();
   }
 
