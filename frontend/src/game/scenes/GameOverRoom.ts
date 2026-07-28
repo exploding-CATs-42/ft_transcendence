@@ -7,8 +7,10 @@ import { Button } from "game/entities";
 import type { Point, Size } from "game/@types";
 import { addFullscreenToggle } from "game/utils";
 import { GameOverAnimation } from "game/animations";
+import type { GameOverPayload } from "@exploding-cats/game-core";
 
 const CENTER_X = SCREEN_WIDTH / 2;
+const CENTER_Y = SCREEN_HEIGHT / 2;
 
 const LEAVE_BUTTON_SIZE: Size = {
   width: 260,
@@ -32,18 +34,76 @@ const CAT_POSITION: Point = {
   y: SCREEN_HEIGHT - 330,
 };
 
+const WINNER_LABEL_POSITION: Point = {
+  x: CENTER_X,
+  y: CENTER_Y - 100,
+};
+
+const WINNER_LABEL_STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
+  fontFamily: "Chewy",
+  fontSize: "96px",
+  color: "#ffd166",
+  stroke: "black",
+  strokeThickness: 10,
+  align: "center",
+};
+
+const UNKNOWN_WINNER_NAME = "Unknown Player";
+
 export class GameOverRoom extends Scene implements GameOverRoomHandlers {
+  #winnerName = UNKNOWN_WINNER_NAME;
+
   constructor() {
     super(Scenes.GameOverRoom);
+  }
+
+  init(payload?: Partial<GameOverPayload>) {
+    this.#winnerName = payload?.winner?.name ?? UNKNOWN_WINNER_NAME;
   }
 
   create() {
     this.addExplosionBackground();
     this.addBackdrop();
     this.addCoolCat();
+    this.addWinnerLabel();
 
     addFullscreenToggle(this);
     this.addLeaveGameButton();
+  }
+
+  private addWinnerLabel() {
+    const nameText = this.add.text(0, 0, this.#winnerName, {
+      ...WINNER_LABEL_STYLE,
+      color: "#ff0000",
+    });
+
+    const winnerText = this.add.text(
+      nameText.width,
+      0,
+      " survived this game",
+      WINNER_LABEL_STYLE,
+    );
+
+    const container = this.add.container(
+      WINNER_LABEL_POSITION.x,
+      WINNER_LABEL_POSITION.y,
+      [nameText, winnerText],
+    );
+
+    // Center the whole sentence
+    container.setSize(nameText.width + winnerText.width, nameText.height);
+    container.setPosition(
+      WINNER_LABEL_POSITION.x - container.width / 2,
+      WINNER_LABEL_POSITION.y - container.height / 2,
+    );
+
+    this.tweens.add({
+      targets: [winnerText, nameText],
+      alpha: { from: 0, to: 1 },
+      ease: "Sine.easeOut",
+      duration: 600,
+      delay: 300,
+    });
   }
 
   private addCoolCat() {
