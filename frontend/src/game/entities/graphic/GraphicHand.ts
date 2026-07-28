@@ -127,6 +127,14 @@ export class GraphicHand {
     return this.#cards.length;
   }
 
+  findCardIdByType(cardType: CardType): number | null {
+    const match = [...this.#cardsData.values()].find(
+      ({ data }) => data.type === cardType,
+    );
+
+    return match?.data.id ?? null;
+  }
+
   clearKindComboSelection() {
     if (!this.hasKindComboSelection()) return;
 
