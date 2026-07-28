@@ -15,6 +15,7 @@ import type {
   DefusePromptPayload,
   GameStartedPayload,
   GameStatePayload,
+  NopePlayedPayload,
   PlayerIdPayload,
   SeeTheFuturePeekPayload,
   TurnChangedPayload,
@@ -565,6 +566,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.cardType];
     const cardFrame = getCardFrame(this, frameIndex);
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
+    this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
+  };
+
+  onNopePlayed = (payload: NopePlayedPayload): void => {
+    this.#opponents.get(payload.playerId)?.removeCard();
+
+    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[CardType.NOPE];
+    const cardFrame = getCardFrame(this, frameIndex);
+    this.addCard(cardFrame, DISCARD_PILE_POSITION);
+
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
   };
 
