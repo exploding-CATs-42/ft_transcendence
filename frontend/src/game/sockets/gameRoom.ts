@@ -39,6 +39,7 @@ export interface GameRoomHandlers {
   onKittenDrawn(): void;
   onKittenInserted(payload: KittenInsertedPayload): void;
   onGameOver(payload: GameOverPayload): void;
+  onNopeWindowResolved(): void;
 }
 
 export type CleanupFunction = () => void;
@@ -83,6 +84,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
     [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
     [ServerPublicEvents.GAME_OVER, handlers.onGameOver],
+    [ServerPublicEvents.NOPE_WINDOW_RESOLVED, handlers.onNopeWindowResolved],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
