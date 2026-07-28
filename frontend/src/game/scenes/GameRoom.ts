@@ -643,6 +643,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onGameOver = (payload: GameOverPayload): void => {
     console.log(`Game over, winner is ${payload.winner.name}`);
+    this.time.delayedCall(5000, () => {
+      this.scene.start(Scenes.GameOverRoom, payload);
+    });
   };
 
   private cleanModal() {
