@@ -6,6 +6,7 @@ import {
   type CardPayload,
   type GameOverPayload,
   type KittenInsertedPayload,
+  CardType,
 } from "@exploding-cats/game-core";
 import type {
   CardPlayedPayload,
@@ -58,6 +59,7 @@ import {
   leaveCurrentGame,
   playCard,
   playCombo,
+  playNope,
   type CleanupFunction,
   type GameRoomHandlers,
   insertKitten,
@@ -518,6 +520,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     playCombo(this.#selectedCardPlay.cardIds);
   };
 
+  private playNope = (cardId: number) => {
+    this.#nopeButton.hide();
+    playNope(cardId);
+  };
+
   private updateComboPlayInteractivity() {
     const canPlaySelectedCards = this.isMyTurn() && this.#selectedCardPlay;
 
@@ -536,7 +543,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const durationMs = nopeWindowExpiresAt - Date.now();
     if (durationMs <= 0) return;
 
-    if (lastPlayerId !== this.#meId) {
+    const myNopeCardId = this.#myHand.findCardIdByType(CardType.NOPE);
+
+    if (lastPlayerId !== this.#meId && myNopeCardId !== null) {
+      this.#nopeButton.onClick = () => this.playNope(myNopeCardId);
       this.#nopeButton.showAnimated();
     }
 
