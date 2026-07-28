@@ -1,4 +1,3 @@
-import { DEFAULT_GAME_RULES } from "@exploding-cats/game-core";
 import type { Point, Size } from "game/@types";
 import { Textures } from "game/constants";
 
@@ -23,16 +22,19 @@ export class NopeAnimation extends Phaser.GameObjects.Sprite {
     );
   }
 
-  playAnimation() {
+  playAnimation(durationMs: number) {
     this.setVisible(true);
-    this.play("nope");
+
+    // play() ignores `duration` when a frameRate is set on the animation, so the duration has to be expressed as a frame rate instead.
+    const totalFrames = this.scene.anims.get("nope").getTotalFrames();
+
+    this.play({ key: "nope", frameRate: totalFrames / (durationMs / 1000) });
   }
 
   private registerAnimationInsideScene(scene: Phaser.Scene): void {
     scene.anims.create({
       key: "nope",
       frames: scene.anims.generateFrameNumbers(Textures.nope),
-      duration: DEFAULT_GAME_RULES.nopeWindowMs,
       repeat: 0,
     });
   }
