@@ -1,3 +1,4 @@
+import { NOPE_WINDOW_MS } from "@exploding-cats/game-core";
 import { NopeAnimation } from "game/animations";
 import { Textures } from "game/constants";
 
@@ -26,10 +27,10 @@ export class NopeButton {
     this.staticImage.setVisible(true);
   }
 
-  showAnimated(): void {
+  showAnimated(durationMs: number = NOPE_WINDOW_MS): void {
     this.staticImage.setVisible(false);
     this.animation.setVisible(true);
-    this.animation.playAnimation();
+    this.animation.playAnimation(durationMs);
   }
 
   hide() {
