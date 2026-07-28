@@ -72,4 +72,5 @@ export const ServerErrorEvents = {
   INSERT_KITTEN_ERROR: "insert-kitten-error",
   PLAY_NOPE_ERROR: "play-nope-error",
   SELECT_PLAYER_ERROR: "select-player-error",
+  GIVE_CARD_ERROR: "give-card-error",
 } as const;

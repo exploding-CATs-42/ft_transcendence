@@ -436,7 +436,7 @@ export async function playCard(input: PlayCardParams, userId: UserId) {
 
   return {
     playerId: player.id,
-    card: lastPlayedCard,
+    card,
     nopeWindowExpiresAt: nopeWindow.endsAt,
   };
 }

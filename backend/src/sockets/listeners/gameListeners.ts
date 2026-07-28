@@ -346,9 +346,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.SELECT_PLAYER_ERROR,
       async (parsed: SelectPlayerPayload) => {
-        const { playerId } = await selectPlayer(parsed, socket.data.user.id);
-        const room = parsed.gameId;
-        io.to(room).emit(ServerPublicEvents.PLAYER_SELECTED, { playerId });
+        await selectPlayer(parsed, socket.data.user.id);
       },
     ),
   );
@@ -358,7 +356,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
     withErrorHandler(
       giveCardSchema,
       socket,
-      ServerErrorEvents.SELECT_PLAYER_ERROR,
+      ServerErrorEvents.GIVE_CARD_ERROR,
       async (parsed: GiveCardPayload) => {
         const { card } = await giveCard(parsed, socket.data.user.id);
         const { playerIdFrom, playerIdTo, cardId } = parsed;
