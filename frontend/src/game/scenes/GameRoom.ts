@@ -511,7 +511,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private drawCard = () => {
     if (!this.isMyTurn()) return;
     drawCard();
-    this.#drawPile?.disableInteractive(true);
   };
 
   private playSelectedKindCombo = () => {
