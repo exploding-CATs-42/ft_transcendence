@@ -4,7 +4,7 @@ import {
   addCardVisual,
   getCardSpacing,
   getHandStartX,
-  getSelectedCardTint,
+  getSelectedCardOutlineColor,
 } from "game/utils";
 import { type Card, type CardType } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
@@ -35,6 +35,7 @@ const KIND_COMBO_LABEL_PADDING = {
 const KIND_COMBO_LABEL_SKEW = 26;
 const CLICK_MAX_DISTANCE = 24;
 const LEFT_POINTER_BUTTON = 0;
+const SELECTED_CARD_OUTLINE_WIDTH = 12;
 
 type onCardDropCallback = (card: GraphicCard) => void;
 type KindCombo = "two-of-a-kind" | "three-of-a-kind";
@@ -68,6 +69,7 @@ export class GraphicHand {
   #cardsData: Map<number, GraphicCard> = new Map();
   #cards: Phaser.GameObjects.Image[] = [];
   #selectedCardIds: number[] = [];
+  #cardSelectionOutlines: Map<number, Phaser.GameObjects.Graphics> = new Map();
   #hoveredCardImage: Phaser.GameObjects.Image | null = null;
   #kindComboLabelBackground: Phaser.GameObjects.Graphics | null = null;
   #kindComboLabel: Phaser.GameObjects.Text | null = null;
@@ -196,9 +198,19 @@ export class GraphicHand {
         ]),
       );
 
-      this.#scene.tweens.killTweensOf(draggedCards);
+      const draggedCardOutlines = draggedCards
+        .map((card) => this.getCardSelectionOutline(card))
+        .filter(
+          (outline): outline is Phaser.GameObjects.Graphics => outline !== null,
+        );
+
+      this.#scene.tweens.killTweensOf([
+        ...draggedCards,
+        ...draggedCardOutlines,
+      ]);
       draggedCards.forEach((card, index) => {
         card.setDepth(BIGGEST_DEPTH + index);
+        this.syncCardSelectionOutline(card);
       });
     };
 
@@ -219,6 +231,7 @@ export class GraphicHand {
 
         card.x = origin.x + deltaX;
         card.y = origin.y + deltaY;
+        this.syncCardSelectionOutline(card);
       });
     };
 
@@ -226,6 +239,7 @@ export class GraphicHand {
       draggedCards.forEach((card) => {
         const origin = dragOrigins.get(card);
         if (origin) card.setDepth(origin.depth);
+        this.syncCardSelectionOutline(card);
       });
 
       draggedCards = [];
@@ -248,7 +262,6 @@ export class GraphicHand {
     cardImage.off("drop");
 
     cardImage.disableInteractive();
-    cardImage.clearTint();
     cardImage.setDepth(0);
 
     this.#cardsData.delete(cardId);
@@ -413,7 +426,10 @@ export class GraphicHand {
   }
 
   private reflowCards() {
-    this.#scene.tweens.killTweensOf(this.#cards);
+    this.#scene.tweens.killTweensOf([
+      ...this.#cards,
+      ...this.#cardSelectionOutlines.values(),
+    ]);
 
     const { spacing, startX } = this.getLayout();
 
@@ -424,8 +440,11 @@ export class GraphicHand {
       });
 
       card.setDepth(index + 1);
+      const selectionOutline = this.getCardSelectionOutline(card);
+      selectionOutline?.setDepth(card.depth - 0.5);
+
       this.#scene.tweens.add({
-        targets: card,
+        targets: selectionOutline ? [card, selectionOutline] : card,
         x: x,
         y,
         duration: 250,
@@ -484,15 +503,48 @@ export class GraphicHand {
 
   private updateCardSelectionStyles() {
     const selectedCardIds = new Set(this.#selectedCardIds);
-    const tint = getSelectedCardTint(this.#selectedCardIds.length);
+    const outlineColor = getSelectedCardOutlineColor(
+      this.#selectedCardIds.length,
+    );
 
-    this.#cardsData.forEach((card) => {
-      card.image.clearTint();
+    this.#cardSelectionOutlines.forEach((outline, cardId) => {
+      if (selectedCardIds.has(cardId) && this.#cardsData.has(cardId)) return;
 
-      if (!selectedCardIds.has(card.data.id) || tint === null) return;
-
-      card.image.setTint(tint);
+      outline.destroy();
+      this.#cardSelectionOutlines.delete(cardId);
     });
+
+    if (outlineColor === null) return;
+
+    selectedCardIds.forEach((cardId) => {
+      const card = this.#cardsData.get(cardId);
+      if (!card) return;
+
+      let outline = this.#cardSelectionOutlines.get(cardId);
+      if (!outline) {
+        outline = this.#scene.add.graphics();
+        this.#cardSelectionOutlines.set(cardId, outline);
+      }
+
+      outline
+        .clear()
+        .lineStyle(SELECTED_CARD_OUTLINE_WIDTH, outlineColor, 1)
+        .strokeRoundedRect(0, 0, CARD_WIDTH, CARD_HEIGHT, CARD_BORDER_RADIUS);
+      this.syncCardSelectionOutline(card.image);
+    });
+  }
+
+  private getCardSelectionOutline(cardImage: Phaser.GameObjects.Image) {
+    const cardId = this.getGraphicCardByImage(cardImage)?.data.id;
+    if (cardId === undefined) return null;
+
+    return this.#cardSelectionOutlines.get(cardId) ?? null;
+  }
+
+  private syncCardSelectionOutline(cardImage: Phaser.GameObjects.Image) {
+    this.getCardSelectionOutline(cardImage)
+      ?.setPosition(cardImage.x, cardImage.y)
+      .setDepth(cardImage.depth - 0.5);
   }
 
   private updateKindComboLabelBackground(
