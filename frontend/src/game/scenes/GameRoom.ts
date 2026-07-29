@@ -91,6 +91,9 @@ const DISCARD_PILE_POSITION: Point = {
   y: PILES_Y,
 };
 
+const CARD_TO_DISCARD_DURATION_MS = 300;
+const CARD_TO_DISCARD_EASE = "Back.Out";
+
 const CARD_DROP_ZONE = {
   x: 400,
   y: 340,
@@ -253,8 +256,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         y: DISCARD_PILE_POSITION.y,
         displayWidth: CARD_WIDTH,
         displayHeight: CARD_HEIGHT,
-        duration: 300,
-        ease: "Back.Out",
+        duration: CARD_TO_DISCARD_DURATION_MS,
+        ease: CARD_TO_DISCARD_EASE,
       });
     };
 
