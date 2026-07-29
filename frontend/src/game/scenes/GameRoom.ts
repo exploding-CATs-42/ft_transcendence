@@ -565,22 +565,40 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#myHand.removeCard(payload.cardId);
   };
 
-  onCardPlayed = (payload: CardPlayedPayload): void => {
-    this.#opponents.get(payload.playerId)?.removeCard();
-
-    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.cardType];
+  private discardOpponentCard(playerId: string, cardType: CardType) {
+    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[cardType];
     const cardFrame = getCardFrame(this, frameIndex);
-    this.addCard(cardFrame, DISCARD_PILE_POSITION);
+    const hand = this.#opponents.get(playerId);
+
+    if (!hand) {
+      this.addCard(cardFrame, DISCARD_PILE_POSITION);
+      return;
+    }
+
+    const { position, size } = hand.getTopCardBounds();
+    hand.removeCard();
+
+    const flyingCard = this.addCard(cardFrame, position);
+    flyingCard.setDisplaySize(size.width, size.height);
+
+    this.tweens.add({
+      targets: flyingCard,
+      x: DISCARD_PILE_POSITION.x,
+      y: DISCARD_PILE_POSITION.y,
+      displayWidth: CARD_WIDTH,
+      displayHeight: CARD_HEIGHT,
+      duration: CARD_TO_DISCARD_DURATION_MS,
+      ease: CARD_TO_DISCARD_EASE,
+    });
+  }
+
+  onCardPlayed = (payload: CardPlayedPayload): void => {
+    this.discardOpponentCard(payload.playerId, payload.cardType);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
   };
 
   onNopePlayed = (payload: NopePlayedPayload): void => {
-    this.#opponents.get(payload.playerId)?.removeCard();
-
-    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[CardType.NOPE];
-    const cardFrame = getCardFrame(this, frameIndex);
-    this.addCard(cardFrame, DISCARD_PILE_POSITION);
-
+    this.discardOpponentCard(payload.playerId, CardType.NOPE);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
   };
 
@@ -669,11 +687,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onComboPlayed = (payload: ComboPlayedPayload): void => {
     payload.cardTypes.forEach((cardType) => {
-      this.#opponents.get(payload.playerId)?.removeCard();
-
-      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[cardType];
-      const cardFrame = getCardFrame(this, frameIndex);
-      this.addCard(cardFrame, DISCARD_PILE_POSITION);
+      this.discardOpponentCard(payload.playerId, cardType);
     });
 
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
