@@ -358,17 +358,22 @@ export async function drawCard(input: DrawCardParams, userId: UserId) {
     throw new SocketError("Could not draw card now");
   }
 
+  const lastDrawnCardBefore = gameSnapshot.context.lastDrawnCard;
+
   game.instance.send({
     type: GameEvents.DRAW_CARD,
     playerId: player.id,
   });
 
-  const lastDrawnCard = game.instance.getSnapshot().context.lastDrawnCard;
-  if (!lastDrawnCard) {
+  const lastDrawnCardAfter = game.instance.getSnapshot().context.lastDrawnCard;
+  if (
+    !lastDrawnCardAfter ||
+    lastDrawnCardBefore?.id === lastDrawnCardAfter.id
+  ) {
     throw new SocketError("Could not draw card");
   }
 
-  return { playerId: player.id, card: lastDrawnCard };
+  return { playerId: player.id, card: lastDrawnCardAfter };
 }
 
 function getPlayableCard(player: Player, cardId: number): Card {
