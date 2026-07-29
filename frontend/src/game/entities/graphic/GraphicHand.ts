@@ -1,6 +1,11 @@
 import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
-import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
+import {
+  addCardVisual,
+  getCardSpacing,
+  getHandStartX,
+  getSelectedCardTint,
+} from "game/utils";
 import { type Card, type CardType } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
 import { playCard } from "game/sockets";
@@ -30,12 +35,6 @@ const KIND_COMBO_LABEL_PADDING = {
 const KIND_COMBO_LABEL_SKEW = 26;
 const CLICK_MAX_DISTANCE = 24;
 const LEFT_POINTER_BUTTON = 0;
-
-const SELECTED_CARD_GLOW_BY_COUNT = {
-  1: { color: 0xfff4a8, outerStrength: 5, distance: 16 },
-  2: { color: 0xffd45a, outerStrength: 7, distance: 20 },
-  3: { color: 0xffa52c, outerStrength: 9, distance: 24 },
-} as const;
 
 type onCardDropCallback = (card: GraphicCard) => void;
 type KindCombo = "two-of-a-kind" | "three-of-a-kind";
@@ -249,7 +248,7 @@ export class GraphicHand {
     cardImage.off("drop");
 
     cardImage.disableInteractive();
-    cardImage.postFX.clear();
+    cardImage.clearTint();
     cardImage.setDepth(0);
 
     this.#cardsData.delete(cardId);
@@ -485,25 +484,14 @@ export class GraphicHand {
 
   private updateCardSelectionStyles() {
     const selectedCardIds = new Set(this.#selectedCardIds);
-    const selectedCardsCount = Math.min(this.#selectedCardIds.length, 3);
-    const glowConfig =
-      selectedCardsCount > 0
-        ? SELECTED_CARD_GLOW_BY_COUNT[selectedCardsCount as 1 | 2 | 3]
-        : null;
+    const tint = getSelectedCardTint(this.#selectedCardIds.length);
 
     this.#cardsData.forEach((card) => {
-      card.image.postFX.clear();
+      card.image.clearTint();
 
-      if (!selectedCardIds.has(card.data.id) || !glowConfig) return;
+      if (!selectedCardIds.has(card.data.id) || tint === null) return;
 
-      card.image.postFX.addGlow(
-        glowConfig.color,
-        glowConfig.outerStrength,
-        0,
-        false,
-        0.1,
-        glowConfig.distance,
-      );
+      card.image.setTint(tint);
     });
   }
 
