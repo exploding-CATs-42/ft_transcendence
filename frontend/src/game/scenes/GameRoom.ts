@@ -605,7 +605,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onNopeWindowResolved = (): void => {
     this.#nopeButton.hide();
-    this.#drawPile?.setInteractive({ useHandCursor: true });
+    this.updateDrawPileInteractivity();
   };
 
   onTurnSkipped = (payload: TurnSkippedPayload): void => {
