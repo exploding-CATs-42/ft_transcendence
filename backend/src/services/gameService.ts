@@ -346,7 +346,17 @@ export async function cancelStart(
 
 export async function drawCard(input: DrawCardParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
-  ensurePlayersTurn(game.instance.getSnapshot().context, player);
+
+  const gameSnapshot = game.instance.getSnapshot();
+  ensurePlayersTurn(gameSnapshot.context, player);
+
+  if (
+    !gameSnapshot.matches({
+      [GameStates.PLAYING]: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+    })
+  ) {
+    throw new SocketError("Could not draw card now");
+  }
 
   game.instance.send({
     type: GameEvents.DRAW_CARD,
