@@ -9,6 +9,7 @@ import {
   type KittenInsertedPayload,
   type PlayerDefusedPayload,
   type PlayerSelectedPayload,
+  type WaitingForFavorCardSelectionPayload,
 } from "@exploding-cats/game-core";
 import type {
   CardGivenPayload,
@@ -469,9 +470,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const players = [...this.#players.values()];
     for (let i = 1; i < players.length; ++i) {
       const player = players[i]!;
-      player.setTargetIconVisible(true);
-      player.onClick = this.selectOpponent;
-      player.setCursorPointer(true);
+      if (player.player?.isAlive) {
+        player.setTargetIconVisible(true);
+        player.onClick = this.selectOpponent;
+        player.setCursorPointer(true);
+      }
     }
   }
 
@@ -661,12 +664,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
-    const card = this.#myHand.removeCard(payload.cardId);
-
-    if (this.isMyTurn() && card.data.type === CardType.FAVOR) {
-      this.#favorModeActive = true;
-      this.showOpponentTargetIcons();
-    }
+    this.#myHand.removeCard(payload.cardId);
   };
 
   private discardOpponentCard(playerId: string, cardType: CardType) {
@@ -827,8 +825,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       if (seat.player?.id !== playerId) players[i]?.setTargetIconVisible(false);
       else players[i]?.setTargetIconVisible(true);
     }
-
-    if (playerId === this.#meId) this.showFavorUI();
   };
 
   onCardGiven = (payload: CardGivenPayload): void => {
@@ -847,6 +843,22 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     } else {
       this.#opponents.get(playerIdFrom)?.removeCard();
       this.#opponents.get(playerIdTo)?.addCard();
+    }
+  };
+
+  onWaitingForPlayerSelection = () => {
+    if (this.isMyTurn()) {
+      this.showOpponentTargetIcons();
+    }
+  };
+
+  onWaitingForFavorCardSelection = (
+    payload: WaitingForFavorCardSelectionPayload,
+  ) => {
+    if (this.#meId === payload.playerId) {
+      this.showFavorUI();
+    } else if (this.#meId === this.#currentTurnPlayerId) {
+      this.#favorModeActive = true;
     }
   };
 

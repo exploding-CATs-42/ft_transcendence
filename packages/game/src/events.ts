@@ -9,6 +9,7 @@ import type {
   PlayerEliminatedPayload,
   GameOverPayload,
   PlayerSelectedPayload,
+  WaitingForFavorCardSelectionPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -84,6 +85,8 @@ export const GameOutEvents = {
   GAME_OVER: "GAME_OVER",
   NOPE_WINDOW_RESOLVED: "NOPE_WINDOW_RESOLVED",
   PLAYER_SELECTED: "PLAYER_SELECTED",
+  WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
+  WAITING_FOR_FAVOR_CARD_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -136,4 +139,11 @@ export type GameOutEvent =
   | {
       type: typeof GameOutEvents.PLAYER_SELECTED;
       payload: PlayerSelectedPayload;
+    }
+  | {
+      type: typeof GameOutEvents.WAITING_FOR_PLAYER_SELECTION;
+    }
+  | {
+      type: typeof GameOutEvents.WAITING_FOR_FAVOR_CARD_SELECTION;
+      payload: WaitingForFavorCardSelectionPayload;
     };
