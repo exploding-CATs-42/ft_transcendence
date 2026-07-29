@@ -1,7 +1,7 @@
 // Libraries
 import { Scene } from "phaser";
 // Local level
-import { leaveFinishedGame, type GameOverRoomHandlers } from "game/sockets";
+import { leaveFinishedGame } from "game/sockets";
 import { Scenes, SCREEN_HEIGHT, SCREEN_WIDTH, Textures } from "game/constants";
 import { Button } from "game/entities";
 import type { Point, Size } from "game/@types";
@@ -50,7 +50,7 @@ const WINNER_LABEL_STYLE: Phaser.Types.GameObjects.Text.TextStyle = {
 
 const UNKNOWN_WINNER_NAME = "Unknown Player";
 
-export class GameOverRoom extends Scene implements GameOverRoomHandlers {
+export class GameOverRoom extends Scene {
   #winnerName = UNKNOWN_WINNER_NAME;
 
   constructor() {
