@@ -1,4 +1,4 @@
-import type { CardConfig, Point, SpacingConfig } from "game/@types";
+import type { CardConfig, Point, Size, SpacingConfig } from "game/@types";
 import { Textures } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
 
@@ -69,6 +69,16 @@ export class OpponentHand {
       this.#cardsContainer.add(card);
       this.reflowCards();
     }
+  }
+
+  getTopCardBounds(): { position: Point; size: Size } {
+    const topCard = this.#cards[this.#cards.length - 1] ?? this.#cardsContainer;
+    const { tx, ty } = topCard.getWorldTransformMatrix();
+
+    return {
+      position: { x: tx, y: ty },
+      size: { width: CARD_WIDTH, height: CARD_HEIGHT },
+    };
   }
 
   removeCard() {
