@@ -94,6 +94,9 @@ const DISCARD_PILE_POSITION: Point = {
 const CARD_TO_DISCARD_DURATION_MS = 300;
 const CARD_TO_DISCARD_EASE = "Back.Out";
 
+const CARD_FROM_DRAW_PILE_DURATION_MS = 400;
+const CARD_FROM_DRAW_PILE_EASE = "Sine.easeInOut";
+
 const CARD_DROP_ZONE = {
   x: 400,
   y: 340,
@@ -471,8 +474,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       targets: faceDownCard,
       x: targetX,
       y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
-      duration: 400,
-      ease: "Sine.easeInOut",
+      duration: CARD_FROM_DRAW_PILE_DURATION_MS,
+      ease: CARD_FROM_DRAW_PILE_EASE,
 
       onComplete: () => {
         // then destroy it
@@ -486,8 +489,34 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   };
 
+  private drawOpponentCard(playerId: string) {
+    const hand = this.#opponents.get(playerId);
+
+    if (!hand) return;
+
+    const { position, size } = hand.getTopCardBounds();
+
+    const cardCover = this.textures.get(Textures.cardCover).get();
+    const flyingCard = this.addCard(cardCover, DRAW_PILE_POSITION);
+
+    this.tweens.add({
+      targets: flyingCard,
+      x: position.x,
+      y: position.y,
+      displayWidth: size.width,
+      displayHeight: size.height,
+      duration: CARD_FROM_DRAW_PILE_DURATION_MS,
+      ease: CARD_FROM_DRAW_PILE_EASE,
+
+      onComplete: () => {
+        flyingCard.destroy();
+        hand.addCard();
+      },
+    });
+  }
+
   onCardDrawn = (payload: PlayerIdPayload): void => {
-    this.#opponents.get(payload.playerId)?.addCard();
+    this.drawOpponentCard(payload.playerId);
 
     if (
       payload.playerId === this.#currentTurnPlayerId &&
