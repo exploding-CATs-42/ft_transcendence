@@ -208,6 +208,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#nopeButton = new NopeButton(this, NOPE_BUTTON_POSITION);
 
     const graphicPlayers = this.createPlayers(players);
+    this.setDeadPlayers(graphicPlayers);
+
     this.createOpponentHands(graphicPlayers);
     this.fillOpponentHands(players);
     this.fillSeats(graphicPlayers);
@@ -248,6 +250,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   }
 
+  private setDeadPlayers(players: GraphicPlayer[]) {
+    players.forEach((player) => (player.isAlive ? player : player.setDead()));
+  }
+
   private fillSeats(players: GraphicPlayer[]) {
     const me = players[0]!;
     this.#meId = me.id;
@@ -259,7 +265,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const opponent = players[i]!;
       const opponentSeat = new PlayerSeat(this, GAME_ROOM_SEATS[i]!);
       opponentSeat.addPlayer(opponent);
-      opponentSeat.addHand(this.#opponents.get(opponent.id)!);
+
+      if (opponent.isAlive)
+        opponentSeat.addHand(this.#opponents.get(opponent.id)!);
+
       this.#players.set(opponent.id, opponentSeat);
     }
   }
@@ -337,6 +346,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private createOpponentHands(players: GraphicPlayer[]) {
     for (let i = 1; i < players.length; ++i) {
+      if (!players[i]?.isAlive) continue;
+
       const x = OPPONENT_HAND_X_OFFSET;
       const y = OPPONENT_HAND_Y_OFFSET;
 

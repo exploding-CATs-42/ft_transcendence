@@ -107,6 +107,8 @@ export class GraphicPlayer implements Player {
     const key = `avatar_${url}`;
 
     const setAvatarVisible = () => {
+      this.container.setVisible(true);
+      if (!this.isAlive) return;
       avatar.setTexture(getRoundedAvatarTexture(scene, key));
       avatar.setDisplaySize(AVATAR_WIDTH, AVATAR_WIDTH);
       this.container.setVisible(true);
