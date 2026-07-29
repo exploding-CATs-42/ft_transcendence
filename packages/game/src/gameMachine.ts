@@ -318,6 +318,10 @@ export const gameMachine = setup({
               actions: [], // TODO: Implement new game state for waiting for favor
               target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
             },
+            // Fallback: RESOLVING_NOPES only passes through, so without an unguarded transition the machine gets stuck when no guard above matches (combos, cat cards, card types not implemented yet).
+            {
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
           ],
         },
         [GameStates.CHECKING_DRAWN_CARD]: {
