@@ -508,6 +508,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private drawCard = () => {
     if (!this.isMyTurn()) return;
     drawCard();
+    this.#drawPile?.disableInteractive(true);
   };
 
   private playSelectedKindCombo = () => {
@@ -569,6 +570,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const cardFrame = getCardFrame(this, frameIndex);
     this.addCard(cardFrame, DISCARD_PILE_POSITION);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
+    this.#drawPile?.disableInteractive(true);
   };
 
   onNopePlayed = (payload: NopePlayedPayload): void => {
@@ -583,6 +585,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onNopeWindowResolved = (): void => {
     this.#nopeButton.hide();
+    this.#drawPile?.setInteractive({ useHandCursor: true });
   };
 
   onTurnSkipped = (payload: TurnSkippedPayload): void => {
