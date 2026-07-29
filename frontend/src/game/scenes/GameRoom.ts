@@ -693,6 +693,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
 
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
+    this.#drawPile?.disableInteractive(true);
   };
 
   onSeeTheFuturePeek = (payload: SeeTheFuturePeekPayload): void => {
