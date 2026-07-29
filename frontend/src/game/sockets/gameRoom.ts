@@ -20,6 +20,7 @@ import type {
   KittenInsertedPayload,
   PlayerDefusedPayload,
   PlayerSelectedPayload,
+  WaitingForFavorCardSelectionPayload,
 } from "@exploding-cats/game-core";
 import { socket } from "socket";
 import { emit, leaveGame } from "./gameSession";
@@ -47,6 +48,10 @@ export interface GameRoomHandlers {
   onNopeWindowResolved(): void;
   onPlayerSelected(payload: PlayerSelectedPayload): void;
   onCardGiven(payload: CardGivenPayload): void;
+  onWaitingForPlayerSelection(): void;
+  onWaitingForFavorCardSelection(
+    payload: WaitingForFavorCardSelectionPayload,
+  ): void;
 }
 
 export type CleanupFunction = () => void;
@@ -95,6 +100,14 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.NOPE_WINDOW_RESOLVED, handlers.onNopeWindowResolved],
     [ServerPublicEvents.PLAYER_SELECTED, handlers.onPlayerSelected],
     [ServerPublicEvents.CARD_GIVEN, handlers.onCardGiven],
+    [
+      ServerPublicEvents.WAITING_FOR_PLAYER_SELECTION,
+      handlers.onWaitingForPlayerSelection,
+    ],
+    [
+      ServerPublicEvents.WAITING_FOR_FAVOR_CARD_SELECTION,
+      handlers.onWaitingForFavorCardSelection,
+    ],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {

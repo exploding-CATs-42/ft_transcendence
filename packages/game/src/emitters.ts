@@ -127,6 +127,17 @@ export const playerSelected = ({ context }: GameEmitterArgs): GameOutEvent => ({
   payload: { playerId: context.selectedPlayerId! },
 });
 
+export const waitingForPlayerSelection = (): GameOutEvent => ({
+  type: GameOutEvents.WAITING_FOR_PLAYER_SELECTION,
+});
+
+export const waitingForFavorCardSelection = ({
+  context,
+}: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.WAITING_FOR_FAVOR_CARD_SELECTION,
+  payload: { playerId: context.selectedPlayerId! },
+});
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,

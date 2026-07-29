@@ -75,6 +75,8 @@ import {
   turnSkipped,
   playerEliminated,
   gameOver,
+  waitingForPlayerSelection,
+  waitingForFavorCardSelection,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -406,20 +408,22 @@ export const gameMachine = setup({
           ],
         },
         [GameStates.SELECTING_PLAYER]: {
+          entry: emit(waitingForPlayerSelection),
           on: {
             [GameEvents.SELECT_PLAYER]: {
-              actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
-              target: GameTargets.WAITING_FOR_CARD_SELECTION,
-            },
-          },
-        },
-        [GameStates.WAITING_FOR_CARD_SELECTION]: {
-          on: {
-            [GameEvents.PASS_CARD_BY_ID]: {
               guard: {
                 type: GameGuards.LAST_PLAYED_CARD_OF_TYPE,
                 params: { cardType: CardType.FAVOR },
               },
+              actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
+              target: GameTargets.WAITING_FOR_FAVOR_CARD_SELECTION,
+            },
+          },
+        },
+        [GameStates.WAITING_FOR_FAVOR_CARD_SELECTION]: {
+          entry: emit(waitingForFavorCardSelection),
+          on: {
+            [GameEvents.PASS_CARD_BY_ID]: {
               actions: GameActions.PASS_CARD_BY_ID,
               target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
             },

@@ -55,3 +55,7 @@ export interface GameOverPayload {
 export interface PlayerSelectedPayload {
   playerId: string;
 }
+
+export interface WaitingForFavorCardSelectionPayload {
+  playerId: string;
+}

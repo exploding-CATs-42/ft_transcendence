@@ -112,6 +112,17 @@ export function attachGameBroadcaster(game: Game) {
   broadcaster.on(GameOutEvents.PLAYER_SELECTED, (event) => {
     io.to(gameId).emit(ServerPublicEvents.PLAYER_SELECTED, event.payload);
   });
+
+  broadcaster.on(GameOutEvents.WAITING_FOR_PLAYER_SELECTION, () => {
+    io.to(gameId).emit(ServerPublicEvents.WAITING_FOR_PLAYER_SELECTION);
+  });
+
+  broadcaster.on(GameOutEvents.WAITING_FOR_FAVOR_CARD_SELECTION, (event) => {
+    io.to(gameId).emit(
+      ServerPublicEvents.WAITING_FOR_FAVOR_CARD_SELECTION,
+      event.payload,
+    );
+  });
 }
 
 /* broadcaster - is a function that just repeats/broadcasts events
