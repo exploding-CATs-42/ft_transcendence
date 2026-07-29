@@ -6,3 +6,4 @@ export {
   getCardFrame,
 } from "./textureUtils";
 export { getCardSpacing, getHandStartX, addCardVisual } from "./cardUtils";
+export { getSelectedCardTint } from "./cardSelectionUtils";
