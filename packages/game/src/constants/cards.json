@@ -14,9 +14,9 @@
     "name": "Defuse",
     "description": "Play instead of dying when you draw an Exploding Kitten. Place Defuse in the discard pile, then secretly reinsert the kitten anywhere in the draw pile.",
     "count": 6,
-    "playable": true,
+    "playable": false,
     "targetRequired": false,
-    "comboEligible": false,
+    "comboEligible": true,
     "playableOutOfTurn": false
   },
   {
