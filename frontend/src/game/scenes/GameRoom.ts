@@ -11,19 +11,20 @@ import {
   type PlayerSelectedPayload,
   type WaitingForFavorCardSelectionPayload,
 } from "@exploding-cats/game-core";
-import type {
-  CardGivenPayload,
-  CardPlayedPayload,
-  CardRemovedPayload,
-  ComboPlayedPayload,
-  DefusePromptPayload,
-  GameStartedPayload,
-  GameStatePayload,
-  NopePlayedPayload,
-  PlayerIdPayload,
-  SeeTheFuturePeekPayload,
-  TurnChangedPayload,
-  TurnSkippedPayload,
+import {
+  CardRemovalReason,
+  type CardGivenPayload,
+  type CardPlayedPayload,
+  type CardRemovedPayload,
+  type ComboPlayedPayload,
+  type DefusePromptPayload,
+  type GameStartedPayload,
+  type GameStatePayload,
+  type NopePlayedPayload,
+  type PlayerIdPayload,
+  type SeeTheFuturePeekPayload,
+  type TurnChangedPayload,
+  type TurnSkippedPayload,
 } from "@exploding-cats/contracts";
 // Local level
 import {
@@ -724,7 +725,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
-    this.#myHand.removeCard(payload.cardId);
+    const card = this.#myHand.removeCard(payload.cardId, payload.reason);
+    if (payload.reason === CardRemovalReason.INSERTED_INTO_DECK)
+      card.image.destroy();
   };
 
   private discardOpponentCard(playerId: string, cardType: CardType) {

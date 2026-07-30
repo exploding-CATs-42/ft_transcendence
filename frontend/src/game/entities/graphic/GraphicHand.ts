@@ -9,6 +9,7 @@ import {
 import { type Card, type CardType } from "@exploding-cats/game-core";
 import type { GraphicCard } from "./GraphicCard";
 import { playCard } from "game/sockets";
+import { CardRemovalReason } from "@exploding-cats/contracts";
 
 const CARD_WIDTH = 186 * 1.75;
 const CARD_HEIGHT = 260 * 1.75;
@@ -279,7 +280,7 @@ export class GraphicHand {
     image.setTint(DEAD_CARD_TINT);
   }
 
-  removeCard(cardId: number) {
+  removeCard(cardId: number, reason: CardRemovalReason) {
     const card = this.#cardsData.get(cardId)!;
     const cardImage = card.image;
     const wasSelected = this.#selectedCardIds.includes(cardId);
@@ -300,7 +301,8 @@ export class GraphicHand {
       this.reflowCards();
     }
 
-    this.#onCardDropCallback(card);
+    if (reason !== CardRemovalReason.INSERTED_INTO_DECK)
+      this.#onCardDropCallback(card);
     return card;
   }
 
