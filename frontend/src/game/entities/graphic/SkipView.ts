@@ -37,13 +37,17 @@ export class SkipView extends Phaser.GameObjects.Container {
   }
 
   private addPlayerNameLabel(scene: Phaser.Scene, name: string) {
-    const label = scene.add.text(-80, -100, name, { ...TEXT_CONFIG });
+    const label = scene.add
+      .text(0, -100, name, { ...TEXT_CONFIG })
+      .setOrigin(0.5, 0);
     return label;
   }
 
   private addActionLabel(scene: Phaser.Scene) {
     const text = "SKIPPED A TURN";
-    const label = scene.add.text(-160, 0, text, { ...TEXT_CONFIG });
+    const label = scene.add
+      .text(0, 0, text, { ...TEXT_CONFIG })
+      .setOrigin(0.5, 0);
     return label;
   }
 }
