@@ -44,4 +44,8 @@ export const GameTargets = {
     GameStates.EXPLODING_PLAYER,
   ),
   GAME_OVER: getStatePath(GameStates.GAME_OVER),
+  CHECKING_REMAINING_TURNS: getStatePath(
+    GameStates.PLAYING,
+    GameStates.CHECKING_REMAINING_TURNS,
+  ),
 } as const;
