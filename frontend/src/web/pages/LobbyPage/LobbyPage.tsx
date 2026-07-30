@@ -22,11 +22,6 @@ import { ExistingGameModal } from "./components/ExistingGameModal";
 import { JoinGameModal } from "./components/JoinGameModal";
 import s from "./LobbyPage.module.css";
 
-type ExistingGame = {
-  id: string;
-  name: string;
-};
-
 type GameConflictDetails = {
   existingGameId?: string;
 };
@@ -80,7 +75,7 @@ const LobbyPage = () => {
   const [gameId, setGameId] = useState("");
   const [joinError, setJoinError] = useState("");
   const [isJoiningGame, setIsJoiningGame] = useState(false);
-  const [existingGame, setExistingGame] = useState<ExistingGame | null>(null);
+  const [existingGame, setExistingGame] = useState<GameRecord | null>(null);
 
   const navigate = useNavigate();
   const { socket } = useSocket();
@@ -140,10 +135,7 @@ const LobbyPage = () => {
 
         if (ignore || !currentGame) return;
 
-        setExistingGame({
-          id: currentGame.id,
-          name: currentGame.name,
-        });
+        setExistingGame(currentGame);
       } catch (error) {
         console.error("Failed to load current game:", error);
       }
@@ -259,11 +251,7 @@ const LobbyPage = () => {
 
       const currentGame = await api.games.getCurrent();
 
-      setExistingGame({
-        id: existingGameId,
-        name: currentGame?.name ?? "your existing game",
-      });
-
+      setExistingGame(currentGame);
       toggleCreateModal(false);
     }
   };
