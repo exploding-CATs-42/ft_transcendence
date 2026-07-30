@@ -11,11 +11,13 @@ import {
   CardType,
   type NopeWindow,
   PendingActionType,
+  PlayerStatus,
 } from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
   REMOVE_PLAYER: "removePlayer",
+  MARK_PLAYER_AS_LEFT: "markPlayerAsLeft",
   ADD_PLAYER_CONFIRMATION: "addPlayerConfirmation",
   REMOVE_PLAYER_CONFIRMATION: "removePlayerConfirmation",
   FILL_DECK: "fillDeck",
@@ -81,6 +83,22 @@ export const removePlayer = ({ context, event }: GameActionArgs) => {
     players,
     currentTurnPlayerId: null,
   };
+};
+
+export const markPlayerAsLeft = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.LEAVE_GAME) return context;
+
+  const leavingPlayerIndex = context.players.findIndex(
+    (player) => player.id === event.playerId,
+  );
+
+  if (leavingPlayerIndex === -1) return context;
+
+  const players = context.players.map((p) =>
+    p.id !== event.playerId ? p : { ...p, status: PlayerStatus.LEFT },
+  );
+
+  return { players };
 };
 
 export const addPlayerConfirmation = ({ context, event }: GameActionArgs) => {
