@@ -471,10 +471,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     leaveCurrentGame();
   };
 
-  onPlayerLeft = (payload: PlayerIdPayload) => {
-    this.removePlayer(payload.playerId);
-  };
-
   private removePlayer(playerId: string) {
     const player = this.#players.get(playerId);
 
@@ -906,6 +902,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onPlayerReconnected = (payload: PlayerIdPayload): void => {
     this.#players.get(payload.playerId)?.player?.setConnected(true);
+  };
+
+  onPlayerLeft = (payload: PlayerIdPayload) => {
+    this.removePlayer(payload.playerId);
   };
 
   onDeckShuffled = (): void => {
