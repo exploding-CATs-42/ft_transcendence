@@ -380,6 +380,7 @@ export const explodePlayer = ({ context }: GameActionArgs) => {
       : {
           ...player,
           isAlive: false,
+          status: PlayerStatus.ELIMINATED,
         },
   );
   return { players };
