@@ -4,7 +4,7 @@ import clsx from "clsx";
 import s from "./ListItem.module.css";
 
 interface Props {
-  className?: string;
+  className?: string | undefined;
   children?: React.ReactNode;
 }
 
