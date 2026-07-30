@@ -18,6 +18,7 @@ import {
   drawCard,
   fillDeck,
   removePlayer,
+  markPlayerAsLeft,
   removePlayerConfirmation,
   playCard,
   setCountdownEndsAt,
@@ -107,6 +108,7 @@ export const gameMachine = setup({
   actions: {
     [GameActions.ADD_PLAYER]: assign(addPlayer),
     [GameActions.REMOVE_PLAYER]: assign(removePlayer),
+    [GameActions.MARK_PLAYER_AS_LEFT]: assign(markPlayerAsLeft),
     [GameActions.ADD_PLAYER_CONFIRMATION]: assign(addPlayerConfirmation),
     [GameActions.REMOVE_PLAYER_CONFIRMATION]: assign(removePlayerConfirmation),
     [GameActions.FILL_DECK]: assign(fillDeck),
@@ -229,11 +231,16 @@ export const gameMachine = setup({
         [GameEvents.LEAVE_GAME]: [
           {
             guard: GameGuards.LEAVES_SINGLE_ALIVE_PLAYER,
-            actions: GameActions.REMOVE_PLAYER,
+            actions: GameActions.MARK_PLAYER_AS_LEFT,
             target: GameTargets.GAME_OVER,
           },
           {
-            actions: GameActions.REMOVE_PLAYER,
+            guard: GameGuards.IS_PLAYERS_TURN,
+            actions: GameActions.MARK_PLAYER_AS_LEFT,
+            target: GameTargets.CHANGING_TURN,
+          },
+          {
+            actions: GameActions.MARK_PLAYER_AS_LEFT,
           },
         ],
       },
