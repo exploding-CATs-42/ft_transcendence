@@ -265,21 +265,44 @@ const LobbyPage = () => {
     }
   };
 
+  const lobbyGames = existingGame
+    ? [existingGame, ...games.filter((game) => game.id !== existingGame.id)]
+    : games;
+
+  const renderGame = (game: GameRecord) => {
+    const isCurrentGame = game.id === existingGame?.id;
+
+    return (
+      <>
+        {isCurrentGame && (
+          <li className={s.currentGameLabel}>Your current game</li>
+        )}
+
+        <button
+          type="button"
+          className={s.gameButton}
+          onClick={() => handleOpenJoinModalWithGameId(game.id)}
+        >
+          <GameListItem
+            game={game}
+            className={isCurrentGame ? s.existingGame : undefined}
+          />
+        </button>
+
+        {isCurrentGame && lobbyGames.length > 1 && (
+          <li role="separator" className={s.separator} />
+        )}
+      </>
+    );
+  };
+
   return (
     <div className={s.pageContainer}>
       <Section className={s.listSection}>
         <List
-          items={games}
+          items={lobbyGames}
           getKey={(game) => game.id}
-          renderItem={(game) => (
-            <button
-              type="button"
-              className={s.gameButton}
-              onClick={() => handleOpenJoinModalWithGameId(game.id)}
-            >
-              <GameListItem game={game} />
-            </button>
-          )}
+          renderItem={renderGame}
           className={s.list}
         />
 
