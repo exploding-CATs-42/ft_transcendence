@@ -54,6 +54,7 @@ import {
   isWindowCardOfType,
   isNoped,
   canPlayNope,
+  hasRemainingTurns,
 } from "./guards";
 import {
   countdownCanceled,
@@ -131,6 +132,7 @@ export const gameMachine = setup({
     [GameGuards.IS_PLAYERS_TURN]: isPlayersTurn,
     [GameGuards.IS_NOPED]: isNoped,
     [GameGuards.CAN_PLAY_NOPE]: canPlayNope,
+    [GameGuards.HAS_REMAINING_TURNS]: hasRemainingTurns,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -224,12 +226,8 @@ export const gameMachine = setup({
               {
                 guard: and([
                   GameGuards.IS_ENOUGH_CARDS_IN_DECK,
-                  GameGuards.HAS_EXTRA_TURNS,
+                  GameGuards.IS_PLAYERS_TURN,
                 ]),
-                actions: GameActions.DRAW_CARD,
-              },
-              {
-                guard: GameGuards.IS_ENOUGH_CARDS_IN_DECK,
                 actions: GameActions.DRAW_CARD,
                 target: GameStates.CHECKING_DRAWN_CARD,
               },
@@ -336,6 +334,17 @@ export const gameMachine = setup({
               target: GameTargets.EXPLODING_KITTEN_DRAWN,
             },
             {
+              target: GameTargets.CHECKING_REMAINING_TURNS,
+            },
+          ],
+        },
+        [GameStates.CHECKING_REMAINING_TURNS]: {
+          always: [
+            {
+              guard: and([GameGuards.HAS_REMAINING_TURNS]),
+              target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
+            },
+            {
               target: GameTargets.CHANGING_TURN,
             },
           ],
@@ -372,7 +381,7 @@ export const gameMachine = setup({
           on: {
             [GameEvents.INSERT_KITTEN]: {
               actions: [GameActions.INSERT_KITTEN, emit(kittenInserted)],
-              target: GameTargets.CHANGING_TURN,
+              target: GameTargets.CHECKING_REMAINING_TURNS,
             },
           },
         },

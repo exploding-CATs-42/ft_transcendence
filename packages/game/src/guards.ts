@@ -18,6 +18,7 @@ export const GameGuards = {
   IS_WINDOW_CARD_OF_TYPE: "isWindowCardOfType",
   IS_NOPED: "isNoped",
   CAN_PLAY_NOPE: "canPlayNope",
+  HAS_REMAINING_TURNS: "hasRemainingTurns",
 } as const;
 
 export interface GameGuardArgs {
@@ -56,6 +57,10 @@ export const hasExtraTurns = ({ context }: GameGuardArgs) => {
   return context.turnsCount > 1;
 };
 
+export const hasRemainingTurns = ({ context }: GameGuardArgs) => {
+  return context.turnsCount > 0;
+};
+
 export const hasDefuseCard = ({ context }: GameGuardArgs) => {
   const player = context.players.find(
     (player) => player.id === context.currentTurnPlayerId,
@@ -76,6 +81,7 @@ export const isOnlyOnePlayerLeftAlive = ({ context }: GameGuardArgs) => {
 export const isPlayersTurn = ({ context, event }: GameGuardArgs) => {
   if (
     event.type !== GameEvents.PLAY_CARD &&
+    event.type !== GameEvents.DRAW_CARD &&
     event.type !== GameEvents.PLAY_COMBO
   ) {
     return false;
