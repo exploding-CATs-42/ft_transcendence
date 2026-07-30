@@ -41,6 +41,7 @@ import {
   type Card,
   type NopeWindow,
   CardType,
+  PendingActionType,
 } from "./types";
 import { type GameEvent, type GameOutEvent, GameEvents } from "./events";
 import {
@@ -58,6 +59,7 @@ import {
   canPlayNope,
   hasRemainingTurns,
   lastPlayedCardOfType,
+  pendingActionOfType,
 } from "./guards";
 import {
   countdownCanceled,
@@ -92,6 +94,7 @@ export interface GameContext {
   isUnderAttack: boolean;
   nopeWindow: NopeWindow | null;
   selectedPlayerId: string | null;
+  pendingAction: PendingActionType | null;
 }
 
 export const gameMachine = setup({
@@ -143,6 +146,7 @@ export const gameMachine = setup({
     [GameGuards.CAN_PLAY_NOPE]: canPlayNope,
     [GameGuards.HAS_REMAINING_TURNS]: hasRemainingTurns,
     [GameGuards.LAST_PLAYED_CARD_OF_TYPE]: lastPlayedCardOfType,
+    [GameGuards.PENDING_ACTION_OF_TYPE]: pendingActionOfType,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -158,6 +162,7 @@ export const gameMachine = setup({
     isUnderAttack: false,
     nopeWindow: null,
     selectedPlayerId: null,
+    pendingAction: null,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -412,8 +417,8 @@ export const gameMachine = setup({
           on: {
             [GameEvents.SELECT_PLAYER]: {
               guard: {
-                type: GameGuards.LAST_PLAYED_CARD_OF_TYPE,
-                params: { cardType: CardType.FAVOR },
+                type: GameGuards.PENDING_ACTION_OF_TYPE,
+                params: { actionType: PendingActionType.FAVOR },
               },
               actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
               target: GameTargets.WAITING_FOR_FAVOR_CARD_SELECTION,

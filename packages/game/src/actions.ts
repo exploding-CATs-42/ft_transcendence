@@ -6,7 +6,12 @@ import {
   WAIT_FOR_DEFUSE_TIMEOUT,
   NOPE_WINDOW_MS,
 } from "./constants";
-import { type Card, CardType, type NopeWindow } from "./types";
+import {
+  type Card,
+  CardType,
+  type NopeWindow,
+  PendingActionType,
+} from "./types";
 
 export const GameActions = {
   ADD_PLAYER: "addPlayer",
@@ -238,10 +243,18 @@ export const playCard = ({ context, event }: GameActionArgs) => {
     player.id === playerId ? { ...player, hand: updatedHand } : player,
   );
 
-  return {
-    players: updatedPlayers,
-    lastPlayedCards: [playedCard!],
-  };
+  if (card.type !== CardType.NOPE) {
+    return {
+      players: updatedPlayers,
+      lastPlayedCards: [playedCard!],
+      pendingAction: card.type as PendingActionType,
+    };
+  } else {
+    return {
+      players: updatedPlayers,
+      lastPlayedCards: [playedCard!],
+    };
+  }
 };
 
 export const shuffleDeck = ({ context }: GameActionArgs) => {
@@ -290,9 +303,15 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
     player.id === playerId ? { ...player, hand: updatedHand } : player,
   );
 
+  const pendingAction =
+    playedCards.length === 2
+      ? PendingActionType.CAT_PAIR
+      : PendingActionType.CAT_TRIPLE;
+
   return {
     players: updatedPlayers,
     lastPlayedCards: playedCards as Card[],
+    pendingAction,
   };
 };
 
@@ -443,5 +462,5 @@ export const passCardById = ({ context, event }: GameActionArgs) => {
   const randomIndex = Math.floor(Math.random() * (playerTo.hand.length + 1));
   playerTo.hand.splice(randomIndex, 0, card);
 
-  return { players };
+  return { players, pendingAction: null };
 };
