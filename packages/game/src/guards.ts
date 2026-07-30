@@ -14,6 +14,7 @@ export const GameGuards = {
   HAS_DEFUSE_CARD: "hasDefuseCard",
   IS_EXPLODING_KITTEN_DRAWN: "isExplodingKittenDrawn",
   IS_ONLY_ONE_PLAYER_LEFT_ALIVE: "isOnlyOnePlayerLeftAlive",
+  LEAVES_SINGLE_ALIVE_PLAYER: "leavesSingleAlivePlayer",
   IS_PLAYERS_TURN: "isPlayersTurn",
   IS_WINDOW_CARD_OF_TYPE: "isWindowCardOfType",
   IS_NOPED: "isNoped",
@@ -73,6 +74,18 @@ export const hasDefuseCard = ({ context }: GameGuardArgs) => {
 
 export const isExplodingKittenDrawn = ({ context }: GameGuardArgs) => {
   return context.lastDrawnCard?.type === CardType.EXPLODING_KITTEN;
+};
+
+export const leavesSingleAlivePlayer = ({ context, event }: GameGuardArgs) => {
+  if (event.type !== GameEvents.LEAVE_GAME) return false;
+
+  const alivePlayers = context.players.filter((player) => player.isAlive);
+
+  // An already eliminated player leaving must not end the game for the others.
+  return (
+    alivePlayers.length === MIN_PLAYERS &&
+    alivePlayers.some((player) => player.id === event.playerId)
+  );
 };
 
 export const isOnlyOnePlayerLeftAlive = ({ context }: GameGuardArgs) => {
