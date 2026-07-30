@@ -60,6 +60,7 @@ import {
   hasRemainingTurns,
   lastPlayedCardOfType,
   pendingActionOfType,
+  leavesSingleAlivePlayer,
 } from "./guards";
 import {
   countdownCanceled,
@@ -141,6 +142,7 @@ export const gameMachine = setup({
     [GameGuards.HAS_DEFUSE_CARD]: hasDefuseCard,
     [GameGuards.IS_EXPLODING_KITTEN_DRAWN]: isExplodingKittenDrawn,
     [GameGuards.IS_ONLY_ONE_PLAYER_LEFT_ALIVE]: isOnlyOnePlayerLeftAlive,
+    [GameGuards.LEAVES_SINGLE_ALIVE_PLAYER]: leavesSingleAlivePlayer,
     [GameGuards.IS_PLAYERS_TURN]: isPlayersTurn,
     [GameGuards.IS_NOPED]: isNoped,
     [GameGuards.CAN_PLAY_NOPE]: canPlayNope,
@@ -224,9 +226,16 @@ export const gameMachine = setup({
         emit(gameStarted),
       ],
       on: {
-        [GameEvents.LEAVE_GAME]: {
-          actions: GameActions.REMOVE_PLAYER,
-        },
+        [GameEvents.LEAVE_GAME]: [
+          {
+            guard: GameGuards.LEAVES_SINGLE_ALIVE_PLAYER,
+            actions: GameActions.REMOVE_PLAYER,
+            target: GameTargets.GAME_OVER,
+          },
+          {
+            actions: GameActions.REMOVE_PLAYER,
+          },
+        ],
       },
       initial: GameStates.CHANGING_TURN,
       states: {
