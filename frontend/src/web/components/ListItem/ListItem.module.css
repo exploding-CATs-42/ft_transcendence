@@ -4,7 +4,7 @@
   border: 1px solid var(--soft-black);
   border-radius: 40px;
 
-  background-color: var(--off-white);
+  background-color: var(--list-item-background, var(--off-white));
 
   box-shadow: 0px 4px 4px 0px var(--shadow);
 
