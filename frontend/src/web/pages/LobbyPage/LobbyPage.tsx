@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import clsx from "clsx";
 import {
@@ -76,6 +76,7 @@ const LobbyPage = () => {
   const [joinError, setJoinError] = useState("");
   const [isJoiningGame, setIsJoiningGame] = useState(false);
   const [existingGame, setExistingGame] = useState<GameRecord | null>(null);
+  const [isOpenExistingGameModal, toggleExistingGameModal] = useModal();
 
   const navigate = useNavigate();
   const { socket } = useSocket();
@@ -126,6 +127,12 @@ const LobbyPage = () => {
     };
   }, [socket]);
 
+  const toggleExistingGameModalRef = useRef(toggleExistingGameModal);
+
+  useEffect(() => {
+    toggleExistingGameModalRef.current = toggleExistingGameModal;
+  });
+
   useEffect(() => {
     let ignore = false;
 
@@ -136,6 +143,7 @@ const LobbyPage = () => {
         if (ignore || !currentGame) return;
 
         setExistingGame(currentGame);
+        toggleExistingGameModalRef.current(true);
       } catch (error) {
         console.error("Failed to load current game:", error);
       }
@@ -219,13 +227,14 @@ const LobbyPage = () => {
   };
 
   const handleCloseExistingGameModal = () => {
-    setExistingGame(null);
+    toggleExistingGameModal(false);
   };
 
   const handleLeaveExistingGame = () => {
     if (!existingGame) return;
 
     socket.once(ServerPrivateEvents.LEFT_GAME, () => {
+      toggleExistingGameModal(false);
       setExistingGame(null);
     });
     socket.emit(ClientEvents.LEAVE_GAME, { gameId: existingGame.id });
@@ -307,7 +316,7 @@ const LobbyPage = () => {
       />
 
       <ExistingGameModal
-        isOpen={Boolean(existingGame)}
+        isOpen={isOpenExistingGameModal}
         gameName={existingGame?.name}
         onReturn={handleReturnToExistingGame}
         onLeave={handleLeaveExistingGame}
