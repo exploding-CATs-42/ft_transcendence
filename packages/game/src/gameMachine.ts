@@ -35,6 +35,7 @@ import {
   addNope,
   selectPlayer,
   passCardById,
+  markPlayersAsPlaying,
 } from "./actions";
 import {
   type Player,
@@ -114,6 +115,7 @@ export const gameMachine = setup({
     [GameActions.FILL_DECK]: assign(fillDeck),
     [GameActions.DEAL_CARDS]: assign(dealCards),
     [GameActions.SHUFFLE_PLAYERS]: assign(shufflePlayers),
+    [GameActions.MARK_PLAYERS_AS_PLAYING]: assign(markPlayersAsPlaying),
     [GameActions.CHANGE_TURN]: assign(changeTurn),
     [GameActions.CHANGE_TURN_UNDER_ATTACK]: assign(changeTurnUnderAttack),
     [GameActions.DRAW_CARD]: assign(drawCard),
@@ -223,6 +225,7 @@ export const gameMachine = setup({
     [GameStates.PLAYING]: {
       entry: [
         GameActions.SHUFFLE_PLAYERS,
+        GameActions.MARK_PLAYERS_AS_PLAYING,
         GameActions.FILL_DECK,
         GameActions.DEAL_CARDS,
         emit(gameStarted),
