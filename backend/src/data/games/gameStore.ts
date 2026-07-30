@@ -1,5 +1,5 @@
 // Project level
-import { getGameContext } from "@exploding-cats/game-core";
+import { getGameContext, PlayerStatus } from "@exploding-cats/game-core";
 // Local level
 import { Game, GameId } from "./types";
 
@@ -17,7 +17,7 @@ export function findCurrentGameByUserId(userId: string): Game | undefined {
   return [...games.values()].find((game) => {
     const players = getGameContext(game.instance).players;
     return players.some((player) => {
-      return player.id === userId;
+      return player.id === userId && player.status !== PlayerStatus.LEFT;
     });
   });
 }
