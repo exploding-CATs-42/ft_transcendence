@@ -26,7 +26,7 @@ export class DefuseView extends Phaser.GameObjects.Container {
     const graphics = scene.add.graphics();
     graphics.fillStyle(color, 1);
     graphics.fillRoundedRect(
-      -width / 4,
+      -width / 2,
       -height / 2,
       width,
       height,
@@ -37,13 +37,17 @@ export class DefuseView extends Phaser.GameObjects.Container {
   }
 
   private addPlayerNameLabel(scene: Phaser.Scene, name: string) {
-    const label = scene.add.text(130, -100, name, { ...TEXT_CONFIG });
+    const label = scene.add
+      .text(0, -100, name, { ...TEXT_CONFIG })
+      .setOrigin(0.5, 0);
     return label;
   }
 
   private addActionLabel(scene: Phaser.Scene) {
     const text = "HAS DEFUSED THE EXPLODING KITTEN!";
-    const label = scene.add.text(-160, 0, text, { ...TEXT_CONFIG });
+    const label = scene.add
+      .text(0, 0, text, { ...TEXT_CONFIG })
+      .setOrigin(0.5, 0);
     return label;
   }
 }
