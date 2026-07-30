@@ -176,7 +176,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #drawPile: Phaser.GameObjects.Image | null = null;
   #shuffleAnimation!: ShuffleAnimation;
   #discardPile: Phaser.GameObjects.Image | null = null;
-  #discardPileZone!: Phaser.GameObjects.Graphics;
+  #discardPileZone: Phaser.GameObjects.Graphics | null = null;
   #cardDropZone: Phaser.GameObjects.Zone | null = null;
   #selectedCardPlay: CardPlaySelection | null = null;
   #modal!: Modal;
@@ -314,10 +314,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
           displayHeight: CARD_HEIGHT,
           duration: CARD_TO_DISCARD_DURATION_MS,
           ease: CARD_TO_DISCARD_EASE,
-          onComplete: () => {
-            this.#discardPile?.destroy();
-            this.#discardPile = card.image;
-          },
+          onComplete: () => this.setDiscardPile(card.image),
         });
       }
     };
@@ -389,21 +386,18 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private createDiscardPile(lastPlayedCard: Card | null = null) {
-    if (lastPlayedCard) {
-      this.drawLastPlayedCard(lastPlayedCard);
-    } else {
-      this.createDiscardPileZone();
-    }
-    this.updateComboPlayInteractivity();
-  }
+    this.createDiscardPileZone();
 
-  private drawLastPlayedCard(lastPlayedCard: Card) {
-    const frame: Phaser.Textures.Frame = getCardFrame(
-      this,
-      CARD_TYPE_TO_FRAME_INDEX[lastPlayedCard.type],
-    );
-    this.#discardPile = this.addCard(frame, DISCARD_PILE_POSITION);
-    this.#discardPile.on("pointerdown", this.playSelectedKindCombo);
+    if (lastPlayedCard) {
+      const frame: Phaser.Textures.Frame = getCardFrame(
+        this,
+        CARD_TYPE_TO_FRAME_INDEX[lastPlayedCard.type],
+      );
+
+      this.setDiscardPile(this.addCard(frame, DISCARD_PILE_POSITION));
+    }
+
+    this.updateComboPlayInteractivity();
   }
 
   private createDiscardPileZone() {
@@ -420,7 +414,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     );
 
     this.#discardPileZone = outline;
-    this.#discardPileZone.on("pointerdown", this.playSelectedKindCombo);
   }
 
   private createCardDropZone() {
@@ -563,6 +556,18 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#favorCardDropZone.setVisible(true);
     this.#discardPile?.setVisible(false);
     this.#drawPile?.setVisible(false);
+  }
+
+  private setDiscardPile(card: Phaser.GameObjects.Image) {
+    if (this.#discardPile === card) return;
+
+    this.#discardPile?.destroy();
+    this.#discardPile = card;
+
+    this.#discardPileZone?.setVisible(false);
+
+    card.on("pointerdown", this.playSelectedKindCombo);
+    this.updateComboPlayInteractivity();
   }
 
   // -------------------- SOCKETS --------------------
@@ -738,7 +743,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const hand = this.#opponents.get(playerId);
 
     if (!hand) {
-      this.addCard(cardFrame, DISCARD_PILE_POSITION);
+      this.setDiscardPile(this.addCard(cardFrame, DISCARD_PILE_POSITION));
       return;
     }
 
@@ -756,10 +761,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       displayHeight: CARD_HEIGHT,
       duration: CARD_TO_DISCARD_DURATION_MS,
       ease: CARD_TO_DISCARD_EASE,
-      onComplete: () => {
-        this.#discardPile?.destroy();
-        this.#discardPile = flyingCard;
-      },
+      onComplete: () => this.setDiscardPile(flyingCard),
     });
   }
 
