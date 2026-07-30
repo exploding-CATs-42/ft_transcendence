@@ -56,6 +56,7 @@ import {
   ExplodingKittenDrawnView,
   ExplodingKittenInsertionView,
   NopeButton,
+  DefuseView,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -117,6 +118,7 @@ const SHUFFLE_ANIMATION_POSITION = {
 };
 
 const SKIP_VIEW_DURATION_MS = 2000;
+const DEFUSE_VIEW_DURATION_MS = SKIP_VIEW_DURATION_MS;
 
 const NOPE_BUTTON_POSITION = {
   x: 1700,
@@ -815,6 +817,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         this.cleanModal();
         insertKitten(explodingKittenPosition);
       };
+    } else {
+      const playerName = this.#players.get(payload.playerId)?.player?.name;
+      if (!playerName) return;
+      const defuseView = new DefuseView(this, playerName);
+      this.#modal.setContent(defuseView);
+      this.#modal.setVisible(true);
+      const modal = this.#modal;
+      this.time.delayedCall(DEFUSE_VIEW_DURATION_MS, () =>
+        modal.setVisible(false),
+      );
     }
   };
 
