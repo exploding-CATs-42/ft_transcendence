@@ -37,6 +37,8 @@ const CLICK_MAX_DISTANCE = 24;
 const LEFT_POINTER_BUTTON = 0;
 const SELECTED_CARD_OUTLINE_WIDTH = 12;
 
+const DEAD_CARD_TINT = 0x555555;
+
 type onCardDropCallback = (card: GraphicCard) => void;
 type KindCombo = "two-of-a-kind" | "three-of-a-kind";
 
@@ -80,6 +82,7 @@ export class GraphicHand {
   #isMyTurn: () => boolean;
   #isFavorModeActive: () => boolean;
   #giveCard: (cardId: number) => void;
+  #isDisabled = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -125,6 +128,7 @@ export class GraphicHand {
         this.#cards.splice(insertIndex, 0, newGraphicCard.image);
         this.#cardsData.set(card.id, newGraphicCard);
         this.updateCardsDraggability();
+        if (this.#isDisabled) this.disableCard(newGraphicCard.image);
         if (this.#cards.length > 1) this.reflowCards();
       },
     });
@@ -256,6 +260,23 @@ export class GraphicHand {
     cardImage.on("dragstart", onDragStart);
     cardImage.on("drag", onDrag);
     cardImage.on("dragend", onDragEnd);
+  }
+
+  disable() {
+    this.#isDisabled = true;
+    this.clearKindComboSelection();
+    this.#hoveredCardImage = null;
+
+    this.#cardsData.forEach(({ image }) => this.disableCard(image));
+
+    this.reflowCards();
+  }
+
+  private disableCard(image: Phaser.GameObjects.Image) {
+    this.#scene.input.setDraggable(image, false);
+    image.disableInteractive();
+    image.postFX.clear();
+    image.setTint(DEAD_CARD_TINT);
   }
 
   removeCard(cardId: number) {
