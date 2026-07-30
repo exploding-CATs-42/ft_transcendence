@@ -5,7 +5,7 @@ import {
   PublicPlayerView,
   WaitingPlayerView,
 } from "@exploding-cats/contracts";
-import { Player } from "@exploding-cats/game-core";
+import { Player, PlayerStatus } from "@exploding-cats/game-core";
 import { isUserOnline } from "sockets/onlineUsers";
 
 export const toWaitingPlayerView = (p: Player): WaitingPlayerView => ({
@@ -14,6 +14,7 @@ export const toWaitingPlayerView = (p: Player): WaitingPlayerView => ({
   avatarUrl: p.avatarUrl,
   isConfirmed: p.isConfirmed,
   isConnected: isUserOnline(p.id),
+  status: PlayerStatus.WAITING,
 });
 
 export const toGamePlayerView = (p: Player): GamePlayerView => ({
@@ -21,6 +22,7 @@ export const toGamePlayerView = (p: Player): GamePlayerView => ({
   name: p.name,
   avatarUrl: p.avatarUrl,
   isAlive: p.isAlive,
+  status: p.status,
   isConnected: isUserOnline(p.id),
 });
 
