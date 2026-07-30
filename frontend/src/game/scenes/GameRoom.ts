@@ -807,7 +807,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.cleanModal();
 
       const view = new ExplodingKittenInsertionView(this, payload.deckSize);
-      this.time.delayedCall(1300, () => {
+      this.time.delayedCall(500, () => {
         this.#modal!.setContent(view);
         this.#modal!.setVisible(true);
       });
