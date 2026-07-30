@@ -23,6 +23,7 @@ export const GameActions = {
   FILL_DECK: "fillDeck",
   DEAL_CARDS: "dealCards",
   SHUFFLE_PLAYERS: "shufflePlayers",
+  MARK_PLAYERS_AS_PLAYING: "markPlayersAsPlaying",
   CHANGE_TURN: "changeTurn",
   CHANGE_TURN_UNDER_ATTACK: "changeTurnUnderAttack",
   DRAW_CARD: "drawCard",
@@ -159,6 +160,15 @@ export const shufflePlayers = ({ context }: GameActionArgs) => {
   const players = context.players.slice();
 
   shuffle(players);
+
+  return { players };
+};
+
+export const markPlayersAsPlaying = ({ context }: GameActionArgs) => {
+  const players = context.players.map((p) => ({
+    ...p,
+    status: PlayerStatus.PLAYING,
+  }));
 
   return { players };
 };
