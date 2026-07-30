@@ -7,6 +7,7 @@ import s from "./GameListItem.module.css";
 
 interface Props {
   game: GameListItemData;
+  className?: string | undefined;
 }
 
 const GAME_HISTORY_SLOT_COUNT = 5;
@@ -15,7 +16,7 @@ const isLobbyGame = (game: GameListItemData): game is LobbyGame => {
   return "maxPlayers" in game;
 };
 
-const GameListItem = ({ game }: Props) => {
+const GameListItem = ({ game, className }: Props) => {
   const gameId = isLobbyGame(game) ? game.id : game.gameId;
   const gameName = isLobbyGame(game) ? game.name : game.gameName;
   const slotCount = isLobbyGame(game)
@@ -24,7 +25,7 @@ const GameListItem = ({ game }: Props) => {
   const slots: GameSlot[] = createGameSlots(game.players, slotCount);
 
   return (
-    <ListItem>
+    <ListItem className={className}>
       <div className={s.container}>
         <span className={s.title}>{gameName}</span>
         <ul className={s.items}>
