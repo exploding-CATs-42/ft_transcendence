@@ -209,7 +209,7 @@ export async function joinGame(
     player,
   } = await getGameContext(userId, input.gameId);
 
-  if (player) {
+  if (player && player.status !== PlayerStatus.LEFT) {
     if (isGameInProgress(game)) {
       // My game is mid-play: the client must use RECONNECT_GAME
       // to get the game state instead of the waiting room.
@@ -281,6 +281,10 @@ export async function reconnectGame(
 
   if (!isGameInProgress(game)) {
     throw new SocketError("Game is not in progress");
+  }
+
+  if (player.status === PlayerStatus.LEFT) {
+    throw new SocketError("Player has already left the game");
   }
 
   const orderedPlayers = orderPlayersForPlayer(players, player.id);
