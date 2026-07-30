@@ -3,7 +3,7 @@ import type { GameContext } from "./gameMachine";
 import { MIN_PLAYERS } from "./constants";
 import { GameEvents } from "./events";
 import type { GameEvent } from "./events";
-import { CardType } from "./types";
+import { CardType, PendingActionType } from "./types";
 
 export const GameGuards = {
   HAS_ENOUGH_PLAYERS: "hasEnoughPlayers",
@@ -20,6 +20,7 @@ export const GameGuards = {
   CAN_PLAY_NOPE: "canPlayNope",
   HAS_REMAINING_TURNS: "hasRemainingTurns",
   LAST_PLAYED_CARD_OF_TYPE: "lastPlayedCardOfType",
+  PENDING_ACTION_OF_TYPE: "pendingActionOfType",
 } as const;
 
 export interface GameGuardArgs {
@@ -127,4 +128,11 @@ export const lastPlayedCardOfType = (
 ) => {
   const cards = context.lastPlayedCards!;
   return cards[0]?.type === params.cardType;
+};
+
+export const pendingActionOfType = (
+  { context }: GameGuardArgs,
+  params: { actionType: PendingActionType },
+) => {
+  return context.pendingAction === params.actionType;
 };
