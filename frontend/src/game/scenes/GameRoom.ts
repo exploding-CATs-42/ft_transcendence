@@ -819,8 +819,39 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onKittenInserted = (payload: KittenInsertedPayload): void => {
-    console.log("EXPLODING KITTEN INSERTED");
-    this.#opponents.get(payload.playerId)?.removeCard();
+    const { playerId } = payload;
+
+    const hand = this.#opponents.get(playerId);
+    if (!hand) return;
+
+    const { position, size } = hand.getTopCardBounds();
+
+    const cardCover = this.textures.get(Textures.cardCover).get();
+    const cardConfig: CardConfig = {
+      frame: cardCover,
+      size,
+    };
+    const flyingCard = addCardVisual(
+      this,
+      position,
+      cardConfig,
+      CARD_BORDER_RADIUS,
+    );
+
+    this.tweens.add({
+      targets: flyingCard,
+      x: DRAW_PILE_POSITION.x,
+      y: DRAW_PILE_POSITION.y,
+      displayWidth: CARD_WIDTH,
+      displayHeight: CARD_HEIGHT,
+      duration: CARD_FROM_DRAW_PILE_DURATION_MS,
+      ease: CARD_FROM_DRAW_PILE_EASE,
+
+      onComplete: () => {
+        flyingCard.destroy();
+        hand.removeCard();
+      },
+    });
   };
 
   onPlayerEliminated = (payload: PlayerIdPayload): void => {
