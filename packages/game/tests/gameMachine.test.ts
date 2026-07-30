@@ -9,7 +9,7 @@ import {
   DEFAULT_GAME_RULES,
   START_GAME_COUNTDOWN_MS,
 } from "../src";
-import { CardType, Player } from "../src/types";
+import { CardType, Player, PlayerStatus } from "../src/types";
 
 const DECK_SIZE = 56;
 const PLAYERS: Player[] = [
@@ -18,16 +18,16 @@ const PLAYERS: Player[] = [
     id: "1",
     avatarUrl: null,
     hand: [],
-    isAlive: true,
     isConfirmed: false,
+    status: PlayerStatus.WAITING,
   },
   {
     name: "player 2",
     id: "2",
     avatarUrl: null,
     hand: [],
-    isAlive: true,
     isConfirmed: false,
+    status: PlayerStatus.WAITING,
   },
 ];
 
@@ -167,8 +167,11 @@ describe("game machine", () => {
 
     const snapshot = actor.getSnapshot();
 
-    expect(snapshot.context.players).not.toContainEqual(
-      expect.objectContaining({ id: leavingPlayerId }),
+    expect(snapshot.context.players).toContainEqual(
+      expect.objectContaining({
+        id: leavingPlayerId,
+        status: PlayerStatus.LEFT,
+      }),
     );
 
     vi.useRealTimers();

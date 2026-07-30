@@ -6,6 +6,7 @@ import {
   GameOutEvents,
   GameStates,
   NOPE_WINDOW_MS,
+  PlayerStatus,
   changeTurn,
   changeTurnUnderAttack,
   gameMachine,
@@ -47,7 +48,7 @@ const PLAYERS: Player[] = [
     avatarUrl: null,
     hand: [ATTACK_CARD],
     isConfirmed: true,
-    isAlive: true,
+    status: PlayerStatus.PLAYING,
   },
   {
     id: "2",
@@ -55,7 +56,7 @@ const PLAYERS: Player[] = [
     avatarUrl: null,
     hand: [],
     isConfirmed: true,
-    isAlive: true,
+    status: PlayerStatus.PLAYING,
   },
 ];
 
@@ -74,6 +75,8 @@ const createContext = (overrides: Partial<GameContext> = {}): GameContext => ({
   currentTurnPlayerId: "1",
   lastDrawnCard: null,
   lastPlayedCards: null,
+  selectedPlayerId: null,
+  pendingAction: null,
   countdownEndsAt: null,
   turnsCount: 1,
   isUnderAttack: false,

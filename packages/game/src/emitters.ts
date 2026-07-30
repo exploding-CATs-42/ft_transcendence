@@ -1,7 +1,7 @@
 // Local level
 import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
 import type { GameContext } from "./gameMachine";
-import { CardType } from "./types";
+import { CardType, PlayerStatus } from "./types";
 
 type GameEmitterArgs = {
   context: GameContext;
@@ -104,7 +104,9 @@ export const playerEliminated = ({
 });
 
 export const gameOver = ({ context }: GameEmitterArgs): GameOutEvent => {
-  const winner = context.players.find((player) => player.isAlive)!;
+  const winner = context.players.find(
+    (player) => player.status === PlayerStatus.PLAYING,
+  )!;
 
   return {
     type: GameOutEvents.GAME_OVER,

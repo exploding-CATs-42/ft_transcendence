@@ -179,7 +179,6 @@ export async function createGame(
     avatarUrl: user.avatarUrl,
     hand: [],
     isConfirmed: false,
-    isAlive: true,
     status: PlayerStatus.WAITING,
   };
 
@@ -254,7 +253,6 @@ export async function joinGame(
     avatarUrl: user.avatarUrl,
     hand: [],
     isConfirmed: false,
-    isAlive: true,
     status: PlayerStatus.WAITING,
   };
 

@@ -2,7 +2,7 @@
 import { describe, it, expect } from "vitest";
 // Package level
 import { createDeck, dealInitialCards, DEFAULT_GAME_RULES } from "../src";
-import { CardType, Deck, Player } from "../src/types";
+import { CardType, Deck, Player, PlayerStatus } from "../src/types";
 
 const DECK_SIZE = 56;
 const PLAYERS: Player[] = [
@@ -11,16 +11,16 @@ const PLAYERS: Player[] = [
     id: "1",
     avatarUrl: null,
     hand: [],
-    isAlive: true,
     isConfirmed: false,
+    status: PlayerStatus.PLAYING,
   },
   {
     name: "player 2",
     id: "2",
     avatarUrl: null,
     hand: [],
-    isAlive: true,
     isConfirmed: false,
+    status: PlayerStatus.PLAYING,
   },
 ];
 

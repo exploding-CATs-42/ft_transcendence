@@ -1,6 +1,6 @@
 // Project level
 import {
-  GamePlayerView,
+  PlayerView,
   GameStartedPayload,
   PublicPlayerView,
   WaitingPlayerView,
@@ -17,17 +17,16 @@ export const toWaitingPlayerView = (p: Player): WaitingPlayerView => ({
   status: PlayerStatus.WAITING,
 });
 
-export const toGamePlayerView = (p: Player): GamePlayerView => ({
+export const toPlayerView = (p: Player): PlayerView => ({
   id: p.id,
   name: p.name,
   avatarUrl: p.avatarUrl,
-  isAlive: p.isAlive,
   status: p.status,
   isConnected: isUserOnline(p.id),
 });
 
 export const toPublicPlayerView = (p: Player): PublicPlayerView => ({
-  ...toGamePlayerView(p),
+  ...toPlayerView(p),
   handSize: p.hand.length,
 });
 

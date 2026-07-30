@@ -108,7 +108,6 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
         name: player.name,
         avatarUrl: player.avatarUrl,
         status: player.status,
-        isAlive: true,
       },
       NAME_LABEL_CONFIG,
     );

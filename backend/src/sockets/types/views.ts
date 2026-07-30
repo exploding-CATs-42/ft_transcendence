@@ -6,12 +6,12 @@ import {
   PendingAction,
   TurnPhase,
 } from "@exploding-cats/game-core";
-import { GamePlayerView } from "@exploding-cats/contracts";
+import { PlayerView } from "@exploding-cats/contracts";
 
 export interface PublicGameView {
   gameId: string;
   turn: PublicTurnView;
-  players: GamePlayerView[];
+  players: PlayerView[];
   deckSize: number;
   discardPileTop: Card | null;
   winnerId: string | null;

@@ -178,7 +178,7 @@ const changeTurnState = (
   for (let i = 1; i <= players.length; ++i) {
     const nextPlayer = players[(currentPlayerIndex + i) % players.length]!;
 
-    if (nextPlayer.isAlive) {
+    if (nextPlayer.status === PlayerStatus.PLAYING) {
       return {
         currentTurnPlayerId: nextPlayer.id,
         turnsCount,
@@ -363,7 +363,6 @@ export const explodePlayer = ({ context }: GameActionArgs) => {
       ? player
       : {
           ...player,
-          isAlive: false,
           status: PlayerStatus.ELIMINATED,
         },
   );

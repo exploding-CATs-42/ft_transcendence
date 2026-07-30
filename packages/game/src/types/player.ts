@@ -16,6 +16,5 @@ export interface Player {
   avatarUrl: string | null;
   hand: Card[];
   isConfirmed: boolean;
-  isAlive: boolean;
   status: PlayerStatus;
 }

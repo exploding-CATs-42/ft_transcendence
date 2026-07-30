@@ -3,7 +3,7 @@ import type { GameContext } from "./gameMachine";
 import { MIN_PLAYERS } from "./constants";
 import { GameEvents } from "./events";
 import type { GameEvent } from "./events";
-import { CardType, PendingActionType } from "./types";
+import { CardType, PendingActionType, PlayerStatus } from "./types";
 
 export const GameGuards = {
   HAS_ENOUGH_PLAYERS: "hasEnoughPlayers",
@@ -79,7 +79,9 @@ export const isExplodingKittenDrawn = ({ context }: GameGuardArgs) => {
 export const leavesSingleAlivePlayer = ({ context, event }: GameGuardArgs) => {
   if (event.type !== GameEvents.LEAVE_GAME) return false;
 
-  const alivePlayers = context.players.filter((player) => player.isAlive);
+  const alivePlayers = context.players.filter(
+    (player) => player.status === PlayerStatus.PLAYING,
+  );
 
   // An already eliminated player leaving must not end the game for the others.
   return (
@@ -89,7 +91,9 @@ export const leavesSingleAlivePlayer = ({ context, event }: GameGuardArgs) => {
 };
 
 export const isOnlyOnePlayerLeftAlive = ({ context }: GameGuardArgs) => {
-  const aliveCount = context.players.filter((player) => player.isAlive).length;
+  const aliveCount = context.players.filter(
+    (player) => player.status === PlayerStatus.PLAYING,
+  ).length;
   return aliveCount === 1;
 };
 
@@ -132,7 +136,7 @@ export const canPlayNope = ({ context, event }: GameGuardArgs) => {
 
   const player = players.find((p) => p.id === event.playerId);
 
-  return player?.isAlive ?? false;
+  return player?.status === PlayerStatus.PLAYING;
 };
 
 export const lastPlayedCardOfType = (

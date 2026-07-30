@@ -8,11 +8,7 @@ export interface PlayerView {
   status: PlayerStatus;
 }
 
-export interface GamePlayerView extends PlayerView {
-  isAlive: boolean;
-}
-
-export interface PublicPlayerView extends GamePlayerView {
+export interface PublicPlayerView extends PlayerView {
   handSize: number;
 }
 

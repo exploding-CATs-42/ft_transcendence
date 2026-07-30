@@ -3,6 +3,7 @@ import { Scene } from "phaser";
 // Project level
 import {
   CardType,
+  PlayerStatus,
   type Card,
   type CardPayload,
   type GameOverPayload,
@@ -228,7 +229,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.updateAttackIndicator();
     }
 
-    this.#isAlive = players[0]!.isAlive;
+    this.#isAlive = players[0]!.status === PlayerStatus.PLAYING;
 
     this.createCardDropZone();
     this.createDrawPile();
@@ -259,7 +260,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private setDeadPlayers(players: GraphicPlayer[]) {
-    players.forEach((player) => (player.isAlive ? player : player.setDead()));
+    players.forEach((player) =>
+      player.status === PlayerStatus.ELIMINATED ? player.setDead() : player,
+    );
   }
 
   private fillSeats(players: GraphicPlayer[]) {
@@ -274,7 +277,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       const opponentSeat = new PlayerSeat(this, GAME_ROOM_SEATS[i]!);
       opponentSeat.addPlayer(opponent);
 
-      if (opponent.isAlive)
+      if (opponent.status === PlayerStatus.PLAYING)
         opponentSeat.addHand(this.#opponents.get(opponent.id)!);
 
       this.#players.set(opponent.id, opponentSeat);
@@ -351,7 +354,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private createOpponentHands(players: GraphicPlayer[]) {
     for (let i = 1; i < players.length; ++i) {
-      if (!players[i]?.isAlive) continue;
+      if (players[i]?.status !== PlayerStatus.PLAYING) continue;
 
       const x = OPPONENT_HAND_X_OFFSET;
       const y = OPPONENT_HAND_Y_OFFSET;
@@ -525,7 +528,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const players = [...this.#players.values()];
     for (let i = 1; i < players.length; ++i) {
       const player = players[i]!;
-      if (player.player?.isAlive) {
+      if (player.player?.status === PlayerStatus.PLAYING) {
         player.setTargetIconVisible(true);
         player.onClick = this.selectOpponent;
         player.setCursorPointer(true);

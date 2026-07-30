@@ -1,4 +1,4 @@
-import type { PlayerStatus } from "@exploding-cats/game-core";
+import { PlayerStatus } from "@exploding-cats/game-core";
 import type { Point, LabelConfig, Player } from "game/@types";
 import { Textures } from "game/constants";
 import { getRoundedAvatarTexture } from "game/utils";
@@ -13,7 +13,6 @@ export class GraphicPlayer implements Player {
   readonly id: string;
   readonly name: string;
   readonly avatarUrl: string | null;
-  isAlive: boolean;
   status: PlayerStatus;
   readonly container: Phaser.GameObjects.Container;
   private avatar: Phaser.GameObjects.Image;
@@ -33,7 +32,6 @@ export class GraphicPlayer implements Player {
     this.id = player.id;
     this.name = player.name;
     this.avatarUrl = player.avatarUrl;
-    this.isAlive = player.isAlive;
     this.status = player.status;
     this.confirmedIcon = this.addConfirmedIcon(scene);
 
@@ -111,7 +109,7 @@ export class GraphicPlayer implements Player {
 
     const setAvatarVisible = () => {
       this.container.setVisible(true);
-      if (!this.isAlive) return;
+      if (this.status !== PlayerStatus.PLAYING) return;
       avatar.setTexture(getRoundedAvatarTexture(scene, key));
       avatar.setDisplaySize(AVATAR_WIDTH, AVATAR_WIDTH);
       this.container.setVisible(true);
@@ -172,7 +170,7 @@ export class GraphicPlayer implements Player {
   }
 
   setDead() {
-    this.isAlive = false;
+    this.status = PlayerStatus.ELIMINATED;
 
     const textureKey = getRoundedAvatarTexture(this.#scene, Textures.dead);
     this.avatar

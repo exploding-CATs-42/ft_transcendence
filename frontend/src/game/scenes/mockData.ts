@@ -1,11 +1,11 @@
 import type { Card } from "@exploding-cats/game-core";
 
 export const fakePlayers = [
-  { id: "1", avatarUrl: null, isAlive: true, name: "me" },
-  { id: "2", avatarUrl: null, isAlive: true, name: "player1" },
-  { id: "3", avatarUrl: null, isAlive: true, name: "player2" },
-  { id: "4", avatarUrl: null, isAlive: true, name: "player3" },
-  { id: "5", avatarUrl: null, isAlive: true, name: "player4" },
+  { id: "1", avatarUrl: null, name: "me", status: "Waiting" },
+  { id: "2", avatarUrl: null, name: "player1", status: "Waiting" },
+  { id: "3", avatarUrl: null, name: "player2", status: "Waiting" },
+  { id: "4", avatarUrl: null, name: "player3", status: "Waiting" },
+  { id: "5", avatarUrl: null, name: "player4", status: "Waiting" },
 ];
 
 export const fakeCards: Card[] = [
