@@ -24,6 +24,7 @@ import {
   GameEvents,
   GameStates,
   type Player,
+  PlayerStatus,
 } from "@exploding-cats/game-core";
 import {
   GameStatePayload,
@@ -179,6 +180,7 @@ export async function createGame(
     hand: [],
     isConfirmed: false,
     isAlive: true,
+    status: PlayerStatus.WAITING,
   };
 
   game.instance.send({
@@ -253,6 +255,7 @@ export async function joinGame(
     hand: [],
     isConfirmed: false,
     isAlive: true,
+    status: PlayerStatus.WAITING,
   };
 
   game.instance.send({
