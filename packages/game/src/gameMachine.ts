@@ -233,11 +233,6 @@ export const gameMachine = setup({
       on: {
         [GameEvents.LEAVE_GAME]: [
           {
-            guard: GameGuards.LEAVES_SINGLE_ALIVE_PLAYER,
-            actions: GameActions.MARK_PLAYER_AS_LEFT,
-            target: GameTargets.GAME_OVER,
-          },
-          {
             guard: GameGuards.IS_PLAYERS_TURN,
             actions: GameActions.MARK_PLAYER_AS_LEFT,
             target: GameTargets.CHANGING_TURN,
@@ -251,9 +246,15 @@ export const gameMachine = setup({
       states: {
         [GameStates.CHANGING_TURN]: {
           entry: [GameActions.CHANGE_TURN, emit(turnChanged)],
-          always: {
-            target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
-          },
+          always: [
+            {
+              guard: GameGuards.IS_ONLY_ONE_PLAYER_LEFT_ALIVE,
+              target: GameTargets.GAME_OVER,
+            },
+            {
+              target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
+            },
+          ],
         },
         [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
           on: {
