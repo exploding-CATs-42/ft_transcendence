@@ -181,6 +181,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #nopeButton!: NopeButton;
   #favorCardDropZone!: Phaser.GameObjects.Graphics;
   #favorModeActive: boolean = false;
+  #isAlive = true;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -224,6 +225,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.updateAttackIndicator();
     }
 
+    this.#isAlive = players[0]!.isAlive;
+
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile(
@@ -233,6 +236,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     );
     this.createMyHand();
     this.fillMyHandWithCards(cards);
+    if (!this.#isAlive) this.#myHand.disable();
 
     this.addShuffleAnimationObject();
     this.addModalWindowObject();
@@ -706,6 +710,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const myNopeCardId = this.#myHand.findCardIdByType(CardType.NOPE);
 
     if (
+      !this.#isAlive ||
       durationMs <= 0 ||
       lastPlayerId === this.#meId ||
       myNopeCardId === null
@@ -817,7 +822,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onPlayerEliminated = (payload: PlayerIdPayload): void => {
     if (payload.playerId === this.#meId) {
+      this.#isAlive = false;
       this.cleanModal();
+      this.#myHand.disable();
+      this.#nopeButton.hide();
+      this.#drawPile?.disableInteractive(true);
+      this.#discardPile?.disableInteractive(true);
     }
     this.#players.get(payload.playerId)?.explodePlayer(this);
   };
