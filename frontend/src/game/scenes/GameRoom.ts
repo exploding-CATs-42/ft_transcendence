@@ -446,6 +446,28 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     leaveCurrentGame();
   };
 
+  onPlayerLeft = (payload: PlayerIdPayload) => {
+    this.removePlayer(payload.playerId);
+  };
+
+  private removePlayer(playerId: string) {
+    const player = this.#players.get(playerId);
+
+    if (!player) return;
+
+    this.#players.forEach((seat) => {
+      if (seat.player?.id === playerId) seat.removePlayer();
+    });
+
+    this.#players.delete(playerId);
+    this.removePLayerHand(playerId);
+  }
+
+  private removePLayerHand(playerId: string) {
+    this.#opponents.get(playerId)?.container.setVisible(false);
+    this.#opponents.delete(playerId);
+  }
+
   setCurrentTurn(playerId: string) {
     this.#players.forEach((seat, id) => {
       seat.player?.setTurnActive(id === playerId);

@@ -52,6 +52,7 @@ export interface GameRoomHandlers {
   onWaitingForFavorCardSelection(
     payload: WaitingForFavorCardSelectionPayload,
   ): void;
+  onPlayerLeft(payload: PlayerIdPayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -108,6 +109,7 @@ export function attachGameRoomSockets(
       ServerPublicEvents.WAITING_FOR_FAVOR_CARD_SELECTION,
       handlers.onWaitingForFavorCardSelection,
     ],
+    [ServerPublicEvents.PLAYER_LEFT, handlers.onPlayerLeft],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
