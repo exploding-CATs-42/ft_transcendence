@@ -67,23 +67,7 @@ export const removePlayer = ({ context, event }: GameActionArgs) => {
   if (leavingPlayerIndex === -1) return context;
 
   const players = context.players.filter((p) => p.id !== event.playerId);
-
-  if (context.currentTurnPlayerId !== event.playerId) {
-    return { players };
-  }
-
-  for (let i = 0; i < players.length; ++i) {
-    const nextPlayer = players[(leavingPlayerIndex + i) % players.length]!;
-
-    if (nextPlayer.isAlive) {
-      return { players, currentTurnPlayerId: nextPlayer.id };
-    }
-  }
-
-  return {
-    players,
-    currentTurnPlayerId: null,
-  };
+  return { players };
 };
 
 export const markPlayerAsLeft = ({ context, event }: GameActionArgs) => {
