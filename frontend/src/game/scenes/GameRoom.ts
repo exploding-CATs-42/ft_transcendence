@@ -173,6 +173,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #drawPile: Phaser.GameObjects.Image | null = null;
   #shuffleAnimation!: ShuffleAnimation;
   #discardPile: Phaser.GameObjects.Image | null = null;
+  #discardPileZone!: Phaser.GameObjects.Graphics;
   #cardDropZone: Phaser.GameObjects.Zone | null = null;
   #selectedCardPlay: CardPlaySelection | null = null;
   #modal!: Modal;
@@ -381,17 +382,38 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private createDiscardPile(lastPlayedCard: Card | null = null) {
-    let frame: Phaser.Textures.Frame;
-
     if (lastPlayedCard) {
-      frame = getCardFrame(this, CARD_TYPE_TO_FRAME_INDEX[lastPlayedCard.type]);
+      this.drawLastPlayedCard(lastPlayedCard);
     } else {
-      frame = this.textures.get(Textures.cards).get(0);
+      this.createDiscardPileZone();
     }
+    this.updateComboPlayInteractivity();
+  }
 
+  private drawLastPlayedCard(lastPlayedCard: Card) {
+    const frame: Phaser.Textures.Frame = getCardFrame(
+      this,
+      CARD_TYPE_TO_FRAME_INDEX[lastPlayedCard.type],
+    );
     this.#discardPile = this.addCard(frame, DISCARD_PILE_POSITION);
     this.#discardPile.on("pointerdown", this.playSelectedKindCombo);
-    this.updateComboPlayInteractivity();
+  }
+
+  private createDiscardPileZone() {
+    const { x, y } = DISCARD_PILE_POSITION;
+
+    const outline = this.add.graphics();
+    outline.lineStyle(4, 0xffffff, 1);
+    outline.strokeRoundedRect(
+      x,
+      y,
+      CARD_WIDTH,
+      CARD_HEIGHT,
+      CARD_BORDER_RADIUS,
+    );
+
+    this.#discardPileZone = outline;
+    this.#discardPileZone.on("pointerdown", this.playSelectedKindCombo);
   }
 
   private createCardDropZone() {
