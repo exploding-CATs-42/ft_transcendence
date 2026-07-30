@@ -63,7 +63,10 @@ export const kittenDrawn = (): GameOutEvent => ({
 
 export const playerDefused = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.PLAYER_DEFUSED,
-  payload: { playerId: context.currentTurnPlayerId! },
+  payload: {
+    playerId: context.currentTurnPlayerId!,
+    deckSize: context.deck.length,
+  },
 });
 
 export const defusePrompt = ({ context }: GameEmitterArgs): GameOutEvent => {

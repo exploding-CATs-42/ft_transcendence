@@ -17,6 +17,7 @@ import type {
   CardPayload,
   GameOverPayload,
   KittenInsertedPayload,
+  PlayerDefusedPayload,
 } from "@exploding-cats/game-core";
 import { socket } from "socket";
 import { emit, leaveGame } from "./gameSession";
@@ -29,7 +30,7 @@ export interface GameRoomHandlers {
   onCardRemoved(payload: CardRemovedPayload): void;
   onCardPlayed(payload: CardPlayedPayload): void;
   onDefusePrompt(payload: DefusePromptPayload): void;
-  onPlayerDefused(payload: PlayerIdPayload): void;
+  onPlayerDefused(payload: PlayerDefusedPayload): void;
   onPlayerEliminated(payload: PlayerIdPayload): void;
   onPlayerDisconnected(payload: PlayerIdPayload): void;
   onPlayerReconnected(payload: PlayerIdPayload): void;

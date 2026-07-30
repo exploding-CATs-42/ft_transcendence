@@ -6,6 +6,7 @@ import {
   type CardPayload,
   type GameOverPayload,
   type KittenInsertedPayload,
+  type PlayerDefusedPayload,
   CardType,
 } from "@exploding-cats/game-core";
 import type {
@@ -161,7 +162,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #cardDropZone: Phaser.GameObjects.Zone | null = null;
   #selectedCardPlay: CardPlaySelection | null = null;
   #modal!: Modal;
-  #drawPileSize: number = 0;
   #attackCount = 1;
   #nopeButton!: NopeButton;
 
@@ -179,7 +179,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       throw new Error("Game room started without game data");
     }
 
-    const { players, hand: cards, deckSize } = gameData;
+    const { players, hand: cards } = gameData;
 
     if (hasTurnState(gameData)) {
       this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
@@ -204,8 +204,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.setCurrentTurn(this.#currentTurnPlayerId);
       this.updateAttackIndicator();
     }
-
-    this.#drawPileSize = deckSize;
 
     this.createCardDropZone();
     this.createDrawPile();
@@ -662,10 +660,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     view.onDefuse = () => playDefuse();
   };
 
-  onPlayerDefused = (payload: PlayerIdPayload): void => {
+  onPlayerDefused = (payload: PlayerDefusedPayload): void => {
     if (payload.playerId === this.#meId) {
       this.cleanModal();
-      const view = new ExplodingKittenInsertionView(this, this.#drawPileSize);
+
+      const view = new ExplodingKittenInsertionView(this, payload.deckSize);
       this.time.delayedCall(1300, () => {
         this.#modal!.setContent(view);
         this.#modal!.setVisible(true);
