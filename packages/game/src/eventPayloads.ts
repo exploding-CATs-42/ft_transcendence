@@ -23,6 +23,7 @@ export interface ShowedCardsToPlayerPayload {
 
 export interface PlayerDefusedPayload {
   playerId: string;
+  deckSize: number;
 }
 
 export interface DefusePromptPayload {
