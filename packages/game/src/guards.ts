@@ -101,7 +101,8 @@ export const isPlayersTurn = ({ context, event }: GameGuardArgs) => {
   if (
     event.type !== GameEvents.PLAY_CARD &&
     event.type !== GameEvents.DRAW_CARD &&
-    event.type !== GameEvents.PLAY_COMBO
+    event.type !== GameEvents.PLAY_COMBO &&
+    event.type !== GameEvents.LEAVE_GAME
   ) {
     return false;
   }
