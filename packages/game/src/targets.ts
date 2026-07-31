@@ -65,4 +65,8 @@ export const GameTargets = {
     GameStates.PLAYING,
     GameStates.PLAYER_LOOKS_AT_THE_FUTURE,
   ),
+  WAITING_FOR_COMBO_SELECTION: getStatePath(
+    GameStates.PLAYING,
+    GameStates.WAITING_FOR_COMBO_SELECTION,
+  ),
 } as const satisfies Record<keyof typeof GameStates, string>;

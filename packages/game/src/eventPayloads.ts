@@ -1,5 +1,5 @@
 // Local level
-import type { Card } from "./types";
+import type { Card, ComboSize } from "./types";
 
 export interface TurnChangedPayload {
   playerId: string;
@@ -61,4 +61,9 @@ export interface WaitingForFavorCardSelectionPayload {
 
 export interface PlayerSawTheFuturePayload {
   playerId: string;
+}
+
+export interface ComboSelectionRequestedPayload {
+  playerId: string;
+  comboSize: ComboSize;
 }
