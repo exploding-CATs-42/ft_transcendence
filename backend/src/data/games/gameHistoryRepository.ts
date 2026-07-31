@@ -50,7 +50,14 @@ export async function persistFinishedGame(
         createdAt: new Date(game.createdAt),
         endedAt,
       },
-      update: {
+      update: {},
+    }),
+    prisma.game.updateMany({
+      where: {
+        id: game.id,
+        endedAt: null,
+      },
+      data: {
         winnerUserId,
         endedAt,
       },
