@@ -11,6 +11,7 @@ import type {
   PlayerSelectedPayload,
   WaitingForFavorCardSelectionPayload,
   PlayerSawTheFuturePayload,
+  ComboSelectionRequestedPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -28,6 +29,7 @@ export const GameEvents = {
   SELECT_PLAYER: "SELECT_PLAYER",
   PASS_CARD_BY_ID: "PASS_CARD_BY_ID",
   SEEN_THE_FUTURE: "SEEN_THE_FUTURE",
+  RESOLVE_COMBO: "RESOLVE_COMBO",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -70,6 +72,13 @@ export type GameEvent =
     }
   | {
       type: typeof GameEvents.SEEN_THE_FUTURE;
+    }
+  | {
+      type: typeof GameEvents.RESOLVE_COMBO;
+      playerId: Player["id"];
+      targetPlayerId: Player["id"];
+      cardIndex?: number;
+      requestedCardType?: Card["type"];
     };
 
 // Events emitted FROM the machine
@@ -93,6 +102,7 @@ export const GameOutEvents = {
   WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
   WAITING_FOR_FAVOR_CARD_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
   PLAYER_SAW_THE_FUTURE: "PLAYER_SAW_THE_FUTURE",
+  COMBO_SELECTION_REQUESTED: "COMBO_SELECTION_REQUESTED",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -117,6 +127,10 @@ export type GameOutEvent =
   | { type: typeof GameOutEvents.DECK_SHUFFLED }
   | { type: typeof GameOutEvents.TURN_SKIPPED; payload: TurnSkippedPayload }
   | { type: typeof GameOutEvents.NOPE_WINDOW_RESOLVED }
+  | {
+      type: typeof GameOutEvents.COMBO_SELECTION_REQUESTED;
+      payload: ComboSelectionRequestedPayload;
+    }
   | {
       type: typeof GameOutEvents.SHOWED_TOP_CARDS;
       payload: ShowedCardsToPlayerPayload;
