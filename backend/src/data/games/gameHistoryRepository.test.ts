@@ -3,13 +3,17 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const prismaMocks = vi.hoisted(() => ({
   transaction: vi.fn(),
   gameUpsert: vi.fn(),
+  gameUpdateMany: vi.fn(),
   userGameCreateMany: vi.fn(),
 }));
 
 vi.mock("lib/prisma", () => ({
   prisma: {
     $transaction: prismaMocks.transaction,
-    game: { upsert: prismaMocks.gameUpsert },
+    game: {
+      upsert: prismaMocks.gameUpsert,
+      updateMany: prismaMocks.gameUpdateMany,
+    },
     userGame: { createMany: prismaMocks.userGameCreateMany },
   },
 }));
@@ -29,6 +33,7 @@ describe("gameHistoryRepository", () => {
   beforeEach(() => {
     vi.clearAllMocks();
     prismaMocks.gameUpsert.mockReturnValue("game-operation");
+    prismaMocks.gameUpdateMany.mockReturnValue("game-update-operation");
     prismaMocks.userGameCreateMany.mockReturnValue("memberships-operation");
     prismaMocks.transaction.mockResolvedValue([]);
   });
@@ -79,7 +84,14 @@ describe("gameHistoryRepository", () => {
         createdAt: new Date(game.createdAt),
         endedAt,
       },
-      update: {
+      update: {},
+    });
+    expect(prismaMocks.gameUpdateMany).toHaveBeenCalledWith({
+      where: {
+        id: game.id,
+        endedAt: null,
+      },
+      data: {
         winnerUserId: "winner",
         endedAt,
       },
@@ -108,6 +120,16 @@ describe("gameHistoryRepository", () => {
     expect(prismaMocks.userGameCreateMany).toHaveBeenNthCalledWith(2, {
       data: [{ gameId: game.id, userId: "winner" }],
       skipDuplicates: true,
+    });
+    expect(prismaMocks.gameUpdateMany).toHaveBeenNthCalledWith(2, {
+      where: {
+        id: game.id,
+        endedAt: null,
+      },
+      data: {
+        winnerUserId: "winner",
+        endedAt,
+      },
     });
   });
 });
