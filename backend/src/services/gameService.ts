@@ -208,7 +208,12 @@ export async function joinGame(
     player,
   } = await getGameContext(userId, input.gameId);
 
-  if (player && player.status !== PlayerStatus.LEFT) {
+  if (player) {
+    if (player.status === PlayerStatus.LEFT) {
+      throw new SocketError("Player has already left the game", {
+        code: SocketErrorCodes.LEFT_GAME,
+      });
+    }
     if (isGameInProgress(game)) {
       // My game is mid-play: the client must use RECONNECT_GAME
       // to get the game state instead of the waiting room.

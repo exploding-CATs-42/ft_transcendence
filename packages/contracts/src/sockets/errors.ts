@@ -5,6 +5,7 @@ export const SocketErrorCodes = {
   GAME_FULL: "GAME_FULL",
   ALREADY_IN_OTHER_GAME: "ALREADY_IN_OTHER_GAME",
   NOT_YOUR_TURN: "NOT_YOUR_TURN",
+  LEFT_GAME: "LEFT_GAME",
   UNKNOWN: "UNKNOWN",
 } as const;
 
