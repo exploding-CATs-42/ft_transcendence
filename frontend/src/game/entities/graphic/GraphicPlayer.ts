@@ -9,6 +9,9 @@ const SPOTLIGHT_POSITION: Point = { x: 103, y: 30 };
 const SPOTLIGHT_WIDTH = 320;
 const SPOTLIGHT_HEIGHT = 400;
 
+const DISCONNECTED_LABEL = "disconnected";
+const LEFT_LABEL = "left";
+
 export class GraphicPlayer implements Player {
   readonly id: string;
   readonly name: string;
@@ -19,6 +22,7 @@ export class GraphicPlayer implements Player {
   private label: Phaser.GameObjects.Text;
   private confirmedIcon: Phaser.GameObjects.Image;
   private disconnectedLabel: Phaser.GameObjects.Text;
+  private leftLabel: Phaser.GameObjects.Text;
   private spotlight: Phaser.GameObjects.Image;
   #scene: Phaser.Scene;
 
@@ -41,7 +45,8 @@ export class GraphicPlayer implements Player {
     this.spotlight = this.addSpotlight(scene);
     this.avatar = this.addAvatar(scene);
     this.label = this.addUsernameLabel(scene, player.name, labelConfig);
-    this.disconnectedLabel = this.addDisconnectedLabel(scene);
+    this.disconnectedLabel = this.addLabel(scene, DISCONNECTED_LABEL);
+    this.leftLabel = this.addLabel(scene, LEFT_LABEL);
 
     this.container.add([
       this.spotlight,
@@ -49,6 +54,7 @@ export class GraphicPlayer implements Player {
       this.label,
       this.confirmedIcon,
       this.disconnectedLabel,
+      this.leftLabel,
     ]);
   }
 
@@ -140,12 +146,12 @@ export class GraphicPlayer implements Player {
     scene.load.start();
   }
 
-  private addDisconnectedLabel(scene: Phaser.Scene) {
+  private addLabel(scene: Phaser.Scene, label: string) {
     const x = AVATAR_WIDTH / 2;
     const y = AVATAR_WIDTH / 2;
 
     return scene.add
-      .text(x, y, "disconnected", {
+      .text(x, y, label, {
         fontSize: 28,
         fontFamily: "Chewy",
         color: "#ffffff",
