@@ -151,6 +151,17 @@ export const comboSelectionRequested = ({
   payload: {
     playerId: context.pendingCombo!.playerId,
     comboSize: context.pendingCombo!.comboSize,
+    targets: context.players
+      .filter(
+        (player) =>
+          player.id !== context.pendingCombo!.playerId &&
+          player.isAlive &&
+          player.hand.length > 0,
+      )
+      .map((player) => ({
+        playerId: player.id,
+        handSize: player.hand.length,
+      })),
   },
 });
 

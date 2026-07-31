@@ -66,6 +66,7 @@ export interface ComboPlayedPayload {
 export interface ComboSelectionRequestedPayload {
   playerId: string;
   comboSize: ComboSize;
+  targets: Array<{ playerId: string; handSize: number }>;
 }
 
 export interface ComboResolvedPayload {
