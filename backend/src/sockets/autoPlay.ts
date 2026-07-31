@@ -22,6 +22,14 @@ export const startAutoPlay = (gameId: GameId, playerId: UserId) => {
   );
 };
 
+export const cancelAutoPlay = (playerId: UserId) => {
+  const timer = timers.get(playerId);
+  if (!timer) return;
+
+  clearTimeout(timer);
+  timers.delete(playerId);
+};
+
 export const autoPlay = async (gameId: GameId, playerId: UserId) => {
   if (isUserOnline(playerId)) return;
 
