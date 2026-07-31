@@ -38,6 +38,16 @@ export const cancelAutoPlay = (playerId: UserId) => {
   timers.delete(playerId);
 };
 
+export const startAutoPlayForCurrentTurnPlayer = (playerId: UserId) => {
+  const game = GameRepository.findCurrentGameByUserId(playerId);
+  if (!game) return;
+
+  const { currentTurnPlayerId } = game.instance.getSnapshot().context;
+  if (currentTurnPlayerId !== playerId) return;
+
+  startAutoPlay(game.id, playerId);
+};
+
 export const autoPlay = async (gameId: GameId, playerId: UserId) => {
   if (isUserOnline(playerId)) return;
 
