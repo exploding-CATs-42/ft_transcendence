@@ -1,6 +1,7 @@
 import type {
   Card,
   CardType,
+  ComboSize,
   ShowedCardsToPlayerPayload,
   GameStates,
 } from "@exploding-cats/game-core";
@@ -60,6 +61,19 @@ export interface ComboPlayedPayload {
   playerId: string;
   cardTypes: CardType[];
   nopeWindowExpiresAt: number;
+}
+
+export interface ComboSelectionRequestedPayload {
+  playerId: string;
+  comboSize: ComboSize;
+}
+
+export interface ComboResolvedPayload {
+  playerId: string;
+  targetPlayerId: string;
+  comboSize: ComboSize;
+  requestedCardType?: CardType;
+  cardStolen: boolean;
 }
 
 export const CardRemovalReason = {
