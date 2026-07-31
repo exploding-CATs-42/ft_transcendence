@@ -23,16 +23,8 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
       cardIndex: number,
     ) => {
       this.bringToTop(outline);
-      scene.add.tween({
-        targets: card,
-        x: CARD_DROP_ZONE.x,
-        y: CARD_DROP_ZONE.y,
-        duration: 300,
-        ease: "Back.Out",
-        onComplete: () => {
-          if (this.onSelection) this.onSelection(cardIndex);
-        },
-      });
+      card.setPosition(CARD_DROP_ZONE.x, CARD_DROP_ZONE.y);
+      this.onSelection?.(cardIndex);
     };
 
     this.add([zone, outline, this.#hand]);
@@ -208,19 +200,21 @@ class Pile extends Phaser.GameObjects.Container {
   }
 
   private attachCardDropHandler(card: Phaser.GameObjects.Image) {
-    const onCardDrop = () => {
+    const selectCard = () => {
       const cardIndex = this.#cards.indexOf(card);
       if (cardIndex === -1) return;
 
       this.#cards.splice(cardIndex, 1);
-
-      card.off("drop", onCardDrop);
+      this.#cards.forEach((candidate) => candidate.disableInteractive());
+      card.off("drop", selectCard);
+      card.off("pointerup", selectCard);
       card.disableInteractive();
       this.reflowCards();
 
-      if (this.onCardDrop) this.onCardDrop(card, cardIndex);
+      this.onCardDrop?.(card, cardIndex);
     };
 
-    card.on("drop", onCardDrop);
+    card.on("drop", selectCard);
+    card.on("pointerup", selectCard);
   }
 }
