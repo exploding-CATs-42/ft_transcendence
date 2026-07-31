@@ -46,9 +46,13 @@ export const autoPlay = async (gameId: GameId, playerId: UserId) => {
   const { currentTurnPlayerId } = game.instance.getSnapshot().context;
   if (currentTurnPlayerId !== playerId) return;
 
-  await drawCard({ gameId }, playerId);
+  try {
+    await drawCard({ gameId }, playerId);
 
-  const publicPayload: PlayerIdPayload = { playerId };
+    const publicPayload: PlayerIdPayload = { playerId };
 
-  io.to(gameId).emit(ServerPublicEvents.CARD_DRAWN, publicPayload);
+    io.to(gameId).emit(ServerPublicEvents.CARD_DRAWN, publicPayload);
+  } catch (error) {
+    console.log("Auto play could not draw a card: ", error);
+  }
 };
