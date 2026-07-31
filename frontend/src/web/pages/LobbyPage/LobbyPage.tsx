@@ -110,11 +110,17 @@ const LobbyPage = () => {
   useEffect(() => {
     const handleLobbyGameUpdated = ({ game }: LobbyGameUpdatedPayload) => {
       setGames((currentGames) => upsertLobbyGame(currentGames, game));
+      setExistingGame((currentExistingGame) =>
+        currentExistingGame?.id === game.id ? game : currentExistingGame,
+      );
     };
 
     const handleLobbyGameRemoved = ({ gameId }: LobbyGameRemovedPayload) => {
       setGames((currentGames) =>
         currentGames.filter((game) => game.id !== gameId),
+      );
+      setExistingGame((currentExistingGame) =>
+        currentExistingGame?.id === gameId ? null : currentExistingGame,
       );
     };
 
