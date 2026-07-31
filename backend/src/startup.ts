@@ -2,7 +2,7 @@
 import type { Game, PersistedGame } from "data/types";
 import { loadGames, GameRepository } from "data";
 import { createGameInstance } from "@exploding-cats/game-core";
-import { attachGameBroadcaster } from "sockets";
+import { attachAutoPlay, attachGameBroadcaster } from "sockets";
 
 export async function restoreGames() {
   const persistedGames: PersistedGame[] = await loadGames();
@@ -13,6 +13,7 @@ export async function restoreGames() {
     const instance = createGameInstance(snapshot);
     const game: Game = { ...metadata, instance };
     attachGameBroadcaster(game);
+    attachAutoPlay(game);
     game.instance.start();
 
     GameRepository.addGame(game);
