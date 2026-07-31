@@ -23,6 +23,7 @@ export const GameGuards = {
   LAST_PLAYED_CARD_OF_TYPE: "lastPlayedCardOfType",
   PENDING_ACTION_OF_TYPE: "pendingActionOfType",
   HAS_PENDING_COMBO: "hasPendingCombo",
+  IS_PENDING_COMBO_PLAYERS_TURN: "isPendingComboPlayersTurn",
   HAS_ELIGIBLE_COMBO_TARGET: "hasEligibleComboTarget",
   CAN_RESOLVE_COMBO: "canResolveCombo",
 } as const;
@@ -155,6 +156,16 @@ export const pendingActionOfType = (
 
 export const hasPendingCombo = ({ context }: GameGuardArgs) => {
   return Boolean(context.pendingCombo);
+};
+
+export const isPendingComboPlayersTurn = ({ context }: GameGuardArgs) => {
+  const playerId = context.pendingCombo?.playerId;
+
+  return (
+    playerId !== undefined &&
+    context.currentTurnPlayerId === playerId &&
+    context.players.some((player) => player.id === playerId && player.isAlive)
+  );
 };
 
 export const hasEligibleComboTarget = ({ context }: GameGuardArgs) => {
