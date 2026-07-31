@@ -290,17 +290,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.onComboSelectionRequested({
         playerId: this.#meId!,
         comboSize: gameData.pendingComboSize,
-        targets: gameData.players
-          .filter(
-            (player) =>
-              player.id !== this.#meId &&
-              player.isAlive &&
-              player.handSize > 0,
-          )
-          .map((player) => ({
-            playerId: player.id,
-            handSize: player.handSize,
-          })),
+        targets: this.getComboTargets(gameData.players),
       });
     }
 
@@ -360,6 +350,18 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.#drawPileSize,
     );
     this.add.existing(this.#explodingKittenRiskBar);
+  }
+
+  private getComboTargets(players: GameRoomData["players"]) {
+    return players
+      .filter(
+        (player) =>
+          player.id !== this.#meId && player.isAlive && player.handSize > 0,
+      )
+      .map((player) => ({
+        playerId: player.id,
+        handSize: player.handSize,
+      }));
   }
 
   private createPlayers(players: Player[]) {
@@ -609,6 +611,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.removePlayer(payload.playerId);
 
     if (this.#pendingComboTargets.delete(payload.playerId)) {
+      this.#isComboResolutionPending = false;
+      this.cleanModal();
       this.showOpponentTargetIcons(this.#pendingComboTargets);
       syncGameState();
     }
@@ -793,29 +797,23 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.updateAttackIndicator();
 
     if (payload.pendingComboSize) {
-      this.onComboSelectionRequested({
-        playerId: this.#meId,
-        comboSize: payload.pendingComboSize,
-        targets: payload.players
-          .filter(
-            (player) =>
-              player.id !== this.#meId &&
-              player.isAlive &&
-              player.handSize > 0,
-          )
-          .map((player) => ({
-            playerId: player.id,
-            handSize: player.handSize,
-          })),
-      });
+      this.applyComboSelection(
+        {
+          playerId: this.#meId,
+          comboSize: payload.pendingComboSize,
+          targets: this.getComboTargets(payload.players),
+        },
+        this.#isComboResolutionPending,
+      );
       return;
     }
 
-    if (
-      this.#isComboPlayPending ||
-      this.#pendingComboSize ||
-      this.#isComboResolutionPending
-    ) {
+    if (this.#isComboPlayPending || this.#isComboResolutionPending) {
+      this.scene.restart(payload);
+      return;
+    }
+
+    if (this.#pendingComboSize) {
       this.cleanModal();
       this.hideComboSelection();
     }
@@ -1341,18 +1339,29 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onComboSelectionRequested = (
     payload: ComboSelectionRequestedPayload,
   ): void => {
+    this.applyComboSelection(payload);
+  };
+
+  private applyComboSelection(
+    payload: ComboSelectionRequestedPayload,
+    recoverPendingRequest = false,
+  ) {
     if (payload.playerId !== this.#meId) return;
 
+    const selectionAlreadyOpen = this.#pendingComboSize === payload.comboSize;
     this.#pendingComboSize = payload.comboSize;
     this.#pendingComboTargets = new Map(
       payload.targets.map((target) => [target.playerId, target.handSize]),
     );
     this.#isComboPlayPending = false;
+    this.#drawPile?.disableInteractive(true);
+
+    if (selectionAlreadyOpen && !recoverPendingRequest) return;
+
     this.#isComboResolutionPending = false;
     this.cleanModal();
-    this.#drawPile?.disableInteractive(true);
     this.showOpponentTargetIcons(this.#pendingComboTargets);
-  };
+  }
 
   onComboPlayError = (payload: SocketErrorPayload): void => {
     this.#myHand.clearKindComboSelection();
