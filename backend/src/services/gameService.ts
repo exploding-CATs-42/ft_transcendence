@@ -332,7 +332,8 @@ export async function reconnectGame(
   }
 
   const orderedPlayers = orderPlayersForPlayer(players, player.id);
-  const context = game.instance.getSnapshot().context;
+  const snapshot = game.instance.getSnapshot();
+  const context = snapshot.context;
   const machineState = getMachineState(game.instance);
 
   let topCards = null;
@@ -342,6 +343,11 @@ export async function reconnectGame(
   ) {
     topCards = context.deck.slice(0, 3);
   }
+
+  const isWaitingForThisPlayersCombo =
+    snapshot.matches({
+      [GameStates.PLAYING]: GameStates.WAITING_FOR_COMBO_SELECTION,
+    }) && context.pendingCombo?.playerId === player.id;
 
   return {
     players: orderedPlayers.map(toPublicPlayerView),
@@ -354,6 +360,9 @@ export async function reconnectGame(
     countdownEndsAt: context.countdownEndsAt,
     topCards,
     machineState,
+    pendingComboSize: isWaitingForThisPlayersCombo
+      ? context.pendingCombo!.comboSize
+      : null,
   };
 }
 

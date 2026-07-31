@@ -283,6 +283,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
+    if (hasTurnState(gameData) && gameData.pendingComboSize) {
+      this.onComboSelectionRequested({
+        playerId: this.#meId!,
+        comboSize: gameData.pendingComboSize,
+      });
+    }
+
     // Subscribe last: everything is initialized before cached socket events are handled.
     this.#detachSockets = attachGameRoomSockets(this);
 
@@ -1284,6 +1291,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.cleanModal();
     this.hideComboSelection();
+    this.updateDrawPileInteractivity();
 
     const requestedCard = payload.requestedCardType?.replaceAll("_", " ");
     const message = payload.cardStolen

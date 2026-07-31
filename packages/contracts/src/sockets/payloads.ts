@@ -103,6 +103,7 @@ export interface GameStatePayload {
   countdownEndsAt: number | null;
   topCards: Card[] | null;
   machineState: GameStates | null;
+  pendingComboSize: ComboSize | null;
 }
 
 export interface FriendOnlineStatusChangedPayload {
