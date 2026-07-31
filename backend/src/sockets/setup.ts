@@ -11,6 +11,7 @@ import {
   broadcastPlayerReconnected,
 } from "./broadcasters";
 import { isUserOnline } from "./onlineUsers";
+import { cancelAutoPlay, startAutoPlayForCurrentTurnPlayer } from "./autoPlay";
 
 export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);
@@ -24,6 +25,7 @@ export const initSockets = (io: Server) => {
     if (cameOnline) {
       broadcastOnlineStatusToFriends(userId, true);
       broadcastPlayerReconnected(userId);
+      cancelAutoPlay(userId);
     }
 
     // Register feature-specific handlers
@@ -35,6 +37,7 @@ export const initSockets = (io: Server) => {
       if (wentOffline) {
         broadcastOnlineStatusToFriends(userId, false);
         broadcastPlayerDisconnected(userId);
+        startAutoPlayForCurrentTurnPlayer(userId);
       }
     });
   });
