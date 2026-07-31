@@ -301,9 +301,9 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       async (parsed: ResolveComboParams) => {
         const { playerId, targetPlayerId, comboSize, requestedCardType, card } =
           await resolveCombo(parsed, socket.data.user.id);
+        const targetSocket = socketsMap.get(targetPlayerId);
 
         if (card) {
-          const targetSocket = socketsMap.get(targetPlayerId);
           const cardRemovedPayload: CardRemovedPayload = {
             cardId: card.id,
             reason: "STOLEN",
@@ -324,6 +324,34 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           ...(requestedCardType ? { requestedCardType } : {}),
           cardStolen: card !== null,
         };
+
+        if (comboSize === 3) {
+          socket.emit(
+            ServerPublicEvents.COMBO_RESOLVED,
+            comboResolvedPayload,
+          );
+          targetSocket?.emit(
+            ServerPublicEvents.COMBO_RESOLVED,
+            comboResolvedPayload,
+          );
+
+          if (card) {
+            const excludedSocketIds = [socket.id, targetSocket?.id].filter(
+              (socketId): socketId is string => socketId !== undefined,
+            );
+            const observerPayload: ComboResolvedPayload = {
+              playerId,
+              targetPlayerId,
+              comboSize,
+              cardStolen: true,
+            };
+            io.to(parsed.gameId)
+              .except(excludedSocketIds)
+              .emit(ServerPublicEvents.COMBO_RESOLVED, observerPayload);
+          }
+          return;
+        }
+
         io.to(parsed.gameId).emit(
           ServerPublicEvents.COMBO_RESOLVED,
           comboResolvedPayload,
