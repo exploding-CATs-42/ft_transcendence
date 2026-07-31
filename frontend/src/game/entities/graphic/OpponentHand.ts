@@ -57,6 +57,10 @@ export class OpponentHand {
     while (this.#cardCount > nextCardCount) this.removeCard();
   }
 
+  getCount() {
+    return this.#cardCount;
+  }
+
   addCard() {
     this.#cardCount++;
     this.#amountLabel.setText(this.#cardCount.toString());
