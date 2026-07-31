@@ -547,6 +547,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private hideFavorUI() {
     this.#favorModeActive = false;
     this.#favorCardDropZone.setVisible(false);
+    this.#discardPileZone?.setVisible(true);
     this.#discardPile?.setVisible(true);
     this.#drawPile?.setVisible(true);
   }
@@ -554,6 +555,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private showFavorUI() {
     this.#favorModeActive = true;
     this.#favorCardDropZone.setVisible(true);
+    this.#discardPileZone?.setVisible(false);
     this.#discardPile?.setVisible(false);
     this.#drawPile?.setVisible(false);
   }
