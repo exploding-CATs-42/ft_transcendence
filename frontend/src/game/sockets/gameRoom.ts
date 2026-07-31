@@ -1,17 +1,21 @@
 import {
   ClientEvents,
+  ServerErrorEvents,
   ServerPrivateEvents,
   ServerPublicEvents,
   type CardGivenPayload,
   type CardPlayedPayload,
   type CardRemovedPayload,
   type ComboPlayedPayload,
+  type ComboResolvedPayload,
+  type ComboSelectionRequestedPayload,
   type DefusePromptPayload,
   type GameStartedPayload,
   type GameStatePayload,
   type NopePlayedPayload,
   type PlayerIdPayload,
   type SeeTheFuturePeekPayload,
+  type SocketErrorPayload,
   type TurnChangedPayload,
   type TurnSkippedPayload,
 } from "@exploding-cats/contracts";
@@ -41,6 +45,10 @@ export interface GameRoomHandlers {
   onDeckShuffled(): void;
   onTurnSkipped(payload: TurnSkippedPayload): void;
   onComboPlayed(payload: ComboPlayedPayload): void;
+  onComboPlayError(payload: SocketErrorPayload): void;
+  onComboSelectionRequested(payload: ComboSelectionRequestedPayload): void;
+  onComboResolved(payload: ComboResolvedPayload): void;
+  onComboResolutionError(payload: SocketErrorPayload): void;
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
   onKittenDrawn(): void;
   onKittenInserted(payload: KittenInsertedPayload): void;
@@ -127,6 +135,13 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.DECK_SHUFFLED, handlers.onDeckShuffled],
     [ServerPublicEvents.TURN_SKIPPED, handlers.onTurnSkipped],
     [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
+    [ServerErrorEvents.PLAY_COMBO_ERROR, handlers.onComboPlayError],
+    [
+      ServerPublicEvents.COMBO_SELECTION_REQUESTED,
+      handlers.onComboSelectionRequested,
+    ],
+    [ServerPublicEvents.COMBO_RESOLVED, handlers.onComboResolved],
+    [ServerErrorEvents.RESOLVE_COMBO_ERROR, handlers.onComboResolutionError],
     [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
     [ServerPublicEvents.GAME_OVER, handlers.onGameOver],
     [ServerPublicEvents.NOPE_PLAYED, handlers.onNopePlayed],
@@ -161,6 +176,18 @@ export const playCard = (cardId: number) =>
   emit(ClientEvents.PLAY_CARD, { cardId });
 export const playCombo = (cardIds: number[]) =>
   emit(ClientEvents.PLAY_COMBO, { cardIds });
+export const resolveTwoCardCombo = (
+  targetPlayerId: string,
+  cardIndex: number,
+) => emit(ClientEvents.RESOLVE_COMBO, { targetPlayerId, cardIndex });
+export const resolveThreeCardCombo = (
+  targetPlayerId: string,
+  requestedCardType: import("@exploding-cats/game-core").CardType,
+) =>
+  emit(ClientEvents.RESOLVE_COMBO, {
+    targetPlayerId,
+    requestedCardType,
+  });
 export const playDefuse = () => emit(ClientEvents.PLAY_DEFUSE);
 export const insertKitten = (explodingKittenPosition: number) =>
   emit(ClientEvents.INSERT_KITTEN, { explodingKittenPosition });
