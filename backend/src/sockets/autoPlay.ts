@@ -3,15 +3,22 @@ import {
   ServerPublicEvents,
   UserId,
 } from "@exploding-cats/contracts";
-import { GameId } from "data/types";
+import { Game, GameId } from "data/types";
 import { isUserOnline } from "./onlineUsers";
 import { GameRepository } from "data";
 import { drawCard } from "services";
 import { io } from "../app";
+import { GameOutEvents } from "@exploding-cats/game-core";
 
 const AUTO_PLAY_DELAY_MS = 60000;
 
 const timers = new Map<UserId, NodeJS.Timeout>();
+
+export const attachAutoPlay = (game: Game) => {
+  game.instance.on(GameOutEvents.TURN_CHANGED, (event) => {
+    startAutoPlay(game.id, event.payload.playerId);
+  });
+};
 
 export const startAutoPlay = (gameId: GameId, playerId: UserId) => {
   if (isUserOnline(playerId)) return;
