@@ -209,13 +209,16 @@ class Pile extends Phaser.GameObjects.Container {
 
   private attachCardDropHandler(card: Phaser.GameObjects.Image) {
     const onCardDrop = () => {
-      this.#cards = this.#cards.filter((c) => c !== card);
+      const cardIndex = this.#cards.indexOf(card);
+      if (cardIndex === -1) return;
+
+      this.#cards.splice(cardIndex, 1);
 
       card.off("drop", onCardDrop);
       card.disableInteractive();
       this.reflowCards();
 
-      if (this.onCardDrop) this.onCardDrop(card, card.depth);
+      if (this.onCardDrop) this.onCardDrop(card, cardIndex);
     };
 
     card.on("drop", onCardDrop);
