@@ -34,12 +34,15 @@ import {
   addNope,
   selectPlayer,
   passCardById,
+  resolveCombo,
+  clearPendingCombo,
 } from "./actions";
 import {
   type Player,
   type Deck,
   type Card,
   type NopeWindow,
+  type PendingCombo,
   CardType,
   PendingActionType,
 } from "./types";
@@ -61,6 +64,9 @@ import {
   lastPlayedCardOfType,
   pendingActionOfType,
   leavesSingleAlivePlayer,
+  hasPendingCombo,
+  hasEligibleComboTarget,
+  canResolveCombo,
 } from "./guards";
 import {
   countdownCanceled,
@@ -81,6 +87,7 @@ import {
   waitingForPlayerSelection,
   waitingForFavorCardSelection,
   playerSawTheFuture,
+  comboSelectionRequested,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -97,6 +104,7 @@ export interface GameContext {
   nopeWindow: NopeWindow | null;
   selectedPlayerId: string | null;
   pendingAction: PendingActionType | null;
+  pendingCombo: PendingCombo | null;
 }
 
 export const gameMachine = setup({
@@ -133,6 +141,8 @@ export const gameMachine = setup({
     [GameActions.ADD_NOPE]: assign(addNope),
     [GameActions.SELECT_PLAYER]: assign(selectPlayer),
     [GameActions.PASS_CARD_BY_ID]: assign(passCardById),
+    [GameActions.RESOLVE_COMBO]: assign(resolveCombo),
+    [GameActions.CLEAR_PENDING_COMBO]: assign(clearPendingCombo),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -150,6 +160,9 @@ export const gameMachine = setup({
     [GameGuards.HAS_REMAINING_TURNS]: hasRemainingTurns,
     [GameGuards.LAST_PLAYED_CARD_OF_TYPE]: lastPlayedCardOfType,
     [GameGuards.PENDING_ACTION_OF_TYPE]: pendingActionOfType,
+    [GameGuards.HAS_PENDING_COMBO]: hasPendingCombo,
+    [GameGuards.HAS_ELIGIBLE_COMBO_TARGET]: hasEligibleComboTarget,
+    [GameGuards.CAN_RESOLVE_COMBO]: canResolveCombo,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -166,6 +179,7 @@ export const gameMachine = setup({
     nopeWindow: null,
     selectedPlayerId: null,
     pendingAction: null,
+    pendingCombo: null,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -291,6 +305,19 @@ export const gameMachine = setup({
           always: [
             {
               guard: GameGuards.IS_NOPED,
+              actions: GameActions.CLEAR_PENDING_COMBO,
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+            {
+              guard: and([
+                GameGuards.HAS_PENDING_COMBO,
+                GameGuards.HAS_ELIGIBLE_COMBO_TARGET,
+              ]),
+              target: GameTargets.WAITING_FOR_COMBO_SELECTION,
+            },
+            {
+              guard: GameGuards.HAS_PENDING_COMBO,
+              actions: GameActions.CLEAR_PENDING_COMBO,
               target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
             },
             {
@@ -351,6 +378,19 @@ export const gameMachine = setup({
               target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
             },
           ],
+        },
+        [GameStates.WAITING_FOR_COMBO_SELECTION]: {
+          entry: emit(comboSelectionRequested),
+          on: {
+            [GameEvents.RESOLVE_COMBO]: {
+              guard: GameGuards.CAN_RESOLVE_COMBO,
+              actions: [
+                GameActions.RESOLVE_COMBO,
+                GameActions.CLEAR_PENDING_COMBO,
+              ],
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+          },
         },
         [GameStates.CHECKING_DRAWN_CARD]: {
           always: [

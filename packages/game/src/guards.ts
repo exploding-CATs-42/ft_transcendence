@@ -22,6 +22,9 @@ export const GameGuards = {
   HAS_REMAINING_TURNS: "hasRemainingTurns",
   LAST_PLAYED_CARD_OF_TYPE: "lastPlayedCardOfType",
   PENDING_ACTION_OF_TYPE: "pendingActionOfType",
+  HAS_PENDING_COMBO: "hasPendingCombo",
+  HAS_ELIGIBLE_COMBO_TARGET: "hasEligibleComboTarget",
+  CAN_RESOLVE_COMBO: "canResolveCombo",
 } as const;
 
 export interface GameGuardArgs {
@@ -148,4 +151,50 @@ export const pendingActionOfType = (
   params: { actionType: PendingActionType },
 ) => {
   return context.pendingAction === params.actionType;
+};
+
+export const hasPendingCombo = ({ context }: GameGuardArgs) => {
+  return Boolean(context.pendingCombo);
+};
+
+export const hasEligibleComboTarget = ({ context }: GameGuardArgs) => {
+  const pendingCombo = context.pendingCombo;
+  if (!pendingCombo) return false;
+
+  return context.players.some(
+    (player) =>
+      player.id !== pendingCombo.playerId &&
+      player.isAlive &&
+      player.hand.length > 0,
+  );
+};
+
+export const canResolveCombo = ({ context, event }: GameGuardArgs) => {
+  if (event.type !== GameEvents.RESOLVE_COMBO) return false;
+
+  const pendingCombo = context.pendingCombo;
+  if (
+    !pendingCombo ||
+    pendingCombo.playerId !== event.playerId ||
+    context.currentTurnPlayerId !== event.playerId ||
+    event.targetPlayerId === event.playerId
+  ) {
+    return false;
+  }
+
+  const targetPlayer = context.players.find(
+    (player) => player.id === event.targetPlayerId,
+  );
+  if (!targetPlayer?.isAlive || targetPlayer.hand.length === 0) return false;
+
+  if (pendingCombo.comboSize === 2) {
+    return (
+      event.requestedCardType === undefined &&
+      Number.isInteger(event.cardIndex) &&
+      event.cardIndex! >= 0 &&
+      event.cardIndex! < targetPlayer.hand.length
+    );
+  }
+
+  return event.cardIndex === undefined && event.requestedCardType !== undefined;
 };

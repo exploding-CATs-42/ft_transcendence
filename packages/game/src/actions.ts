@@ -11,6 +11,7 @@ import {
   CardType,
   type NopeWindow,
   PendingActionType,
+  type PendingCombo,
 } from "./types";
 
 export const GameActions = {
@@ -39,6 +40,8 @@ export const GameActions = {
   ADD_NOPE: "addNope",
   SELECT_PLAYER: "selectPlayer",
   PASS_CARD_BY_ID: "passCardById",
+  RESOLVE_COMBO: "resolveCombo",
+  CLEAR_PENDING_COMBO: "clearPendingCombo",
 } as const;
 
 export interface GameActionArgs {
@@ -333,6 +336,10 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
     players: updatedPlayers,
     lastPlayedCards: playedCards as Card[],
     pendingAction,
+    pendingCombo: {
+      playerId,
+      comboSize: cardIds.length,
+    } as PendingCombo,
   };
 };
 
@@ -485,3 +492,46 @@ export const passCardById = ({ context, event }: GameActionArgs) => {
 
   return { players, pendingAction: null };
 };
+
+export const resolveCombo = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.RESOLVE_COMBO || !context.pendingCombo) {
+    return context;
+  }
+
+  const { playerId, targetPlayerId } = event;
+  const player = context.players.find((candidate) => candidate.id === playerId);
+  const targetPlayer = context.players.find(
+    (candidate) => candidate.id === targetPlayerId,
+  );
+
+  if (!player || !targetPlayer) return context;
+
+  const stolenCard =
+    context.pendingCombo.comboSize === 2
+      ? targetPlayer.hand[event.cardIndex!]
+      : targetPlayer.hand.find((card) => card.type === event.requestedCardType);
+
+  if (!stolenCard) return context;
+
+  const players = context.players.map((candidate) => {
+    if (candidate.id === playerId) {
+      return { ...candidate, hand: [...candidate.hand, stolenCard] };
+    }
+
+    if (candidate.id === targetPlayerId) {
+      return {
+        ...candidate,
+        hand: candidate.hand.filter((card) => card.id !== stolenCard.id),
+      };
+    }
+
+    return candidate;
+  });
+
+  return { players };
+};
+
+export const clearPendingCombo = () => ({
+  pendingCombo: null,
+  pendingAction: null,
+});
