@@ -15,3 +15,4 @@ export * from "./playNopeSchema";
 export * from "./selectPlayerSchema";
 export * from "./giveCardSchema";
 export * from "./seenTheFutureSchema";
+export * from "./resolveComboSchema";
