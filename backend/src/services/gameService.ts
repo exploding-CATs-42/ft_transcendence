@@ -128,7 +128,7 @@ export async function getGames(userId: UserId): Promise<GameRecord[]> {
   await ensureUserExists(userId);
 
   return GameRepository.getAllGames()
-    .filter((game) => game.instance.getSnapshot().matches("waiting"))
+    .filter((game) => game.instance.getSnapshot().matches(GameStates.WAITING))
     .map(toGameRecord);
 }
 
