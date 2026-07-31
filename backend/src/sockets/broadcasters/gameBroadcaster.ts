@@ -134,6 +134,13 @@ export function attachGameBroadcaster(game: Game) {
     const socket = socketsMap.get(event.payload.playerId);
     socket?.to(gameId).emit(ServerPublicEvents.PLAYER_SAW_THE_FUTURE);
   });
+
+  broadcaster.on(GameOutEvents.COMBO_SELECTION_REQUESTED, (event) => {
+    io.to(gameId).emit(
+      ServerPublicEvents.COMBO_SELECTION_REQUESTED,
+      event.payload,
+    );
+  });
 }
 
 /* broadcaster - is a function that just repeats/broadcasts events
