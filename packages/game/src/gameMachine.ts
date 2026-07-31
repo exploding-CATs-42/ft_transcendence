@@ -1,5 +1,5 @@
 // Libraries
-import { and, assign, emit, setup } from "xstate";
+import { and, assign, emit, not, setup } from "xstate";
 // Local level
 import {
   GAME_MACHINE_ID,
@@ -65,6 +65,7 @@ import {
   pendingActionOfType,
   leavesSingleAlivePlayer,
   hasPendingCombo,
+  isPendingComboPlayersTurn,
   hasEligibleComboTarget,
   canResolveCombo,
 } from "./guards";
@@ -161,6 +162,7 @@ export const gameMachine = setup({
     [GameGuards.LAST_PLAYED_CARD_OF_TYPE]: lastPlayedCardOfType,
     [GameGuards.PENDING_ACTION_OF_TYPE]: pendingActionOfType,
     [GameGuards.HAS_PENDING_COMBO]: hasPendingCombo,
+    [GameGuards.IS_PENDING_COMBO_PLAYERS_TURN]: isPendingComboPlayersTurn,
     [GameGuards.HAS_ELIGIBLE_COMBO_TARGET]: hasEligibleComboTarget,
     [GameGuards.CAN_RESOLVE_COMBO]: canResolveCombo,
   },
@@ -381,6 +383,18 @@ export const gameMachine = setup({
         },
         [GameStates.WAITING_FOR_COMBO_SELECTION]: {
           entry: emit(comboSelectionRequested),
+          always: [
+            {
+              guard: not(GameGuards.IS_PENDING_COMBO_PLAYERS_TURN),
+              actions: GameActions.CLEAR_PENDING_COMBO,
+              target: GameStates.CHANGING_TURN,
+            },
+            {
+              guard: not(GameGuards.HAS_ELIGIBLE_COMBO_TARGET),
+              actions: GameActions.CLEAR_PENDING_COMBO,
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+          ],
           on: {
             [GameEvents.RESOLVE_COMBO]: {
               guard: GameGuards.CAN_RESOLVE_COMBO,
