@@ -9,6 +9,19 @@ import { GameRepository } from "data";
 import { drawCard } from "services";
 import { io } from "../app";
 
+const AUTO_PLAY_DELAY_MS = 60000;
+
+const timers = new Map<UserId, NodeJS.Timeout>();
+
+export const startAutoPlay = (gameId: GameId, playerId: UserId) => {
+  if (isUserOnline(playerId)) return;
+
+  timers.set(
+    playerId,
+    setTimeout(() => autoPlay(gameId, playerId), AUTO_PLAY_DELAY_MS),
+  );
+};
+
 export const autoPlay = async (gameId: GameId, playerId: UserId) => {
   if (isUserOnline(playerId)) return;
 
