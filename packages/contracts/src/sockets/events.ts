@@ -13,6 +13,7 @@ export const ClientEvents = {
   SELECT_PLAYER: "select-player",
   GIVE_CARD: "give-card",
   SEEN_THE_FUTURE: "seen-the-future",
+  RESOLVE_COMBO: "resolve-combo",
 } as const;
 
 export const ServerPublicEvents = {
@@ -46,6 +47,8 @@ export const ServerPublicEvents = {
   WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
   WAITING_FOR_FAVOR_CARD_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
   PLAYER_SAW_THE_FUTURE: "PLAYER_SAW_THE_FUTURE",
+  COMBO_SELECTION_REQUESTED: "COMBO_SELECTION_REQUESTED",
+  COMBO_RESOLVED: "COMBO_RESOLVED",
 } as const;
 
 export const ServerPrivateEvents = {
@@ -78,4 +81,5 @@ export const ServerErrorEvents = {
   SELECT_PLAYER_ERROR: "select-player-error",
   GIVE_CARD_ERROR: "give-card-error",
   SEEN_THE_FUTURE_ERROR: "seen-the-future-error",
+  RESOLVE_COMBO_ERROR: "resolve-combo-error",
 } as const;
