@@ -709,7 +709,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         if (this.#isComboResolutionPending) return;
 
         this.#isComboResolutionPending = true;
-        this.cleanModal();
         resolveTwoCardCombo(playerId, cardIndex);
         this.scheduleComboStateSync();
       };

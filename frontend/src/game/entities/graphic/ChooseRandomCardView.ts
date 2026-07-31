@@ -1,220 +1,89 @@
-const CARD_WIDTH = 186;
-const CARD_HEIGHT = 260;
-const CARD_BORDER_RADIUS = 20;
+import { Textures } from "game/constants";
 
-const CARD_DROP_ZONE = {
-  x: 0,
-  y: 400,
-  width: CARD_WIDTH,
-  height: CARD_HEIGHT,
-};
+const PANEL_WIDTH = 1120;
+const PANEL_HEIGHT = 500;
+const CARD_WIDTH = 150;
+const CARD_HEIGHT = 210;
+const MAX_ROW_WIDTH = 1000;
 
 export class ChooseRandomCardView extends Phaser.GameObjects.Container {
   onSelection?: (cardIndex: number) => void;
-  #hand: Pile;
+
+  #cards: Phaser.GameObjects.Image[] = [];
+  #status: Phaser.GameObjects.Text;
+  #selectionPending = false;
 
   constructor(scene: Phaser.Scene, cardsAmount: number) {
     super(scene);
 
-    const { zone, outline } = this.createCardDropZone(scene);
-    this.#hand = new Pile(scene, { x: 0, y: 0 }, cardsAmount);
-    this.#hand.onCardDrop = (
-      card: Phaser.GameObjects.Image,
-      cardIndex: number,
-    ) => {
-      this.bringToTop(outline);
-      card.setPosition(CARD_DROP_ZONE.x, CARD_DROP_ZONE.y);
-      this.onSelection?.(cardIndex);
-    };
+    const background = scene.add
+      .rectangle(0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0xf3ead9, 0.98)
+      .setStrokeStyle(3, 0xffffff, 0.7);
+    const title = scene.add
+      .text(0, -194, "Choose a random card", {
+        fontFamily: "Chewy",
+        fontSize: 42,
+        color: "#2c211d",
+      })
+      .setOrigin(0.5);
+    const hint = scene.add
+      .text(0, -150, "All cards are hidden", {
+        fontFamily: "Chewy",
+        fontSize: 24,
+        color: "#68564e",
+      })
+      .setOrigin(0.5);
 
-    this.add([zone, outline, this.#hand]);
+    this.#cards = this.addCards(scene, cardsAmount);
+    this.#status = scene.add
+      .text(0, 205, "Click one card to steal it", {
+        fontFamily: "Chewy",
+        fontSize: 25,
+        color: "#68564e",
+      })
+      .setOrigin(0.5);
+
+    this.add([background, title, hint, ...this.#cards, this.#status]);
   }
 
-  private createCardDropZone(scene: Phaser.Scene) {
-    const { x, y, width, height } = CARD_DROP_ZONE;
-    const zone = scene.add.zone(x, y, width, height).setOrigin(0, 0);
-    zone.setRectangleDropZone(width, height);
+  private addCards(scene: Phaser.Scene, cardsAmount: number) {
+    const spacing =
+      cardsAmount <= 1
+        ? 0
+        : Math.min(
+            CARD_WIDTH * 0.55,
+            (MAX_ROW_WIDTH - CARD_WIDTH) / (cardsAmount - 1),
+          );
+    const startX = -((cardsAmount - 1) * spacing) / 2;
 
-    // Zone visualization
-    const outline = scene.add.graphics();
-    outline.lineStyle(4, 0xffffff, 1);
-    outline.strokeRoundedRect(x, y, width, height, CARD_BORDER_RADIUS);
+    return Array.from({ length: cardsAmount }, (_, index) => {
+      const card = scene.add
+        .image(startX + index * spacing, 35, Textures.cardCover)
+        .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
+        .setDepth(index)
+        .setInteractive({ useHandCursor: true });
 
-    return { zone, outline };
-  }
-}
-
-// New class alert
-
-import type { CardConfig, Point, SpacingConfig } from "game/@types";
-import { Textures } from "game/constants";
-import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
-
-const CARD_SPACING_CONFIG: SpacingConfig = {
-  minSpacing: CARD_WIDTH / 3,
-  maxSpacing: CARD_WIDTH / 2,
-  cardsBeforeMinSpacing: 20,
-};
-
-const HOVER_LIFT = -40; // How many px the hovered card rises
-
-class Pile extends Phaser.GameObjects.Container {
-  onCardDrop?: (card: Phaser.GameObjects.Image, cardIndex: number) => void;
-  #scene: Phaser.Scene;
-  #cards: Phaser.GameObjects.Image[] = [];
-
-  constructor(scene: Phaser.Scene, position: Point, cardsAmount: number) {
-    super(scene);
-    this.#scene = scene;
-    this.setPosition(position.x, position.y);
-
-    for (let i = 0; i < cardsAmount; ++i) {
-      this.addCard();
-    }
-    this.reflowCards();
-  }
-
-  private addCard() {
-    const card = this.buildCard();
-    this.#cards.push(card);
-    this.add(card);
-  }
-
-  // --------------- Layout ---------------
-
-  private reflowCards() {
-    const count = this.#cards.length;
-    if (count === 0) return;
-
-    const spacing = getCardSpacing(count, CARD_SPACING_CONFIG);
-    let x = getHandStartX(count, spacing, CARD_WIDTH, 0);
-    // Somehow this line of code puts pile right in the middle of the screen
-    x += CARD_WIDTH / 2;
-
-    this.#cards.forEach((card, i) => {
-      card.setDepth(i);
-
-      this.#scene.tweens.add({
-        targets: card,
-        x: x,
-        y: this.y,
-        duration: 250,
-        ease: "Back.Out",
+      card.on("pointerover", () => {
+        if (!this.#selectionPending) card.setY(20);
       });
+      card.on("pointerout", () => {
+        if (!this.#selectionPending) card.setY(35);
+      });
+      card.on("pointerdown", () => this.selectCard(index));
 
-      x += spacing;
+      return card;
     });
   }
 
-  // --------------- Builders ---------------
+  private selectCard(cardIndex: number) {
+    if (this.#selectionPending) return;
+    this.#selectionPending = true;
+    this.#status.setText("Stealing selected card...").setColor("#2c211d");
 
-  private buildCard() {
-    const card = addCardVisual(
-      this.#scene,
-      { x: 0, y: 0 },
-      this.buildCardConfig(),
-      CARD_BORDER_RADIUS,
-    );
-
-    card.setInteractive({ draggable: true, useHandCursor: true });
-    this.attachCardDragHandlers(card);
-    this.attachCardDropHandler(card);
-    this.attachCardHoverHandler(card);
-
-    return card;
-  }
-
-  private buildCardConfig(): CardConfig {
-    const cardCover = this.#scene.textures.get(Textures.cardCover).get();
-    return {
-      frame: cardCover,
-      size: { width: CARD_WIDTH, height: CARD_HEIGHT },
-    };
-  }
-
-  // --------------- Event handlers ---------------
-
-  private attachCardHoverHandler(card: Phaser.GameObjects.Image) {
-    const tween = (target: Phaser.GameObjects.GameObject, props: object) => {
-      this.#scene.tweens.add({
-        targets: target,
-        duration: 120,
-        ease: "Power2",
-        ...props,
-      });
-    };
-
-    const liftCard = () => {
-      const targetY = this.y - HOVER_LIFT;
-      tween(card, { y: targetY });
-    };
-
-    const lowerCard = () => {
-      const baseY = this.y;
-      tween(card, { y: baseY });
-    };
-
-    card.on("pointerover", () => {
-      liftCard();
-    });
-
-    card.on("pointerout", () => {
-      lowerCard();
-    });
-  }
-
-  private attachCardDragHandlers(card: Phaser.GameObjects.Image) {
-    let originX: number;
-    let originDepth: number;
-
-    const onDragStart = () => {
-      originX = card.x;
-      originDepth = card.depth;
-      this.bringToTop(card);
-    };
-
-    const onDrag = (
-      _pointer: Phaser.Input.Pointer,
-      dragX: number,
-      dragY: number,
-    ) => {
-      card.x = dragX;
-      card.y = dragY;
-    };
-
-    const onDragEnd = () => {
-      this.moveTo(card, originDepth);
-
-      this.#scene.tweens.add({
-        targets: card,
-        x: originX,
-        y: this.y,
-        duration: 300,
-        ease: "Back.Out",
-      });
-    };
-
-    card.on("dragstart", onDragStart);
-    card.on("drag", onDrag);
-    card.on("dragend", onDragEnd);
-  }
-
-  private attachCardDropHandler(card: Phaser.GameObjects.Image) {
-    const selectCard = () => {
-      const cardIndex = this.#cards.indexOf(card);
-      if (cardIndex === -1) return;
-
-      this.#cards.splice(cardIndex, 1);
-      this.#cards.forEach((candidate) => candidate.disableInteractive());
-      card.off("drop", selectCard);
-      card.off("pointerup", selectCard);
+    this.#cards.forEach((card, index) => {
       card.disableInteractive();
-      this.reflowCards();
-
-      this.onCardDrop?.(card, cardIndex);
-    };
-
-    card.on("drop", selectCard);
-    card.on("pointerup", selectCard);
+      card.setAlpha(index === cardIndex ? 1 : 0.25);
+    });
+    this.onSelection?.(cardIndex);
   }
 }
