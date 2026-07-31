@@ -34,7 +34,7 @@ import {
 import { Game, GameId, GameRecord } from "data/types";
 import { JoinGameResult } from "types";
 import { GameRepository, toGameRecord } from "data";
-import { attachGameBroadcaster } from "sockets";
+import { attachAutoPlay, attachGameBroadcaster } from "sockets";
 import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
@@ -170,6 +170,7 @@ export async function createGame(
 
   const game = GameRepository.createGame(input.gameName, input.maxPlayers);
   attachGameBroadcaster(game);
+  attachAutoPlay(game);
   game.instance.start();
 
   const player: Player = {
