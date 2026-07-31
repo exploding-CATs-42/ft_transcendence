@@ -214,7 +214,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#nopeButton = new NopeButton(this, NOPE_BUTTON_POSITION);
 
     const graphicPlayers = this.createPlayers(players);
-    this.setDeadPlayers(graphicPlayers);
 
     this.createOpponentHands(graphicPlayers);
     this.fillOpponentHands(players);
@@ -222,6 +221,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     players.forEach((player) => {
       this.#players.get(player.id)?.player?.setConnected(player.isConnected);
     });
+    this.setLeftPlayers(graphicPlayers);
+    this.setDeadPlayers(graphicPlayers);
 
     // Re-apply a turn that arrived before the scene existed
     if (this.#currentTurnPlayerId) {
@@ -262,6 +263,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private setDeadPlayers(players: GraphicPlayer[]) {
     players.forEach((player) =>
       player.status === PlayerStatus.ELIMINATED ? player.setDead() : player,
+    );
+  }
+
+  private setLeftPlayers(players: GraphicPlayer[]) {
+    players.forEach((player) =>
+      player.status === PlayerStatus.LEFT ? player.setHasLeft(true) : player,
     );
   }
 
