@@ -27,9 +27,21 @@ export class NopeButton {
     this.staticImage.setVisible(true);
   }
 
-  showAnimated(durationMs: number = NOPE_WINDOW_MS): void {
+  showAnimated(
+    durationMs: number = NOPE_WINDOW_MS,
+    isPlayable: boolean = true,
+  ): void {
     this.staticImage.setVisible(false);
     this.animation.setVisible(true);
+
+    this.animation.setTint(isPlayable ? 0xffffff : 0x808080);
+
+    if (isPlayable) {
+      this.animation.setInteractive({ useHandCursor: true });
+    } else {
+      this.animation.disableInteractive(true);
+    }
+
     this.animation.playAnimation(durationMs);
   }
 
