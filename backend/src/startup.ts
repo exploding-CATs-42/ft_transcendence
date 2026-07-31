@@ -1,6 +1,6 @@
 // Project level
 import type { Game, PersistedGame } from "data/types";
-import { loadGames, GameRepository } from "data";
+import { attachGameHistoryPersistence, loadGames, GameRepository } from "data";
 import { createGameInstance } from "@exploding-cats/game-core";
 import { attachAutoPlay, attachGameBroadcaster } from "sockets";
 
@@ -14,6 +14,7 @@ export async function restoreGames() {
     const game: Game = { ...metadata, instance };
     attachGameBroadcaster(game);
     attachAutoPlay(game);
+    attachGameHistoryPersistence(game);
     game.instance.start();
 
     GameRepository.addGame(game);

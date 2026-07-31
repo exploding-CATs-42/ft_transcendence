@@ -33,7 +33,11 @@ import {
 } from "@exploding-cats/contracts";
 import { Game, GameId, GameRecord } from "data/types";
 import { JoinGameResult } from "types";
-import { GameRepository, toGameRecord } from "data";
+import {
+  attachGameHistoryPersistence,
+  GameRepository,
+  toGameRecord,
+} from "data";
 import { attachAutoPlay, attachGameBroadcaster } from "sockets";
 import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
@@ -171,6 +175,7 @@ export async function createGame(
   const game = GameRepository.createGame(input.gameName, input.maxPlayers);
   attachGameBroadcaster(game);
   attachAutoPlay(game);
+  attachGameHistoryPersistence(game);
   game.instance.start();
 
   const player: Player = {
