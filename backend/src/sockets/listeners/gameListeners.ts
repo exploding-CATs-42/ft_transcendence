@@ -16,6 +16,7 @@ import {
   selectPlayer,
   giveCard,
   confirmPlayerSeenTheCards,
+  resolveCombo,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -47,6 +48,8 @@ import {
   GiveCardPayload,
   SeenTheFuturePayload,
   seenTheFutureSchema,
+  ResolveComboParams,
+  resolveComboSchema,
 } from "schemas";
 import {
   CardGivenPayload,
@@ -62,6 +65,7 @@ import {
   ServerPublicEvents,
   WaitingStatePayload,
   NopePlayedPayload,
+  ComboResolvedPayload,
 } from "@exploding-cats/contracts";
 import { CardPayload } from "@exploding-cats/game-core";
 // Local level
@@ -284,6 +288,46 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         socket
           .to(room)
           .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.RESOLVE_COMBO,
+    withErrorHandler(
+      resolveComboSchema,
+      socket,
+      ServerErrorEvents.RESOLVE_COMBO_ERROR,
+      async (parsed: ResolveComboParams) => {
+        const { playerId, targetPlayerId, comboSize, requestedCardType, card } =
+          await resolveCombo(parsed, socket.data.user.id);
+
+        if (card) {
+          const targetSocket = socketsMap.get(targetPlayerId);
+          const cardRemovedPayload: CardRemovedPayload = {
+            cardId: card.id,
+            reason: "STOLEN",
+          };
+          targetSocket?.emit(
+            ServerPrivateEvents.CARD_REMOVED,
+            cardRemovedPayload,
+          );
+
+          const cardReceivedPayload: CardPayload = { playerId, card };
+          socket.emit(ServerPrivateEvents.CARD_RECEIVED, cardReceivedPayload);
+        }
+
+        const comboResolvedPayload: ComboResolvedPayload = {
+          playerId,
+          targetPlayerId,
+          comboSize,
+          ...(requestedCardType ? { requestedCardType } : {}),
+          cardStolen: card !== null,
+        };
+        io.to(parsed.gameId).emit(
+          ServerPublicEvents.COMBO_RESOLVED,
+          comboResolvedPayload,
+        );
       },
     ),
   );
