@@ -23,6 +23,7 @@ export const attachAutoPlay = (game: Game) => {
 export const startAutoPlay = (gameId: GameId, playerId: UserId) => {
   if (isUserOnline(playerId)) return;
 
+  cancelAutoPlay(playerId);
   timers.set(
     playerId,
     setTimeout(() => autoPlay(gameId, playerId), AUTO_PLAY_DELAY_MS),
