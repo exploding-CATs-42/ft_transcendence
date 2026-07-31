@@ -171,6 +171,12 @@ export class GraphicPlayer implements Player {
     this.disconnectedLabel.setVisible(!connected);
   }
 
+  setHasLeft(left: boolean) {
+    this.avatar.setAlpha(left ? 0.4 : 1);
+    this.leftLabel.setVisible(left);
+    console.log(this.avatar.alpha);
+  }
+
   setTurnActive(active: boolean) {
     this.spotlight.setVisible(active);
   }
