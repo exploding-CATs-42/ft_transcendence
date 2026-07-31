@@ -703,7 +703,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
 
     if (this.#pendingComboSize === 2) {
-      const cardsAmount = this.#opponents.get(playerId)?.getCount() ?? 0;
+      const cardsAmount = this.#pendingComboTargets.get(playerId) ?? 0;
       const view = new ChooseRandomCardView(this, cardsAmount);
       view.onSelection = (cardIndex) => {
         if (this.#isComboResolutionPending) return;
