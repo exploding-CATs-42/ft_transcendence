@@ -176,7 +176,12 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
   // Labels & UI updates
   // ==============================
 
-  private addLabel(scene: Phaser.Scene, position: Point, text: string) {
+  private addLabel(
+    scene: Phaser.Scene,
+    position: Point,
+    text: string,
+    origin: number,
+  ) {
     const { x, y } = position;
     const label = scene.add
       .text(x, y, text, {
@@ -185,7 +190,7 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
         stroke: "black",
         strokeThickness: 1,
       })
-      .setOrigin(0.5, 1);
+      .setOrigin(origin, 1);
     return label;
   }
 
@@ -194,18 +199,21 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
       scene,
       { x: 0, y: LABEL_POSITION_Y },
       "Top",
+      1,
     );
 
     this.#labelBottom = this.createLabel(
       scene,
       { x: 0, y: LABEL_POSITION_Y },
       "Bottom",
+      0,
     );
 
     this.#labelScore = this.createLabel(
       scene,
       { x: 0, y: LABEL_POSITION_Y },
       `${this.#explodingKittenPosition + 1}/${this.#drawPileSize + 1}`,
+      0.5,
     );
 
     this.add([this.#labelTop, this.#labelBottom, this.#labelScore]);
@@ -215,8 +223,9 @@ export class ExplodingKittenInsertionView extends Phaser.GameObjects.Container {
     scene: Phaser.Scene,
     position: { x: number; y: number },
     text: string,
+    origin: number,
   ): Phaser.GameObjects.Text {
-    return this.addLabel(scene, position, text).setAlpha(0);
+    return this.addLabel(scene, position, text, origin).setAlpha(0);
   }
 
   private updateLabels(scene: Phaser.Scene): void {
