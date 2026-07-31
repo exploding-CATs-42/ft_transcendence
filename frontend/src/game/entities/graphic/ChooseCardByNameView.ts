@@ -1,134 +1,105 @@
 import type { CardType } from "@exploding-cats/game-core";
-import type { CardOption, Point } from "game/@types";
-import { CARD_OPTIONS, Textures } from "game/constants";
+import {
+  CARD_OPTIONS,
+  CARD_TYPE_TO_FRAME,
+  Textures,
+} from "game/constants";
 
-// ------------------- CONFIGURATION -------------------
-const CARD_OPTIONS_PER_ROW = 4;
-const COLUMN_GAP = 300;
-const ROW_GAP = 200;
+const PANEL_WIDTH = 1120;
+const PANEL_HEIGHT = 680;
+const CARD_WIDTH = 142;
+const CARD_HEIGHT = 198;
+const COLUMNS = 6;
+const COLUMN_GAP = 170;
+const ROW_GAP = 235;
 
-const BACKGROUND_CONFIG = {
-  width: 1200,
-  height: 670,
-  radius: 20,
-};
-
-const ICONS_CONTAINER_OFFSET = {
-  x: 100,
-  y: 104,
-};
-
-// ---------------------- CLASS ----------------------
 export class ChooseCardByNameView extends Phaser.GameObjects.Container {
   onSelection?: (type: CardType) => void;
 
-  constructor(scene: Phaser.Scene) {
+  #cards: Array<{ type: CardType; image: Phaser.GameObjects.Image }> = [];
+  #status: Phaser.GameObjects.Text;
+  #selectionPending = false;
+
+  constructor(scene: Phaser.Scene, targetName: string) {
     super(scene);
-    const background = this.addBackground(scene);
-    const images = this.addCardOptions(scene);
 
-    this.add([background, images]);
+    const background = scene.add
+      .rectangle(0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0xf3ead9, 0.98)
+      .setStrokeStyle(3, 0xffffff, 0.7);
+    const title = scene.add
+      .text(0, -294, `Choose a card from ${targetName}`, {
+        fontFamily: "Chewy",
+        fontSize: 42,
+        color: "#2c211d",
+      })
+      .setOrigin(0.5);
+    const hint = scene.add
+      .text(0, -248, "You get it only if that player has one", {
+        fontFamily: "Chewy",
+        fontSize: 24,
+        color: "#68564e",
+      })
+      .setOrigin(0.5);
+
+    this.#cards = CARD_OPTIONS.map(({ type }, index) => ({
+      type,
+      image: this.addCard(scene, type, index),
+    }));
+
+    this.#status = scene.add
+      .text(0, 300, "Select the card you want to request", {
+        fontFamily: "Chewy",
+        fontSize: 25,
+        color: "#68564e",
+      })
+      .setOrigin(0.5);
+
+    this.add([
+      background,
+      title,
+      hint,
+      ...this.#cards.map(({ image }) => image),
+      this.#status,
+    ]);
   }
 
-  private addBackground(scene: Phaser.Scene) {
-    const { width, height, radius } = BACKGROUND_CONFIG;
+  private addCard(scene: Phaser.Scene, type: CardType, index: number) {
+    const column = index % COLUMNS;
+    const row = Math.floor(index / COLUMNS);
+    const image = scene.add
+      .image(
+        (column - (COLUMNS - 1) / 2) * COLUMN_GAP,
+        -105 + row * ROW_GAP,
+        Textures.cards,
+        CARD_TYPE_TO_FRAME[type],
+      )
+      .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
+      .setInteractive({ useHandCursor: true });
 
-    const graphics = scene.add.graphics();
-    graphics.fillStyle(0x000000, 1);
-    graphics.fillRoundedRect(0, 0, width, height, radius);
-
-    return graphics;
-  }
-
-  private addCardOptions(scene: Phaser.Scene) {
-    const iconsContainer = scene.add.container();
-    this.fillContainerWithIcons(scene, iconsContainer);
-
-    // Put it in the middle of the black background
-    const { x, y } = ICONS_CONTAINER_OFFSET;
-    iconsContainer.setPosition(x, y);
-
-    return iconsContainer;
-  }
-
-  private fillContainerWithIcons(
-    scene: Phaser.Scene,
-    container: Phaser.GameObjects.Container,
-  ) {
-    const iconsAmount = CARD_OPTIONS.length;
-    const rowsCount = iconsAmount / CARD_OPTIONS_PER_ROW;
-    const columnsCount = CARD_OPTIONS_PER_ROW;
-    let i = 0;
-    const pos: Point = { x: 0, y: 0 };
-    for (let y = 0; y < rowsCount; ++y) {
-      for (let x = 0; x < columnsCount && i < iconsAmount; ++x) {
-        const icon = new GraphicCardOption(scene, pos, CARD_OPTIONS[i]!);
-        icon.onClick = (type) => {
-          this.onSelection?.(type);
-        };
-
-        container.add(icon);
-        pos.x += COLUMN_GAP;
-        ++i;
-      }
-      pos.x = 0;
-      pos.y += ROW_GAP;
-    }
-  }
-}
-
-// -- NEW CLASS ALERT --
-
-// ------------------- CONFIGURATION -------------------
-const ICON_OFFSET: Point = {
-  x: 50,
-  y: 0,
-};
-
-const LABEL_OFFSET: Point = {
-  x: 0,
-  y: 60,
-};
-
-class GraphicCardOption extends Phaser.GameObjects.Container {
-  onClick?: (type: CardType) => void;
-  #type: CardType;
-
-  constructor(scene: Phaser.Scene, position: Point, cardOption: CardOption) {
-    super(scene);
-    this.#type = cardOption.type;
-    const icon = this.addIcon(scene, cardOption.iconFrameIndex);
-    const label = this.addLabel(scene, cardOption.label);
-    this.add([icon, label]);
-    this.setPosition(position.x, position.y);
-    this.addHitBox();
-  }
-
-  private addHitBox() {
-    // I don't really know why these 4 numbers look like they look like
-    // I found them just by iterating through different combinations
-    const width = 250;
-    const height = 150;
-    const hitArea = new Phaser.Geom.Rectangle(60, 24, width, height);
-
-    this.setSize(width, height);
-    this.setInteractive(hitArea, Phaser.Geom.Rectangle.Contains);
-    this.input!.cursor = "pointer";
-
-    this.on("pointerdown", () => {
-      if (this.onClick) this.onClick(this.#type);
+    image.on("pointerover", () => {
+      if (!this.#selectionPending) image.setAlpha(0.82);
     });
+    image.on("pointerout", () => {
+      if (!this.#selectionPending) image.setAlpha(1);
+    });
+    image.on("pointerdown", () => this.selectCard(type));
+
+    return image;
   }
 
-  private addIcon(scene: Phaser.Scene, iconFrameIndex: number) {
-    const { x, y } = ICON_OFFSET;
-    const icon = scene.add.image(x, y, Textures.cardTypeIcons, iconFrameIndex);
-    return icon;
-  }
+  private selectCard(type: CardType) {
+    if (this.#selectionPending) return;
+    this.#selectionPending = true;
 
-  private addLabel(scene: Phaser.Scene, text: string) {
-    const { x, y } = LABEL_OFFSET;
-    const label = scene.add.text(x, y, text).setOrigin(0, 0);
-    return label;
+    const label = CARD_OPTIONS.find((option) => option.type === type)?.label;
+    this.#status
+      .setText(`Requesting ${label ?? type.replaceAll("_", " ")}...`)
+      .setColor("#2c211d");
+
+    this.#cards.forEach((card) => {
+      card.image.disableInteractive();
+      card.image.setAlpha(card.type === type ? 1 : 0.25);
+    });
+    this.onSelection?.(type);
   }
 }

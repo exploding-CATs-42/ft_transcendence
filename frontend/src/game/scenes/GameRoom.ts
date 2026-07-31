@@ -718,12 +718,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       return;
     }
 
-    const view = new ChooseCardByNameView(this);
+    const targetName =
+      this.#players.get(playerId)?.player?.name ?? "the selected player";
+    const view = new ChooseCardByNameView(this, targetName);
     view.onSelection = (requestedCardType) => {
       if (this.#isComboResolutionPending) return;
 
       this.#isComboResolutionPending = true;
-      this.cleanModal();
       resolveThreeCardCombo(playerId, requestedCardType);
       this.scheduleComboStateSync();
     };
