@@ -1386,16 +1386,43 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.#opponents.get(payload.playerId)?.addCard();
     }
 
-    this.cleanModal();
-    this.hideComboSelection();
-    this.updateDrawPileInteractivity();
+    const isComboPlayer = this.#meId === payload.playerId;
+    const isComboTarget = this.#meId === payload.targetPlayerId;
+    const playerName =
+      this.#players.get(payload.playerId)?.player?.name ?? "A player";
+    const targetName =
+      this.#players.get(payload.targetPlayerId)?.player?.name ?? "the player";
 
-    const requestedCard = payload.requestedCardType?.replaceAll("_", " ");
-    const message = payload.cardStolen
-      ? requestedCard
-        ? `${requestedCard} stolen`
-        : "Random card stolen"
-      : `${requestedCard ?? "Requested card"} not found`;
+    if (isComboPlayer) {
+      this.cleanModal();
+      this.hideComboSelection();
+      this.updateDrawPileInteractivity();
+    }
+
+    if (payload.comboSize === 3) {
+      if (!isComboPlayer && !isComboTarget) {
+        toast.info(`${playerName} stole a card from ${targetName}`);
+        return;
+      }
+
+      const requestedCard =
+        payload.requestedCardType?.replaceAll("_", " ") ?? "the requested card";
+      const message = isComboPlayer
+        ? payload.cardStolen
+          ? `You stole ${requestedCard} from ${targetName}`
+          : `${targetName} does not have ${requestedCard}`
+        : payload.cardStolen
+          ? `${playerName} stole your ${requestedCard}`
+          : `${playerName} requested ${requestedCard}, but you did not have it`;
+      toast.info(message);
+      return;
+    }
+
+    const message = isComboPlayer
+      ? `You stole a random card from ${targetName}`
+      : isComboTarget
+        ? `${playerName} stole one of your cards`
+        : `${playerName} stole a card from ${targetName}`;
     toast.info(message);
   };
 
