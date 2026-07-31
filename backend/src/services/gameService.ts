@@ -17,6 +17,7 @@ import {
   PlayNopeParams,
   ReconnectGameParams,
   SeenTheFuturePayload,
+  ResolveComboParams,
 } from "schemas";
 import {
   type Card,
@@ -576,6 +577,94 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
     playerId: player.id,
     cards: lastPlayedCards,
     nopeWindowExpiresAt: nopeWindow.endsAt,
+  };
+}
+
+export async function resolveCombo(input: ResolveComboParams, userId: UserId) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  const beforeContext = game.instance.getSnapshot().context;
+  const pendingCombo = beforeContext.pendingCombo;
+
+  if (!pendingCombo || pendingCombo.playerId !== player.id) {
+    throw new SocketError("No combo is waiting for your selection");
+  }
+
+  const targetPlayer = beforeContext.players.find(
+    (candidate) => candidate.id === input.targetPlayerId,
+  );
+  if (
+    !targetPlayer ||
+    targetPlayer.id === player.id ||
+    !targetPlayer.isAlive ||
+    targetPlayer.hand.length === 0
+  ) {
+    throw new SocketError("Choose a living opponent who has cards");
+  }
+
+  if (
+    (pendingCombo.comboSize === 2 &&
+      (input.cardIndex === undefined ||
+        input.requestedCardType !== undefined)) ||
+    (pendingCombo.comboSize === 3 &&
+      (input.cardIndex !== undefined || input.requestedCardType === undefined))
+  ) {
+    throw new SocketError("Invalid selection for this combo");
+  }
+
+  const card =
+    pendingCombo.comboSize === 2
+      ? targetPlayer.hand[input.cardIndex!]
+      : targetPlayer.hand.find(
+          (candidate) => candidate.type === input.requestedCardType,
+        );
+
+  if (pendingCombo.comboSize === 2 && !card) {
+    throw new SocketError("Selected card does not exist");
+  }
+
+  const comboSelectionEvent =
+    pendingCombo.comboSize === 2
+      ? {
+          type: GameEvents.RESOLVE_COMBO,
+          playerId: player.id,
+          targetPlayerId: targetPlayer.id,
+          cardIndex: input.cardIndex!,
+        }
+      : {
+          type: GameEvents.RESOLVE_COMBO,
+          playerId: player.id,
+          targetPlayerId: targetPlayer.id,
+          requestedCardType: input.requestedCardType!,
+        };
+  game.instance.send(comboSelectionEvent);
+
+  const afterContext = game.instance.getSnapshot().context;
+  if (afterContext.pendingCombo !== null) {
+    throw new SocketError("Could not resolve combo");
+  }
+
+  if (card) {
+    const updatedPlayer = afterContext.players.find(
+      (candidate) => candidate.id === player.id,
+    );
+    const updatedTarget = afterContext.players.find(
+      (candidate) => candidate.id === targetPlayer.id,
+    );
+    const wasTransferred =
+      updatedPlayer?.hand.some((candidate) => candidate.id === card.id) &&
+      !updatedTarget?.hand.some((candidate) => candidate.id === card.id);
+
+    if (!wasTransferred) {
+      throw new SocketError("Could not transfer selected card");
+    }
+  }
+
+  return {
+    playerId: player.id,
+    targetPlayerId: targetPlayer.id,
+    comboSize: pendingCombo.comboSize,
+    requestedCardType: input.requestedCardType,
+    card: card ?? null,
   };
 }
 
