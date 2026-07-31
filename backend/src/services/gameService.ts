@@ -129,6 +129,9 @@ function getComboCards(player: Player, cardIds: number[]) {
   if (comboCards.some((card) => card.type !== comboCardType)) {
     throw new SocketError("Combo cards must have the same type");
   }
+  if (!comboCards.every((card) => card.comboEligible)) {
+    throw new SocketError("These cards cannot be played as a combo");
+  }
 
   return comboCards;
 }
@@ -536,7 +539,18 @@ export async function playNope(input: PlayNopeParams, userId: UserId) {
 
 export async function playCombo(input: PlayComboParams, userId: UserId) {
   const { game, player } = await requirePlayerInGame(userId, input.gameId);
-  ensurePlayersTurn(game.instance.getSnapshot().context, player);
+  const context = game.instance.getSnapshot().context;
+  ensurePlayersTurn(context, player);
+
+  const hasEligibleTarget = context.players.some(
+    (candidate) =>
+      candidate.id !== player.id &&
+      candidate.isAlive &&
+      candidate.hand.length > 0,
+  );
+  if (!hasEligibleTarget) {
+    throw new SocketError("No opponent has a card to steal");
+  }
 
   const cards = getComboCards(player, input.cardIds);
 

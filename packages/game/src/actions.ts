@@ -274,10 +274,18 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
   const player = context.players.find((player) => player.id === playerId);
   if (!player) return context;
 
+  if (cardIds.length !== 2 && cardIds.length !== 3) {
+    return {
+      lastPlayedCards: null,
+      pendingCombo: null,
+    };
+  }
+
   const cardIdsSet = new Set(cardIds);
   if (cardIdsSet.size !== cardIds.length) {
     return {
       lastPlayedCards: null,
+      pendingCombo: null,
     };
   }
 
@@ -288,6 +296,18 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
   if (playedCards.some((card) => !card)) {
     return {
       lastPlayedCards: null,
+      pendingCombo: null,
+    };
+  }
+
+  const firstCard = playedCards[0]!;
+  if (
+    !firstCard.comboEligible ||
+    playedCards.some((card) => card!.type !== firstCard.type)
+  ) {
+    return {
+      lastPlayedCards: null,
+      pendingCombo: null,
     };
   }
 
@@ -296,6 +316,7 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
   if (updatedHand.length !== player.hand.length - cardIdsSet.size) {
     return {
       lastPlayedCards: null,
+      pendingCombo: null,
     };
   }
 
