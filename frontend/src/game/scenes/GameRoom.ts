@@ -61,6 +61,7 @@ import {
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
   attachGameRoomSockets,
+  getCachedGameState,
   drawCard,
   playDefuse,
   giveCard,
@@ -136,6 +137,9 @@ type GameRoomData = GameStartedPayload | GameStatePayload;
 const hasTurnState = (data: GameRoomData): data is GameStatePayload =>
   "currentTurnPlayerId" in data;
 
+const hasGameData = (data?: GameRoomData): data is GameRoomData =>
+  Boolean(data && "players" in data);
+
 const getLastPlayedCard = (cards: Card[] | null) => {
   if (!cards || cards.length === 0) return null;
 
@@ -166,12 +170,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
   #opponents: Map<string, OpponentHand> = new Map();
   #myHand!: GraphicHand;
-  #detachSockets: CleanupFunction;
-  #pendingGameState: GameStatePayload | null = null;
+  #detachSockets: CleanupFunction | null = null;
   #meId: string | null = null;
-  // The first TURN_CHANGED arrives before create() runs (scene.start
-  // is deferred to the next frame), when #players is still empty.
-  // Save the turn here so create() can re-apply it once seats exist.
   #currentTurnPlayerId: string | null = null;
   #drawPile: Phaser.GameObjects.Image | null = null;
   #shuffleAnimation!: ShuffleAnimation;
@@ -188,13 +188,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   constructor() {
     super(Scenes.GameRoom);
-    this.#detachSockets = attachGameRoomSockets(this);
   }
 
   // -------------------- INITIALIZATION --------------------
 
   create(data?: GameRoomData) {
-    const gameData = this.#pendingGameState ?? data;
+    // WaitingRoom normally pass payload GameRoom. After a page reload, use cached state instead.
+    const gameData = hasGameData(data) ? data : getCachedGameState();
 
     if (!gameData) {
       throw new Error("Game room started without game data");
@@ -248,6 +248,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
+
+    // Subscribe last: everything is initialized before cached socket events are handled.
+    this.#detachSockets = attachGameRoomSockets(this);
 
     EventBus.emit("scene-ready", this);
   }
@@ -575,7 +578,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   // -------------------- SOCKETS --------------------
 
   onGameState = (payload: GameStatePayload): void => {
-    this.#pendingGameState = payload;
     this.#currentTurnPlayerId = payload.currentTurnPlayerId;
     this.#attackCount = payload.attackCount;
   };
@@ -982,7 +984,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   private cleanup = () => {
-    this.#detachSockets();
+    this.#detachSockets?.();
+    this.#detachSockets = null;
 
     // Remove whichever event didn't fire
     this.events.off(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
