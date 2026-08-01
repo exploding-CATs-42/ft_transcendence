@@ -310,6 +310,7 @@ const LobbyPage = () => {
           getKey={(game) => game.id}
           renderItem={renderGame}
           className={s.list}
+          empty="It's quiet here..."
         />
 
         <div className={s.buttons}>
