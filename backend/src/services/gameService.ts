@@ -126,9 +126,9 @@ function getComboCards(player: Player, cardIds: number[]) {
 export async function getGames(userId: UserId): Promise<GameRecord[]> {
   await ensureUserExists(userId);
 
-  return GameRepository.getAllGames().map((game) => {
-    return toGameRecord(game);
-  });
+  return GameRepository.getAllGames()
+    .filter((game) => game.instance.getSnapshot().matches(GameStates.WAITING))
+    .map(toGameRecord);
 }
 
 export async function getGameById(
