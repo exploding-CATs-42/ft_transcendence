@@ -14,3 +14,4 @@ export * from "./insertKittenSchema";
 export * from "./playNopeSchema";
 export * from "./selectPlayerSchema";
 export * from "./giveCardSchema";
+export * from "./seenTheFutureSchema";

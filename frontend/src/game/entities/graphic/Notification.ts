@@ -17,9 +17,11 @@ export const NotificationMode = {
   SEE_THE_FUTURE: "SEE_THE_FUTURE",
   WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
   SELECT_PLAYER: "SELECT_PLAYER",
+  SELECT_CARD: "SELECT_CARD",
   EXPLODING_KITTEN: "EXPLODING_KITTEN",
-  TWO_OF_A_KIND: "TWO_OF_A_KIND",
-  THREE_OF_A_KIND: "THREE_OF_A_KIND",
+  WAITING_FOR_CARD_SELECTION: "WAITING_FOR_CARD_SELECTION",
+  WAITING_FOR_NOPES: "WAITING_FOR_NOPES",
+  INSERTING_KITTEN: "INSERTING_KITTEN",
 } as const;
 
 export type NotificationMode =
@@ -28,7 +30,7 @@ export type NotificationMode =
 export class Notification extends Phaser.GameObjects.Container {
   #label: Phaser.GameObjects.Text;
 
-  constructor(scene: Phaser.Scene, position: Point = { x: 1420, y: 470 }) {
+  constructor(scene: Phaser.Scene, position: Point) {
     super(scene);
 
     const background = this.addBackground(scene);
@@ -66,7 +68,9 @@ export class Notification extends Phaser.GameObjects.Container {
     return label;
   }
 
-  setMessageFor(mode: NotificationMode) {
+  showMessageFor(mode: NotificationMode) {
+    this.setVisible(true);
+
     let text = "";
     if (mode === NotificationMode.SEE_THE_FUTURE) {
       text = "Player is looking at the cards";
@@ -74,14 +78,17 @@ export class Notification extends Phaser.GameObjects.Container {
       text = "Player is selecting a target";
     } else if (mode === NotificationMode.SELECT_PLAYER) {
       text = "Select a player";
+    } else if (mode === NotificationMode.SELECT_CARD) {
+      text = "Select a card";
     } else if (mode === NotificationMode.EXPLODING_KITTEN) {
+      text = " Player drew an\nexploding kitten";
+    } else if (mode === NotificationMode.WAITING_FOR_CARD_SELECTION) {
+      text = "Player is selecting a card";
+    } else if (mode === NotificationMode.WAITING_FOR_NOPES) {
+      text = "Waiting for nope cards";
+    } else if (mode === NotificationMode.INSERTING_KITTEN) {
       text = "Player is placing kitten\n    back into the deck";
-    } else if (mode === NotificationMode.TWO_OF_A_KIND) {
-      text = "Player is selecting a card";
-    } else if (mode === NotificationMode.THREE_OF_A_KIND) {
-      text = "Player is selecting a card";
     }
-
     this.#label.setText(text);
   }
 }

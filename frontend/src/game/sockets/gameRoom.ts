@@ -53,6 +53,7 @@ export interface GameRoomHandlers {
     payload: WaitingForFavorCardSelectionPayload,
   ): void;
   onPlayerLeft(payload: PlayerIdPayload): void;
+  onPlayerSawTheFuture(): void;
 }
 
 export type CleanupFunction = () => void;
@@ -119,6 +120,7 @@ export function attachGameRoomSockets(
       handlers.onWaitingForFavorCardSelection,
     ],
     [ServerPublicEvents.PLAYER_LEFT, handlers.onPlayerLeft],
+    [ServerPublicEvents.PLAYER_SAW_THE_FUTURE, handlers.onPlayerSawTheFuture],
   ] as const;
 
   subscriptions.forEach(([event, handler]) => {
@@ -154,3 +156,4 @@ export const giveCard = (
   playerIdTo: string,
   cardId: number,
 ) => emit(ClientEvents.GIVE_CARD, { playerIdFrom, playerIdTo, cardId });
+export const seenTheFuture = () => emit(ClientEvents.SEEN_THE_FUTURE);
