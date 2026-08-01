@@ -57,19 +57,28 @@ export interface GameRoomHandlers {
 
 export type CleanupFunction = () => void;
 let lastGameState: GameStatePayload | null = null;
+let lastTurnChanged: TurnChangedPayload | null = null;
 
 export const hasCachedGameState = () => lastGameState !== null;
 
+export const getCachedGameState = () => lastGameState;
+
 export function trackGameState(): CleanupFunction {
-  const cache = (payload: GameStatePayload) => {
+  const cacheState = (payload: GameStatePayload) => {
     lastGameState = payload;
   };
+  const cacheTurn = (payload: TurnChangedPayload) => {
+    lastTurnChanged = payload;
+  };
 
-  socket.on(ServerPrivateEvents.GAME_STATE, cache);
+  socket.on(ServerPrivateEvents.GAME_STATE, cacheState);
+  socket.on(ServerPublicEvents.TURN_CHANGED, cacheTurn);
 
   return () => {
-    socket.off(ServerPrivateEvents.GAME_STATE, cache);
+    socket.off(ServerPrivateEvents.GAME_STATE, cacheState);
+    socket.off(ServerPublicEvents.TURN_CHANGED, cacheTurn);
     lastGameState = null;
+    lastTurnChanged = null;
   };
 }
 
@@ -117,6 +126,7 @@ export function attachGameRoomSockets(
   });
 
   if (lastGameState) handlers.onGameState(lastGameState);
+  if (lastTurnChanged) handlers.onTurnChanged(lastTurnChanged);
 
   return () => {
     subscriptions.forEach(([event, handler]) => {
