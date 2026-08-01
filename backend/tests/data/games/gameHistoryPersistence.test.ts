@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { GameOutEvents, GameStates } from "@exploding-cats/game-core";
-import type { Game } from "./types";
+import type { Game } from "data/types";
 
 const repositoryMocks = vi.hoisted(() => ({
   persistStartedGame: vi.fn(),
   persistFinishedGame: vi.fn(),
 }));
 
-vi.mock("./gameHistoryRepository", () => repositoryMocks);
+vi.mock("data/games/gameHistoryRepository", () => repositoryMocks);
 
-import { attachGameHistoryPersistence } from "./gameHistoryPersistence";
+import { attachGameHistoryPersistence } from "data/games/gameHistoryPersistence";
 
 type GameListener = (event: unknown) => void;
 

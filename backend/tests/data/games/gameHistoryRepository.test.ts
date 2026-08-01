@@ -21,7 +21,7 @@ vi.mock("lib/prisma", () => ({
 import {
   persistFinishedGame,
   persistStartedGame,
-} from "./gameHistoryRepository";
+} from "data/games/gameHistoryRepository";
 
 const game = {
   id: "4cce3d3e-3597-42b1-b251-61f803e3e18b",
