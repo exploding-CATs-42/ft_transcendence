@@ -57,6 +57,8 @@ import {
   ExplodingKittenInsertionView,
   NopeButton,
   DefuseView,
+  Notification,
+  NotificationMode,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -73,6 +75,7 @@ import {
   type CleanupFunction,
   type GameRoomHandlers,
   insertKitten,
+  seenTheFuture,
 } from "../sockets";
 import { ShuffleAnimation } from "../animations";
 
@@ -165,6 +168,9 @@ const FAVOR_CARD_DROP_ZONE = {
   height: CARD_HEIGHT,
 };
 
+// -------------------- NOTIFICATIONS --------------------
+const NOTIFICATION_POSITION: Point = { x: 1640, y: 560 };
+
 // -------------------- GAME ROOM --------------------
 export class GameRoom extends Scene implements GameRoomHandlers {
   #players: Map<string, PlayerSeat> = new Map();
@@ -185,6 +191,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #favorCardDropZone!: Phaser.GameObjects.Graphics;
   #favorModeActive: boolean = false;
   #isAlive = true;
+  #notification!: Notification;
+  #lastPlayedCardType: CardType | null = null;
+  #insertingKittenNotificationTimeout: number | null = null;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -245,6 +254,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.addModalWindowObject();
     this.createFavorCardDropZone();
     this.hideFavorUI();
+    this.addNotificationObject();
 
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
@@ -447,6 +457,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#favorCardDropZone = outline;
   }
 
+  private addNotificationObject() {
+    this.#notification = new Notification(this, NOTIFICATION_POSITION);
+    this.#notification.setVisible(false);
+  }
+
   // -------------------- UTILS --------------------
 
   private addCard(frame: Phaser.Textures.Frame, position: Point) {
@@ -624,6 +639,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         },
       });
     } else {
+      this.#notification.setVisible(false);
       this.#favorModeActive = false;
 
       // spawn the card into player's hand
@@ -743,6 +759,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const card = this.#myHand.removeCard(payload.cardId, payload.reason);
     if (payload.reason === CardRemovalReason.INSERTED_INTO_DECK)
       card.image.destroy();
+
+    if (this.isMyTurn() && card.data.type !== CardType.DEFUSE)
+      this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
   };
 
   private discardOpponentCard(playerId: string, cardType: CardType) {
@@ -777,6 +796,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.discardOpponentCard(payload.playerId, payload.cardType);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
     this.#drawPile?.disableInteractive(true);
+
+    this.#lastPlayedCardType = payload.cardType;
   };
 
   onNopePlayed = (payload: NopePlayedPayload): void => {
@@ -785,8 +806,15 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onNopeWindowResolved = (): void => {
+    this.#notification.setVisible(false);
     this.#nopeButton.hide();
     this.updateDrawPileInteractivity();
+
+    if (this.#lastPlayedCardType === CardType.SEE_THE_FUTURE) {
+      this.#notification.showMessageFor(NotificationMode.SEE_THE_FUTURE);
+    }
+
+    this.#lastPlayedCardType = null;
   };
 
   onTurnSkipped = (payload: TurnSkippedPayload): void => {
@@ -828,6 +856,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         insertKitten(explodingKittenPosition);
       };
     } else {
+      if (!this.isMyTurn()) {
+        this.#notification.setVisible(false);
+        this.#insertingKittenNotificationTimeout = setTimeout(() => {
+          this.#notification.showMessageFor(NotificationMode.INSERTING_KITTEN);
+        }, DEFUSE_VIEW_DURATION_MS);
+      }
+
       const playerName = this.#players.get(payload.playerId)?.player?.name;
       if (!playerName) return;
       const defuseView = new DefuseView(this, playerName);
@@ -841,6 +876,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onKittenInserted = (payload: KittenInsertedPayload): void => {
+    if (this.#insertingKittenNotificationTimeout) {
+      clearTimeout(this.#insertingKittenNotificationTimeout);
+      this.#insertingKittenNotificationTimeout = null;
+    }
+    this.#notification.setVisible(false);
+
     const { playerId } = payload;
 
     const hand = this.#opponents.get(playerId);
@@ -877,6 +918,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onPlayerEliminated = (payload: PlayerIdPayload): void => {
+    this.#notification.setVisible(false);
+
     if (payload.playerId === this.#meId) {
       this.#isAlive = false;
       this.cleanModal();
@@ -889,7 +932,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onKittenDrawn = (): void => {
-    console.log("EXPLODING KITTEN DRAWN");
+    if (this.#meId !== this.#currentTurnPlayerId)
+      this.#notification.showMessageFor(NotificationMode.EXPLODING_KITTEN);
   };
 
   onGameOver = (payload: GameOverPayload): void => {
@@ -929,6 +973,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const view = new SeeTheFutureView(this, threeCards);
     view.onConfirm = () => {
       this.#modal.setVisible(false);
+      seenTheFuture();
     };
 
     this.#modal.setContent(view);
@@ -936,6 +981,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onPlayerSelected = (payload: PlayerSelectedPayload): void => {
+    this.#notification.setVisible(false);
+
     const { playerId } = payload;
 
     const players = [...this.#players.values()];
@@ -949,6 +996,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardGiven = (payload: CardGivenPayload): void => {
+    this.#notification.setVisible(false);
+
     const players = [...this.#players.values()];
     for (let i = 0; i < players.length; ++i) {
       const seat = players[i]!;
@@ -970,6 +1019,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onWaitingForPlayerSelection = () => {
     if (this.isMyTurn()) {
       this.showOpponentTargetIcons();
+      this.#notification.showMessageFor(NotificationMode.SELECT_PLAYER);
+    } else {
+      this.#notification.showMessageFor(
+        NotificationMode.WAITING_FOR_PLAYER_SELECTION,
+      );
     }
   };
 
@@ -978,9 +1032,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   ) => {
     if (this.#meId === payload.playerId) {
       this.showFavorUI();
-    } else if (this.#meId === this.#currentTurnPlayerId) {
-      this.#favorModeActive = true;
+      this.#notification.showMessageFor(NotificationMode.SELECT_CARD);
+    } else {
+      this.#notification.showMessageFor(
+        NotificationMode.WAITING_FOR_CARD_SELECTION,
+      );
+
+      if (this.isMyTurn()) {
+        this.#favorModeActive = true;
+      }
     }
+  };
+
+  onPlayerSawTheFuture = (): void => {
+    this.#notification.setVisible(false);
   };
 
   private cleanup = () => {

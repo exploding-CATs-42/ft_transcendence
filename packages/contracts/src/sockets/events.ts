@@ -12,6 +12,7 @@ export const ClientEvents = {
   PLAY_NOPE: "play-nope",
   SELECT_PLAYER: "select-player",
   GIVE_CARD: "give-card",
+  SEEN_THE_FUTURE: "seen-the-future",
 } as const;
 
 export const ServerPublicEvents = {
@@ -44,6 +45,7 @@ export const ServerPublicEvents = {
   CARD_GIVEN: "CARD_GIVEN",
   WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
   WAITING_FOR_FAVOR_CARD_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
+  PLAYER_SAW_THE_FUTURE: "PLAYER_SAW_THE_FUTURE",
 } as const;
 
 export const ServerPrivateEvents = {
@@ -75,4 +77,5 @@ export const ServerErrorEvents = {
   PLAY_NOPE_ERROR: "play-nope-error",
   SELECT_PLAYER_ERROR: "select-player-error",
   GIVE_CARD_ERROR: "give-card-error",
+  SEEN_THE_FUTURE_ERROR: "seen-the-future-error",
 } as const;

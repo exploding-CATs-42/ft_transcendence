@@ -44,6 +44,8 @@ import {
   selectPlayerSchema,
   giveCardSchema,
   GiveCardPayload,
+  SeenTheFuturePayload,
+  seenTheFutureSchema,
 } from "schemas";
 import {
   CardGivenPayload,
@@ -384,6 +386,19 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           playerIdTo,
         };
         io.to(room).emit(ServerPublicEvents.CARD_GIVEN, cardGivenPayload);
+      },
+    ),
+  );
+
+  socket.on(
+    ClientEvents.SEEN_THE_FUTURE,
+    withErrorHandler(
+      seenTheFutureSchema,
+      socket,
+      ServerErrorEvents.SEEN_THE_FUTURE_ERROR,
+      async (parsed: SeenTheFuturePayload) => {
+        const room = parsed.gameId;
+        socket.to(room).emit(ServerPublicEvents.PLAYER_SAW_THE_FUTURE);
       },
     ),
   );

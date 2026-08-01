@@ -19,4 +19,4 @@ export { NopeButton } from "./NopeButton";
 export { ExplodingKittenInsertionView } from "./ExplodingKittenInsertionView";
 export { ExplodingKittenDrawnView } from "./ExplodingKittenDrawnView";
 export { PlayerIsDeadView } from "./PlayerIsDeadView";
-export { Notification } from "./Notification";
+export { Notification, NotificationMode } from "./Notification";
