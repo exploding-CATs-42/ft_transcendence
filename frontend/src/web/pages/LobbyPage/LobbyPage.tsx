@@ -82,9 +82,9 @@ const LobbyPage = () => {
   const { socket } = useSocket();
 
   const loadGames = useCallback(async () => {
-    const games = await api.games.getAll();
+    const loadedGames = await api.games.getAll();
 
-    setGames(sortGamesByCreatedAt(games));
+    setGames(sortGamesByCreatedAt(loadedGames));
   }, []);
 
   useEffect(() => {
