@@ -52,10 +52,22 @@
   letter-spacing: -1%;
 }
 
+.profile:hover,
+.profile:focus-visible,
+.signUp:hover,
+.signUp:focus-visible {
+  background-color: var(--exploding-kittens-hover);
+}
+
 @media only screen and (max-width: 767.98px) {
   .link {
     background-color: var(--throw-throw-burrito);
     box-shadow: 0 4px 6px var(--soft-black);
+  }
+
+  .link:hover,
+  .link:focus-visible {
+    background-color: var(--throw-throw-burrito-hover);
   }
 
   .signUp {
@@ -75,6 +87,11 @@
 
     font-size: 25px;
     line-height: 1.32;
+  }
+
+  .link:hover,
+  .link:focus-visible {
+    color: var(--throw-throw-burrito);
   }
 
   .signUp {
