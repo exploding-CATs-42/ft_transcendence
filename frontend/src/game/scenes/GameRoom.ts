@@ -59,6 +59,7 @@ import {
   DefuseView,
   Notification,
   NotificationMode,
+  ExplodingKittenRiskBar,
 } from "../entities";
 import type { Point, LabelConfig, CardConfig, Player } from "../@types";
 import {
@@ -101,6 +102,11 @@ const DRAW_PILE_POSITION: Point = {
 const DISCARD_PILE_POSITION: Point = {
   x: 1050,
   y: PILES_Y,
+};
+
+const CARDS_LEFT_LABEL: Point = {
+  x: 485,
+  y: PILES_Y + 170,
 };
 
 const CARD_TO_DISCARD_DURATION_MS = 300;
@@ -187,6 +193,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #lastPlayedCardType: CardType | null = null;
   #insertingKittenNotificationTimeout: number | null = null;
   #drawPileSize = 0;
+  #explodingKittenRiskBar: ExplodingKittenRiskBar | null = null;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -231,6 +238,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.#isAlive = players[0]!.isAlive;
 
+    this.createExplodingKittenRiskBar();
     this.createCardDropZone();
     this.createDrawPile();
     this.createDiscardPile(getLastPlayedCard(gameData.lastPlayedCards));
@@ -251,6 +259,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#detachSockets = attachGameRoomSockets(this);
 
     EventBus.emit("scene-ready", this);
+  }
+
+  private createExplodingKittenRiskBar() {
+    this.#explodingKittenRiskBar = new ExplodingKittenRiskBar(
+      this,
+      CARDS_LEFT_LABEL,
+      this.#players.size - 1,
+      this.#drawPileSize,
+    );
+    this.add.existing(this.#explodingKittenRiskBar);
   }
 
   private createPlayers(players: Player[]) {
@@ -684,6 +702,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.drawOpponentCard(payload.playerId);
 
     this.#drawPileSize--;
+    this.#explodingKittenRiskBar?.updateFrame(this.#drawPileSize);
 
     if (
       payload.playerId === this.#currentTurnPlayerId &&
@@ -892,6 +911,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { playerId } = payload;
 
     this.#drawPileSize++;
+    this.#explodingKittenRiskBar?.updateFrame(this.#drawPileSize);
 
     const hand = this.#opponents.get(playerId);
     if (!hand) return;
