@@ -29,6 +29,11 @@
   fill: var(--off-white);
 }
 
+.copyButton:hover .copyIcon,
+.copyButton:focus-visible .copyIcon {
+  fill: var(--throw-throw-burrito);
+}
+
 @media only screen and (min-width: 768px) {
   .section {
     grid-template-columns: auto auto;
@@ -52,8 +57,8 @@
   }
 
   .copyIcon {
-    width: 30px;
-    height: 30px;
+    width: 35px;
+    height: 35px;
   }
 }
 
