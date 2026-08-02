@@ -205,6 +205,17 @@
   width: 100%;
 }
 
+/* A full width row needs a softer lift than the global one */
+.gameButton:hover {
+  scale: 1.01;
+  filter: brightness(0.96);
+}
+
+.gameButton:active {
+  scale: 0.99;
+  filter: brightness(0.9);
+}
+
 @media only screen and (min-width: 1920px) {
   .pageContainer {
     --container-inline-padding: 100px;
