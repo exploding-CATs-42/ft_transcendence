@@ -178,6 +178,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #meId: string | null = null;
   #currentTurnPlayerId: string | null = null;
   #drawPile: Phaser.GameObjects.Image | null = null;
+  #drawPileZone: Phaser.GameObjects.Graphics | null = null;
   #shuffleAnimation!: ShuffleAnimation;
   #discardPile: Phaser.GameObjects.Image | null = null;
   #discardPileZone: Phaser.GameObjects.Graphics | null = null;
@@ -416,10 +417,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.#drawPile.on("pointerdown", this.drawCard);
     this.updateDrawPileInteractivity();
+
+    this.#drawPileZone = this.createPileZone(DRAW_PILE_POSITION);
+    this.#drawPileZone.setVisible(false);
   }
 
   private createDiscardPile(lastPlayedCard: Card | null = null) {
-    this.createDiscardPileZone();
+    this.#discardPileZone = this.createPileZone(DISCARD_PILE_POSITION);
 
     if (lastPlayedCard) {
       const frame: Phaser.Textures.Frame = getCardFrame(
@@ -433,8 +437,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.updateComboPlayInteractivity();
   }
 
-  private createDiscardPileZone() {
-    const { x, y } = DISCARD_PILE_POSITION;
+  private createPileZone(position: Point) {
+    const { x, y } = position;
 
     const outline = this.add.graphics();
     outline.lineStyle(4, 0xffffff, 1);
@@ -446,7 +450,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       CARD_BORDER_RADIUS,
     );
 
-    this.#discardPileZone = outline;
+    return outline;
   }
 
   private createCardDropZone() {
@@ -698,6 +702,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   }
 
+  private setDrawPileVisible(visible: boolean) {
+    this.#drawPile?.setVisible(visible);
+    this.#drawPileZone?.setVisible(!visible);
+  }
+
   onCardDrawn = (payload: PlayerIdPayload): void => {
     this.drawOpponentCard(payload.playerId);
 
@@ -710,6 +719,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     ) {
       this.#attackCount -= 1;
       this.updateAttackIndicator();
+    }
+    if (this.#drawPileSize === 0) {
+      this.setDrawPileVisible(false);
     }
   };
 
@@ -911,6 +923,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { playerId } = payload;
 
     this.#drawPileSize++;
+    if (this.isMyTurn() && this.#drawPileSize === 1)
+      this.setDrawPileVisible(true);
+
     this.#explodingKittenRiskBar?.updateFrame(this.#drawPileSize);
 
     const hand = this.#opponents.get(playerId);
@@ -942,6 +957,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       onComplete: () => {
         flyingCard.destroy();
         hand.removeCard();
+        if (this.#drawPileSize === 1) this.setDrawPileVisible(true);
       },
     });
   };
