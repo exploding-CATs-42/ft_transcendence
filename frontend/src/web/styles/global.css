@@ -57,12 +57,53 @@ main {
 
 input,
 textarea,
-button {
+button,
+a {
   transition: all var(--transition-options);
 }
 
 input:focus-visible {
   outline: none;
+}
+
+/* Clickable elements: hover highlights them, click presses them */
+
+button:hover,
+a:hover {
+  scale: 1.03;
+  filter: brightness(0.92);
+}
+
+button:active,
+a:active {
+  scale: 0.96;
+  filter: brightness(0.82);
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--throw-throw-burrito);
+  outline-offset: 3px;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+button:disabled:hover,
+button:disabled:active {
+  scale: 1;
+  filter: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  button:hover,
+  a:hover,
+  button:active,
+  a:active {
+    scale: 1;
+  }
 }
 
 h1,
