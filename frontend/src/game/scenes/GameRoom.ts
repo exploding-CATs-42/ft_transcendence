@@ -277,6 +277,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
       this.#players.set(opponent.id, opponentSeat);
     }
+
+    const seats = [...this.#players.values()];
+    if (seats.length === 2) {
+      seats[1]?.moveTo(GAME_ROOM_SEATS[4]!);
+    }
+    if (players.length === 3) {
+      seats[1]?.moveTo(GAME_ROOM_SEATS[2]!);
+      seats[2]?.moveTo(GAME_ROOM_SEATS[4]!);
+    }
+    if (players.length === 4) {
+      seats[1]?.moveTo(GAME_ROOM_SEATS[2]!);
+      seats[2]?.moveTo(GAME_ROOM_SEATS[3]!);
+      seats[3]?.moveTo(GAME_ROOM_SEATS[4]!);
+    }
   }
 
   private isMyTurn = () => this.#meId === this.#currentTurnPlayerId;
