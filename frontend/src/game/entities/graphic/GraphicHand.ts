@@ -109,8 +109,7 @@ export class GraphicHand {
   // -------------- Public API --------------
 
   addCard(card: Card, frame: Phaser.Textures.Frame, insertIndex = -1) {
-    if (insertIndex === -1)
-      insertIndex = Phaser.Math.Between(0, this.#cards.length);
+    if (insertIndex === -1) insertIndex = this.getSortedInsertIndex(card);
 
     this.adjustDepthsForInsertion(insertIndex);
 
@@ -137,8 +136,11 @@ export class GraphicHand {
     });
   }
 
-  getCount() {
-    return this.#cards.length;
+  getCardInsertion(card: Card) {
+    const insertIndex = this.getSortedInsertIndex(card);
+    const targetX = this.getInsertPositionX(insertIndex);
+
+    return { insertIndex, targetX };
   }
 
   findCardIdByType(cardType: CardType): number | null {
@@ -457,8 +459,7 @@ export class GraphicHand {
     });
   }
 
-  getLayout() {
-    const cardCount = this.#cards.length;
+  getLayout(cardCount = this.#cards.length) {
     const spacing = getCardSpacing(cardCount, CARD_SPACING_CONFIG);
     const baseX = this.#position.x;
     const startX = getHandStartX(cardCount, spacing, CARD_WIDTH, baseX);
@@ -752,14 +753,16 @@ export class GraphicHand {
 
   // -------------- Utils --------------
 
+  private getSortedInsertIndex(card: Card) {
+    return [...this.#cardsData.values()].filter(
+      ({ data }) => compareHandCards(data, card) <= 0,
+    ).length;
+  }
+
   private getInsertPositionX(insertIndex: number) {
-    const { spacing, startX } = this.getLayout();
+    const { spacing, startX } = this.getLayout(this.#cards.length + 1);
 
-    let targetX;
-    if (this.#cards.length === 0) targetX = this.#position.x - CARD_WIDTH / 2;
-    else targetX = startX + spacing * insertIndex - spacing / 2;
-
-    return targetX;
+    return startX + spacing * insertIndex;
   }
 
   private hasKindComboSelection() {

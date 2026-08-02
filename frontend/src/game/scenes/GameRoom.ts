@@ -587,17 +587,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.#myHand.clearKindComboSelection();
 
-    // Generate random insert index
-    const cardCount = this.#myHand.getCount();
-    const insertIndex = Phaser.Math.Between(0, cardCount);
-
-    // Get current card spacing and most left card position
-    const { startX, spacing } = this.#myHand.getLayout();
-
-    // Using that calculate where to insert the card
-    let targetX;
-    if (cardCount === 0) targetX = HAND_POSITION.x;
-    else targetX = startX + spacing * insertIndex - spacing / 2;
+    const { insertIndex, targetX } = this.#myHand.getCardInsertion(
+      payload.card,
+    );
 
     if (!this.#favorModeActive) {
       // Create face down card
