@@ -525,6 +525,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   // -------------------- ACTIONS --------------------
 
   private showOpponentTargetIcons() {
+    this.#drawPile?.disableInteractive(true);
+
     const players = [...this.#players.values()];
     for (let i = 1; i < players.length; ++i) {
       const player = players[i]!;
@@ -626,6 +628,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     } else {
       this.#notification.setVisible(false);
       this.#favorModeActive = false;
+      this.updateDrawPileInteractivity();
 
       // spawn the card into player's hand
       const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
