@@ -78,12 +78,12 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
 
   private getRiskFrame(probability: number) {
     if (probability === 100) return 0;
-    else if (probability >= 85) return 1;
-    else if (probability >= 65) return 2;
-    else if (probability >= 50) return 3;
-    else if (probability >= 40) return 4;
-    else if (probability >= 25) return 5;
-    else return 6;
+    if (probability >= 85) return 1;
+    if (probability > 50) return 2;
+    if (probability === 50) return 3;
+    if (probability >= 40) return 4;
+    if (probability >= 25) return 5;
+    return 6;
   }
 
   updateFrame(drawPileSize: number) {
