@@ -2,6 +2,7 @@ import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
 import {
   addCardVisual,
+  compareHandCards,
   getCardSpacing,
   getHandStartX,
   getSelectedCardOutlineColor,
@@ -128,6 +129,7 @@ export class GraphicHand {
       onComplete: () => {
         this.#cards.splice(insertIndex, 0, newGraphicCard.image);
         this.#cardsData.set(card.id, newGraphicCard);
+        this.sortCards();
         this.updateCardsDraggability();
         if (this.#isDisabled) this.disableCard(newGraphicCard.image);
         if (this.#cards.length > 1) this.reflowCards();
@@ -444,6 +446,16 @@ export class GraphicHand {
   }
 
   // -------------- Layout --------------
+
+  private sortCards() {
+    this.#cards.sort((firstImage, secondImage) => {
+      const firstCard = this.getGraphicCardByImage(firstImage)?.data;
+      const secondCard = this.getGraphicCardByImage(secondImage)?.data;
+
+      if (!firstCard || !secondCard) return 0;
+      return compareHandCards(firstCard, secondCard);
+    });
+  }
 
   getLayout() {
     const cardCount = this.#cards.length;
