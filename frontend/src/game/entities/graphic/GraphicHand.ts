@@ -311,7 +311,7 @@ export class GraphicHand {
     const cardImage = graphicCard.image;
 
     cardImage.on("drop", () => {
-      if (this.#isFavorModeActive()) {
+      if (this.#isFavorModeActive() && !this.#isMyTurn()) {
         this.#giveCard(graphicCard.data.id);
       } else {
         if (this.canPlayKindComboWithCard(cardData.id)) {
