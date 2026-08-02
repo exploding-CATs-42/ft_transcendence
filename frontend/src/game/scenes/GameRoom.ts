@@ -186,6 +186,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #notification!: Notification;
   #lastPlayedCardType: CardType | null = null;
   #insertingKittenNotificationTimeout: number | null = null;
+  #drawPileSize = 0;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -200,7 +201,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       throw new Error("Game room started without game data");
     }
 
-    const { players, hand: cards } = gameData;
+    const { players, hand: cards, deckSize } = gameData;
+
+    this.#drawPileSize = deckSize;
 
     this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
     this.#attackCount = gameData.attackCount;
@@ -680,6 +683,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onCardDrawn = (payload: PlayerIdPayload): void => {
     this.drawOpponentCard(payload.playerId);
 
+    this.#drawPileSize--;
+
     if (
       payload.playerId === this.#currentTurnPlayerId &&
       this.#attackCount > 1
@@ -885,6 +890,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#notification.setVisible(false);
 
     const { playerId } = payload;
+
+    this.#drawPileSize++;
 
     const hand = this.#opponents.get(playerId);
     if (!hand) return;
