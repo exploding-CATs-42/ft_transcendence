@@ -17,7 +17,7 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, cards: Card[]) {
     super(scene);
     this.addCards(scene, cards);
-    this.addConfirmationButton(scene);
+    this.addConfirmationButton(scene, cards.length);
   }
 
   // ------------------ INITIALIZATION ------------------
@@ -31,9 +31,10 @@ export class SeeTheFutureView extends Phaser.GameObjects.Container {
     });
   }
 
-  private addConfirmationButton(scene: Phaser.Scene) {
+  private addConfirmationButton(scene: Phaser.Scene, cardCount: number) {
+    const x = ((cardCount - 1) * SPACING_BETWEEN_CARDS + CARD_WIDTH) / 2;
     const confirmationButton = scene.add
-      .image(540, 550, Textures.confirmedIcon)
+      .image(x, 550, Textures.confirmedIcon)
       .setDisplaySize(100, 100)
       .setInteractive({ useHandCursor: true });
 
