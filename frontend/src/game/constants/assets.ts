@@ -21,6 +21,7 @@ export const Textures = {
   fire: "fire",
   nuclear: "nuclear",
   coolCat: "coolCat",
+  scaleMeterBar: "scaleMeterBar",
 } as const;
 
 type Textures = (typeof Textures)[keyof typeof Textures];
