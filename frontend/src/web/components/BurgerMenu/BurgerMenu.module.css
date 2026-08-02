@@ -37,6 +37,11 @@
   stroke: var(--off-white);
 }
 
+.burgerMenuButton:hover,
+.burgerMenuButton:focus-visible {
+  stroke: var(--throw-throw-burrito);
+}
+
 .navContainer {
   display: flex;
   flex-direction: column;
