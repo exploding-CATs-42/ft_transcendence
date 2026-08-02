@@ -7,6 +7,11 @@
   fill: var(--off-white);
 }
 
+.editButton:hover .editIcon,
+.editButton:focus-visible .editIcon {
+  fill: var(--throw-throw-burrito);
+}
+
 .logoutButton {
   border: 1px solid #fffdfdd4;
   margin-left: auto;
@@ -20,6 +25,24 @@
 .logoutIcon {
   fill: transparent;
   stroke: var(--off-white);
+}
+
+/* An outlined button reads better filled in than tinted */
+.logoutButton:hover,
+.logoutButton:focus-visible {
+  color: var(--exploding-kittens);
+  border-color: var(--off-white);
+  background-color: var(--off-white);
+  filter: none;
+}
+
+.logoutButton:hover .logoutIcon,
+.logoutButton:focus-visible .logoutIcon {
+  stroke: var(--exploding-kittens);
+}
+
+.logoutButton:active {
+  filter: brightness(0.9);
 }
 
 .logoutText {
