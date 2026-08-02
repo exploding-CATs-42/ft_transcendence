@@ -25,3 +25,38 @@
   text-align: center;
   color: var(--dark-gray);
 }
+
+@media only screen and (min-width: 768px) {
+  .rightContent {
+    flex-direction: row;
+    gap: 7px;
+  }
+
+  .button {
+    width: 110px;
+    height: 40px;
+
+    font-size: 25px;
+    line-height: 33px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .button {
+    width: 162px;
+    height: 53px;
+
+    font-size: 30px;
+    line-height: 39px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .button {
+    width: 170px;
+    height: 60px;
+
+    font-size: 40px;
+    line-height: 52px;
+  }
+}
