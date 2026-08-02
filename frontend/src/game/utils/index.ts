@@ -7,3 +7,4 @@ export {
 } from "./textureUtils";
 export { getCardSpacing, getHandStartX, addCardVisual } from "./cardUtils";
 export { getSelectedCardOutlineColor } from "./cardSelectionUtils";
+export { compareHandCards, sortHandCards } from "./handCardSorting";
