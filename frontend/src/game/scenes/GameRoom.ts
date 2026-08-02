@@ -18,10 +18,10 @@ import {
   type CardRemovedPayload,
   type ComboPlayedPayload,
   type DefusePromptPayload,
-  type GameStartedPayload,
   type GameStatePayload,
   type NopePlayedPayload,
   type PlayerIdPayload,
+  type PublicPlayerView,
   type SeeTheFuturePeekPayload,
   type TurnChangedPayload,
   type TurnSkippedPayload,
@@ -135,14 +135,6 @@ const HAND_POSITION: Point = {
   y: 940,
 };
 
-type GameRoomData = GameStartedPayload | GameStatePayload;
-
-const hasTurnState = (data: GameRoomData): data is GameStatePayload =>
-  "currentTurnPlayerId" in data;
-
-const hasGameData = (data?: GameRoomData): data is GameRoomData =>
-  Boolean(data && "players" in data);
-
 const getLastPlayedCard = (cards: Card[] | null) => {
   if (!cards || cards.length === 0) return null;
 
@@ -201,9 +193,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   // -------------------- INITIALIZATION --------------------
 
-  create(data?: GameRoomData) {
-    // WaitingRoom normally pass payload GameRoom. After a page reload, use cached state instead.
-    const gameData = hasGameData(data) ? data : getCachedGameState();
+  create() {
+    const gameData = getCachedGameState();
 
     if (!gameData) {
       throw new Error("Game room started without game data");
@@ -211,10 +202,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const { players, hand: cards } = gameData;
 
-    if (hasTurnState(gameData)) {
-      this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
-      this.#attackCount = gameData.attackCount;
-    }
+    this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
+    this.#attackCount = gameData.attackCount;
 
     addBackgroundImage(this, Textures.gameRoomBg);
     addFullscreenToggle(this);
@@ -241,11 +230,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.createCardDropZone();
     this.createDrawPile();
-    this.createDiscardPile(
-      hasTurnState(gameData)
-        ? getLastPlayedCard(gameData.lastPlayedCards)
-        : null,
-    );
+    this.createDiscardPile(getLastPlayedCard(gameData.lastPlayedCards));
     this.createMyHand();
     this.fillMyHandWithCards(cards);
     if (!this.#isAlive) this.#myHand.disable();
@@ -375,7 +360,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
   }
 
-  private fillOpponentHands(players: GameRoomData["players"]) {
+  private fillOpponentHands(players: PublicPlayerView[]) {
     for (let i = 1; i < players.length; ++i) {
       const player = players[i]!;
       this.#opponents.get(player.id)?.setCardCount(player.handSize);

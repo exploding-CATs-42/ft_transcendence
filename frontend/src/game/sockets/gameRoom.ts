@@ -7,6 +7,7 @@ import {
   type CardRemovedPayload,
   type ComboPlayedPayload,
   type DefusePromptPayload,
+  type GameStartedPayload,
   type GameStatePayload,
   type NopePlayedPayload,
   type PlayerIdPayload,
@@ -57,29 +58,46 @@ export interface GameRoomHandlers {
 }
 
 export type CleanupFunction = () => void;
-let lastGameState: GameStatePayload | null = null;
-let lastTurnChanged: TurnChangedPayload | null = null;
+let cachedState: GameStatePayload | null = null;
 
-export const hasCachedGameState = () => lastGameState !== null;
-
-export const getCachedGameState = () => lastGameState;
+export const hasCachedGameState = () => cachedState !== null;
+export const getCachedGameState = () => cachedState;
 
 export function trackGameState(): CleanupFunction {
-  const cacheState = (payload: GameStatePayload) => {
-    lastGameState = payload;
-  };
-  const cacheTurn = (payload: TurnChangedPayload) => {
-    lastTurnChanged = payload;
+  // Fresh start: no turn yet, the TURN_CHANGED right after fills it in.
+  const onStarted = (payload: GameStartedPayload) => {
+    cachedState = {
+      ...payload,
+      currentTurnPlayerId: null,
+      lastPlayedCards: null,
+      attackCount: 1,
+    };
   };
 
-  socket.on(ServerPrivateEvents.GAME_STATE, cacheState);
-  socket.on(ServerPublicEvents.TURN_CHANGED, cacheTurn);
+  // Reload: server already sends a full snapshot.
+  const onState = (payload: GameStatePayload) => {
+    cachedState = payload;
+  };
+
+  const onTurn = (payload: TurnChangedPayload) => {
+    if (!cachedState) return;
+
+    cachedState = {
+      ...cachedState,
+      currentTurnPlayerId: payload.playerId,
+      attackCount: payload.attackCount,
+    };
+  };
+
+  socket.on(ServerPrivateEvents.GAME_STARTED, onStarted);
+  socket.on(ServerPrivateEvents.GAME_STATE, onState);
+  socket.on(ServerPublicEvents.TURN_CHANGED, onTurn);
 
   return () => {
-    socket.off(ServerPrivateEvents.GAME_STATE, cacheState);
-    socket.off(ServerPublicEvents.TURN_CHANGED, cacheTurn);
-    lastGameState = null;
-    lastTurnChanged = null;
+    socket.off(ServerPrivateEvents.GAME_STARTED, onStarted);
+    socket.off(ServerPrivateEvents.GAME_STATE, onState);
+    socket.off(ServerPublicEvents.TURN_CHANGED, onTurn);
+    cachedState = null;
   };
 }
 
@@ -126,9 +144,6 @@ export function attachGameRoomSockets(
   subscriptions.forEach(([event, handler]) => {
     socket.on(event, handler);
   });
-
-  if (lastGameState) handlers.onGameState(lastGameState);
-  if (lastTurnChanged) handlers.onTurnChanged(lastTurnChanged);
 
   return () => {
     subscriptions.forEach(([event, handler]) => {

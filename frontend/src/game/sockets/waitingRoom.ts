@@ -3,8 +3,6 @@ import {
   ServerPrivateEvents,
   ServerPublicEvents,
   type CountdownStartedPayload,
-  type GameStartedPayload,
-  type GameStatePayload,
   type PlayerIdPayload,
   type PlayerJoinedPayload,
   type WaitingPlayerView,
@@ -28,7 +26,7 @@ export interface WaitingRoomHandlers {
   onPlayerReconnected(playerId: string): void;
   onCountdownStarted(endsAt: number): void;
   onCountdownCanceled(): void;
-  onGameStarted(payload?: GameStartedPayload | GameStatePayload): void;
+  onGameStarted(): void;
 }
 
 let lastWaitingState: WaitingStatePayload | null = null;
@@ -68,8 +66,8 @@ export function subscribeWaitingRoom(
   const onCountdownStarted = (p: CountdownStartedPayload) =>
     handlers.onCountdownStarted(p.endsAt);
   const onCountdownCanceled = () => handlers.onCountdownCanceled();
-  const onGameStarted = (p: GameStartedPayload) => handlers.onGameStarted(p);
-  const onGameState = (p: GameStatePayload) => handlers.onGameStarted(p);
+  const onGameStarted = () => handlers.onGameStarted();
+  const onGameState = () => handlers.onGameStarted();
 
   socket.on(ServerPrivateEvents.WAITING_STATE, onWaitingState);
   socket.on(ServerPrivateEvents.GAME_STATE, onGameState);
