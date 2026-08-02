@@ -238,6 +238,9 @@ const LobbyPage = () => {
 
     socket.once(ServerPrivateEvents.LEFT_GAME, () => {
       toggleExistingGameModal(false);
+      setGames((currentGames) =>
+        currentGames.filter((game) => game.id !== existingGame.id),
+      );
       setExistingGame(null);
     });
     socket.emit(ClientEvents.LEAVE_GAME, { gameId: existingGame.id });
