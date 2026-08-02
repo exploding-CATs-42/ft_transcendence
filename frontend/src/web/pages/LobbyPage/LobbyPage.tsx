@@ -119,9 +119,6 @@ const LobbyPage = () => {
       setGames((currentGames) =>
         currentGames.filter((game) => game.id !== gameId),
       );
-      setExistingGame((currentExistingGame) =>
-        currentExistingGame?.id === gameId ? null : currentExistingGame,
-      );
     };
 
     socket.on(ServerPublicEvents.LOBBY_GAME_UPDATED, handleLobbyGameUpdated);
