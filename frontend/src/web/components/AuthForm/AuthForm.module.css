@@ -55,3 +55,8 @@
   text-decoration: underline;
   color: var(--off-white);
 }
+
+.signUpLink:hover,
+.signUpLink:focus-visible {
+  color: var(--throw-throw-burrito);
+}
