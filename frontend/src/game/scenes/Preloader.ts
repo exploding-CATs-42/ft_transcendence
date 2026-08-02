@@ -24,6 +24,7 @@ import {
   fireSpriteSheet,
   nuclearSpritesheet,
   coolCat,
+  scaleMeterBar,
 } from "game/assets";
 import { addBackgroundImage } from "game/utils";
 import { hasCachedGameState } from "game/sockets";
@@ -89,6 +90,10 @@ export class Preloader extends Scene {
       frameHeight: 420,
     });
     this.load.image(Textures.coolCat, coolCat);
+    this.load.spritesheet(Textures.scaleMeterBar, scaleMeterBar, {
+      frameWidth: 300,
+      frameHeight: 400,
+    });
   }
 
   create() {
