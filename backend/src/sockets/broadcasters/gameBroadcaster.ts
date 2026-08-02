@@ -19,6 +19,8 @@ import { Game } from "data/types";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
 import { toGameStartedPayload } from "mappers";
+// Local level
+import { broadcastLobbyGameRemoved } from "./lobbyBroadcaster";
 
 export function attachGameBroadcaster(game: Game) {
   const { instance: broadcaster, id: gameId } = game;
@@ -36,6 +38,10 @@ export function attachGameBroadcaster(game: Game) {
 
       socket?.emit(ServerPrivateEvents.GAME_STARTED, payload);
     });
+
+    // The countdown starts the game on its own, so this is the only chance to
+    // drop it from the lobby lists of everyone who is not playing it.
+    broadcastLobbyGameRemoved(gameId);
   });
 
   broadcaster.on(GameOutEvents.COUNTDOWN_STARTED, (event) => {
