@@ -20,3 +20,4 @@ export { ExplodingKittenInsertionView } from "./ExplodingKittenInsertionView";
 export { ExplodingKittenDrawnView } from "./ExplodingKittenDrawnView";
 export { PlayerIsDeadView } from "./PlayerIsDeadView";
 export { Notification, NotificationMode } from "./Notification";
+export { ExplodingKittenRiskBar } from "./ExplodingKittenRiskBar";
