@@ -136,7 +136,7 @@ export function attachGameBroadcaster(game: Game) {
   });
 
   broadcaster.on(GameOutEvents.COMBO_SELECTION_REQUESTED, (event) => {
-    io.to(gameId).emit(
+    socketsMap.get(event.payload.playerId)?.emit(
       ServerPublicEvents.COMBO_SELECTION_REQUESTED,
       event.payload,
     );

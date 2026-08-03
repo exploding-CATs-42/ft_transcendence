@@ -263,12 +263,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.PLAY_COMBO_ERROR,
       async (parsed: PlayComboParams) => {
-        const { playerId, cards, nopeWindowExpiresAt } = await playCombo(
-          parsed,
-          socket.data.user.id,
-        );
-
-        const room = parsed.gameId;
+        const { cards } = await playCombo(parsed, socket.data.user.id);
 
         cards.forEach((card) => {
           const cardRemovedPayload: CardRemovedPayload = {
@@ -278,16 +273,6 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
           socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
         });
-
-        const comboPlayedPayload: ComboPlayedPayload = {
-          playerId,
-          cardTypes: cards.map((card) => card.type),
-          nopeWindowExpiresAt,
-        };
-
-        socket
-          .to(room)
-          .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
       },
     ),
   );
@@ -299,8 +284,23 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.RESOLVE_COMBO_ERROR,
       async (parsed: ResolveComboParams) => {
+        const result = await resolveCombo(parsed, socket.data.user.id);
+
+        if (result.status === "declared") {
+          const comboPlayedPayload: ComboPlayedPayload = {
+            playerId: result.playerId,
+            cardTypes: result.cards.map((card) => card.type),
+            nopeWindowExpiresAt: result.nopeWindowExpiresAt,
+          };
+
+          socket
+            .to(parsed.gameId)
+            .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
+          return;
+        }
+
         const { playerId, targetPlayerId, comboSize, requestedCardType, card } =
-          await resolveCombo(parsed, socket.data.user.id);
+          result;
         const targetSocket = socketsMap.get(targetPlayerId);
 
         if (card) {
