@@ -3,6 +3,7 @@ import { Scene } from "phaser";
 // Project level
 import {
   CardType,
+  GameStates,
   type Card,
   type CardPayload,
   type GameOverPayload,
@@ -265,6 +266,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.hideFavorUI();
     this.addNotificationObject();
 
+    this.restoreUIState(gameData);
+
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
@@ -272,6 +275,48 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#detachSockets = attachGameRoomSockets(this);
 
     EventBus.emit("scene-ready", this);
+  }
+
+  private restoreUIState(gameData: GameStatePayload) {
+    if (gameData.machineState) {
+      const state = gameData.machineState;
+      if (state === GameStates.SELECTING_PLAYER) {
+        this.onWaitingForPlayerSelection();
+      } else if (state === GameStates.WAITING_FOR_FAVOR_CARD_SELECTION) {
+        this.onPlayerSelected({ playerId: gameData.selectedPlayerId! });
+        this.onWaitingForFavorCardSelection({
+          playerId: gameData.selectedPlayerId!,
+        });
+      } else if (state === GameStates.WAITING_FOR_DEFUSE_CARD) {
+        if (this.isMyTurn()) {
+          this.onDefusePrompt({
+            endsAt: gameData.countdownEndsAt!,
+            playerId: gameData.currentTurnPlayerId!,
+            canDefuse: true,
+          });
+        } else {
+          this.#notification.showMessageFor(NotificationMode.EXPLODING_KITTEN);
+        }
+      } else if (state === GameStates.PLAYER_LOOKS_AT_THE_FUTURE) {
+        if (this.isMyTurn()) {
+          this.onSeeTheFuturePeek({
+            cards: gameData.topCards!,
+            playerId: gameData.currentTurnPlayerId!,
+          });
+        } else {
+          this.#notification.showMessageFor(NotificationMode.SEE_THE_FUTURE);
+        }
+      } else if (state === GameStates.WAITING_FOR_KITTEN_INSERTION) {
+        if (this.isMyTurn()) {
+          this.onPlayerDefused({
+            playerId: gameData.currentTurnPlayerId!,
+            deckSize: gameData.deckSize,
+          });
+        } else {
+          this.#notification.showMessageFor(NotificationMode.INSERTING_KITTEN);
+        }
+      }
+    }
   }
 
   private createExplodingKittenRiskBar() {
