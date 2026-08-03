@@ -151,12 +151,22 @@ export const comboSelectionRequested = ({
   payload: {
     playerId: context.pendingCombo!.playerId,
     comboSize: context.pendingCombo!.comboSize,
+    ...(context.pendingCombo!.targetPlayerId
+      ? { targetPlayerId: context.pendingCombo!.targetPlayerId }
+      : {}),
+    ...(context.pendingCombo!.requestedCardType
+      ? { requestedCardType: context.pendingCombo!.requestedCardType }
+      : {}),
     targets: context.players
       .filter(
         (player) =>
           player.id !== context.pendingCombo!.playerId &&
+          (!context.pendingCombo!.targetPlayerId ||
+            player.id === context.pendingCombo!.targetPlayerId) &&
           player.isAlive &&
-          player.hand.length > 0,
+          (player.hand.length > 0 ||
+            (Boolean(context.pendingCombo!.targetPlayerId) &&
+              context.pendingCombo!.comboSize === 3)),
       )
       .map((player) => ({
         playerId: player.id,

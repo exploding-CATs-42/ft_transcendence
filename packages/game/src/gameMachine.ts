@@ -35,6 +35,7 @@ import {
   selectPlayer,
   passCardById,
   resolveCombo,
+  declareCombo,
   clearPendingCombo,
 } from "./actions";
 import {
@@ -68,6 +69,8 @@ import {
   isPendingComboPlayersTurn,
   hasEligibleComboTarget,
   canResolveCombo,
+  canDeclareCombo,
+  hasDeclaredCombo,
 } from "./guards";
 import {
   countdownCanceled,
@@ -143,6 +146,7 @@ export const gameMachine = setup({
     [GameActions.SELECT_PLAYER]: assign(selectPlayer),
     [GameActions.PASS_CARD_BY_ID]: assign(passCardById),
     [GameActions.RESOLVE_COMBO]: assign(resolveCombo),
+    [GameActions.DECLARE_COMBO]: assign(declareCombo),
     [GameActions.CLEAR_PENDING_COMBO]: assign(clearPendingCombo),
   },
   guards: {
@@ -165,6 +169,8 @@ export const gameMachine = setup({
     [GameGuards.IS_PENDING_COMBO_PLAYERS_TURN]: isPendingComboPlayersTurn,
     [GameGuards.HAS_ELIGIBLE_COMBO_TARGET]: hasEligibleComboTarget,
     [GameGuards.CAN_RESOLVE_COMBO]: canResolveCombo,
+    [GameGuards.CAN_DECLARE_COMBO]: canDeclareCombo,
+    [GameGuards.HAS_DECLARED_COMBO]: hasDeclaredCombo,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -281,8 +287,8 @@ export const gameMachine = setup({
             },
             [GameEvents.PLAY_COMBO]: {
               guard: GameGuards.IS_PLAYERS_TURN,
-              actions: [GameActions.PLAY_COMBO, GameActions.SET_NOPE_WINDOW],
-              target: GameStates.WAITING_FOR_NOPES,
+              actions: GameActions.PLAY_COMBO,
+              target: GameStates.WAITING_FOR_COMBO_SELECTION,
             },
           },
         },
@@ -313,7 +319,7 @@ export const gameMachine = setup({
             {
               guard: and([
                 GameGuards.HAS_PENDING_COMBO,
-                GameGuards.HAS_ELIGIBLE_COMBO_TARGET,
+                GameGuards.HAS_DECLARED_COMBO,
               ]),
               target: GameTargets.WAITING_FOR_COMBO_SELECTION,
             },
@@ -396,14 +402,24 @@ export const gameMachine = setup({
             },
           ],
           on: {
-            [GameEvents.RESOLVE_COMBO]: {
-              guard: GameGuards.CAN_RESOLVE_COMBO,
-              actions: [
-                GameActions.RESOLVE_COMBO,
-                GameActions.CLEAR_PENDING_COMBO,
-              ],
-              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-            },
+            [GameEvents.RESOLVE_COMBO]: [
+              {
+                guard: GameGuards.CAN_DECLARE_COMBO,
+                actions: [
+                  GameActions.DECLARE_COMBO,
+                  GameActions.SET_NOPE_WINDOW,
+                ],
+                target: GameStates.WAITING_FOR_NOPES,
+              },
+              {
+                guard: GameGuards.CAN_RESOLVE_COMBO,
+                actions: [
+                  GameActions.RESOLVE_COMBO,
+                  GameActions.CLEAR_PENDING_COMBO,
+                ],
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+              },
+            ],
           },
         },
         [GameStates.CHECKING_DRAWN_CARD]: {

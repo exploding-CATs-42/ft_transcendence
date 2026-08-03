@@ -67,4 +67,6 @@ export interface ComboSelectionRequestedPayload {
   playerId: string;
   comboSize: ComboSize;
   targets: Array<{ playerId: string; handSize: number }>;
+  targetPlayerId?: string;
+  requestedCardType?: Card["type"];
 }
