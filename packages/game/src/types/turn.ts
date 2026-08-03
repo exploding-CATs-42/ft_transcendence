@@ -35,6 +35,8 @@ export type ComboSize = 2 | 3;
 export interface PendingCombo {
   playerId: string;
   comboSize: ComboSize;
+  targetPlayerId?: string;
+  requestedCardType?: CardType;
 }
 
 export interface TurnState {

@@ -41,6 +41,7 @@ export const GameActions = {
   SELECT_PLAYER: "selectPlayer",
   PASS_CARD_BY_ID: "passCardById",
   RESOLVE_COMBO: "resolveCombo",
+  DECLARE_COMBO: "declareCombo",
   CLEAR_PENDING_COMBO: "clearPendingCombo",
 } as const;
 
@@ -425,7 +426,8 @@ export const insertKitten = ({ context, event }: GameActionArgs) => {
 export const setNopeWindow = ({ context, event }: GameActionArgs) => {
   if (
     event.type !== GameEvents.PLAY_CARD &&
-    event.type !== GameEvents.PLAY_COMBO
+    event.type !== GameEvents.PLAY_COMBO &&
+    event.type !== GameEvents.RESOLVE_COMBO
   ) {
     return context;
   }
@@ -442,6 +444,22 @@ export const setNopeWindow = ({ context, event }: GameActionArgs) => {
   };
 
   return { nopeWindow };
+};
+
+export const declareCombo = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.RESOLVE_COMBO || !context.pendingCombo) {
+    return context;
+  }
+
+  return {
+    pendingCombo: {
+      ...context.pendingCombo,
+      targetPlayerId: event.targetPlayerId,
+      ...(event.requestedCardType
+        ? { requestedCardType: event.requestedCardType }
+        : {}),
+    },
+  };
 };
 
 export const clearNopeWindow = () => {
@@ -509,7 +527,9 @@ export const resolveCombo = ({ context, event }: GameActionArgs) => {
   const stolenCard =
     context.pendingCombo.comboSize === 2
       ? targetPlayer.hand[event.cardIndex!]
-      : targetPlayer.hand.find((card) => card.type === event.requestedCardType);
+      : targetPlayer.hand.find(
+          (card) => card.type === context.pendingCombo!.requestedCardType,
+        );
 
   if (!stolenCard) return context;
 
