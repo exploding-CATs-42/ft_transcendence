@@ -1,4 +1,4 @@
-import { GameOutEvents } from "@exploding-cats/game-core";
+import { GameOutEvents, GameStates } from "@exploding-cats/game-core";
 import { GameRepository } from "data";
 import { Game, GameId } from "data/types";
 import { io } from "../app";
@@ -13,6 +13,10 @@ export const attachGameCleanup = (game: Game) => {
   game.instance.on(GameOutEvents.GAME_OVER, () => {
     scheduleGameCleanup(game.id);
   });
+
+  if (game.instance.getSnapshot().matches(GameStates.GAME_OVER)) {
+    scheduleGameCleanup(game.id);
+  }
 };
 
 export const scheduleGameCleanup = (gameId: GameId) => {
