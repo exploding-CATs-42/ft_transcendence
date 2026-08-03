@@ -40,6 +40,7 @@ export const deleteGame = (gameId: GameId) => {
   if (!game) return;
 
   io.to(gameId).emit(ServerPrivateEvents.LEFT_GAME);
+  io.in(gameId).socketsLeave(gameId);
 
   GameRepository.deleteGameById(gameId);
 };
