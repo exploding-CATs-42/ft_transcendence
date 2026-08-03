@@ -1,6 +1,8 @@
 import { GameOutEvents } from "@exploding-cats/game-core";
 import { GameRepository } from "data";
 import { Game, GameId } from "data/types";
+import { io } from "../app";
+import { ServerPrivateEvents } from "@exploding-cats/contracts";
 
 const GAME_OVER_CLEANUP_DELAY_MS = 60000;
 
@@ -36,6 +38,8 @@ export const deleteGame = (gameId: GameId) => {
   const game = GameRepository.getGame(gameId);
 
   if (!game) return;
+
+  io.to(gameId).emit(ServerPrivateEvents.LEFT_GAME);
 
   GameRepository.deleteGameById(gameId);
 };
