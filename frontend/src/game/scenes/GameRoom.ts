@@ -238,6 +238,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       throw new Error("Game room started without game data");
     }
 
+    this.resetComboState();
+
     const { players, hand: cards, deckSize } = gameData;
 
     this.#drawPileSize = deckSize;
@@ -287,11 +289,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
-    if (hasTurnState(gameData) && gameData.pendingComboSize) {
+    if (gameData.pendingComboSize) {
       this.onComboSelectionRequested({
         playerId: this.#meId!,
         comboSize: gameData.pendingComboSize,
         targets: this.getComboTargets(gameData.players),
+        ...(gameData.pendingComboTargetPlayerId
+          ? { targetPlayerId: gameData.pendingComboTargetPlayerId }
+          : {}),
+        ...(gameData.pendingComboRequestedCardType
+          ? { requestedCardType: gameData.pendingComboRequestedCardType }
+          : {}),
       });
     }
 
@@ -353,7 +361,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.add.existing(this.#explodingKittenRiskBar);
   }
 
-  private getComboTargets(players: GameRoomData["players"]) {
+  private getComboTargets(players: readonly PublicPlayerView[]) {
     return players
       .filter(
         (player) =>
@@ -735,6 +743,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       seat.setCursorPointer(false);
       seat.setTargetIconVisible(false);
     });
+
+    this.resetComboState();
+  }
+
+  private resetComboState() {
     this.#pendingComboSize = null;
     this.#pendingComboTargets.clear();
     this.#isComboPlayPending = false;
@@ -811,6 +824,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
 
     if (this.#isComboPlayPending || this.#isComboResolutionPending) {
+      this.cleanModal();
+      this.hideComboSelection();
       this.scene.restart(payload);
       return;
     }
