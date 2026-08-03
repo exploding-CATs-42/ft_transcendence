@@ -23,6 +23,7 @@ import {
   CardType,
   GameContext,
   GameEvents,
+  GameInstance,
   GameStates,
   type Player,
 } from "@exploding-cats/game-core";
@@ -126,6 +127,40 @@ function getComboCards(player: Player, cardIds: number[]) {
   }
 
   return comboCards;
+}
+
+function getMachineState(gameInstance: GameInstance): GameStates | null {
+  const state = gameInstance.getSnapshot();
+
+  if (state.matches({ [GameStates.PLAYING]: GameStates.SELECTING_PLAYER })) {
+    return GameStates.SELECTING_PLAYER;
+  } else if (
+    state.matches({
+      [GameStates.PLAYING]: GameStates.WAITING_FOR_FAVOR_CARD_SELECTION,
+    })
+  ) {
+    return GameStates.WAITING_FOR_FAVOR_CARD_SELECTION;
+  } else if (
+    state.matches({
+      [GameStates.PLAYING]: GameStates.WAITING_FOR_KITTEN_INSERTION,
+    })
+  ) {
+    return GameStates.WAITING_FOR_KITTEN_INSERTION;
+  } else if (
+    state.matches({
+      [GameStates.PLAYING]: GameStates.WAITING_FOR_DEFUSE_CARD,
+    })
+  ) {
+    return GameStates.WAITING_FOR_DEFUSE_CARD;
+  } else if (
+    state.matches({
+      [GameStates.PLAYING]: GameStates.PLAYER_LOOKS_AT_THE_FUTURE,
+    })
+  ) {
+    return GameStates.PLAYER_LOOKS_AT_THE_FUTURE;
+  }
+
+  return null;
 }
 
 export async function getGames(userId: UserId): Promise<GameRecord[]> {
@@ -289,6 +324,15 @@ export async function reconnectGame(
 
   const orderedPlayers = orderPlayersForPlayer(players, player.id);
   const context = game.instance.getSnapshot().context;
+  const machineState = getMachineState(game.instance);
+
+  let topCards = null;
+  if (
+    machineState === GameStates.PLAYER_LOOKS_AT_THE_FUTURE &&
+    userId === context.currentTurnPlayerId
+  ) {
+    topCards = context.deck.slice(0, 3);
+  }
 
   return {
     players: orderedPlayers.map(toPublicPlayerView),
@@ -297,6 +341,10 @@ export async function reconnectGame(
     deckSize: context.deck.length,
     lastPlayedCards: context.lastPlayedCards,
     attackCount: context.turnsCount,
+    selectedPlayerId: context.selectedPlayerId,
+    countdownEndsAt: context.countdownEndsAt,
+    topCards,
+    machineState,
   };
 }
 

@@ -71,6 +71,10 @@ export function trackGameState(): CleanupFunction {
       currentTurnPlayerId: null,
       lastPlayedCards: null,
       attackCount: 1,
+      machineState: null,
+      selectedPlayerId: null,
+      countdownEndsAt: null,
+      topCards: null,
     };
   };
 

@@ -2,6 +2,7 @@ import type {
   Card,
   CardType,
   ShowedCardsToPlayerPayload,
+  GameStates,
 } from "@exploding-cats/game-core";
 import type { GameRecord } from "../shared";
 import type {
@@ -84,6 +85,10 @@ export interface GameStatePayload {
   deckSize: number;
   lastPlayedCards: Card[] | null;
   attackCount: number;
+  selectedPlayerId: string | null;
+  countdownEndsAt: number | null;
+  topCards: Card[] | null;
+  machineState: GameStates | null;
 }
 
 export interface FriendOnlineStatusChangedPayload {
