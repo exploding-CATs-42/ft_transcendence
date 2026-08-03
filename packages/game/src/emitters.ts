@@ -81,7 +81,6 @@ export const defusePrompt = ({ context }: GameEmitterArgs): GameOutEvent => {
     type: GameOutEvents.DEFUSE_PROMPT,
     payload: {
       playerId: context.currentTurnPlayerId!,
-      card: context.lastDrawnCard!,
       endsAt: context.countdownEndsAt!,
       canDefuse,
     },
