@@ -85,6 +85,7 @@ import {
   type GameRoomHandlers,
   insertKitten,
   seenTheFuture,
+  declareTwoCardCombo,
   resolveTwoCardCombo,
   resolveThreeCardCombo,
   syncGameState,
@@ -707,17 +708,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
 
     if (this.#pendingComboSize === 2) {
-      const cardsAmount = this.#pendingComboTargets.get(playerId) ?? 0;
-      const view = new ChooseRandomCardView(this, cardsAmount);
-      view.onSelection = (cardIndex) => {
-        if (this.#isComboResolutionPending) return;
-
-        this.#isComboResolutionPending = true;
-        resolveTwoCardCombo(playerId, cardIndex);
-        this.scheduleComboStateSync();
-      };
-      this.#modal.setContent(view);
-      this.#modal.setVisible(true);
+      this.#isComboResolutionPending = true;
+      declareTwoCardCombo(playerId);
       return;
     }
 
@@ -729,7 +721,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
       this.#isComboResolutionPending = true;
       resolveThreeCardCombo(playerId, requestedCardType);
-      this.scheduleComboStateSync();
     };
     this.#modal.setContent(view);
     this.#modal.setVisible(true);
@@ -802,6 +793,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
           playerId: this.#meId,
           comboSize: payload.pendingComboSize,
           targets: this.getComboTargets(payload.players),
+          ...(payload.pendingComboTargetPlayerId
+            ? { targetPlayerId: payload.pendingComboTargetPlayerId }
+            : {}),
+          ...(payload.pendingComboRequestedCardType
+            ? {
+                requestedCardType: payload.pendingComboRequestedCardType,
+              }
+            : {}),
         },
         this.#isComboResolutionPending,
       );
@@ -1152,12 +1151,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#notification.setVisible(false);
     this.#nopeButton.hide();
 
-    if (this.#isComboPlayPending) {
-      syncGameState();
+    if (
+      this.#isComboPlayPending ||
+      this.#pendingComboSize ||
+      this.#isComboResolutionPending
+    ) {
+      this.cleanModal();
+      this.hideComboSelection();
+      this.updateDrawPileInteractivity();
       return;
     }
-
-    if (this.#pendingComboSize || this.#isComboResolutionPending) return;
     this.updateDrawPileInteractivity();
 
     if (this.#lastPlayedCardType === CardType.SEE_THE_FUTURE) {
@@ -1355,6 +1358,35 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     );
     this.#isComboPlayPending = false;
     this.#drawPile?.disableInteractive(true);
+
+    if (payload.targetPlayerId) {
+      const targetPlayerId = payload.targetPlayerId;
+      const cardsAmount = this.#pendingComboTargets.get(targetPlayerId) ?? 0;
+
+      this.#isComboResolutionPending = false;
+      this.cleanModal();
+
+      if (payload.comboSize === 2) {
+        const view = new ChooseRandomCardView(this, cardsAmount);
+        view.onSelection = (cardIndex) => {
+          if (this.#isComboResolutionPending) return;
+
+          this.#isComboResolutionPending = true;
+          resolveTwoCardCombo(targetPlayerId, cardIndex);
+          this.scheduleComboStateSync();
+        };
+        this.#modal.setContent(view);
+        this.#modal.setVisible(true);
+        return;
+      }
+
+      if (payload.requestedCardType) {
+        this.#isComboResolutionPending = true;
+        resolveThreeCardCombo(targetPlayerId, payload.requestedCardType);
+        this.scheduleComboStateSync();
+      }
+      return;
+    }
 
     if (selectionAlreadyOpen && !recoverPendingRequest) return;
 
