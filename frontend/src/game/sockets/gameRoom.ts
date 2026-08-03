@@ -176,6 +176,8 @@ export const playCard = (cardId: number) =>
   emit(ClientEvents.PLAY_CARD, { cardId });
 export const playCombo = (cardIds: number[]) =>
   emit(ClientEvents.PLAY_COMBO, { cardIds });
+export const declareTwoCardCombo = (targetPlayerId: string) =>
+  emit(ClientEvents.RESOLVE_COMBO, { targetPlayerId });
 export const resolveTwoCardCombo = (
   targetPlayerId: string,
   cardIndex: number,
