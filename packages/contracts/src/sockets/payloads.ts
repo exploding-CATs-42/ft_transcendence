@@ -67,6 +67,8 @@ export interface ComboSelectionRequestedPayload {
   playerId: string;
   comboSize: ComboSize;
   targets: Array<{ playerId: string; handSize: number }>;
+  targetPlayerId?: string;
+  requestedCardType?: CardType;
 }
 
 export interface ComboResolvedPayload {
@@ -105,6 +107,8 @@ export interface GameStatePayload {
   topCards: Card[] | null;
   machineState: GameStates | null;
   pendingComboSize: ComboSize | null;
+  pendingComboTargetPlayerId: string | null;
+  pendingComboRequestedCardType: CardType | null;
 }
 
 export interface FriendOnlineStatusChangedPayload {

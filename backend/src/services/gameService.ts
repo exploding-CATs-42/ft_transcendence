@@ -363,6 +363,12 @@ export async function reconnectGame(
     pendingComboSize: isWaitingForThisPlayersCombo
       ? context.pendingCombo!.comboSize
       : null,
+    pendingComboTargetPlayerId: isWaitingForThisPlayersCombo
+      ? (context.pendingCombo!.targetPlayerId ?? null)
+      : null,
+    pendingComboRequestedCardType: isWaitingForThisPlayersCombo
+      ? (context.pendingCombo!.requestedCardType ?? null)
+      : null,
   };
 }
 
@@ -570,14 +576,16 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
     cardIds: cards.map((card) => card.id),
   });
 
-  const { lastPlayedCards, nopeWindow } = game.instance.getSnapshot().context;
+  const { lastPlayedCards, pendingCombo } =
+    game.instance.getSnapshot().context;
   const lastPlayedCardIds = new Set(lastPlayedCards?.map((card) => card.id));
 
   if (
     !lastPlayedCards ||
     lastPlayedCards.length !== cards.length ||
     cards.some((card) => !lastPlayedCardIds.has(card.id)) ||
-    !nopeWindow
+    !pendingCombo ||
+    pendingCombo.playerId !== player.id
   ) {
     throw new SocketError("Could not play combo");
   }
@@ -585,7 +593,6 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
   return {
     playerId: player.id,
     cards: lastPlayedCards,
-    nopeWindowExpiresAt: nopeWindow.endsAt,
   };
 }
 
@@ -605,9 +612,52 @@ export async function resolveCombo(input: ResolveComboParams, userId: UserId) {
     !targetPlayer ||
     targetPlayer.id === player.id ||
     !targetPlayer.isAlive ||
-    targetPlayer.hand.length === 0
+    (!pendingCombo.targetPlayerId && targetPlayer.hand.length === 0)
   ) {
     throw new SocketError("Choose a living opponent who has cards");
+  }
+
+  if (!pendingCombo.targetPlayerId) {
+    if (
+      (pendingCombo.comboSize === 2 &&
+        (input.cardIndex !== undefined ||
+          input.requestedCardType !== undefined)) ||
+      (pendingCombo.comboSize === 3 &&
+        (input.cardIndex !== undefined || input.requestedCardType === undefined))
+    ) {
+      throw new SocketError("Invalid declaration for this combo");
+    }
+
+    game.instance.send({
+      type: GameEvents.RESOLVE_COMBO,
+      playerId: player.id,
+      targetPlayerId: targetPlayer.id,
+      ...(input.requestedCardType
+        ? { requestedCardType: input.requestedCardType }
+        : {}),
+    });
+
+    const declaredContext = game.instance.getSnapshot().context;
+    if (
+      declaredContext.pendingCombo?.targetPlayerId !== targetPlayer.id ||
+      !declaredContext.nopeWindow ||
+      !declaredContext.lastPlayedCards
+    ) {
+      throw new SocketError("Could not declare combo");
+    }
+
+    return {
+      status: "declared" as const,
+      playerId: player.id,
+      cards: declaredContext.lastPlayedCards,
+      nopeWindowExpiresAt: declaredContext.nopeWindow.endsAt,
+    };
+  }
+
+  if (input.targetPlayerId !== pendingCombo.targetPlayerId) {
+    throw new SocketError(
+      "Combo target cannot be changed after the Nope window",
+    );
   }
 
   if (
@@ -615,7 +665,8 @@ export async function resolveCombo(input: ResolveComboParams, userId: UserId) {
       (input.cardIndex === undefined ||
         input.requestedCardType !== undefined)) ||
     (pendingCombo.comboSize === 3 &&
-      (input.cardIndex !== undefined || input.requestedCardType === undefined))
+      (input.cardIndex !== undefined ||
+        input.requestedCardType !== pendingCombo.requestedCardType))
   ) {
     throw new SocketError("Invalid selection for this combo");
   }
@@ -669,6 +720,7 @@ export async function resolveCombo(input: ResolveComboParams, userId: UserId) {
   }
 
   return {
+    status: "resolved" as const,
     playerId: player.id,
     targetPlayerId: targetPlayer.id,
     comboSize: pendingCombo.comboSize,
