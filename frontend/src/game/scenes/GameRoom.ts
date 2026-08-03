@@ -709,6 +709,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (this.#pendingComboSize === 2) {
       this.#isComboResolutionPending = true;
+      this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
       declareTwoCardCombo(playerId);
       return;
     }
@@ -716,10 +717,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const targetName =
       this.#players.get(playerId)?.player?.name ?? "the selected player";
     const view = new ChooseCardByNameView(this, targetName);
+    this.#notification.showMessageFor(NotificationMode.SELECT_CARD);
     view.onSelection = (requestedCardType) => {
       if (this.#isComboResolutionPending) return;
 
       this.#isComboResolutionPending = true;
+      this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
       resolveThreeCardCombo(playerId, requestedCardType);
     };
     this.#modal.setContent(view);
@@ -1102,7 +1105,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     if (payload.reason === CardRemovalReason.INSERTED_INTO_DECK)
       this.animateCardToDrawPile(card.image);
 
-    if (this.isMyTurn() && card.data.type !== CardType.DEFUSE)
+    const isSelectingComboTarget =
+      this.#isComboPlayPending || this.#pendingComboSize !== null;
+
+    if (
+      this.isMyTurn() &&
+      card.data.type !== CardType.DEFUSE &&
+      !isSelectingComboTarget
+    )
       this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
   };
 
@@ -1367,6 +1377,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.cleanModal();
 
       if (payload.comboSize === 2) {
+        this.#notification.showMessageFor(NotificationMode.SELECT_CARD);
         const view = new ChooseRandomCardView(this, cardsAmount);
         view.onSelection = (cardIndex) => {
           if (this.#isComboResolutionPending) return;
@@ -1393,6 +1404,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#isComboResolutionPending = false;
     this.cleanModal();
     this.showOpponentTargetIcons(this.#pendingComboTargets);
+    this.#notification.showMessageFor(NotificationMode.SELECT_PLAYER);
   }
 
   onComboPlayError = (payload: SocketErrorPayload): void => {
@@ -1413,6 +1425,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onComboResolved = (payload: ComboResolvedPayload): void => {
+    this.#notification.setVisible(false);
+
     if (payload.cardStolen) {
       this.#opponents.get(payload.targetPlayerId)?.removeCard();
       this.#opponents.get(payload.playerId)?.addCard();
