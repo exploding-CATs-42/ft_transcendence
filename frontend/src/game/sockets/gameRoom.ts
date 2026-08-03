@@ -83,6 +83,9 @@ export function trackGameState(): CleanupFunction {
       selectedPlayerId: null,
       countdownEndsAt: null,
       topCards: null,
+      pendingComboSize: null,
+      pendingComboTargetPlayerId: null,
+      pendingComboRequestedCardType: null,
     };
   };
 
