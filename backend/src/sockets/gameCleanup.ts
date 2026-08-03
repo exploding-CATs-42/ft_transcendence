@@ -1,9 +1,16 @@
+import { GameOutEvents } from "@exploding-cats/game-core";
 import { GameRepository } from "data";
-import { GameId } from "data/types";
+import { Game, GameId } from "data/types";
 
 const GAME_OVER_CLEANUP_DELAY_MS = 60000;
 
 const timers = new Map<GameId, NodeJS.Timeout>();
+
+export const attachGameCleanup = (game: Game) => {
+  game.instance.on(GameOutEvents.GAME_OVER, () => {
+    scheduleGameCleanup(game.id);
+  });
+};
 
 export const scheduleGameCleanup = (gameId: GameId) => {
   cancelGameCleanup(gameId);
