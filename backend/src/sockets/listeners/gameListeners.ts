@@ -15,6 +15,7 @@ import {
   playNope,
   selectPlayer,
   giveCard,
+  confirmPlayerSeenTheCards,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -397,8 +398,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.SEEN_THE_FUTURE_ERROR,
       async (parsed: SeenTheFuturePayload) => {
-        const room = parsed.gameId;
-        socket.to(room).emit(ServerPublicEvents.PLAYER_SAW_THE_FUTURE);
+        await confirmPlayerSeenTheCards(parsed, socket.data.user.id);
       },
     ),
   );

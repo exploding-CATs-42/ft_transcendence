@@ -16,6 +16,7 @@ import {
   PlayDefuseParams,
   PlayNopeParams,
   ReconnectGameParams,
+  SeenTheFuturePayload,
 } from "schemas";
 import {
   type Card,
@@ -572,4 +573,12 @@ export async function insertKitten(input: InsertKittenParams, userId: UserId) {
   }
 
   return { playerId: player.id, card };
+}
+
+export async function confirmPlayerSeenTheCards(
+  input: SeenTheFuturePayload,
+  userId: UserId,
+) {
+  const { game } = await requirePlayerInGame(userId, input.gameId);
+  game.instance.send({ type: GameEvents.SEEN_THE_FUTURE });
 }

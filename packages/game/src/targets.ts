@@ -61,4 +61,8 @@ export const GameTargets = {
     GameStates.PLAYING,
     GameStates.WAITING_FOR_FAVOR_CARD_SELECTION,
   ),
+  PLAYER_LOOKS_AT_THE_FUTURE: getStatePath(
+    GameStates.PLAYING,
+    GameStates.PLAYER_LOOKS_AT_THE_FUTURE,
+  ),
 } as const satisfies Record<keyof typeof GameStates, string>;

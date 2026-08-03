@@ -80,6 +80,7 @@ import {
   gameOver,
   waitingForPlayerSelection,
   waitingForFavorCardSelection,
+  playerSawTheFuture,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -336,7 +337,7 @@ export const gameMachine = setup({
                 params: { cardType: CardType.SEE_THE_FUTURE },
               },
               actions: [emit(showedTopThreeCards)],
-              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+              target: GameStates.PLAYER_LOOKS_AT_THE_FUTURE,
             },
             {
               guard: {
@@ -439,6 +440,14 @@ export const gameMachine = setup({
           on: {
             [GameEvents.PASS_CARD_BY_ID]: {
               actions: GameActions.PASS_CARD_BY_ID,
+              target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
+            },
+          },
+        },
+        [GameStates.PLAYER_LOOKS_AT_THE_FUTURE]: {
+          on: {
+            [GameEvents.SEEN_THE_FUTURE]: {
+              actions: emit(playerSawTheFuture),
               target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
             },
           },

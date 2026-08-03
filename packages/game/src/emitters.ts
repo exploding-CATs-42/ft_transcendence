@@ -138,6 +138,13 @@ export const waitingForFavorCardSelection = ({
   payload: { playerId: context.selectedPlayerId! },
 });
 
+export const playerSawTheFuture = ({
+  context,
+}: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.PLAYER_SAW_THE_FUTURE,
+  payload: { playerId: context.currentTurnPlayerId! },
+});
+
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.
  * it takes as a parameter an object, containing machine context,

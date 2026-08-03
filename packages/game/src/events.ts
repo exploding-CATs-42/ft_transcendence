@@ -10,6 +10,7 @@ import type {
   GameOverPayload,
   PlayerSelectedPayload,
   WaitingForFavorCardSelectionPayload,
+  PlayerSawTheFuturePayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -26,6 +27,7 @@ export const GameEvents = {
   PLAY_NOPE: "PLAY_NOPE",
   SELECT_PLAYER: "SELECT_PLAYER",
   PASS_CARD_BY_ID: "PASS_CARD_BY_ID",
+  SEEN_THE_FUTURE: "SEEN_THE_FUTURE",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -65,6 +67,9 @@ export type GameEvent =
       cardId: number;
       playerIdFrom: string;
       playerIdTo: string;
+    }
+  | {
+      type: typeof GameEvents.SEEN_THE_FUTURE;
     };
 
 // Events emitted FROM the machine
@@ -87,6 +92,7 @@ export const GameOutEvents = {
   PLAYER_SELECTED: "PLAYER_SELECTED",
   WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
   WAITING_FOR_FAVOR_CARD_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
+  PLAYER_SAW_THE_FUTURE: "PLAYER_SAW_THE_FUTURE",
 
   //   COMBO_PLAYED: "COMBO_PLAYED",
   //   NOPE_PLAYED: "NOPE_PLAYED",
@@ -146,4 +152,8 @@ export type GameOutEvent =
   | {
       type: typeof GameOutEvents.WAITING_FOR_FAVOR_CARD_SELECTION;
       payload: WaitingForFavorCardSelectionPayload;
+    }
+  | {
+      type: typeof GameOutEvents.PLAYER_SAW_THE_FUTURE;
+      payload: PlayerSawTheFuturePayload;
     };
