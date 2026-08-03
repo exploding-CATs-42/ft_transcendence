@@ -115,6 +115,18 @@ const CARD_TO_DISCARD_EASE = "Back.Out";
 const CARD_FROM_DRAW_PILE_DURATION_MS = 400;
 const CARD_FROM_DRAW_PILE_EASE = "Sine.easeInOut";
 
+const CARD_TO_DRAW_PILE_DURATION_MS = 600;
+const CARD_TO_DRAW_PILE_EASE = "Cubic.easeInOut";
+const FLYING_CARD_DEPTH = 1000;
+
+// Odd number of half turns, so the card lands face down on the pile
+const CARD_FLIP_HALF_TURNS = 1;
+const CARD_FLIP_HALF_TURN_DURATION_MS =
+  CARD_TO_DRAW_PILE_DURATION_MS / (CARD_FLIP_HALF_TURNS * 2);
+
+const DRAW_PILE_PULSE_SCALE = 1.08;
+const DRAW_PILE_PULSE_DURATION_MS = 120;
+
 const CARD_DROP_ZONE = {
   x: 400,
   y: 340,
@@ -707,6 +719,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#drawPileZone?.setVisible(!visible);
   }
 
+  private revealDrawPile() {
+    if (this.#drawPileSize > 0) this.setDrawPileVisible(true);
+  }
+
   onCardDrawn = (payload: PlayerIdPayload): void => {
     this.drawOpponentCard(payload.playerId);
 
@@ -793,10 +809,99 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#nopeButton.showAnimated(durationMs, true);
   };
 
+  private pulseDrawPile() {
+    if (!this.#drawPile?.visible) return;
+
+    const widthGrowth = CARD_WIDTH * (DRAW_PILE_PULSE_SCALE - 1);
+    const heightGrowth = CARD_HEIGHT * (DRAW_PILE_PULSE_SCALE - 1);
+
+    this.tweens.add({
+      targets: this.#drawPile,
+      x: DRAW_PILE_POSITION.x - widthGrowth / 2,
+      y: DRAW_PILE_POSITION.y - heightGrowth / 2,
+      displayWidth: CARD_WIDTH + widthGrowth,
+      displayHeight: CARD_HEIGHT + heightGrowth,
+      duration: DRAW_PILE_PULSE_DURATION_MS,
+      ease: "Sine.easeInOut",
+      yoyo: true,
+    });
+  }
+
+  // Shrinking the width to zero and back reads as the card turning around
+  // itself; swapping the visible face at every zero width turns it face down.
+  private flipCard(
+    flipper: Phaser.GameObjects.Container,
+    face: Phaser.GameObjects.Image,
+    back: Phaser.GameObjects.Image,
+  ) {
+    let isFaceUp = true;
+
+    this.tweens.add({
+      targets: flipper,
+      scaleX: 0,
+      duration: CARD_FLIP_HALF_TURN_DURATION_MS,
+      ease: "Sine.easeIn",
+      yoyo: true,
+      repeat: CARD_FLIP_HALF_TURNS - 1,
+
+      onYoyo: () => {
+        isFaceUp = !isFaceUp;
+        face.setVisible(isFaceUp);
+        back.setVisible(!isFaceUp);
+      },
+    });
+  }
+
+  private animateCardToDrawPile(card: Phaser.GameObjects.Image) {
+    this.tweens.killTweensOf(card);
+
+    const { displayWidth: width, displayHeight: height } = card;
+    const center: Point = {
+      x: card.x + width / 2,
+      y: card.y + height / 2,
+    };
+
+    const cardCover = this.textures.get(Textures.cardCover).get();
+    const back = addCardVisual(
+      this,
+      { x: 0, y: 0 },
+      { frame: cardCover, size: { width, height } },
+      CARD_BORDER_RADIUS,
+    ).setVisible(false);
+
+    // Centered origins keep the card turning around itself instead of its corner
+    [card, back].forEach((image) =>
+      image.setOrigin(0.5, 0.5).setPosition(0, 0),
+    );
+
+    // The inner container spins, the outer one flies: no tween fights over scale
+    const flipper = this.add.container(0, 0, [card, back]);
+    const flyingCard = this.add
+      .container(center.x, center.y, [flipper])
+      .setDepth(FLYING_CARD_DEPTH);
+
+    this.flipCard(flipper, card, back);
+
+    this.tweens.add({
+      targets: flyingCard,
+      x: DRAW_PILE_POSITION.x + CARD_WIDTH / 2,
+      y: DRAW_PILE_POSITION.y + CARD_HEIGHT / 2,
+      scale: CARD_WIDTH / width,
+      duration: CARD_TO_DRAW_PILE_DURATION_MS,
+      ease: CARD_TO_DRAW_PILE_EASE,
+
+      onComplete: () => {
+        flyingCard.destroy();
+        this.revealDrawPile();
+        this.pulseDrawPile();
+      },
+    });
+  }
+
   onCardRemoved = (payload: CardRemovedPayload): void => {
     const card = this.#myHand.removeCard(payload.cardId, payload.reason);
     if (payload.reason === CardRemovalReason.INSERTED_INTO_DECK)
-      card.image.destroy();
+      this.animateCardToDrawPile(card.image);
 
     if (this.isMyTurn() && card.data.type !== CardType.DEFUSE)
       this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
@@ -923,11 +1028,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { playerId } = payload;
 
     this.#drawPileSize++;
-    if (this.isMyTurn() && this.#drawPileSize === 1)
-      this.setDrawPileVisible(true);
-
     this.#explodingKittenRiskBar?.updateFrame(this.#drawPileSize);
 
+    // My own insertion is animated out of my hand by the card removal
     const hand = this.#opponents.get(playerId);
     if (!hand) return;
 
@@ -957,7 +1060,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       onComplete: () => {
         flyingCard.destroy();
         hand.removeCard();
-        if (this.#drawPileSize === 1) this.setDrawPileVisible(true);
+        this.revealDrawPile();
       },
     });
   };
