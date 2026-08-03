@@ -16,4 +16,5 @@ export const GameStates = {
   CHECKING_REMAINING_TURNS: "checkingExtraTurns",
   SELECTING_PLAYER: "selectingPlayer",
   WAITING_FOR_FAVOR_CARD_SELECTION: "waitingForFavorCardSelection",
+  PLAYER_LOOKS_AT_THE_FUTURE: "PLAYER_LOOKS_AT_THE_FUTURE",
 } as const;

@@ -28,7 +28,6 @@ export interface PlayerDefusedPayload {
 
 export interface DefusePromptPayload {
   playerId: string;
-  card: Card;
   endsAt: number;
   canDefuse: boolean;
 }
@@ -57,5 +56,9 @@ export interface PlayerSelectedPayload {
 }
 
 export interface WaitingForFavorCardSelectionPayload {
+  playerId: string;
+}
+
+export interface PlayerSawTheFuturePayload {
   playerId: string;
 }
