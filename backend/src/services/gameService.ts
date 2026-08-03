@@ -40,7 +40,11 @@ import {
   GameRepository,
   toGameRecord,
 } from "data";
-import { attachAutoPlay, attachGameBroadcaster } from "sockets";
+import {
+  attachAutoPlay,
+  attachGameBroadcaster,
+  attachGameCleanup,
+} from "sockets";
 import { toPublicPlayerView, toWaitingPlayerView } from "mappers";
 // Local level
 import { ensureUserExists } from "./usersService";
@@ -212,6 +216,7 @@ export async function createGame(
   attachGameBroadcaster(game);
   attachAutoPlay(game);
   attachGameHistoryPersistence(game);
+  attachGameCleanup(game);
   game.instance.start();
 
   const player: Player = {
