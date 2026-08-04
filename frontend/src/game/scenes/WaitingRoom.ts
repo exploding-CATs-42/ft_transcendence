@@ -81,14 +81,10 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
-    this.#clearWaitingStateListener = setWaitingStateListener(() => {
-      this.renderSeats(getOpponents());
-      this.renderCountdown(getWaitingState().countdownEndsAt);
-    });
+    this.#clearWaitingStateListener = setWaitingStateListener(this.render);
     this.#stopListeningForGameStart = goToGameRoomWhenStarted(this);
 
-    this.renderSeats(getOpponents());
-    this.renderCountdown(getWaitingState().countdownEndsAt);
+    this.render();
   }
 
   private cleanup = () => {
@@ -105,6 +101,13 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
       return new PlayerSeat(this, seat);
     });
   }
+
+  private render = () => {
+    const { countdownEndsAt } = getWaitingState();
+
+    this.renderSeats(getOpponents());
+    this.renderCountdown(countdownEndsAt);
+  };
 
   private renderSeats = (opponents: WaitingPlayerView[]) => {
     opponents.forEach((opponent) => {
