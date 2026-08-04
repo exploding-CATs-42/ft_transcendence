@@ -93,7 +93,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         const privatePayload: WaitingStatePayload = {
           waitingState,
-          meConfirmed: player.isConfirmed,
+          meId: player.id,
           countdownEndsAt,
         };
         const publicPayload: PlayerJoinedPayload = { player };
