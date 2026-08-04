@@ -86,22 +86,27 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const room = parsed.gameId;
         await socket.join(room);
 
-        const { waitingState, player, countdownEndsAt } = await joinGame(
-          parsed,
-          socket.data.user.id,
-        );
-        socketsMap.set(player.id, socket);
+        try {
+          const { waitingState, player, countdownEndsAt } = await joinGame(
+            parsed,
+            socket.data.user.id,
+          );
+          socketsMap.set(player.id, socket);
 
-        const privatePayload: WaitingStatePayload = {
-          waitingState,
-          meId: player.id,
-          countdownEndsAt,
-        };
-        const publicPayload: PlayerJoinedPayload = { player };
+          const privatePayload: WaitingStatePayload = {
+            waitingState,
+            meId: player.id,
+            countdownEndsAt,
+          };
+          const publicPayload: PlayerJoinedPayload = { player };
 
-        socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
-        socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
-        broadcastLobbyGameChanged(parsed.gameId);
+          socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
+          socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+          broadcastLobbyGameChanged(parsed.gameId);
+        } catch (error) {
+          await socket.leave(room);
+          throw error;
+        }
       },
     ),
   );
