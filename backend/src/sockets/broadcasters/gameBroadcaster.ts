@@ -73,6 +73,7 @@ export function attachGameBroadcaster(game: Game) {
   broadcaster.on(GameOutEvents.SHOWED_TOP_CARDS, (event) => {
     const socket = socketsMap.get(event.payload.playerId)!;
     socket.emit(ServerPrivateEvents.SEE_THE_FUTURE_PEEK, event.payload);
+    io.to(gameId).emit(ServerPublicEvents.PLAYER_SEEING_THE_FUTURE);
   });
 
   broadcaster.on(GameOutEvents.EXPLODING_KITTEN_DRAWN, () => {
