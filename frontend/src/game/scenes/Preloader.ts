@@ -20,7 +20,7 @@ import {
   arrowLeft,
   arrowRight,
   confirmedIconRoundedSquare,
-  boomExplosionSpritesheet,
+  explosionSpritesheet,
   fireSpriteSheet,
   nuclearSpritesheet,
   coolCat,
@@ -77,9 +77,9 @@ export class Preloader extends Scene {
       confirmedIconRoundedSquare,
     );
     this.load.image(Textures.dead, dead);
-    this.load.spritesheet(Textures.boomExplosion, boomExplosionSpritesheet, {
-      frameWidth: 266.6,
-      frameHeight: 300,
+    this.load.spritesheet(Textures.explosion, explosionSpritesheet, {
+      frameWidth: 200,
+      frameHeight: 227,
     });
     this.load.spritesheet(Textures.fire, fireSpriteSheet, {
       frameWidth: 512,

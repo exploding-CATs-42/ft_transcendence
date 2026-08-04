@@ -17,7 +17,7 @@ export const Textures = {
   arrowLeft: "arrowLeft",
   arrowRight: "arrowRight",
   confirmedIconRoundedSquare: "confirmedIconRoundedSquare",
-  boomExplosion: "boomExplosion",
+  explosion: "explosion",
   fire: "fire",
   nuclear: "nuclear",
   coolCat: "coolCat",
