@@ -21,6 +21,7 @@ import {
 } from "game/sockets";
 import {
   getOpponents,
+  isMeConfirmed,
   getWaitingState,
   setWaitingStateListener,
 } from "game/store";
@@ -57,7 +58,6 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   #playersById = new Map<string, GraphicPlayer>();
   #waitingLabel!: Phaser.GameObjects.Text;
   #readyButton!: Button;
-  #isReady = false;
   #countdownTimer: Phaser.Time.TimerEvent | null = null;
   #renderedCountdownEndsAt: number | null = null;
   #clearWaitingStateListener: (() => void) | null = null;
@@ -105,8 +105,19 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   private render = () => {
     const { countdownEndsAt } = getWaitingState();
 
+    this.renderReadyButton(isMeConfirmed());
     this.renderSeats(getOpponents());
     this.renderCountdown(countdownEndsAt);
+  };
+
+  private renderReadyButton = (isConfirmed: boolean) => {
+    if (isConfirmed) {
+      this.#readyButton.setBackgroundColor(0xff0000);
+      this.#readyButton.setText("Cancel");
+    } else {
+      this.#readyButton.setBackgroundColor(0x61c51b);
+      this.#readyButton.setText("Ready");
+    }
   };
 
   private renderSeats = (opponents: WaitingPlayerView[]) => {
@@ -166,11 +177,9 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
 
   private addReadinessButton() {
     const onClick = () => {
-      if (this.#isReady) {
-        this.setReady(false);
+      if (isMeConfirmed()) {
         cancelStart();
       } else {
-        this.setReady(true);
         confirmStart();
       }
     };
@@ -182,17 +191,6 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
       "Ready",
       onClick,
     );
-  }
-
-  private setReady(isReady: boolean) {
-    this.#isReady = isReady;
-    if (isReady) {
-      this.#readyButton.setBackgroundColor(0xff0000);
-      this.#readyButton.setText("Cancel");
-    } else {
-      this.#readyButton.setBackgroundColor(0x61c51b);
-      this.#readyButton.setText("Ready");
-    }
   }
 
   private addLeaveGameButton() {
@@ -252,7 +250,6 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     countdownEndsAt: number | null,
   ) => {
     players.forEach((player) => this.addPlayer(player));
-    this.setReady(isConfirmed);
     if (countdownEndsAt !== null) this.onCountdownStarted(countdownEndsAt);
   };
 
