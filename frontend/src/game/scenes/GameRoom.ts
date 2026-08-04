@@ -180,7 +180,7 @@ const FAVOR_CARD_DROP_ZONE = {
 };
 
 // -------------------- NOTIFICATIONS --------------------
-const NOTIFICATION_POSITION: Point = { x: 1640, y: 560 };
+const NOTIFICATION_POSITION: Point = { x: SCREEN_WIDTH / 2, y: 870 };
 
 // -------------------- GAME ROOM --------------------
 export class GameRoom extends Scene implements GameRoomHandlers {
