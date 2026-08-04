@@ -31,6 +31,7 @@ export const NotificationMode = {
   WAITING_FOR_CARD_SELECTION: "WAITING_FOR_CARD_SELECTION",
   WAITING_FOR_NOPES: "WAITING_FOR_NOPES",
   INSERTING_KITTEN: "INSERTING_KITTEN",
+  TURN_CHANGED: "TURN_CHANGED",
 } as const;
 
 export type NotificationMode =
@@ -97,6 +98,8 @@ export class Notification extends Phaser.GameObjects.Container {
       text = "Waiting for nope cards";
     } else if (mode === NotificationMode.INSERTING_KITTEN) {
       text = "Player is placing kitten\n    back into the deck";
+    } else if (mode === NotificationMode.TURN_CHANGED) {
+      text = "Players\`s turn";
     }
     this.#label.setText(text);
   }
