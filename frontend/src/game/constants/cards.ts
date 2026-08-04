@@ -8,12 +8,12 @@ export const CARD_TYPE_TO_FRAME: Record<CardType, number> = {
   [CardType.CATTERMELON]: 6,
   [CardType.TACOCAT]: 7,
   [CardType.RAINBOW_RALPHING_CAT]: 8,
-  [CardType.ATTACK]: 9,
-  [CardType.DEFUSE]: 13,
-  [CardType.FAVOR]: 19,
-  [CardType.NOPE]: 23,
-  [CardType.SEE_THE_FUTURE]: 28,
-  [CardType.SHUFFLE]: 33,
+  [CardType.ATTACK]: 12,
+  [CardType.DEFUSE]: 16,
+  [CardType.FAVOR]: 21,
+  [CardType.NOPE]: 25,
+  [CardType.SEE_THE_FUTURE]: 32,
+  [CardType.SHUFFLE]: 34,
   [CardType.SKIP]: 37,
 };
 
