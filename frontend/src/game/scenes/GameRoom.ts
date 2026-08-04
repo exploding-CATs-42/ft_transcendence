@@ -595,6 +595,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   }
 
+  private getPlayerNameById(playerId: string) {
+    return this.#players.get(playerId)?.player?.name;
+  }
+
   private updateAttackIndicator() {
     this.#players.forEach((seat, playerId) => {
       const shouldShow =
@@ -797,9 +801,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.updateDrawPileInteractivity();
     this.updateComboPlayInteractivity();
 
-    this.#notification.showMessageFor(
-      NotificationMode.TURN_CHANGED,
-    );
+    this.#notification.showMessageFor(NotificationMode.TURN_CHANGED);
     this.time.delayedCall(2000, () => this.#notification.setVisible(false));
   };
 
