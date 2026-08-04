@@ -61,6 +61,7 @@ export class Notification extends Phaser.GameObjects.Container {
 
     const { x, y } = position;
     this.setPosition(x, y);
+    this.setDepth(1000);
 
     scene.add.existing(this);
   }
