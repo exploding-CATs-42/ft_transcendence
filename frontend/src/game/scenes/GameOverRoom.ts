@@ -25,13 +25,13 @@ const LEAVE_BUTTON_POSITION: Point = {
 const BACKDROP_ALPHA = 0.35;
 
 const CAT_SIZE: Size = {
-  width: 700,
-  height: 700,
+  width: 500,
+  height: 500,
 };
 
 const CAT_POSITION: Point = {
-  x: CENTER_X + 220,
-  y: SCREEN_HEIGHT - 330,
+  x: CENTER_X,
+  y: SCREEN_HEIGHT - 300,
 };
 
 const WINNER_LABEL_POSITION: Point = {
