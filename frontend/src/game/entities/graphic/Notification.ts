@@ -22,6 +22,13 @@ const TEXT_CONFIG = {
   dropShadowDistance: 4,
 };
 
+const TEXT_PADDING = {
+  left: 60,
+  right: 60,
+  top: 5,
+  bottom: 5,
+};
+
 export const NotificationMode = {
   SEE_THE_FUTURE: "SEE_THE_FUTURE",
   WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
@@ -52,6 +59,36 @@ export class Notification extends Phaser.GameObjects.Container {
     this.setPosition(x, y);
 
     scene.add.existing(this);
+  }
+
+  private drawBackground(
+    graphics: Phaser.GameObjects.Graphics,
+    width: number,
+    height: number,
+  ) {
+    const { color } = BACKGROUND_CONFIG;
+    const { left, right, top, bottom } = TEXT_PADDING;
+
+    graphics.clear();
+    graphics.fillStyle(color, 0.5);
+
+    const halfWidth = width / 2;
+    const halfHeight = height / 2;
+
+    const topInset = 40;
+
+    graphics.beginPath();
+
+    // Bottom edge (slightly narrower)
+    graphics.moveTo(halfWidth + right - topInset, halfHeight + bottom);
+    graphics.lineTo(-(halfWidth + left - topInset), halfHeight + bottom);
+
+    // Top edge (full width)
+    graphics.lineTo(-(halfWidth + left), -halfHeight - top);
+    graphics.lineTo(halfWidth + right, -halfHeight - top);
+
+    graphics.closePath();
+    graphics.fillPath();
   }
 
   private addBackground(scene: Phaser.Scene) {
