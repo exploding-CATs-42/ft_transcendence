@@ -269,6 +269,10 @@ export const gameMachine = setup({
           },
         },
         [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
+          always: {
+            guard: GameGuards.HAS_PENDING_COMBO,
+            target: GameStates.WAITING_FOR_COMBO_SELECTION,
+          },
           on: {
             [GameEvents.DRAW_CARD]: [
               {
@@ -288,7 +292,6 @@ export const gameMachine = setup({
             [GameEvents.PLAY_COMBO]: {
               guard: GameGuards.IS_PLAYERS_TURN,
               actions: GameActions.PLAY_COMBO,
-              target: GameStates.WAITING_FOR_COMBO_SELECTION,
             },
           },
         },
