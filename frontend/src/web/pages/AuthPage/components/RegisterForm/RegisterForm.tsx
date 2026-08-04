@@ -2,7 +2,7 @@
 import { useForm, type SubmitHandler } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "react-toastify";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 // Project level
 import {
   AuthForm,
@@ -42,6 +42,13 @@ const RegisterForm = () => {
       redirectLink="/login"
       onSubmit={handleSubmit(onSubmit)}
       disabled={isSubmitting}
+      legalNote={
+        <>
+          By clicking “Sign up” you agree to our{" "}
+          <Link to="/terms">Terms of Service</Link> and confirm that you have
+          read our <Link to="/privacy">Privacy Policy</Link>.
+        </>
+      }
     >
       <FormField error={errors.email?.message}>
         <EmailInput
