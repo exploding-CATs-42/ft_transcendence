@@ -16,6 +16,7 @@ import {
   onPlayerLeft,
   onPlayerReconnected,
   onWaitingState,
+  resetWaitingState,
 } from "game/store";
 import { Scenes } from "game/constants";
 
@@ -36,6 +37,7 @@ export const startWaitingRoomSession = () => {
 
   return () => {
     subscriptions.forEach(([event, handler]) => socket.off(event, handler));
+    resetWaitingState();
   };
 };
 

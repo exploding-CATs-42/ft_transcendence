@@ -37,6 +37,10 @@ const setState = (patch: Partial<WaitingRoomState>) => {
   listener?.();
 };
 
+export const resetWaitingState = () => {
+  state = EMPTY_STATE;
+};
+
 export const getOpponents = () =>
   state.players.filter((player) => player.id !== state.meId);
 
