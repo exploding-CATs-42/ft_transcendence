@@ -216,7 +216,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #favorModeActive: boolean = false;
   #isAlive = true;
   #notification!: Notification;
-  #lastPlayedCardType: CardType | null = null;
   #insertingKittenNotificationTimeout: number | null = null;
   #drawPileSize = 0;
   #explodingKittenRiskBar: ExplodingKittenRiskBar | null = null;
@@ -1168,8 +1167,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.discardOpponentCard(payload.playerId, payload.cardType);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
     this.#drawPile?.disableInteractive(true);
-
-    this.#lastPlayedCardType = payload.cardType;
   };
 
   onNopePlayed = (payload: NopePlayedPayload): void => {
@@ -1193,16 +1190,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       return;
     }
     this.updateDrawPileInteractivity();
-
-    if (this.#lastPlayedCardType === CardType.SEE_THE_FUTURE) {
-      const playerName = this.getPlayerNameById(this.#currentTurnPlayerId!);
-      this.#notification.showMessageFor(
-        NotificationMode.SEE_THE_FUTURE,
-        playerName,
-      );
-    }
-
-    this.#lastPlayedCardType = null;
   };
 
   onTurnSkipped = (payload: TurnSkippedPayload): void => {
