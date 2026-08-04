@@ -1,4 +1,7 @@
-import type { WaitingPlayerView } from "@exploding-cats/contracts";
+import type {
+  WaitingPlayerView,
+  WaitingStatePayload,
+} from "@exploding-cats/contracts";
 
 interface WaitingRoomState {
   players: WaitingPlayerView[];
@@ -26,7 +29,15 @@ export const setWaitingStateListener = (l: () => void) => {
   };
 };
 
-export const setState = (patch: Partial<WaitingRoomState>) => {
+const setState = (patch: Partial<WaitingRoomState>) => {
   state = { ...state, ...patch };
   listener?.();
+};
+
+export const onWaitingState = ({
+  waitingState,
+  meId,
+  countdownEndsAt,
+}: WaitingStatePayload) => {
+  setState({ players: waitingState.players, meId, countdownEndsAt });
 };
