@@ -74,3 +74,8 @@ export const onPlayerDisconnected = ({ playerId }: PlayerIdPayload) =>
 
 export const onPlayerReconnected = ({ playerId }: PlayerIdPayload) =>
   patchPlayer(playerId, { isConnected: true });
+
+export const onCountdownStarted = ({ endsAt }: CountdownStartedPayload) =>
+  setState({ countdownEndsAt: endsAt });
+
+export const onCountdownCanceled = () => setState({ countdownEndsAt: null });
