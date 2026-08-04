@@ -35,7 +35,7 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
     );
 
     const title = scene.add
-      .text(0, -194, "Choose a random card", {
+      .text(0, -194, "Choose a card", {
         fontFamily: "Chewy",
         fontSize: 42,
         color: "#2c211d",
@@ -44,7 +44,7 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
 
     this.#cards = this.addCards(scene, cardsAmount);
     this.#status = scene.add
-      .text(0, 205, "Click one card to steal it", {
+      .text(0, 205, "Click on a card to steal it", {
         fontFamily: "Chewy",
         fontSize: 25,
         color: "#68564e",
