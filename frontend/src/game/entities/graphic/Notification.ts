@@ -134,5 +134,11 @@ export class Notification extends Phaser.GameObjects.Container {
       text = `${playerName}\`s turn`;
     }
     this.#label.setText(text);
+    this.#background.clear();
+    this.drawBackground(
+      this.#background,
+      this.#label.width,
+      this.#label.height,
+    );
   }
 }
