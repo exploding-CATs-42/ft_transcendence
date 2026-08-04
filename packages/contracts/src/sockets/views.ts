@@ -16,7 +16,3 @@ export interface PublicPlayerView extends GamePlayerView {
 export interface WaitingPlayerView extends PlayerView {
   isConfirmed: boolean;
 }
-
-export interface WaitingStateView {
-  players: WaitingPlayerView[];
-}

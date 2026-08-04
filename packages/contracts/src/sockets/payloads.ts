@@ -6,11 +6,7 @@ import type {
   GameStates,
 } from "@exploding-cats/game-core";
 import type { GameRecord } from "../shared";
-import type {
-  PublicPlayerView,
-  WaitingPlayerView,
-  WaitingStateView,
-} from "./views";
+import type { PublicPlayerView, WaitingPlayerView } from "./views";
 import type { SocketErrorCode } from "./errors";
 import type { UserId } from "../shared";
 
@@ -35,7 +31,7 @@ export interface CountdownStartedPayload {
 }
 
 export interface WaitingStatePayload {
-  waitingState: WaitingStateView;
+  players: WaitingPlayerView[];
   meId: string;
   countdownEndsAt: number | null;
 }

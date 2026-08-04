@@ -82,7 +82,7 @@ function buildJoinResult(
   const { players, countdownEndsAt } = game.instance.getSnapshot().context;
 
   return {
-    waitingState: { players: players.map(toWaitingPlayerView) },
+    players: players.map(toWaitingPlayerView),
     player: toWaitingPlayerView(player),
     isNewPlayer,
     countdownEndsAt,
