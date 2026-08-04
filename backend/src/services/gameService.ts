@@ -74,12 +74,17 @@ function orderPlayersForPlayer(players: Player[], playerId: UserId): Player[] {
   return [...players.slice(playerIndex), ...players.slice(0, playerIndex)];
 }
 
-function buildJoinResult(game: Game, player: Player): JoinGameResult {
+function buildJoinResult(
+  game: Game,
+  player: Player,
+  isNewPlayer: boolean,
+): JoinGameResult {
   const { players, countdownEndsAt } = game.instance.getSnapshot().context;
 
   return {
     waitingState: { players: players.map(toWaitingPlayerView) },
     player: toWaitingPlayerView(player),
+    isNewPlayer,
     countdownEndsAt,
   };
 }
@@ -278,7 +283,7 @@ export async function joinGame(
       });
     }
 
-    return buildJoinResult(game, player);
+    return buildJoinResult(game, player, false);
   }
 
   if (isGameInProgress(game)) {
@@ -316,7 +321,7 @@ export async function joinGame(
     player: newPlayer,
   });
 
-  return buildJoinResult(game, newPlayer);
+  return buildJoinResult(game, newPlayer, true);
 }
 
 export async function reconnectGame(
