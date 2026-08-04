@@ -51,11 +51,11 @@ export const isMeConfirmed = () => {
 };
 
 export const onWaitingState = ({
-  waitingState,
+  players,
   meId,
   countdownEndsAt,
 }: WaitingStatePayload) => {
-  setState({ players: waitingState.players, meId, countdownEndsAt });
+  setState({ players, meId, countdownEndsAt });
 };
 
 export const onPlayerJoined = ({ player }: PlayerJoinedPayload) => {

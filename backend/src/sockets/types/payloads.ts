@@ -1,10 +1,10 @@
 // Project level
-import { WaitingPlayerView, WaitingStateView } from "@exploding-cats/contracts";
+import { WaitingPlayerView } from "@exploding-cats/contracts";
 import { Card, PendingActionType } from "@exploding-cats/game-core";
 
 export interface JoinGameResult {
   player: WaitingPlayerView;
-  waitingState: WaitingStateView;
+  players: WaitingPlayerView[];
   isNewPlayer: boolean;
   countdownEndsAt: number | null;
 }

@@ -87,12 +87,12 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         await socket.join(room);
 
         try {
-          const { waitingState, player, countdownEndsAt, isNewPlayer } =
+          const { players, player, countdownEndsAt, isNewPlayer } =
             await joinGame(parsed, socket.data.user.id);
           socketsMap.set(player.id, socket);
 
           const privatePayload: WaitingStatePayload = {
-            waitingState,
+            players,
             meId: player.id,
             countdownEndsAt,
           };
