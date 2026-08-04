@@ -8,9 +8,18 @@ const BACKGROUND_CONFIG = {
 };
 
 const TEXT_CONFIG = {
-  color: "white",
+  color: "#FFF9E6",
   fontFamily: "Chewy",
-  fontSize: 32,
+  fontSize: 33,
+
+  stroke: "#5A3512", // dark brown outline
+  strokeThickness: 6,
+
+  dropShadow: true,
+  dropShadowColor: "#000000",
+  dropShadowBlur: 2,
+  dropShadowAngle: Math.PI / 4,
+  dropShadowDistance: 4,
 };
 
 export const NotificationMode = {
