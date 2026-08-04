@@ -19,7 +19,7 @@ import {
   leaveWaitingGame,
   type WaitingRoomHandlers,
 } from "game/sockets";
-import { setWaitingStateListener } from "game/store";
+import { getWaitingState, setWaitingStateListener } from "game/store";
 
 const NAME_LABEL_CONFIG: LabelConfig = {
   fontColor: "black",
@@ -55,6 +55,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   #readyButton!: Button;
   #isReady = false;
   #countdownTimer: Phaser.Time.TimerEvent | null = null;
+  #renderedCountdownEndsAt: number | null = null;
   #clearWaitingStateListener: (() => void) | null = null;
   #stopListeningForGameStart: (() => void) | null = null;
 
@@ -76,8 +77,12 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
-    this.#clearWaitingStateListener = setWaitingStateListener(() => {});
+    this.#clearWaitingStateListener = setWaitingStateListener(() => {
+      this.renderCountdown(getWaitingState().countdownEndsAt);
+    });
     this.#stopListeningForGameStart = goToGameRoomWhenStarted(this);
+
+    this.renderCountdown(getWaitingState().countdownEndsAt);
   }
 
   private cleanup = () => {
@@ -86,6 +91,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.#stopListeningForGameStart?.();
     this.#stopListeningForGameStart = null;
     this.#countdownTimer?.remove();
+    this.#countdownTimer = null;
   };
 
   private buildSeats() {
@@ -187,6 +193,31 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
       })
       .setOrigin(0.5, 0);
   }
+
+  private renderCountdown = (endsAt: number | null) => {
+    if (endsAt === this.#renderedCountdownEndsAt) return;
+
+    this.#renderedCountdownEndsAt = endsAt;
+    this.#countdownTimer?.remove();
+    this.#countdownTimer = null;
+
+    if (endsAt === null) {
+      this.#waitingLabel.setText(WAITING_MESSAGE);
+      return;
+    }
+
+    const tick = () => {
+      const secondsLeft = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
+      this.#waitingLabel.setText(`Game starts in ${secondsLeft}...`);
+    };
+
+    tick();
+    this.#countdownTimer = this.time.addEvent({
+      delay: 1000,
+      loop: true,
+      callback: tick,
+    });
+  };
 
   onWaitingState = (
     players: WaitingPlayerView[],
