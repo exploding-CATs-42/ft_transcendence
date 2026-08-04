@@ -40,7 +40,7 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
     );
 
     const title = scene.add
-      .text(0, -294, `Choose a card from ${targetName}`, {
+      .text(0, -294, `Name the card you want from ${targetName}`, {
         fontFamily: "Chewy",
         fontSize: 42,
         color: "#2c211d",
@@ -60,7 +60,7 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
     }));
 
     this.#status = scene.add
-      .text(0, 300, "Select the card you want to request", {
+      .text(0, 300, "Select the card by clicking on it", {
         fontFamily: "Chewy",
         fontSize: 25,
         color: "#68564e",
