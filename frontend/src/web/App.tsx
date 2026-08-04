@@ -15,6 +15,8 @@ const NotFoundPage = lazy(() => import("./pages/NotFoundPage/NotFoundPage.js"));
 const AuthPage = lazy(() => import("./pages/AuthPage/AuthPage"));
 const RulesPage = lazy(() => import("./pages/RulesPage/RulesPage"));
 const AboutPage = lazy(() => import("./pages/AboutPage/AboutPage"));
+const PrivacyPage = lazy(() => import("./pages/PrivacyPage/PrivacyPage"));
+const TermsPage = lazy(() => import("./pages/TermsPage/TermsPage"));
 
 function App() {
   return (
@@ -24,6 +26,8 @@ function App() {
         <Route index element={<HomePage />} />
         <Route path="rules" element={<RulesPage />} />
         <Route path="about" element={<AboutPage />} />
+        <Route path="privacy" element={<PrivacyPage />} />
+        <Route path="terms" element={<TermsPage />} />
 
         {/* Login/Register routes */}
         <Route element={<AuthRoute />}>
