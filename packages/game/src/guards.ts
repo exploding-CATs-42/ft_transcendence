@@ -181,7 +181,7 @@ export const hasEligibleComboTarget = ({ context }: GameGuardArgs) => {
 
     return Boolean(
       targetPlayer?.isAlive &&
-        (pendingCombo.comboSize === 3 || targetPlayer.hand.length > 0),
+      (pendingCombo.comboSize === 3 || targetPlayer.hand.length > 0),
     );
   }
 

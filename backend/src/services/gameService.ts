@@ -576,8 +576,7 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
     cardIds: cards.map((card) => card.id),
   });
 
-  const { lastPlayedCards, pendingCombo } =
-    game.instance.getSnapshot().context;
+  const { lastPlayedCards, pendingCombo } = game.instance.getSnapshot().context;
   const lastPlayedCardIds = new Set(lastPlayedCards?.map((card) => card.id));
 
   if (
@@ -623,7 +622,8 @@ export async function resolveCombo(input: ResolveComboParams, userId: UserId) {
         (input.cardIndex !== undefined ||
           input.requestedCardType !== undefined)) ||
       (pendingCombo.comboSize === 3 &&
-        (input.cardIndex !== undefined || input.requestedCardType === undefined))
+        (input.cardIndex !== undefined ||
+          input.requestedCardType === undefined))
     ) {
       throw new SocketError("Invalid declaration for this combo");
     }

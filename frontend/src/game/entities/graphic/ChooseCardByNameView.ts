@@ -1,9 +1,5 @@
 import type { CardType } from "@exploding-cats/game-core";
-import {
-  CARD_OPTIONS,
-  CARD_TYPE_TO_FRAME,
-  Textures,
-} from "game/constants";
+import { CARD_OPTIONS, CARD_TYPE_TO_FRAME, Textures } from "game/constants";
 
 const PANEL_WIDTH = 1120;
 const PANEL_HEIGHT = 680;

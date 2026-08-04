@@ -136,10 +136,9 @@ export function attachGameBroadcaster(game: Game) {
   });
 
   broadcaster.on(GameOutEvents.COMBO_SELECTION_REQUESTED, (event) => {
-    socketsMap.get(event.payload.playerId)?.emit(
-      ServerPublicEvents.COMBO_SELECTION_REQUESTED,
-      event.payload,
-    );
+    socketsMap
+      .get(event.payload.playerId)
+      ?.emit(ServerPublicEvents.COMBO_SELECTION_REQUESTED, event.payload);
   });
 }
 

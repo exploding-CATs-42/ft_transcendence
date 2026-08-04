@@ -326,10 +326,7 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         };
 
         if (comboSize === 3) {
-          socket.emit(
-            ServerPublicEvents.COMBO_RESOLVED,
-            comboResolvedPayload,
-          );
+          socket.emit(ServerPublicEvents.COMBO_RESOLVED, comboResolvedPayload);
           targetSocket?.emit(
             ServerPublicEvents.COMBO_RESOLVED,
             comboResolvedPayload,
