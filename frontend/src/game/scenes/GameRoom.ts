@@ -606,6 +606,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#discardPileZone?.setVisible(true);
     this.#discardPile?.setVisible(true);
     this.#drawPile?.setVisible(true);
+    this.#explodingKittenRiskBar?.setVisible(true);
   }
 
   private showFavorUI() {
@@ -614,6 +615,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#discardPileZone?.setVisible(false);
     this.#discardPile?.setVisible(false);
     this.#drawPile?.setVisible(false);
+    this.#explodingKittenRiskBar?.setVisible(false);
   }
 
   private setDiscardPile(card: Phaser.GameObjects.Image) {
