@@ -1,4 +1,5 @@
 import type {
+  CountdownStartedPayload,
   PlayerIdPayload,
   PlayerJoinedPayload,
   WaitingPlayerView,
@@ -53,3 +54,23 @@ export const onPlayerJoined = ({ player }: PlayerJoinedPayload) => {
 export const onPlayerLeft = ({ playerId }: PlayerIdPayload) => {
   setState({ players: state.players.filter((p) => p.id !== playerId) });
 };
+
+const patchPlayer = (playerId: string, fields: Partial<WaitingPlayerView>) => {
+  setState({
+    players: state.players.map((player) =>
+      player.id === playerId ? { ...player, ...fields } : player,
+    ),
+  });
+};
+
+export const onPlayerConfirmed = ({ playerId }: PlayerIdPayload) =>
+  patchPlayer(playerId, { isConfirmed: true });
+
+export const onPlayerCanceled = ({ playerId }: PlayerIdPayload) =>
+  patchPlayer(playerId, { isConfirmed: false });
+
+export const onPlayerDisconnected = ({ playerId }: PlayerIdPayload) =>
+  patchPlayer(playerId, { isConnected: false });
+
+export const onPlayerReconnected = ({ playerId }: PlayerIdPayload) =>
+  patchPlayer(playerId, { isConnected: true });
