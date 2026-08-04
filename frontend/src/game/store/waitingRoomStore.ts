@@ -12,9 +12,8 @@ const EMPTY_STATE: WaitingRoomState = {
   countdownEndsAt: null,
 };
 
-const state = EMPTY_STATE;
+let state = EMPTY_STATE;
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
 let listener: (() => void) | null = null;
 
 export const getWaitingState = () => state;
@@ -25,4 +24,9 @@ export const setWaitingStateListener = (l: () => void) => {
   return () => {
     listener = null;
   };
+};
+
+export const setState = (patch: Partial<WaitingRoomState>) => {
+  state = { ...state, ...patch };
+  listener?.();
 };
