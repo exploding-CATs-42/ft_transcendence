@@ -19,9 +19,24 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
   constructor(scene: Phaser.Scene, targetName: string) {
     super(scene);
 
-    const background = scene.add
-      .rectangle(0, 0, PANEL_WIDTH, PANEL_HEIGHT, 0xf3ead9, 0.98)
-      .setStrokeStyle(3, 0xffffff, 0.7);
+    const background = scene.add.graphics();
+    background.fillStyle(0xf3ead9, 0.98);
+    background.lineStyle(3, 0xffffff, 0.7);
+    background.fillRoundedRect(
+      -PANEL_WIDTH / 2,
+      -PANEL_HEIGHT / 2,
+      PANEL_WIDTH,
+      PANEL_HEIGHT,
+      20,
+    );
+    background.strokeRoundedRect(
+      -PANEL_WIDTH / 2,
+      -PANEL_HEIGHT / 2,
+      PANEL_WIDTH,
+      PANEL_HEIGHT,
+      20,
+    );
+
     const title = scene.add
       .text(0, -294, `Choose a card from ${targetName}`, {
         fontFamily: "Chewy",
