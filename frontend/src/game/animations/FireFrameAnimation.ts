@@ -35,7 +35,7 @@ export class FireFrameAnimation extends Phaser.GameObjects.Sprite {
     scene.anims.create({
       key: "fire",
       frames: scene.anims.generateFrameNumbers(Textures.fire),
-      frameRate: 10,
+      frameRate: 24,
       repeat: 0,
     });
   }
