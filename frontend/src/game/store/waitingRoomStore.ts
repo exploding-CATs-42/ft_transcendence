@@ -40,6 +40,12 @@ const setState = (patch: Partial<WaitingRoomState>) => {
 export const getOpponents = () =>
   state.players.filter((player) => player.id !== state.meId);
 
+export const isMeConfirmed = () => {
+  const me = state.players.find((player) => player.id === state.meId);
+
+  return me?.isConfirmed ?? false;
+};
+
 export const onWaitingState = ({
   waitingState,
   meId,
