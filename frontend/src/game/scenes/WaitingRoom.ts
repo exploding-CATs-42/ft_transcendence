@@ -15,6 +15,7 @@ import { type WaitingPlayerView } from "@exploding-cats/contracts";
 import {
   cancelStart,
   confirmStart,
+  goToGameRoomWhenStarted,
   leaveWaitingGame,
   type WaitingRoomHandlers,
 } from "game/sockets";
@@ -55,6 +56,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   #isReady = false;
   #countdownTimer: Phaser.Time.TimerEvent | null = null;
   #clearWaitingStateListener: (() => void) | null = null;
+  #stopListeningForGameStart: (() => void) | null = null;
 
   constructor() {
     super(Scenes.WaitingRoom);
@@ -75,11 +77,14 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
     this.#clearWaitingStateListener = setWaitingStateListener(() => {});
+    this.#stopListeningForGameStart = goToGameRoomWhenStarted(this);
   }
 
   private cleanup = () => {
     this.#clearWaitingStateListener?.();
     this.#clearWaitingStateListener = null;
+    this.#stopListeningForGameStart?.();
+    this.#stopListeningForGameStart = null;
     this.#countdownTimer?.remove();
   };
 
