@@ -1,0 +1,51 @@
+.footer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+
+  /* Never give up height to the scrolling <main> above it. */
+  flex-shrink: 0;
+
+  padding: 12px 20px;
+  background-color: var(--soft-black);
+
+  font-size: 14px;
+  line-height: 1.25;
+}
+
+.copy {
+  opacity: 0.7;
+}
+
+.linkList {
+  display: flex;
+  flex-direction: row;
+  column-gap: 24px;
+}
+
+.link:hover,
+.link:focus-visible {
+  color: var(--throw-throw-burrito);
+}
+
+@media only screen and (min-width: 768px) {
+  .footer {
+    flex-direction: row;
+
+    font-size: 16px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .footer {
+    padding: 12px 70px;
+
+    font-size: 20px;
+  }
+
+  .linkList {
+    column-gap: 40px;
+  }
+}
