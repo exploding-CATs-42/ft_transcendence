@@ -796,6 +796,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.updateAttackIndicator();
     this.updateDrawPileInteractivity();
     this.updateComboPlayInteractivity();
+
+    this.#notification.showMessageFor(
+      NotificationMode.TURN_CHANGED,
+    );
+    this.time.delayedCall(2000, () => this.#notification.setVisible(false));
   };
 
   private drawCard = () => {
