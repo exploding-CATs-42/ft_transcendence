@@ -6,8 +6,8 @@ import { ServerPrivateEvents } from "@exploding-cats/contracts";
 import {
   connectToGameSession,
   setGameId,
+  startWaitingRoomSession,
   trackGameState,
-  trackWaitingState,
 } from "game/sockets";
 // Local level
 import { useSocket } from "./useSocket";
@@ -19,7 +19,7 @@ export function useGameSession(gameId: string) {
   useEffect(() => {
     if (!gameId) return;
     setGameId(gameId);
-    const untrackWaitingState = trackWaitingState();
+    const stopWaitingRoomSession = startWaitingRoomSession();
     const untrackGameState = trackGameState();
     const cleanupGameSession = connectToGameSession(socket, gameId, () => {
       navigate("/lobby", { replace: true });
@@ -34,7 +34,7 @@ export function useGameSession(gameId: string) {
       socket.off(ServerPrivateEvents.LEFT_GAME, handleLeftGame);
       cleanupGameSession();
       untrackGameState();
-      untrackWaitingState();
+      stopWaitingRoomSession();
     };
   }, [socket, gameId, navigate]);
 }
