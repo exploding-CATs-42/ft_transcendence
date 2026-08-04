@@ -1,10 +1,12 @@
 import type { CardType } from "@exploding-cats/game-core";
 import { CARD_OPTIONS, CARD_TYPE_TO_FRAME, Textures } from "game/constants";
+import { addCardVisual } from "game/utils";
 
 const PANEL_WIDTH = 1120;
 const PANEL_HEIGHT = 680;
 const CARD_WIDTH = 142;
 const CARD_HEIGHT = 198;
+const CARD_BORDER_RADIUS = 10;
 const COLUMNS = 6;
 const COLUMN_GAP = 170;
 const ROW_GAP = 235;
@@ -77,14 +79,17 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
   private addCard(scene: Phaser.Scene, type: CardType, index: number) {
     const column = index % COLUMNS;
     const row = Math.floor(index / COLUMNS);
-    const image = scene.add
-      .image(
-        (column - (COLUMNS - 1) / 2) * COLUMN_GAP,
-        -105 + row * ROW_GAP,
-        Textures.cards,
-        CARD_TYPE_TO_FRAME[type],
-      )
-      .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
+
+    const frame = scene.textures
+      .get(Textures.cards)
+      .get(CARD_TYPE_TO_FRAME[type]);
+    const image = addCardVisual(
+      scene,
+      { x: (column - (COLUMNS - 1) / 2) * COLUMN_GAP, y: -105 + row * ROW_GAP },
+      { frame, size: { width: CARD_WIDTH, height: CARD_HEIGHT } },
+      CARD_BORDER_RADIUS,
+    )
+      .setOrigin(0.5, 0.5)
       .setInteractive({ useHandCursor: true });
 
     image.on("pointerover", () => {
