@@ -83,12 +83,13 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.JOIN_GAME_ERROR,
       async (parsed: JoinGameParams) => {
+        const room = parsed.gameId;
+        await socket.join(room);
+
         const { waitingState, player, countdownEndsAt } = await joinGame(
           parsed,
           socket.data.user.id,
         );
-        const room = parsed.gameId;
-        await socket.join(room);
         socketsMap.set(player.id, socket);
 
         const privatePayload: WaitingStatePayload = {
