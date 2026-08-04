@@ -801,7 +801,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.updateDrawPileInteractivity();
     this.updateComboPlayInteractivity();
 
-    this.#notification.showMessageFor(NotificationMode.TURN_CHANGED);
+    const playerName = this.getPlayerNameById(payload.playerId);
+    this.#notification.showMessageFor(
+      NotificationMode.TURN_CHANGED,
+      playerName,
+    );
     this.time.delayedCall(2000, () => this.#notification.setVisible(false));
   };
 
@@ -1008,7 +1012,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.updateDrawPileInteractivity();
 
     if (this.#lastPlayedCardType === CardType.SEE_THE_FUTURE) {
-      this.#notification.showMessageFor(NotificationMode.SEE_THE_FUTURE);
+      const playerName = this.getPlayerNameById(this.#currentTurnPlayerId!);
+      this.#notification.showMessageFor(
+        NotificationMode.SEE_THE_FUTURE,
+        playerName,
+      );
     }
 
     this.#lastPlayedCardType = null;
@@ -1056,7 +1064,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       if (!this.isMyTurn()) {
         this.#notification.setVisible(false);
         this.#insertingKittenNotificationTimeout = setTimeout(() => {
-          this.#notification.showMessageFor(NotificationMode.INSERTING_KITTEN);
+          const playerName = this.getPlayerNameById(this.#currentTurnPlayerId!);
+          this.#notification.showMessageFor(
+            NotificationMode.INSERTING_KITTEN,
+            playerName,
+          );
         }, DEFUSE_VIEW_DURATION_MS);
       }
 
@@ -1134,8 +1146,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onKittenDrawn = (): void => {
-    if (this.#meId !== this.#currentTurnPlayerId)
-      this.#notification.showMessageFor(NotificationMode.EXPLODING_KITTEN);
+    if (this.#meId !== this.#currentTurnPlayerId) {
+      const playerName = this.getPlayerNameById(this.#currentTurnPlayerId!);
+      this.#notification.showMessageFor(
+        NotificationMode.EXPLODING_KITTEN,
+        playerName,
+      );
+    }
   };
 
   onGameOver = (payload: GameOverPayload): void => {
@@ -1223,8 +1240,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.showOpponentTargetIcons();
       this.#notification.showMessageFor(NotificationMode.SELECT_PLAYER);
     } else {
+      const playerName = this.getPlayerNameById(this.#currentTurnPlayerId!);
       this.#notification.showMessageFor(
         NotificationMode.WAITING_FOR_PLAYER_SELECTION,
+        playerName,
       );
     }
   };
@@ -1236,8 +1255,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.showFavorUI();
       this.#notification.showMessageFor(NotificationMode.SELECT_CARD);
     } else {
+      const playerName = this.getPlayerNameById(payload.playerId);
       this.#notification.showMessageFor(
         NotificationMode.WAITING_FOR_CARD_SELECTION,
+        playerName,
       );
 
       if (this.isMyTurn()) {
