@@ -32,7 +32,10 @@
 
 html,
 body {
-  min-height: 100vh;
+  height: 100vh;
+  height: 100dvh;
+
+  overflow: hidden;
 }
 
 body {
@@ -45,6 +48,7 @@ body {
   flex-direction: column;
 
   flex: 1;
+  min-height: 0;
   height: 100%;
 }
 
@@ -53,6 +57,9 @@ main {
   flex-direction: column;
 
   flex: 1;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 input,
@@ -160,22 +167,22 @@ body {
   --sb-border-radius: 6px;
 }
 
-body::-webkit-scrollbar {
+main::-webkit-scrollbar {
   width: var(--sb-size);
 }
 
-body::-webkit-scrollbar-track {
+main::-webkit-scrollbar-track {
   background: var(--sb-track-color);
   border-radius: var(--sb-border-radius);
 }
 
-body::-webkit-scrollbar-thumb {
+main::-webkit-scrollbar-thumb {
   background: var(--sb-thumb-color);
   border-radius: var(--sb-border-radius);
 }
 
 @supports not selector(::-webkit-scrollbar) {
-  body {
+  main {
     scrollbar-color: var(--sb-thumb-color) var(--sb-track-color);
   }
 }
