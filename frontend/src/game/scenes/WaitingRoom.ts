@@ -19,7 +19,11 @@ import {
   leaveWaitingGame,
   type WaitingRoomHandlers,
 } from "game/sockets";
-import { getWaitingState, setWaitingStateListener } from "game/store";
+import {
+  getOpponents,
+  getWaitingState,
+  setWaitingStateListener,
+} from "game/store";
 
 const NAME_LABEL_CONFIG: LabelConfig = {
   fontColor: "black",
@@ -78,10 +82,12 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
     this.#clearWaitingStateListener = setWaitingStateListener(() => {
+      this.renderSeats(getOpponents());
       this.renderCountdown(getWaitingState().countdownEndsAt);
     });
     this.#stopListeningForGameStart = goToGameRoomWhenStarted(this);
 
+    this.renderSeats(getOpponents());
     this.renderCountdown(getWaitingState().countdownEndsAt);
   }
 
@@ -100,9 +106,27 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     });
   }
 
-  private addPlayer(player: WaitingPlayerView) {
-    if (this.#playersById.has(player.id)) return;
+  private renderSeats = (opponents: WaitingPlayerView[]) => {
+    opponents.forEach((opponent) => {
+      const seatedPlayer = this.#playersById.get(opponent.id);
 
+      if (seatedPlayer) {
+        seatedPlayer.setConfirmed(opponent.isConfirmed);
+        seatedPlayer.setConnected(opponent.isConnected);
+        return;
+      }
+
+      this.addPlayer(opponent);
+    });
+
+    const presentIds = new Set(opponents.map((opponent) => opponent.id));
+
+    this.#playersById.forEach((_, playerId) => {
+      if (!presentIds.has(playerId)) this.removePlayer(playerId);
+    });
+  };
+
+  private addPlayer(player: WaitingPlayerView) {
     const emptySeat = this.#seats.find((seat) => !seat.player);
 
     if (!emptySeat) return;
