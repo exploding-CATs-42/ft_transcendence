@@ -93,10 +93,24 @@ export class ChooseCardByNameView extends Phaser.GameObjects.Container {
       .setInteractive({ useHandCursor: true });
 
     image.on("pointerover", () => {
-      if (!this.#selectionPending) image.setAlpha(0.82);
+      if (!this.#selectionPending) {
+        scene.tweens.add({
+          targets: image,
+          alpha: 0.82,
+          duration: 140,
+          ease: "Sine.Out",
+        });
+      }
     });
     image.on("pointerout", () => {
-      if (!this.#selectionPending) image.setAlpha(1);
+      if (!this.#selectionPending) {
+        scene.tweens.add({
+          targets: image,
+          alpha: 1,
+          duration: 140,
+          ease: "Sine.Out",
+        });
+      }
     });
     image.on("pointerdown", () => this.selectCard(type));
 
