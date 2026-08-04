@@ -17,7 +17,6 @@ import {
   confirmStart,
   goToGameRoomWhenStarted,
   leaveWaitingGame,
-  type WaitingRoomHandlers,
 } from "game/sockets";
 import {
   getOpponents,
@@ -53,7 +52,7 @@ const LEAVE_BUTTON_POSITION = {
 
 const WAITING_MESSAGE = "Waiting for other players...";
 
-export class WaitingRoom extends Scene implements WaitingRoomHandlers {
+export class WaitingRoom extends Scene {
   #seats: PlayerSeat[] = [];
   #playersById = new Map<string, GraphicPlayer>();
   #waitingLabel!: Phaser.GameObjects.Text;
@@ -242,62 +241,5 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
       loop: true,
       callback: tick,
     });
-  };
-
-  onWaitingState = (
-    players: WaitingPlayerView[],
-    isConfirmed: boolean,
-    countdownEndsAt: number | null,
-  ) => {
-    players.forEach((player) => this.addPlayer(player));
-    if (countdownEndsAt !== null) this.onCountdownStarted(countdownEndsAt);
-  };
-
-  onPlayerJoined = (player: WaitingPlayerView) => {
-    this.addPlayer(player);
-  };
-
-  onPlayerLeft = (playerId: string) => {
-    this.removePlayer(playerId);
-  };
-
-  onPlayerConfirmed = (playerId: string) => {
-    this.#playersById.get(playerId)?.setConfirmed(true);
-  };
-
-  onPlayerCanceled = (playerId: string) => {
-    this.#playersById.get(playerId)?.setConfirmed(false);
-  };
-
-  onPlayerDisconnected = (playerId: string) => {
-    this.#playersById.get(playerId)?.setConnected(false);
-  };
-
-  onPlayerReconnected = (playerId: string) => {
-    this.#playersById.get(playerId)?.setConnected(true);
-  };
-
-  onCountdownStarted = (endsAt: number) => {
-    this.#countdownTimer?.remove();
-    const tick = () => {
-      const secondsLeft = Math.max(0, Math.ceil((endsAt - Date.now()) / 1000));
-      this.#waitingLabel.setText(`Game starts in ${secondsLeft}...`);
-    };
-    tick();
-    this.#countdownTimer = this.time.addEvent({
-      delay: 1000,
-      loop: true,
-      callback: tick,
-    });
-  };
-
-  onCountdownCanceled = () => {
-    this.#countdownTimer?.remove();
-    this.#countdownTimer = null;
-    this.#waitingLabel.setText(WAITING_MESSAGE);
-  };
-
-  onGameStarted = () => {
-    this.scene.start(Scenes.GameRoom);
   };
 }
