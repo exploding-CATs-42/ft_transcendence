@@ -698,10 +698,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private selectOpponent = (playerId: string) => {
     if (this.#isComboResolutionPending) return;
-    if (
-      this.#pendingComboSize &&
-      !this.#pendingComboTargets.has(playerId)
-    )
+    if (this.#pendingComboSize && !this.#pendingComboTargets.has(playerId))
       return;
 
     this.#players.forEach((seat, id) => {
