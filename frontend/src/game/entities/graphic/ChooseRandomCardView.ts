@@ -41,13 +41,6 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
         color: "#2c211d",
       })
       .setOrigin(0.5);
-    const hint = scene.add
-      .text(0, -150, "All cards are hidden", {
-        fontFamily: "Chewy",
-        fontSize: 24,
-        color: "#68564e",
-      })
-      .setOrigin(0.5);
 
     this.#cards = this.addCards(scene, cardsAmount);
     this.#status = scene.add
@@ -58,7 +51,7 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
       })
       .setOrigin(0.5);
 
-    this.add([background, title, hint, ...this.#cards, this.#status]);
+    this.add([background, title, ...this.#cards, this.#status]);
   }
 
   private addCards(scene: Phaser.Scene, cardsAmount: number) {
