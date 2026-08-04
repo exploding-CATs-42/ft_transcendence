@@ -74,6 +74,16 @@ function orderPlayersForPlayer(players: Player[], playerId: UserId): Player[] {
   return [...players.slice(playerIndex), ...players.slice(0, playerIndex)];
 }
 
+function buildJoinResult(game: Game, player: Player): JoinGameResult {
+  const { players, countdownEndsAt } = game.instance.getSnapshot().context;
+
+  return {
+    waitingState: { players: players.map(toWaitingPlayerView) },
+    player: toWaitingPlayerView(player),
+    countdownEndsAt,
+  };
+}
+
 async function getGameContext(userId: UserId, gameId: GameId) {
   const user = await ensureUserExists(userId);
   const game = GameRepository.getGame(gameId);
@@ -268,13 +278,7 @@ export async function joinGame(
       });
     }
 
-    const filteredPlayers = playersBefore.filter((p) => p.id !== player.id);
-
-    return {
-      player: toWaitingPlayerView(player),
-      waitingState: { players: filteredPlayers.map(toWaitingPlayerView) },
-      countdownEndsAt: game.instance.getSnapshot().context.countdownEndsAt,
-    };
+    return buildJoinResult(game, player);
   }
 
   if (isGameInProgress(game)) {
@@ -312,11 +316,7 @@ export async function joinGame(
     player: newPlayer,
   });
 
-  return {
-    player: toWaitingPlayerView(newPlayer),
-    waitingState: { players: playersBefore.map(toWaitingPlayerView) },
-    countdownEndsAt: game.instance.getSnapshot().context.countdownEndsAt,
-  };
+  return buildJoinResult(game, newPlayer);
 }
 
 export async function reconnectGame(
