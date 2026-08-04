@@ -46,13 +46,17 @@ export type NotificationMode =
 
 export class Notification extends Phaser.GameObjects.Container {
   #label: Phaser.GameObjects.Text;
+  #background: Phaser.GameObjects.Graphics;
 
   constructor(scene: Phaser.Scene, position: Point) {
     super(scene);
 
-    const background = this.addBackground(scene);
     const label = this.addLabel(scene);
+    const background = this.addBackground(scene);
+    this.drawBackground(background, label.width, label.height);
+
     this.#label = label;
+    this.#background = background;
     this.add([background, label]);
 
     const { x, y } = position;
@@ -92,17 +96,7 @@ export class Notification extends Phaser.GameObjects.Container {
   }
 
   private addBackground(scene: Phaser.Scene) {
-    const { width, height, color, borderRadius } = BACKGROUND_CONFIG;
-
     const graphics = scene.add.graphics();
-    graphics.fillStyle(color, 1);
-    graphics.fillRoundedRect(
-      -width / 2,
-      -height / 2,
-      width,
-      height,
-      borderRadius,
-    );
 
     return graphics;
   }
