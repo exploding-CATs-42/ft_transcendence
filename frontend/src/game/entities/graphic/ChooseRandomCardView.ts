@@ -64,10 +64,24 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
         .setInteractive({ useHandCursor: true });
 
       card.on("pointerover", () => {
-        if (!this.#selectionPending) card.setY(20);
+        if (!this.#selectionPending) {
+          scene.tweens.add({
+            targets: card,
+            y: 20,
+            duration: 250,
+            ease: "Back.Out",
+          });
+        }
       });
       card.on("pointerout", () => {
-        if (!this.#selectionPending) card.setY(35);
+        if (!this.#selectionPending) {
+          scene.tweens.add({
+            targets: card,
+            y: 35,
+            duration: 250,
+            ease: "Back.Out",
+          });
+        }
       });
       card.on("pointerdown", () => this.selectCard(index));
 
