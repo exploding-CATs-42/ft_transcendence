@@ -1,4 +1,6 @@
 import type {
+  PlayerIdPayload,
+  PlayerJoinedPayload,
   WaitingPlayerView,
   WaitingStatePayload,
 } from "@exploding-cats/contracts";
@@ -40,4 +42,14 @@ export const onWaitingState = ({
   countdownEndsAt,
 }: WaitingStatePayload) => {
   setState({ players: waitingState.players, meId, countdownEndsAt });
+};
+
+export const onPlayerJoined = ({ player }: PlayerJoinedPayload) => {
+  const others = state.players.filter((p) => p.id !== player.id);
+
+  setState({ players: [...others, player] });
+};
+
+export const onPlayerLeft = ({ playerId }: PlayerIdPayload) => {
+  setState({ players: state.players.filter((p) => p.id !== playerId) });
 };
