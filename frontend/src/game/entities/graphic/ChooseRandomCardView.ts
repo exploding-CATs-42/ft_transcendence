@@ -58,7 +58,7 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
 
     return Array.from({ length: cardsAmount }, (_, index) => {
       const card = scene.add
-        .image(startX + index * spacing, 35, Textures.cardCover)
+        .image(startX + index * spacing, 20, Textures.cardCover)
         .setDisplaySize(CARD_WIDTH, CARD_HEIGHT)
         .setDepth(index)
         .setInteractive({ useHandCursor: true });
@@ -67,7 +67,7 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
         if (!this.#selectionPending) {
           scene.tweens.add({
             targets: card,
-            y: 20,
+            y: 35,
             duration: 250,
             ease: "Back.Out",
           });
@@ -77,7 +77,7 @@ export class ChooseRandomCardView extends Phaser.GameObjects.Container {
         if (!this.#selectionPending) {
           scene.tweens.add({
             targets: card,
-            y: 35,
+            y: 20,
             duration: 250,
             ease: "Back.Out",
           });
