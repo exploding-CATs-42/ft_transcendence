@@ -22,6 +22,7 @@ import {
   onPlayerReconnected,
   onWaitingState,
 } from "game/store";
+import { Scenes } from "game/constants";
 
 export interface WaitingRoomHandlers {
   onWaitingState(
@@ -132,6 +133,22 @@ export const startWaitingRoomSession = () => {
 
   return () => {
     subscriptions.forEach(([event, handler]) => socket.off(event, handler));
+  };
+};
+
+export const goToGameRoomWhenStarted = (scene: Phaser.Scene) => {
+  const goToGameRoom = () => scene.scene.start(Scenes.GameRoom);
+
+  socket.on(ServerPrivateEvents.GAME_STARTED, goToGameRoom);
+  socket.on(ServerPrivateEvents.GAME_STATE, goToGameRoom);
+
+  if (hasCachedGameState()) {
+    goToGameRoom();
+  }
+
+  return () => {
+    socket.off(ServerPrivateEvents.GAME_STARTED, goToGameRoom);
+    socket.off(ServerPrivateEvents.GAME_STATE, goToGameRoom);
   };
 };
 
