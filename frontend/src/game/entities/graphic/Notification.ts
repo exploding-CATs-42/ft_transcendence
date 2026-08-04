@@ -110,28 +110,28 @@ export class Notification extends Phaser.GameObjects.Container {
     return label;
   }
 
-  showMessageFor(mode: NotificationMode) {
+  showMessageFor(mode: NotificationMode, playerName: string = "Player") {
     this.setVisible(true);
 
     let text = "";
     if (mode === NotificationMode.SEE_THE_FUTURE) {
-      text = "Player is looking at the cards";
+      text = `${playerName} is looking at the cards`;
     } else if (mode === NotificationMode.WAITING_FOR_PLAYER_SELECTION) {
-      text = "Player is selecting a target";
+      text = `${playerName} is selecting a target`;
     } else if (mode === NotificationMode.SELECT_PLAYER) {
-      text = "Select a player";
+      text = `Select a player`;
     } else if (mode === NotificationMode.SELECT_CARD) {
-      text = "Select a card";
+      text = `Select a card`;
     } else if (mode === NotificationMode.EXPLODING_KITTEN) {
-      text = " Player drew an\nexploding kitten";
+      text = `${playerName} drew an exploding kitten`;
     } else if (mode === NotificationMode.WAITING_FOR_CARD_SELECTION) {
-      text = "Player is selecting a card";
+      text = `${playerName} is selecting a card`;
     } else if (mode === NotificationMode.WAITING_FOR_NOPES) {
-      text = "Waiting for nope cards";
+      text = `Waiting for nope cards`;
     } else if (mode === NotificationMode.INSERTING_KITTEN) {
-      text = "Player is placing kitten\n    back into the deck";
+      text = `${playerName} is placing kitten back into the deck`;
     } else if (mode === NotificationMode.TURN_CHANGED) {
-      text = "Players\`s turn";
+      text = `${playerName}\`s turn`;
     }
     this.#label.setText(text);
   }
