@@ -730,6 +730,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       if (this.#isComboResolutionPending) return;
 
       this.#isComboResolutionPending = true;
+      this.cleanModal();
       this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
       resolveThreeCardCombo(playerId, requestedCardType);
     };
