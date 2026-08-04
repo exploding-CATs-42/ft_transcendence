@@ -31,6 +31,7 @@ export const ServerPublicEvents = {
   CARD_DRAWN: "card-drawn",
   TURN_CHANGED: "TURN_CHANGED",
   CARD_PLAYED: "card-played",
+  PLAYER_SEEING_THE_FUTURE: "player-seeing-the-future",
   COMBO_PLAYED: "COMBO_PLAYED",
   NOPE_PLAYED: "NOPE_PLAYED",
   NOPE_WINDOW_RESOLVED: "NOPE_WINDOW_RESOLVED",
