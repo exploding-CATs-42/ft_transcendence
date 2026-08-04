@@ -6,6 +6,17 @@ modules:
       preferred_ip_protocol: ip4
       headers:
         Host: localhost
+        
+  https_2xx_self_signed:
+    prober: http
+    timeout: 5s
+    http:
+      preferred_ip_protocol: ip4
+      follow_redirects: false
+      headers:
+        Host: localhost
+      tls_config:
+        insecure_skip_verify: true
 
   tcp_connect:
     prober: tcp
