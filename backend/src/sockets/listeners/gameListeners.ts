@@ -87,10 +87,8 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         await socket.join(room);
 
         try {
-          const { waitingState, player, countdownEndsAt } = await joinGame(
-            parsed,
-            socket.data.user.id,
-          );
+          const { waitingState, player, countdownEndsAt, isNewPlayer } =
+            await joinGame(parsed, socket.data.user.id);
           socketsMap.set(player.id, socket);
 
           const privatePayload: WaitingStatePayload = {
@@ -101,7 +99,13 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           const publicPayload: PlayerJoinedPayload = { player };
 
           socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
-          socket.to(room).emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+
+          if (isNewPlayer) {
+            socket
+              .to(room)
+              .emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+          }
+
           broadcastLobbyGameChanged(parsed.gameId);
         } catch (error) {
           await socket.leave(room);
