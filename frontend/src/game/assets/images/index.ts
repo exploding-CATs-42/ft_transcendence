@@ -15,3 +15,4 @@ export { default as fireSpriteSheet } from "./fire.png";
 export { default as nuclearSpritesheet } from "./nuclear-loop.png";
 export const coolCat = "favicon.png";
 export { default as scaleMeterBar } from "./scale_meter_bar.png";
+export { default as playerSpotlight } from "./player-spotlight.png";
