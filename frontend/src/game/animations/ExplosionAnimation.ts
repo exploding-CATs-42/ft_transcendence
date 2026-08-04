@@ -9,7 +9,7 @@ const FRAME_SIZE: Size = {
 export class ExplosionAnimation extends Phaser.GameObjects.Sprite {
   constructor(scene: Phaser.Scene, position: Point) {
     const { x, y } = position;
-    super(scene, x, y, Textures.boomExplosion);
+    super(scene, x, y, Textures.explosion);
     scene.add.existing(this);
 
     const { width, height } = FRAME_SIZE;
@@ -34,8 +34,8 @@ export class ExplosionAnimation extends Phaser.GameObjects.Sprite {
 
     scene.anims.create({
       key: "explosion",
-      frames: scene.anims.generateFrameNumbers(Textures.boomExplosion),
-      frameRate: 10,
+      frames: scene.anims.generateFrameNumbers(Textures.explosion),
+      frameRate: 24,
       repeat: 0,
     });
   }

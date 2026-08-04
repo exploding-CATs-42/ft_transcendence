@@ -23,7 +23,7 @@ const HIT_BOX_SIZE: Size = {
 
 const EXPLOSION_ANIMATION_POSITION: Point = {
   x: 100,
-  y: 85,
+  y: 0,
 };
 
 export class PlayerSeat {
@@ -155,12 +155,14 @@ export class PlayerSeat {
     this.hand?.container.setVisible(false);
     explosionAnimation.playAnimation();
 
-    scene.time.delayedCall(1000, () => {
+    scene.time.delayedCall(500, () => {
       this.player?.setDead();
     });
 
-    scene.time.delayedCall(2000, () => {
-      this.addPlayerExplodedLabel(scene);
+    explosionAnimation.on(Phaser.Animations.Events.ANIMATION_COMPLETE, () => {
+      scene.time.delayedCall(300, () => {
+        this.addPlayerExplodedLabel(scene);
+      });
     });
   }
 }
