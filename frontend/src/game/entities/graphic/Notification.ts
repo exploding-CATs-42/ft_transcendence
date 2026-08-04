@@ -2,7 +2,7 @@ import type { Point } from "game/@types";
 
 const BACKGROUND_CONFIG = {
   width: 440,
-  height: 140,
+  height: 80,
   color: 0x000000,
   borderRadius: 20,
 };
