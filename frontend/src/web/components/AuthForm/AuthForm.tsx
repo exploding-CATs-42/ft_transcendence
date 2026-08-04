@@ -14,6 +14,7 @@ interface Props {
   redirectLink: string;
   onSubmit: SubmitEventHandler;
   disabled?: boolean;
+  legalNote?: ReactNode;
 }
 
 const AuthForm = ({
@@ -24,6 +25,7 @@ const AuthForm = ({
   redirectLink,
   onSubmit,
   disabled,
+  legalNote,
 }: Props) => {
   return (
     <>
@@ -36,6 +38,7 @@ const AuthForm = ({
         <Button className={s.signIn} type="submit" disabled={disabled}>
           {title}
         </Button>
+        {legalNote && <p className={s.legalNote}>{legalNote}</p>}
       </form>
       <span className={s.signUp}>
         {redirectMessage}{" "}

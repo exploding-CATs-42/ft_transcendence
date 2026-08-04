@@ -2,6 +2,7 @@ declare const styles: {
   readonly "form": string;
   readonly "formTitleContainer": string;
   readonly "inputsContainer": string;
+  readonly "legalNote": string;
   readonly "signIn": string;
   readonly "signUp": string;
   readonly "signUpLink": string;

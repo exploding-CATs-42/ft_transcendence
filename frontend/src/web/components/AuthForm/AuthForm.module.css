@@ -43,6 +43,27 @@
   box-shadow: 0 4px 4px 0 var(--shadow);
 }
 
+.legalNote {
+  margin-top: 18px;
+  max-width: 280px;
+
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: center;
+  font-family: "Shantell Sans", sans-serif;
+  color: rgba(var(--off-white-rgb), 0.5);
+}
+
+.legalNote a {
+  text-decoration: underline;
+  color: var(--off-white);
+}
+
+.legalNote a:hover,
+.legalNote a:focus-visible {
+  color: var(--throw-throw-burrito);
+}
+
 .signUp {
   font-size: 16px;
   color: rgba(var(--off-white-rgb), 0.5);
