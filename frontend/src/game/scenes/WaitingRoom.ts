@@ -16,9 +16,9 @@ import {
   cancelStart,
   confirmStart,
   leaveWaitingGame,
-  subscribeWaitingRoom,
   type WaitingRoomHandlers,
 } from "game/sockets";
+import { setWaitingStateListener } from "game/store";
 
 const NAME_LABEL_CONFIG: LabelConfig = {
   fontColor: "black",
@@ -54,7 +54,7 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
   #readyButton!: Button;
   #isReady = false;
   #countdownTimer: Phaser.Time.TimerEvent | null = null;
-  #unsubscribe: (() => void) | null = null;
+  #clearWaitingStateListener: (() => void) | null = null;
 
   constructor() {
     super(Scenes.WaitingRoom);
@@ -74,12 +74,12 @@ export class WaitingRoom extends Scene implements WaitingRoomHandlers {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
-    this.#unsubscribe = subscribeWaitingRoom(this);
+    this.#clearWaitingStateListener = setWaitingStateListener(() => {});
   }
 
   private cleanup = () => {
-    this.#unsubscribe?.();
-    this.#unsubscribe = null;
+    this.#clearWaitingStateListener?.();
+    this.#clearWaitingStateListener = null;
     this.#countdownTimer?.remove();
   };
 
