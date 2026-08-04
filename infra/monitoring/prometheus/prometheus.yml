@@ -25,10 +25,10 @@ scrape_configs:
     metrics_path: /probe
     static_configs:
       - targets:
-          - "http://nginx/health"
+          - "https://nginx/health"
         labels:
           service: "nginx"
-          module: "http_2xx"
+          module: "https_2xx_self_signed"
 
       - targets:
           - "http://frontend:5173/"
