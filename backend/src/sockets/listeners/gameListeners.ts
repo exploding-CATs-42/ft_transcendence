@@ -349,25 +349,27 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         if (comboSize === 3) {
           socket.emit(ServerPublicEvents.COMBO_RESOLVED, comboResolvedPayload);
+
           targetSocket?.emit(
             ServerPublicEvents.COMBO_RESOLVED,
             comboResolvedPayload,
           );
 
-          if (card) {
-            const excludedSocketIds = [socket.id, targetSocket?.id].filter(
-              (socketId): socketId is string => socketId !== undefined,
-            );
-            const observerPayload: ComboResolvedPayload = {
-              playerId,
-              targetPlayerId,
-              comboSize,
-              cardStolen: true,
-            };
-            io.to(parsed.gameId)
-              .except(excludedSocketIds)
-              .emit(ServerPublicEvents.COMBO_RESOLVED, observerPayload);
-          }
+          const excludedSocketIds = [socket.id, targetSocket?.id].filter(
+            (socketId): socketId is string => socketId !== undefined,
+          );
+
+          const observerPayload: ComboResolvedPayload = {
+            playerId,
+            targetPlayerId,
+            comboSize,
+            cardStolen: card !== null,
+          };
+
+          io.to(parsed.gameId)
+            .except(excludedSocketIds)
+            .emit(ServerPublicEvents.COMBO_RESOLVED, observerPayload);
+
           return;
         }
 

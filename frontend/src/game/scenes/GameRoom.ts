@@ -1479,9 +1479,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (payload.comboSize === 3) {
       if (!isComboPlayer && !isComboTarget) {
-        this.#notification.showTransientMessage(
-          `${playerName} stole a card from ${targetName}`,
-        );
+        const message = payload.cardStolen
+          ? `${playerName} stole a card from ${targetName}`
+          : `${playerName} did not steal a card from ${targetName}`;
+
+        this.#notification.showTransientMessage(message);
         return;
       }
 
