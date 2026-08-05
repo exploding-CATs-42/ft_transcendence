@@ -374,7 +374,6 @@ export const gameMachine = setup({
                 type: GameGuards.IS_WINDOW_CARD_OF_TYPE,
                 params: { cardType: CardType.SEE_THE_FUTURE },
               },
-              actions: [emit(showedTopThreeCards)],
               target: GameStates.PLAYER_LOOKS_AT_THE_FUTURE,
             },
             {
@@ -518,6 +517,7 @@ export const gameMachine = setup({
           },
         },
         [GameStates.PLAYER_LOOKS_AT_THE_FUTURE]: {
+          entry: emit(showedTopThreeCards),
           on: {
             [GameEvents.SEEN_THE_FUTURE]: {
               actions: emit(playerSawTheFuture),
