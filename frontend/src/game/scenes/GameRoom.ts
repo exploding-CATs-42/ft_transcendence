@@ -962,7 +962,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       NotificationMode.TURN_CHANGED,
       playerName,
     );
-    this.time.delayedCall(2000, () => this.#notification.setVisible(false));
   };
 
   private drawCard = () => {
