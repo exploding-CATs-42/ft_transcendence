@@ -111,9 +111,13 @@ export class Notification extends Phaser.GameObjects.Container {
     return label;
   }
 
-  showMessage(message: string) {
+  private clearTimer() {
     this.#hideTimer?.remove(false);
     this.#hideTimer = null;
+  }
+
+  showMessage(message: string) {
+    this.clearTimer();
     this.setVisible(true);
     this.#label.setText(message);
     this.#background.clear();
@@ -131,6 +135,11 @@ export class Notification extends Phaser.GameObjects.Container {
       this.setVisible(false);
       this.#hideTimer = null;
     });
+  }
+
+  hide() {
+    this.clearTimer();
+    this.setVisible(false);
   }
 
   showMessageFor(mode: NotificationMode, playerName: string = "Player") {
@@ -153,6 +162,11 @@ export class Notification extends Phaser.GameObjects.Container {
       text = `${playerName} is placing kitten back into the deck`;
     } else if (mode === NotificationMode.TURN_CHANGED) {
       text = `${playerName}\`s turn`;
+    }
+
+    if (mode === NotificationMode.TURN_CHANGED) {
+      this.showTransientMessage(text, 2000);
+      return;
     }
     this.showMessage(text);
   }
