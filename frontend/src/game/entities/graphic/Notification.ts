@@ -47,6 +47,7 @@ export type NotificationMode =
 export class Notification extends Phaser.GameObjects.Container {
   #label: Phaser.GameObjects.Text;
   #background: Phaser.GameObjects.Graphics;
+  #hideTimer: Phaser.Time.TimerEvent | null = null;
 
   constructor(scene: Phaser.Scene, position: Point) {
     super(scene);
@@ -110,9 +111,29 @@ export class Notification extends Phaser.GameObjects.Container {
     return label;
   }
 
-  showMessageFor(mode: NotificationMode, playerName: string = "Player") {
+  showMessage(message: string) {
+    this.#hideTimer?.remove(false);
+    this.#hideTimer = null;
     this.setVisible(true);
+    this.#label.setText(message);
+    this.#background.clear();
+    this.drawBackground(
+      this.#background,
+      this.#label.width,
+      this.#label.height,
+    );
+  }
 
+  showTransientMessage(message: string, duration = 3000) {
+    this.showMessage(message);
+
+    this.#hideTimer = this.scene.time.delayedCall(duration, () => {
+      this.setVisible(false);
+      this.#hideTimer = null;
+    });
+  }
+
+  showMessageFor(mode: NotificationMode, playerName: string = "Player") {
     let text = "";
     if (mode === NotificationMode.SEE_THE_FUTURE) {
       text = `${playerName} is looking at the cards`;
@@ -133,12 +154,6 @@ export class Notification extends Phaser.GameObjects.Container {
     } else if (mode === NotificationMode.TURN_CHANGED) {
       text = `${playerName}\`s turn`;
     }
-    this.#label.setText(text);
-    this.#background.clear();
-    this.drawBackground(
-      this.#background,
-      this.#label.width,
-      this.#label.height,
-    );
+    this.showMessage(text);
   }
 }

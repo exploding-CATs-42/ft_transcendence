@@ -1,6 +1,5 @@
 // Libraries
 import { Scene } from "phaser";
-import { toast } from "react-toastify";
 // Project level
 import {
   CardType,
@@ -1443,11 +1442,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#myHand.clearKindComboSelection();
     this.#isComboPlayPending = false;
     this.updateDrawPileInteractivity();
-    toast.error(payload.message);
+    this.#notification.showTransientMessage(payload.message);
   };
 
   onComboResolutionError = (payload: SocketErrorPayload): void => {
-    toast.error(payload.message);
+    this.#notification.showTransientMessage(payload.message);
     if (!this.#pendingComboSize) return;
 
     this.#isComboResolutionPending = false;
@@ -1480,7 +1479,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (payload.comboSize === 3) {
       if (!isComboPlayer && !isComboTarget) {
-        toast.info(`${playerName} stole a card from ${targetName}`);
+        this.#notification.showTransientMessage(
+          `${playerName} stole a card from ${targetName}`,
+        );
         return;
       }
 
@@ -1493,7 +1494,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         : payload.cardStolen
           ? `${playerName} stole your ${requestedCard}`
           : `${playerName} requested ${requestedCard}, but you did not have it`;
-      toast.info(message);
+      this.#notification.showTransientMessage(message);
       return;
     }
 
@@ -1502,7 +1503,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       : isComboTarget
         ? `${playerName} stole one of your cards`
         : `${playerName} stole a card from ${targetName}`;
-    toast.info(message);
+    this.#notification.showTransientMessage(message);
   };
 
   onSeeTheFuturePeek = (payload: SeeTheFuturePeekPayload): void => {
