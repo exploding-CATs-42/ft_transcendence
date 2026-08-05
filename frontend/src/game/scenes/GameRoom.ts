@@ -216,7 +216,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #favorModeActive: boolean = false;
   #isAlive = true;
   #notification!: Notification;
-  #insertingKittenNotificationTimeout: number | null = null;
+  #insertingKittenNotificationTimer: Phaser.Time.TimerEvent | null = null;
   #drawPileSize = 0;
   #explodingKittenRiskBar: ExplodingKittenRiskBar | null = null;
   #pendingComboSize: ComboSize | null = null;
@@ -1231,14 +1231,22 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       };
     } else {
       if (!this.isMyTurn()) {
-        this.#notification.setVisible(false);
-        this.#insertingKittenNotificationTimeout = setTimeout(() => {
-          const playerName = this.getPlayerNameById(this.#currentTurnPlayerId!);
-          this.#notification.showMessageFor(
-            NotificationMode.INSERTING_KITTEN,
-            playerName,
-          );
-        }, DEFUSE_VIEW_DURATION_MS);
+        this.#notification.hide();
+        this.#insertingKittenNotificationTimer = this.time.delayedCall(
+          DEFUSE_VIEW_DURATION_MS,
+          () => {
+            this.#insertingKittenNotificationTimer = null;
+
+            const playerName = this.getPlayerNameById(
+              this.#currentTurnPlayerId!,
+            );
+
+            this.#notification.showMessageFor(
+              NotificationMode.INSERTING_KITTEN,
+              playerName,
+            );
+          },
+        );
       }
 
       const playerName = this.#players.get(payload.playerId)?.player?.name;
@@ -1254,11 +1262,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onKittenInserted = (payload: KittenInsertedPayload): void => {
-    if (this.#insertingKittenNotificationTimeout) {
-      clearTimeout(this.#insertingKittenNotificationTimeout);
-      this.#insertingKittenNotificationTimeout = null;
-    }
-    this.#notification.setVisible(false);
+    this.#insertingKittenNotificationTimer?.remove(false);
+    this.#insertingKittenNotificationTimer = null;
+    this.#notification.hide();
 
     const { playerId } = payload;
 
