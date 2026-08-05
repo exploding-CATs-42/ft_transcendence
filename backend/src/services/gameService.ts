@@ -18,6 +18,7 @@ import {
   ReconnectGameParams,
   SeenTheFuturePayload,
   ResolveComboParams,
+  SelectComboTargetParams,
 } from "schemas";
 import {
   type Card,
@@ -798,4 +799,39 @@ export async function confirmPlayerSeenTheCards(
 ) {
   const { game } = await requirePlayerInGame(userId, input.gameId);
   game.instance.send({ type: GameEvents.SEEN_THE_FUTURE });
+}
+
+export async function selectComboTarget(
+  input: SelectComboTargetParams,
+  userId: UserId,
+) {
+  const { game, player } = await requirePlayerInGame(userId, input.gameId);
+  const context = game.instance.getSnapshot().context;
+  const pendingCombo = context.pendingCombo;
+
+  if (
+    !pendingCombo ||
+    pendingCombo.playerId !== player.id ||
+    context.currentTurnPlayerId !== player.id
+  ) {
+    throw new SocketError("No combo is waiting for your selection");
+  }
+
+  const target = context.players.find(
+    (candidate) => candidate.id === input.targetPlayerId,
+  );
+
+  if (
+    !target ||
+    target.id === player.id ||
+    !target.isAlive ||
+    target.hand.length === 0
+  ) {
+    throw new SocketError("Choose a living opponent who has cards");
+  }
+
+  return {
+    playerId: player.id,
+    targetPlayerId: target.id,
+  };
 }
