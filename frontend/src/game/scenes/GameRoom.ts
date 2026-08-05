@@ -589,7 +589,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private addNotificationObject() {
     this.#notification = new Notification(this, NOTIFICATION_POSITION);
-    this.#notification.setVisible(false);
+    this.#notification.hide();
   }
 
   // -------------------- UTILS --------------------
@@ -884,7 +884,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         },
       });
     } else {
-      this.#notification.setVisible(false);
+      this.#notification.hide();
       this.#favorModeActive = false;
       this.updateDrawPileInteractivity();
 
@@ -1175,7 +1175,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onNopeWindowResolved = (): void => {
-    this.#notification.setVisible(false);
+    this.#notification.hide();
     this.#nopeButton.hide();
     this.hideTargetIcons();
 
@@ -1302,7 +1302,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onPlayerEliminated = (payload: PlayerIdPayload): void => {
-    this.#notification.setVisible(false);
+    this.#notification.hide();
 
     if (payload.playerId === this.#meId) {
       this.#isAlive = false;
@@ -1443,7 +1443,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onComboResolved = (payload: ComboResolvedPayload): void => {
-    this.#notification.setVisible(false);
+    this.#notification.hide();
     this.hideTargetIcons();
 
     if (payload.cardStolen) {
@@ -1512,7 +1512,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onPlayerSelected = (payload: PlayerSelectedPayload): void => {
-    this.#notification.setVisible(false);
+    this.#notification.hide();
 
     const { playerId } = payload;
 
@@ -1527,7 +1527,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardGiven = (payload: CardGivenPayload): void => {
-    this.#notification.setVisible(false);
+    this.#notification.hide();
 
     const players = [...this.#players.values()];
     for (let i = 0; i < players.length; ++i) {
@@ -1580,7 +1580,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onPlayerSawTheFuture = (): void => {
-    this.#notification.setVisible(false);
+    this.#notification.hide();
   };
 
   private cleanup = () => {
