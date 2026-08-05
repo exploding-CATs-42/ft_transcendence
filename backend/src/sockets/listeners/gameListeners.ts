@@ -17,6 +17,7 @@ import {
   giveCard,
   confirmPlayerSeenTheCards,
   resolveCombo,
+  selectComboTarget,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -50,6 +51,8 @@ import {
   seenTheFutureSchema,
   ResolveComboParams,
   resolveComboSchema,
+  SelectComboTargetParams,
+  selectComboTargetSchema,
 } from "schemas";
 import {
   CardGivenPayload,
@@ -278,6 +281,23 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
   );
 
   socket.on(
+    ClientEvents.SELECT_COMBO_TARGET,
+    withErrorHandler(
+      selectComboTargetSchema,
+      socket,
+      ServerErrorEvents.RESOLVE_COMBO_ERROR,
+      async (parsed: SelectComboTargetParams) => {
+        const payload = await selectComboTarget(parsed, socket.data.user.id);
+
+        io.to(parsed.gameId).emit(
+          ServerPublicEvents.COMBO_TARGET_SELECTED,
+          payload,
+        );
+      },
+    ),
+  );
+
+  socket.on(
     ClientEvents.RESOLVE_COMBO,
     withErrorHandler(
       resolveComboSchema,
@@ -324,6 +344,8 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           ...(requestedCardType ? { requestedCardType } : {}),
           cardStolen: card !== null,
         };
+
+        io.to(parsed.gameId).emit(ServerPublicEvents.COMBO_TARGET_CLEARED);
 
         if (comboSize === 3) {
           socket.emit(ServerPublicEvents.COMBO_RESOLVED, comboResolvedPayload);

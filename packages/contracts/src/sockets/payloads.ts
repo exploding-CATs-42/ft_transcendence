@@ -126,3 +126,8 @@ export interface CardGivenPayload {
   playerIdFrom: string;
   playerIdTo: string;
 }
+
+export interface ComboTargetSelectedPayload {
+  playerId: string;
+  targetPlayerId: string;
+}

@@ -22,6 +22,7 @@ import {
   type ComboPlayedPayload,
   type ComboResolvedPayload,
   type ComboSelectionRequestedPayload,
+  type ComboTargetSelectedPayload,
   type DefusePromptPayload,
   type GameStatePayload,
   type NopePlayedPayload,
@@ -88,6 +89,7 @@ import {
   declareTwoCardCombo,
   resolveTwoCardCombo,
   resolveThreeCardCombo,
+  selectComboTarget,
   syncGameState,
 } from "../sockets";
 import { ShuffleAnimation } from "../animations";
@@ -712,6 +714,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       return;
     }
 
+    selectComboTarget(playerId);
+
     if (this.#pendingComboSize === 2) {
       this.#isComboResolutionPending = true;
       this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
@@ -739,10 +743,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#players.forEach((seat) => {
       seat.onClick = null;
       seat.setCursorPointer(false);
-      seat.setTargetIconVisible(false);
     });
 
+    this.hideTargetIcons();
     this.resetComboState();
+  }
+
+  private hideTargetIcons() {
+    this.#players.forEach((seat) => seat.setTargetIconVisible(false));
   }
 
   private resetComboState() {
@@ -1173,6 +1181,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onNopeWindowResolved = (): void => {
     this.#notification.setVisible(false);
     this.#nopeButton.hide();
+    this.hideTargetIcons();
 
     if (
       this.#isComboPlayPending ||
@@ -1368,6 +1377,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.applyComboSelection(payload);
   };
 
+  onComboTargetSelected = (payload: ComboTargetSelectedPayload): void => {
+    this.#players.forEach((seat, playerId) => {
+      seat.setTargetIconVisible(playerId === payload.targetPlayerId);
+    });
+  };
+
+  onComboTargetCleared = (): void => {
+    this.hideTargetIcons();
+  };
+
   private applyComboSelection(
     payload: ComboSelectionRequestedPayload,
     recoverPendingRequest = false,
@@ -1439,6 +1458,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onComboResolved = (payload: ComboResolvedPayload): void => {
     this.#notification.setVisible(false);
+    this.hideTargetIcons();
 
     if (payload.cardStolen) {
       this.#opponents.get(payload.targetPlayerId)?.removeCard();

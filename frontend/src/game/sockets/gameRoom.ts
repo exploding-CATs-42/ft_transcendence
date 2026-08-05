@@ -9,6 +9,7 @@ import {
   type ComboPlayedPayload,
   type ComboResolvedPayload,
   type ComboSelectionRequestedPayload,
+  type ComboTargetSelectedPayload,
   type DefusePromptPayload,
   type GameStartedPayload,
   type GameStatePayload,
@@ -47,6 +48,8 @@ export interface GameRoomHandlers {
   onComboPlayed(payload: ComboPlayedPayload): void;
   onComboPlayError(payload: SocketErrorPayload): void;
   onComboSelectionRequested(payload: ComboSelectionRequestedPayload): void;
+  onComboTargetSelected(payload: ComboTargetSelectedPayload): void;
+  onComboTargetCleared(): void;
   onComboResolved(payload: ComboResolvedPayload): void;
   onComboResolutionError(payload: SocketErrorPayload): void;
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
@@ -143,6 +146,8 @@ export function attachGameRoomSockets(
       ServerPublicEvents.COMBO_SELECTION_REQUESTED,
       handlers.onComboSelectionRequested,
     ],
+    [ServerPublicEvents.COMBO_TARGET_SELECTED, handlers.onComboTargetSelected],
+    [ServerPublicEvents.COMBO_TARGET_CLEARED, handlers.onComboTargetCleared],
     [ServerPublicEvents.COMBO_RESOLVED, handlers.onComboResolved],
     [ServerErrorEvents.RESOLVE_COMBO_ERROR, handlers.onComboResolutionError],
     [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
@@ -179,6 +184,8 @@ export const playCard = (cardId: number) =>
   emit(ClientEvents.PLAY_CARD, { cardId });
 export const playCombo = (cardIds: number[]) =>
   emit(ClientEvents.PLAY_COMBO, { cardIds });
+export const selectComboTarget = (targetPlayerId: string) =>
+  emit(ClientEvents.SELECT_COMBO_TARGET, { targetPlayerId });
 export const declareTwoCardCombo = (targetPlayerId: string) =>
   emit(ClientEvents.RESOLVE_COMBO, { targetPlayerId });
 export const resolveTwoCardCombo = (

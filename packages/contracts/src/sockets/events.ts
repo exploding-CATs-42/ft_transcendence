@@ -14,6 +14,7 @@ export const ClientEvents = {
   GIVE_CARD: "give-card",
   SEEN_THE_FUTURE: "seen-the-future",
   RESOLVE_COMBO: "resolve-combo",
+  SELECT_COMBO_TARGET: "select-combo-target",
 } as const;
 
 export const ServerPublicEvents = {
@@ -49,6 +50,8 @@ export const ServerPublicEvents = {
   PLAYER_SAW_THE_FUTURE: "PLAYER_SAW_THE_FUTURE",
   COMBO_SELECTION_REQUESTED: "COMBO_SELECTION_REQUESTED",
   COMBO_RESOLVED: "COMBO_RESOLVED",
+  COMBO_TARGET_SELECTED: "COMBO_TARGET_SELECTED",
+  COMBO_TARGET_CLEARED: "COMBO_TARGET_CLEARED",
 } as const;
 
 export const ServerPrivateEvents = {

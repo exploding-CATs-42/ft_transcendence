@@ -16,3 +16,4 @@ export * from "./selectPlayerSchema";
 export * from "./giveCardSchema";
 export * from "./seenTheFutureSchema";
 export * from "./resolveComboSchema";
+export * from "./selectComboTargetSchema";
