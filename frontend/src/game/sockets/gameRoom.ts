@@ -168,7 +168,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.PLAYER_LEFT, handlers.onPlayerLeft],
     [ServerPublicEvents.PLAYER_SAW_THE_FUTURE, handlers.onPlayerSawTheFuture],
     [
-      ServerPublicEvents.PLAYER_SEEING_THE_FUTURE,
+      ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE,
       handlers.onPlayerSeeingTheFuture,
     ],
   ] as const;
