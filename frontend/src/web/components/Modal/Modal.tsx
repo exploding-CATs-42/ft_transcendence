@@ -32,8 +32,8 @@ const Modal = ({
   closeButtonClassName,
   closeIconClassName,
   closeIconName = "cross",
-  closeIconWidth = 12,
-  closeIconHeight = 12,
+  closeIconWidth = 18,
+  closeIconHeight = 18,
 }: Props) => {
   useEffect(() => {
     if (previosModal) return;
