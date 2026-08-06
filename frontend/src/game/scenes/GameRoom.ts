@@ -146,6 +146,8 @@ const CARD_TO_DRAW_PILE_EASE = "Cubic.easeInOut";
 const CARD_TRANSFER_DURATION_MS = 550;
 const CARD_TRANSFER_EASE = "Cubic.easeInOut";
 
+const COMBO_TO_DISCARD_DURATION_MS = 400;
+
 // Odd number of half turns, so the card lands face down on the pile
 const CARD_FLIP_HALF_TURNS = 1;
 const CARD_FLIP_HALF_TURN_DURATION_MS =
@@ -240,6 +242,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #isComboPlayPending = false;
   #isComboResolutionPending = false;
   #isStolenCardRemoval = false;
+  #nextDiscardStartsAt = 0;
 
   constructor() {
     super(Scenes.GameRoom);
@@ -459,15 +462,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         this.giveCardToOpponent(card.image);
       } else {
         // move it to the discard pile and shrink it down to pile size
-        this.tweens.add({
-          targets: card.image,
-          x: DISCARD_PILE_POSITION.x,
-          y: DISCARD_PILE_POSITION.y,
-          displayWidth: CARD_WIDTH,
-          displayHeight: CARD_HEIGHT,
-          duration: CARD_TO_DISCARD_DURATION_MS,
-          ease: CARD_TO_DISCARD_EASE,
-          onComplete: () => this.setDiscardPile(card.image),
+        this.scheduleDiscard(() => {
+          this.tweens.add({
+            targets: card.image,
+            x: DISCARD_PILE_POSITION.x,
+            y: DISCARD_PILE_POSITION.y,
+            displayWidth: CARD_WIDTH,
+            displayHeight: CARD_HEIGHT,
+            duration: CARD_TO_DISCARD_DURATION_MS,
+            ease: CARD_TO_DISCARD_EASE,
+            onComplete: () => this.setDiscardPile(card.image),
+          });
         });
       }
     };
@@ -1281,6 +1286,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   };
 
+  private scheduleDiscard = (startDiscard: () => void) => {
+    const now = this.time.now;
+    const startAt = Math.max(now, this.#nextDiscardStartsAt);
+
+    this.#nextDiscardStartsAt = startAt + COMBO_TO_DISCARD_DURATION_MS;
+
+    if (startAt === now) {
+      startDiscard();
+      return;
+    }
+
+    this.time.delayedCall(startAt - now, startDiscard);
+  };
+
   onCardPlayed = (payload: CardPlayedPayload): void => {
     this.discardOpponentCard(payload.playerId, payload.cardType);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
@@ -1480,7 +1499,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onComboPlayed = (payload: ComboPlayedPayload): void => {
     payload.cardTypes.forEach((cardType) => {
-      this.discardOpponentCard(payload.playerId, cardType);
+      this.scheduleDiscard(() => {
+        this.discardOpponentCard(payload.playerId, cardType);
+      });
     });
 
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
