@@ -14,6 +14,7 @@ import {
   KittenInsertedPayload,
   PlayerEliminatedPayload,
   GameOverPayload,
+  ExplodingKittenDrawnPayload,
 } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
@@ -77,8 +78,10 @@ export function attachGameBroadcaster(game: Game) {
     socket.to(gameId).emit(ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE);
   });
 
-  broadcaster.on(GameOutEvents.EXPLODING_KITTEN_DRAWN, () => {
-    io.to(gameId).emit(ServerPublicEvents.EXPLODING_KITTEN_DRAWN);
+  broadcaster.on(GameOutEvents.EXPLODING_KITTEN_DRAWN, (event) => {
+    const payload: ExplodingKittenDrawnPayload = event.payload;
+
+    io.to(gameId).emit(ServerPublicEvents.EXPLODING_KITTEN_DRAWN, payload);
   });
 
   broadcaster.on(GameOutEvents.DEFUSE_PROMPT, (event) => {
