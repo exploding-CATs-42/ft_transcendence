@@ -105,7 +105,7 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
   }
 
   private calculateProbability(kittensInDeck: number, drawPileSize: number) {
-    if (drawPileSize === 0) return 0;
+    if (drawPileSize <= 0) return 0;
 
     const probability = (kittensInDeck / drawPileSize) * 100;
 
