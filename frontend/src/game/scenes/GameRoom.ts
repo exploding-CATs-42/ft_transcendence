@@ -1495,9 +1495,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#notification.showTransientMessage(message);
   };
 
-  onPlayerSeeingTheFuture = (): void => {
-    if (!this.isMyTurn())
-      this.#notification.showMessageFor(NotificationMode.SEE_THE_FUTURE);
+  onPlayerLooksAtTheFuture = (): void => {
+    this.#notification.showMessageFor(NotificationMode.SEE_THE_FUTURE);
   };
 
   onSeeTheFuturePeek = (payload: SeeTheFuturePeekPayload): void => {
