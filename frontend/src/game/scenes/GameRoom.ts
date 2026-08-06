@@ -49,6 +49,7 @@ import {
   addBackgroundImage,
   addCardVisual,
   addFullscreenToggle,
+  animateCardTo,
   getCardFrame,
 } from "../utils";
 import {
@@ -1185,19 +1186,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       return;
     }
 
-    const { position, size } = receiverHand.getTopCardBounds();
-
-    cardImage.setDepth(FLYING_CARD_DEPTH);
-
-    this.tweens.add({
-      targets: cardImage,
-      x: position.x,
-      y: position.y,
-      displayWidth: size.width,
-      displayHeight: size.height,
+    animateCardTo(this, cardImage, receiverHand.getTopCardBounds(), {
       duration: CARD_TRANSFER_DURATION_MS,
       ease: CARD_TRANSFER_EASE,
-
       onComplete: () => {
         cardImage.destroy();
         receiverHand.addCard();
