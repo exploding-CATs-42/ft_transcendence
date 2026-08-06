@@ -6,10 +6,12 @@ import {
   GameStates,
   type Card,
   type CardPayload,
+  type ExplodingKittenDrawnPayload,
   type GameOverPayload,
   type KittenInsertedPayload,
   type ComboSize,
   type PlayerDefusedPayload,
+  type PlayerEliminatedPayload,
   type PlayerSelectedPayload,
   type WaitingForFavorCardSelectionPayload,
 } from "@exploding-cats/game-core";
@@ -218,6 +220,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #notification!: Notification;
   #insertingKittenNotificationTimer: Phaser.Time.TimerEvent | null = null;
   #drawPileSize = 0;
+  #kittensInDeck = 0;
   #explodingKittenRiskBar: ExplodingKittenRiskBar | null = null;
   #pendingComboSize: ComboSize | null = null;
   #pendingComboTargets = new Map<string, number>();
@@ -240,9 +243,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.resetComboState();
 
-    const { players, hand: cards, deckSize } = gameData;
+    const { players, hand: cards, deckSize, kittensInDeck } = gameData;
 
     this.#drawPileSize = deckSize;
+    this.#kittensInDeck = kittensInDeck;
 
     this.#currentTurnPlayerId = gameData.currentTurnPlayerId;
     this.#attackCount = gameData.attackCount;
@@ -355,10 +359,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#explodingKittenRiskBar = new ExplodingKittenRiskBar(
       this,
       CARDS_LEFT_LABEL,
-      this.#players.size - 1,
+      this.#kittensInDeck,
       this.#drawPileSize,
     );
     this.add.existing(this.#explodingKittenRiskBar);
+  }
+
+  private refreshExplodingKittenRisk() {
+    this.#explodingKittenRiskBar?.setRisk(
+      this.#kittensInDeck,
+      this.#drawPileSize,
+    );
   }
 
   private getComboTargets(players: readonly PublicPlayerView[]) {
@@ -804,6 +815,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (!this.sys.isActive() || !this.#meId) return;
 
+    this.#drawPileSize = payload.deckSize;
+    this.#kittensInDeck = payload.kittensInDeck;
+    this.refreshExplodingKittenRisk();
+
     this.setCurrentTurn(payload.currentTurnPlayerId ?? "");
     this.updateAttackIndicator();
 
@@ -934,7 +949,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.drawOpponentCard(payload.playerId);
 
     this.#drawPileSize--;
-    this.#explodingKittenRiskBar?.updateFrame(this.#drawPileSize);
+    this.refreshExplodingKittenRisk();
 
     if (
       payload.playerId === this.#currentTurnPlayerId &&
@@ -1269,7 +1284,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { playerId } = payload;
 
     this.#drawPileSize++;
-    this.#explodingKittenRiskBar?.updateFrame(this.#drawPileSize);
+    this.#kittensInDeck = payload.kittensInDeck;
+    this.refreshExplodingKittenRisk();
 
     // My own insertion is animated out of my hand by the card removal
     const hand = this.#opponents.get(playerId);
@@ -1306,8 +1322,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   };
 
-  onPlayerEliminated = (payload: PlayerIdPayload): void => {
-    this.#notification.hide();
+  onPlayerEliminated = (payload: PlayerEliminatedPayload): void => {
+    this.#notification.setVisible(false);
+
+    this.#kittensInDeck = payload.kittensInDeck;
+    this.refreshExplodingKittenRisk();
 
     if (payload.playerId === this.#meId) {
       this.#isAlive = false;
@@ -1320,7 +1339,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#players.get(payload.playerId)?.explodePlayer(this);
   };
 
-  onKittenDrawn = (): void => {
+  onKittenDrawn = (payload: ExplodingKittenDrawnPayload): void => {
+    this.#kittensInDeck = payload.kittensInDeck;
+    this.refreshExplodingKittenRisk();
+
     if (this.#meId !== this.#currentTurnPlayerId) {
       const playerName = this.getPlayerNameById(this.#currentTurnPlayerId!);
       this.#notification.showMessageFor(

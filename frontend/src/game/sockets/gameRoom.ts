@@ -22,9 +22,11 @@ import {
 } from "@exploding-cats/contracts";
 import type {
   CardPayload,
+  ExplodingKittenDrawnPayload,
   GameOverPayload,
   KittenInsertedPayload,
   PlayerDefusedPayload,
+  PlayerEliminatedPayload,
   PlayerSelectedPayload,
   WaitingForFavorCardSelectionPayload,
 } from "@exploding-cats/game-core";
@@ -40,7 +42,7 @@ export interface GameRoomHandlers {
   onCardPlayed(payload: CardPlayedPayload): void;
   onDefusePrompt(payload: DefusePromptPayload): void;
   onPlayerDefused(payload: PlayerDefusedPayload): void;
-  onPlayerEliminated(payload: PlayerIdPayload): void;
+  onPlayerEliminated(payload: PlayerEliminatedPayload): void;
   onPlayerDisconnected(payload: PlayerIdPayload): void;
   onPlayerReconnected(payload: PlayerIdPayload): void;
   onDeckShuffled(): void;
@@ -53,7 +55,7 @@ export interface GameRoomHandlers {
   onComboResolved(payload: ComboResolvedPayload): void;
   onComboResolutionError(payload: SocketErrorPayload): void;
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
-  onKittenDrawn(): void;
+  onKittenDrawn(payload: ExplodingKittenDrawnPayload): void;
   onKittenInserted(payload: KittenInsertedPayload): void;
   onGameOver(payload: GameOverPayload): void;
   onNopePlayed(payload: NopePlayedPayload): void;
