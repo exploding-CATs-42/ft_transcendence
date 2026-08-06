@@ -40,6 +40,7 @@ export interface GameStartedPayload {
   players: PublicPlayerView[];
   hand: Card[];
   deckSize: number;
+  kittensInDeck: number;
 }
 
 export interface CardPlayedPayload {
@@ -96,6 +97,7 @@ export interface GameStatePayload {
   hand: Card[];
   currentTurnPlayerId: string | null;
   deckSize: number;
+  kittensInDeck: number;
   lastPlayedCards: Card[] | null;
   attackCount: number;
   selectedPlayerId: string | null;

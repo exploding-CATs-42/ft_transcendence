@@ -35,10 +35,12 @@ export interface DefusePromptPayload {
 export interface KittenInsertedPayload {
   playerId: string;
   cardId: number;
+  kittensInDeck: number;
 }
 
 export interface PlayerEliminatedPayload {
   playerId: string;
+  kittensInDeck: number;
 }
 
 export interface WinnerView {
