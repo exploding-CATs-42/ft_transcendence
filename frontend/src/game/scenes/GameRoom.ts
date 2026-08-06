@@ -1583,8 +1583,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const isComboTarget = this.#meId === payload.targetPlayerId;
 
     if (payload.cardStolen && !isComboTarget && !isComboPlayer) {
-      this.#opponents.get(payload.targetPlayerId)?.removeCard();
-      this.#opponents.get(payload.playerId)?.addCard();
+      this.passCardBetweenOpponents(payload.targetPlayerId, payload.playerId);
     }
 
     const playerName =
