@@ -931,20 +931,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (!hand) return;
 
-    const { position, size } = hand.getTopCardBounds();
-
     const cardCover = this.textures.get(Textures.cardCover).get();
     const flyingCard = this.addCard(cardCover, DRAW_PILE_POSITION);
 
-    this.tweens.add({
-      targets: flyingCard,
-      x: position.x,
-      y: position.y,
-      displayWidth: size.width,
-      displayHeight: size.height,
+    animateCardTo(this, flyingCard, hand.getTopCardBounds(), {
       duration: CARD_FROM_DRAW_PILE_DURATION_MS,
       ease: CARD_FROM_DRAW_PILE_EASE,
-
       onComplete: () => {
         flyingCard.destroy();
         hand.addCard();
