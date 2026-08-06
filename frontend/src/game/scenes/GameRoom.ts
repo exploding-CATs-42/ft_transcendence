@@ -892,10 +892,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.#favorModeActive = false;
       this.updateDrawPileInteractivity();
 
-      // spawn the card into player's hand
-      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
-      const frame = getCardFrame(this, frameIndex);
-      this.#myHand.addCard(payload.card, frame, insertIndex);
+      this.takeCardFromOpponent(
+        this.#favorGiverId,
+        payload.card,
+        insertIndex,
+        targetX,
+      );
+
+      this.#favorGiverId = null;
     }
   };
 
@@ -1194,6 +1198,45 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       onComplete: () => {
         cardImage.destroy();
         receiverHand.addCard();
+      },
+    });
+  };
+
+  private takeCardFromOpponent = (
+    giverId: string | null,
+    card: Card,
+    insertIndex: number,
+    targetX: number,
+  ) => {
+    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
+    const frame = getCardFrame(this, frameIndex);
+
+    const giverHand = giverId ? this.#opponents.get(giverId) : null;
+
+    if (!giverHand) {
+      this.#myHand.addCard(card, frame, insertIndex);
+      return;
+    }
+
+    const { position, size } = giverHand.getTopCardBounds();
+    giverHand.removeCard();
+
+    const flyingCard = this.addCard(frame, position);
+    flyingCard.setDisplaySize(size.width, size.height);
+    flyingCard.setDepth(FLYING_CARD_DEPTH);
+
+    this.tweens.add({
+      targets: flyingCard,
+      x: targetX,
+      y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
+      displayWidth: CARD_WIDTH,
+      displayHeight: CARD_HEIGHT,
+      duration: 550,
+      ease: "Cubic.easeInOut",
+
+      onComplete: () => {
+        flyingCard.destroy();
+        this.#myHand.addCard(card, frame, insertIndex);
       },
     });
   };
@@ -1585,14 +1628,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const { playerIdFrom, playerIdTo } = payload;
 
-    if (this.#meId === playerIdFrom) return;
+    if (this.#meId === playerIdFrom || this.#meId === playerIdTo) return;
 
-    if (this.#meId === playerIdTo) {
-      this.#opponents.get(playerIdFrom)?.removeCard();
-    } else {
-      this.#opponents.get(playerIdFrom)?.removeCard();
-      this.#opponents.get(playerIdTo)?.addCard();
-    }
+    this.#opponents.get(playerIdFrom)?.removeCard();
+    this.#opponents.get(playerIdTo)?.addCard();
   };
 
   onWaitingForPlayerSelection = () => {
