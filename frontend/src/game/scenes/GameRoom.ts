@@ -476,15 +476,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       } else {
         // move it to the discard pile and shrink it down to pile size
         this.scheduleDiscard(() => {
-          this.tweens.add({
-            targets: card.image,
-            x: DISCARD_PILE_POSITION.x,
-            y: DISCARD_PILE_POSITION.y,
-            displayWidth: CARD_WIDTH,
-            displayHeight: CARD_HEIGHT,
+          animateCardTo(this, card.image, DISCARD_PILE_BOUNDS, {
             duration: CARD_TO_DISCARD_DURATION_MS,
             ease: CARD_TO_DISCARD_EASE,
-            onComplete: () => this.setDiscardPile(card.image),
+            onComplete: () => {
+              card.image.setDepth(0);
+              this.setDiscardPile(card.image);
+            },
           });
         });
       }
