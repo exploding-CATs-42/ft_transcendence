@@ -73,7 +73,14 @@ import {
   ChooseRandomCardView,
   ChooseCardByNameView,
 } from "../entities";
-import type { Point, LabelConfig, CardConfig, Player } from "../@types";
+import type {
+  Point,
+  LabelConfig,
+  CardConfig,
+  Player,
+  Size,
+  CardBounds,
+} from "../@types";
 import {
   attachGameRoomSockets,
   getCachedGameState,
@@ -120,6 +127,7 @@ const DISCARD_PILE_POSITION: Point = {
   x: 1050,
   y: PILES_Y,
 };
+const PILE_CARD_SIZE: Size = { width: CARD_WIDTH, height: CARD_HEIGHT };
 
 const CARDS_LEFT_LABEL: Point = {
   x: 485,
@@ -1217,14 +1225,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const flyingCard = this.addCard(frame, position);
     flyingCard.setDisplaySize(size.width, size.height);
-    flyingCard.setDepth(FLYING_CARD_DEPTH);
 
-    this.tweens.add({
-      targets: flyingCard,
-      x: targetX,
-      y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
-      displayWidth: CARD_WIDTH,
-      displayHeight: CARD_HEIGHT,
+    const toCardBounds: CardBounds = {
+      position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
+      size: PILE_CARD_SIZE,
+    };
+
+    animateCardTo(this, flyingCard, toCardBounds, {
       duration: CARD_TRANSFER_DURATION_MS,
       ease: CARD_TRANSFER_EASE,
 
