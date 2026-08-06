@@ -758,6 +758,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.setCurrentTurn(payload.currentTurnPlayerId ?? "");
     this.updateAttackIndicator();
+    this.fillOpponentHands(payload.players);
 
     this.updateDrawPileInteractivity();
   };
