@@ -450,11 +450,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private createMyHand() {
     const onCardDrop = (card: GraphicCard) => {
       if (this.#isStolenCardRemoval) {
-        card.image.destroy();
+        this.giveCardToOpponent(card.image);
         return;
       }
 
       if (this.#favorModeActive) {
+        this.hideFavorUI();
         this.giveCardToOpponent(card.image);
       } else {
         // move it to the discard pile and shrink it down to pile size
@@ -1188,7 +1189,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private giveCardToOpponent = (cardImage: Phaser.GameObjects.Image) => {
-    this.hideFavorUI();
     this.#notification.hide();
 
     const receiverHand = this.#opponents.get(this.#currentTurnPlayerId!);
@@ -1571,13 +1571,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#notification.hide();
     this.hideTargetIcons();
 
-    if (payload.cardStolen) {
+    const isComboPlayer = this.#meId === payload.playerId;
+    const isComboTarget = this.#meId === payload.targetPlayerId;
+
+    if (payload.cardStolen && !isComboTarget) {
       this.#opponents.get(payload.targetPlayerId)?.removeCard();
       this.#opponents.get(payload.playerId)?.addCard();
     }
 
-    const isComboPlayer = this.#meId === payload.playerId;
-    const isComboTarget = this.#meId === payload.targetPlayerId;
     const playerName =
       this.#players.get(payload.playerId)?.player?.name ?? "A player";
     const targetName =
