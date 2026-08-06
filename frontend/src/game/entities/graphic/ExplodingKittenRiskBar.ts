@@ -104,14 +104,10 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
     return container;
   }
 
-  private calculateProbability(
-    kittensInDeck: number,
-    drawPileSize: number,
-    multiplier: number = 1,
-  ) {
+  private calculateProbability(kittensInDeck: number, drawPileSize: number) {
     if (drawPileSize === 0) return 0;
 
-    const probability = (kittensInDeck / drawPileSize) * multiplier * 100;
+    const probability = (kittensInDeck / drawPileSize) * 100;
 
     return Math.min(probability, 100);
   }
@@ -145,11 +141,7 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
   updateFrame(kittensInDeck: number, drawPileSize: number) {
     if (drawPileSize <= 0) return;
 
-    const probability = this.calculateProbability(
-      kittensInDeck,
-      drawPileSize,
-      1,
-    );
+    const probability = this.calculateProbability(kittensInDeck, drawPileSize);
 
     const frame = this.getRiskFrame(probability);
     this.#meterSprite?.setFrame(frame);
