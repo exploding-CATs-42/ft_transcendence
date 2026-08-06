@@ -45,6 +45,7 @@ import {
 } from "../constants";
 import {
   EventBus,
+  FLYING_CARD_DEPTH,
   addBackgroundImage,
   addCardVisual,
   addFullscreenToggle,
@@ -132,7 +133,6 @@ const CARD_FROM_DRAW_PILE_EASE = "Sine.easeInOut";
 
 const CARD_TO_DRAW_PILE_DURATION_MS = 600;
 const CARD_TO_DRAW_PILE_EASE = "Cubic.easeInOut";
-const FLYING_CARD_DEPTH = 1000;
 
 const CARD_TRANSFER_DURATION_MS = 550;
 const CARD_TRANSFER_EASE = "Cubic.easeInOut";
