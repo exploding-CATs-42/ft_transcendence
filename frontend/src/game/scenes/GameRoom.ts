@@ -228,7 +228,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #nopeButton!: NopeButton;
   #favorCardDropZone!: Phaser.GameObjects.Graphics;
   #favorModeActive: boolean = false;
-  #favorGiverId: string | null = null;
+  #incomingCardFromPlayerId: string | null = null;
   #isAlive = true;
   #notification!: Notification;
   #insertingKittenNotificationTimer: Phaser.Time.TimerEvent | null = null;
@@ -905,13 +905,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.updateDrawPileInteractivity();
 
       this.takeCardFromOpponent(
-        this.#favorGiverId,
+        this.#incomingCardFromPlayerId,
         payload.card,
         insertIndex,
         targetX,
       );
 
-      this.#favorGiverId = null;
+      this.#incomingCardFromPlayerId = null;
     }
   };
 
@@ -969,7 +969,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onTurnChanged = (payload: TurnChangedPayload) => {
-    this.#favorGiverId = null;
+    this.#incomingCardFromPlayerId = null;
     this.#currentTurnPlayerId = payload.playerId;
     this.#attackCount = payload.attackCount;
 
@@ -1680,7 +1680,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onWaitingForFavorCardSelection = (
     payload: WaitingForFavorCardSelectionPayload,
   ) => {
-    this.#favorGiverId =
+    this.#incomingCardFromPlayerId =
       this.#meId === payload.playerId ? null : payload.playerId;
 
     if (this.#meId === payload.playerId) {
