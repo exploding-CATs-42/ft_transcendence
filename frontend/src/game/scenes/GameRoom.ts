@@ -780,23 +780,27 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
       // and move it below the screen
       // at the x position calculated earlier
-      this.tweens.add({
-        targets: faceDownCard,
-        x: targetX,
-        y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
-        duration: CARD_FROM_DRAW_PILE_DURATION_MS,
-        ease: CARD_FROM_DRAW_PILE_EASE,
-
-        onComplete: () => {
-          // then destroy it
-          faceDownCard.destroy();
-
-          // and spawn the real card into player's hand
-          const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
-          const frame = getCardFrame(this, frameIndex);
-          this.#myHand.addCard(payload.card, frame, insertIndex);
+      animateCardTo(
+        this,
+        faceDownCard,
+        {
+          position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
+          size: PILE_CARD_SIZE,
         },
-      });
+        {
+          duration: CARD_FROM_DRAW_PILE_DURATION_MS,
+          ease: CARD_FROM_DRAW_PILE_EASE,
+          depth: 0,
+
+          onComplete: () => {
+            faceDownCard.destroy();
+
+            const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
+            const frame = getCardFrame(this, frameIndex);
+            this.#myHand.addCard(payload.card, frame, insertIndex);
+          },
+        },
+      );
     } else {
       this.#modal.setVisible(false);
       this.#notification.hide();
