@@ -66,7 +66,7 @@ export interface GameRoomHandlers {
   ): void;
   onPlayerLeft(payload: PlayerIdPayload): void;
   onPlayerSawTheFuture(): void;
-  onPlayerSeeingTheFuture(): void;
+  onPlayerLooksAtTheFuture(): void;
 }
 
 export type CleanupFunction = () => void;
@@ -169,7 +169,7 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.PLAYER_SAW_THE_FUTURE, handlers.onPlayerSawTheFuture],
     [
       ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE,
-      handlers.onPlayerSeeingTheFuture,
+      handlers.onPlayerLooksAtTheFuture,
     ],
   ] as const;
 
