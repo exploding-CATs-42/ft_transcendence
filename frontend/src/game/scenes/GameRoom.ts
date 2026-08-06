@@ -1241,6 +1241,45 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   };
 
+  private passCardBetweenOpponents = (
+    fromPlayerId: string,
+    toPlayerId: string,
+  ) => {
+    const fromHand = this.#opponents.get(fromPlayerId);
+    const toHand = this.#opponents.get(toPlayerId);
+
+    if (!fromHand || !toHand) {
+      fromHand?.removeCard();
+      toHand?.addCard();
+      return;
+    }
+
+    const from = fromHand.getTopCardBounds();
+    fromHand.removeCard();
+
+    const to = toHand.getTopCardBounds();
+
+    const cardCover = this.textures.get(Textures.cardCover).get();
+    const flyingCard = this.addCard(cardCover, from.position);
+    flyingCard.setDisplaySize(from.size.width, from.size.height);
+    flyingCard.setDepth(FLYING_CARD_DEPTH);
+
+    this.tweens.add({
+      targets: flyingCard,
+      x: to.position.x,
+      y: to.position.y,
+      displayWidth: to.size.width,
+      displayHeight: to.size.height,
+      duration: 550,
+      ease: "Cubic.easeInOut",
+
+      onComplete: () => {
+        flyingCard.destroy();
+        toHand.addCard();
+      },
+    });
+  };
+
   onCardPlayed = (payload: CardPlayedPayload): void => {
     this.discardOpponentCard(payload.playerId, payload.cardType);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
@@ -1630,8 +1669,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (this.#meId === playerIdFrom || this.#meId === playerIdTo) return;
 
-    this.#opponents.get(playerIdFrom)?.removeCard();
-    this.#opponents.get(playerIdTo)?.addCard();
+    this.passCardBetweenOpponents(playerIdFrom, playerIdTo);
   };
 
   onWaitingForPlayerSelection = () => {
