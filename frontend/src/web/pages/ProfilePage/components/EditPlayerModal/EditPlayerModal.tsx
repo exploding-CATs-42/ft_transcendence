@@ -189,11 +189,21 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
     }
   }
 
+  const cleanForm = () => {
+    reset();
+    clearErrors();
+  };
+
+  const handleClose = () => {
+    cleanForm();
+    toggleModal();
+  };
+
   return (
     <Modal
       className={s.editPlayerModal}
       isOpen={isOpen}
-      toggleModal={toggleModal}
+      toggleModal={handleClose}
     >
       <form className={s.editPlayerForm} onSubmit={handleSubmit(onSubmit)}>
         <h2 className={s.modalTitle}>{formTitle}</h2>
