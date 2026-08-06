@@ -442,19 +442,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       }
 
       if (this.#favorModeActive) {
-        this.tweens.add({
-          targets: card.image,
-          x: FAVOR_CARD_DROP_ZONE.x,
-          y: FAVOR_CARD_DROP_ZONE.y,
-          displayWidth: CARD_WIDTH,
-          displayHeight: CARD_HEIGHT,
-          duration: 300,
-          ease: "Back.Out",
-          onComplete: () => {
-            card.image.destroy();
-            this.hideFavorUI();
-          },
-        });
+        this.giveCardToOpponent(card.image);
       } else {
         // move it to the discard pile and shrink it down to pile size
         this.tweens.add({
@@ -1177,6 +1165,37 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   }
 
+  private giveCardToOpponent = (cardImage: Phaser.GameObjects.Image) => {
+    this.hideFavorUI();
+    this.#notification.hide();
+
+    const receiverHand = this.#opponents.get(this.#currentTurnPlayerId!);
+
+    if (!receiverHand) {
+      cardImage.destroy();
+      return;
+    }
+
+    const { position, size } = receiverHand.getTopCardBounds();
+
+    cardImage.setDepth(FLYING_CARD_DEPTH);
+
+    this.tweens.add({
+      targets: cardImage,
+      x: position.x,
+      y: position.y,
+      displayWidth: size.width,
+      displayHeight: size.height,
+      duration: 550,
+      ease: "Cubic.easeInOut",
+
+      onComplete: () => {
+        cardImage.destroy();
+        receiverHand.addCard();
+      },
+    });
+  };
+
   onCardPlayed = (payload: CardPlayedPayload): void => {
     this.discardOpponentCard(payload.playerId, payload.cardType);
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
@@ -1564,9 +1583,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const { playerIdFrom, playerIdTo } = payload;
 
-    if (this.#meId === playerIdFrom) {
-      this.#opponents.get(playerIdTo)?.addCard();
-    } else if (this.#meId === playerIdTo) {
+    if (this.#meId === playerIdFrom) return;
+
+    if (this.#meId === playerIdTo) {
       this.#opponents.get(playerIdFrom)?.removeCard();
     } else {
       this.#opponents.get(playerIdFrom)?.removeCard();
