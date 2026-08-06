@@ -134,6 +134,9 @@ const CARD_TO_DRAW_PILE_DURATION_MS = 600;
 const CARD_TO_DRAW_PILE_EASE = "Cubic.easeInOut";
 const FLYING_CARD_DEPTH = 1000;
 
+const CARD_TRANSFER_DURATION_MS = 550;
+const CARD_TRANSFER_EASE = "Cubic.easeInOut";
+
 // Odd number of half turns, so the card lands face down on the pile
 const CARD_FLIP_HALF_TURNS = 1;
 const CARD_FLIP_HALF_TURN_DURATION_MS =
@@ -1192,8 +1195,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       y: position.y,
       displayWidth: size.width,
       displayHeight: size.height,
-      duration: 550,
-      ease: "Cubic.easeInOut",
+      duration: CARD_TRANSFER_DURATION_MS,
+      ease: CARD_TRANSFER_EASE,
 
       onComplete: () => {
         cardImage.destroy();
@@ -1231,8 +1234,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
       displayWidth: CARD_WIDTH,
       displayHeight: CARD_HEIGHT,
-      duration: 550,
-      ease: "Cubic.easeInOut",
+      duration: CARD_TRANSFER_DURATION_MS,
+      ease: CARD_TRANSFER_EASE,
 
       onComplete: () => {
         flyingCard.destroy();
@@ -1270,8 +1273,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       y: to.position.y,
       displayWidth: to.size.width,
       displayHeight: to.size.height,
-      duration: 550,
-      ease: "Cubic.easeInOut",
+      duration: CARD_TRANSFER_DURATION_MS,
+      ease: CARD_TRANSFER_EASE,
 
       onComplete: () => {
         flyingCard.destroy();
