@@ -1,4 +1,4 @@
-import type { CardConfig, Point, Size, SpacingConfig } from "game/@types";
+import type { CardBounds, CardConfig, Point, SpacingConfig } from "game/@types";
 import { Textures } from "game/constants";
 import { addCardVisual, getCardSpacing, getHandStartX } from "game/utils";
 
@@ -75,7 +75,7 @@ export class OpponentHand {
     }
   }
 
-  getTopCardBounds(): { position: Point; size: Size } {
+  getTopCardBounds(): CardBounds {
     const topCard = this.#cards[this.#cards.length - 1] ?? this.#cardsContainer;
     const { tx, ty } = topCard.getWorldTransformMatrix();
 
