@@ -19,8 +19,6 @@ const TITLE_TEXT_CONFIG = {
 };
 
 export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
-  #explodingKittensAmount: number = 0;
-
   #position: Point | null = null;
 
   #meterSprite: Phaser.GameObjects.Sprite | null = null;
@@ -31,12 +29,11 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
   constructor(
     scene: Phaser.Scene,
     position: Point,
-    explodingKittensAmount: number,
+    kittensInDeck: number,
     drawPileSize: number,
   ) {
     super(scene);
     this.#position = position;
-    this.#explodingKittensAmount = explodingKittensAmount;
 
     this.#meterSprite = this.createMeterSprite(scene);
     this.#probabilityContainer = this.createProbabilityIndicator(scene);
@@ -47,7 +44,7 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
       this.#probabilityContainer,
       this.#titleContainer,
     ]);
-    this.updateFrame(drawPileSize);
+    this.updateFrame(kittensInDeck, drawPileSize);
   }
 
   private createMeterSprite(scene: Phaser.Scene) {
@@ -107,12 +104,14 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
     return container;
   }
 
-  private calculateProbability(drawPileSize: number, multiplier: number = 1) {
+  private calculateProbability(
+    kittensInDeck: number,
+    drawPileSize: number,
+    multiplier: number = 1,
+  ) {
     if (drawPileSize === 0) return 0;
-    else if (drawPileSize === 1) return 100;
 
-    const probability =
-      (this.#explodingKittensAmount / drawPileSize) * multiplier * 100;
+    const probability = (kittensInDeck / drawPileSize) * multiplier * 100;
 
     return Math.min(probability, 100);
   }
@@ -143,10 +142,14 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
     return 6;
   }
 
-  updateFrame(drawPileSize: number) {
+  updateFrame(kittensInDeck: number, drawPileSize: number) {
     if (drawPileSize <= 0) return;
 
-    const probability = this.calculateProbability(drawPileSize, 1);
+    const probability = this.calculateProbability(
+      kittensInDeck,
+      drawPileSize,
+      1,
+    );
 
     const frame = this.getRiskFrame(probability);
     this.#meterSprite?.setFrame(frame);
