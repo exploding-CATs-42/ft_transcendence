@@ -28,6 +28,7 @@ import {
   GameInstance,
   GameStates,
   type Player,
+  countKittensInDeck,
 } from "@exploding-cats/game-core";
 import {
   GameStatePayload,
@@ -360,6 +361,7 @@ export async function reconnectGame(
     hand: player.hand,
     currentTurnPlayerId: context.currentTurnPlayerId,
     deckSize: context.deck.length,
+    kittensInDeck: countKittensInDeck(context.deck),
     lastPlayedCards: context.lastPlayedCards,
     attackCount: context.turnsCount,
     selectedPlayerId: context.selectedPlayerId,

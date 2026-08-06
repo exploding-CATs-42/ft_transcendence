@@ -120,6 +120,7 @@ export type GameOutEvent =
       type: typeof GameOutEvents.GAME_STARTED;
       players: Player[];
       deckSize: number;
+      kittensInDeck: number;
     }
   | { type: typeof GameOutEvents.COUNTDOWN_STARTED; endsAt: number }
   | { type: typeof GameOutEvents.COUNTDOWN_CANCELED }

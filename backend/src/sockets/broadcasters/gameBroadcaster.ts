@@ -34,6 +34,7 @@ export function attachGameBroadcaster(game: Game) {
         players,
         player.id,
         event.deckSize,
+        event.kittensInDeck,
       );
 
       socket?.emit(ServerPrivateEvents.GAME_STARTED, payload);
