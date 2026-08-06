@@ -113,8 +113,7 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
   }
 
   private getProbabilityString(probability: number) {
-    const text = `${probability.toFixed(0)}%`;
-    return text;
+    return `${probability}%`;
   }
 
   private addLabel(scene: Phaser.Scene) {
