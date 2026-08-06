@@ -123,11 +123,8 @@ export class ExplodingKittenRiskBar extends Phaser.GameObjects.Container {
   }
 
   private addLabel(scene: Phaser.Scene) {
-    const probability = this.calculateProbability(5);
-    const text = this.getProbabilityString(probability);
-
     const label = scene.add
-      .text(0, 0, text, {
+      .text(0, 0, "", {
         fontFamily: "Chewy",
         fontSize: 20,
         color: "black",
