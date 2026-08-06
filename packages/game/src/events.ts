@@ -12,6 +12,7 @@ import type {
   WaitingForFavorCardSelectionPayload,
   PlayerSawTheFuturePayload,
   ComboSelectionRequestedPayload,
+  ExplodingKittenDrawnPayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -136,7 +137,10 @@ export type GameOutEvent =
       type: typeof GameOutEvents.SHOWED_TOP_CARDS;
       payload: ShowedCardsToPlayerPayload;
     }
-  | { type: typeof GameOutEvents.EXPLODING_KITTEN_DRAWN }
+  | {
+      type: typeof GameOutEvents.EXPLODING_KITTEN_DRAWN;
+      payload: ExplodingKittenDrawnPayload;
+    }
   | {
       type: typeof GameOutEvents.PLAYER_ELIMINATED;
       payload: PlayerEliminatedPayload;
