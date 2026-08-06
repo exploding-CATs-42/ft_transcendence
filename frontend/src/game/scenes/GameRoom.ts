@@ -671,6 +671,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     };
   }
 
+  private getHandBounds(targetX: number): CardBounds {
+    return {
+      position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
+      size: PILE_CARD_SIZE,
+    };
+  }
+
   // -------------------- ACTIONS --------------------
 
   private showOpponentTargetIcons(targets?: ReadonlyMap<string, number>) {
@@ -780,27 +787,19 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
       // and move it below the screen
       // at the x position calculated earlier
-      animateCardTo(
-        this,
-        faceDownCard,
-        {
-          position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
-          size: PILE_CARD_SIZE,
-        },
-        {
-          duration: CARD_FROM_DRAW_PILE_DURATION_MS,
-          ease: CARD_FROM_DRAW_PILE_EASE,
-          depth: 0,
+      animateCardTo(this, faceDownCard, this.getHandBounds(targetX), {
+        duration: CARD_FROM_DRAW_PILE_DURATION_MS,
+        ease: CARD_FROM_DRAW_PILE_EASE,
+        depth: 0,
 
-          onComplete: () => {
-            faceDownCard.destroy();
+        onComplete: () => {
+          faceDownCard.destroy();
 
-            const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
-            const frame = getCardFrame(this, frameIndex);
-            this.#myHand.addCard(payload.card, frame, insertIndex);
-          },
+          const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
+          const frame = getCardFrame(this, frameIndex);
+          this.#myHand.addCard(payload.card, frame, insertIndex);
         },
-      );
+      });
     } else {
       this.#modal.setVisible(false);
       this.#notification.hide();
@@ -1115,12 +1114,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const flyingCard = this.addCard(frame, position);
     flyingCard.setDisplaySize(size.width, size.height);
 
-    const toCardBounds: CardBounds = {
-      position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
-      size: PILE_CARD_SIZE,
-    };
-
-    animateCardTo(this, flyingCard, toCardBounds, {
+    animateCardTo(this, flyingCard, this.getHandBounds(targetX), {
       duration: CARD_TRANSFER_DURATION_MS,
       ease: CARD_TRANSFER_EASE,
 
