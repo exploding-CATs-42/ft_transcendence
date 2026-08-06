@@ -1,7 +1,13 @@
 // Libraries
 import { describe, it, expect } from "vitest";
 // Package level
-import { createDeck, dealInitialCards, DEFAULT_GAME_RULES } from "../src";
+import {
+  createDeck,
+  dealInitialCards,
+  countKittensInDeck,
+  drawOneCard,
+  DEFAULT_GAME_RULES,
+} from "../src";
 import { CardType, Deck, Player } from "../src/types";
 
 const DECK_SIZE = 56;
@@ -61,5 +67,52 @@ describe("dealInitialCards", () => {
         player.hand.some((card) => card.type === CardType.DEFUSE),
       ).toBeTruthy();
     });
+  });
+});
+
+describe("countKittensInDeck", () => {
+  const makePlayers = (amount: number): Player[] =>
+    Array.from({ length: amount }, (_, i) => ({
+      name: `player ${i + 1}`,
+      id: `${i + 1}`,
+      avatarUrl: null,
+      hand: [],
+      isAlive: true,
+      isConfirmed: false,
+    }));
+
+  it("counts one kitten less than the players a game was dealt for", () => {
+    const players = makePlayers(4);
+    const deck = dealInitialCards(createDeck(), players);
+
+    expect(countKittensInDeck(deck)).toBe(players.length - 1);
+  });
+
+  it("drops the count when a kitten is drawn and restores it on reinsertion", () => {
+    const players = makePlayers(4);
+    const deck = dealInitialCards(createDeck(), players);
+    const kittensBefore = countKittensInDeck(deck);
+
+    // Pull cards until a kitten comes off the top
+    let drawn = drawOneCard(deck);
+    while (drawn && drawn.type !== CardType.EXPLODING_KITTEN) {
+      drawn = drawOneCard(deck);
+    }
+
+    expect(drawn?.type).toBe(CardType.EXPLODING_KITTEN);
+    expect(countKittensInDeck(deck)).toBe(kittensBefore - 1);
+
+    deck.splice(3, 0, drawn!);
+    expect(countKittensInDeck(deck)).toBe(kittensBefore);
+  });
+
+  it("is unaffected by a player leaving, unlike the player count", () => {
+    const players = makePlayers(4);
+    const deck = dealInitialCards(createDeck(), players);
+
+    players.pop();
+
+    expect(countKittensInDeck(deck)).toBe(3);
+    expect(countKittensInDeck(deck)).not.toBe(players.length - 1);
   });
 });
