@@ -512,8 +512,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private fillMyHandWithCards(cards: Card[]) {
     cards.forEach((card) => {
-      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
-      const frame = getCardFrame(this, frameIndex);
+      const frame = this.getFrameFor(card.type);
       this.#myHand.addCard(card, frame);
     });
   }
@@ -561,10 +560,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#discardPileZone = this.createPileZone(DISCARD_PILE_POSITION);
 
     if (lastPlayedCard) {
-      const frame: Phaser.Textures.Frame = getCardFrame(
-        this,
-        CARD_TYPE_TO_FRAME_INDEX[lastPlayedCard.type],
-      );
+      const frame = this.getFrameFor(lastPlayedCard.type);
 
       this.setDiscardPile(this.addCard(frame, DISCARD_PILE_POSITION));
     }
@@ -712,6 +708,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
       size: PILE_CARD_SIZE,
     };
+  }
+
+  private getFrameFor(cardType: CardType) {
+    return getCardFrame(this, CARD_TYPE_TO_FRAME_INDEX[cardType]);
   }
 
   // -------------------- ACTIONS --------------------
@@ -915,8 +915,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         onComplete: () => {
           faceDownCard.destroy();
 
-          const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
-          const frame = getCardFrame(this, frameIndex);
+          const frame = this.getFrameFor(payload.card.type);
+
           this.#myHand.addCard(payload.card, frame, insertIndex);
         },
       });
@@ -1173,8 +1173,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   private discardOpponentCard(playerId: string, cardType: CardType) {
-    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[cardType];
-    const cardFrame = getCardFrame(this, frameIndex);
+    const cardFrame = this.getFrameFor(cardType);
     const hand = this.#opponents.get(playerId);
 
     if (!hand) {
@@ -1225,8 +1224,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     insertIndex: number,
     targetX: number,
   ) => {
-    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
-    const frame = getCardFrame(this, frameIndex);
+    const frame = this.getFrameFor(card.type);
 
     const giverHand = giverId ? this.#opponents.get(giverId) : null;
 
