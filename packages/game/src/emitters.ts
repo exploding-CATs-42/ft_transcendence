@@ -2,6 +2,7 @@
 import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
 import type { GameContext } from "./gameMachine";
 import { CardType } from "./types";
+import { countKittensInDeck } from "./utils/deck";
 
 type GameEmitterArgs = {
   context: GameContext;
@@ -23,6 +24,7 @@ export const gameStarted = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.GAME_STARTED,
   players: context.players,
   deckSize: context.deck.length,
+  kittensInDeck: countKittensInDeck(context.deck),
 });
 
 export const turnChanged = ({ context }: GameEmitterArgs): GameOutEvent => ({
@@ -57,8 +59,9 @@ export const showedTopThreeCards = ({
   };
 };
 
-export const kittenDrawn = (): GameOutEvent => ({
+export const kittenDrawn = ({ context }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.EXPLODING_KITTEN_DRAWN,
+  payload: { kittensInDeck: countKittensInDeck(context.deck) },
 });
 
 export const playerDefused = ({ context }: GameEmitterArgs): GameOutEvent => ({
@@ -92,6 +95,7 @@ export const kittenInserted = ({ context }: GameEmitterArgs): GameOutEvent => ({
   payload: {
     cardId: context.lastDrawnCard!.id,
     playerId: context.currentTurnPlayerId!,
+    kittensInDeck: countKittensInDeck(context.deck),
   },
 });
 
@@ -99,7 +103,10 @@ export const playerEliminated = ({
   context,
 }: GameEmitterArgs): GameOutEvent => ({
   type: GameOutEvents.PLAYER_ELIMINATED,
-  payload: { playerId: context.currentTurnPlayerId! },
+  payload: {
+    playerId: context.currentTurnPlayerId!,
+    kittensInDeck: countKittensInDeck(context.deck),
+  },
 });
 
 export const gameOver = ({ context }: GameEmitterArgs): GameOutEvent => {
