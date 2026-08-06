@@ -137,6 +137,11 @@ const DISCARD_PILE_POSITION: Point = {
   y: PILES_Y,
 };
 
+const DISCARD_PILE_BOUNDS: CardBounds = {
+  position: DISCARD_PILE_POSITION,
+  size: PILE_CARD_SIZE,
+};
+
 const CARDS_LEFT_LABEL: Point = {
   x: 485,
   y: PILES_Y + 170,
@@ -1182,15 +1187,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const flyingCard = this.addCard(cardFrame, position);
     flyingCard.setDisplaySize(size.width, size.height);
 
-    this.tweens.add({
-      targets: flyingCard,
-      x: DISCARD_PILE_POSITION.x,
-      y: DISCARD_PILE_POSITION.y,
-      displayWidth: CARD_WIDTH,
-      displayHeight: CARD_HEIGHT,
+    animateCardTo(this, flyingCard, DISCARD_PILE_BOUNDS, {
       duration: CARD_TO_DISCARD_DURATION_MS,
       ease: CARD_TO_DISCARD_EASE,
-      onComplete: () => this.setDiscardPile(flyingCard),
+
+      onComplete: () => {
+        flyingCard.setDepth(0);
+        this.setDiscardPile(flyingCard);
+      },
     });
   }
 
