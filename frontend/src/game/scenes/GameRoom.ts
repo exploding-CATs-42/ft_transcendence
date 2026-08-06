@@ -119,15 +119,23 @@ const CARD_HEIGHT = 260 * 1.5;
 const CARD_BORDER_RADIUS = 20;
 
 const PILES_Y = 410;
+
+const PILE_CARD_SIZE: Size = { width: CARD_WIDTH, height: CARD_HEIGHT };
+
 const DRAW_PILE_POSITION: Point = {
   x: 560,
   y: PILES_Y,
 };
+
+const DRAW_PILE_BOUNDS: CardBounds = {
+  position: DRAW_PILE_POSITION,
+  size: PILE_CARD_SIZE,
+};
+
 const DISCARD_PILE_POSITION: Point = {
   x: 1050,
   y: PILES_Y,
 };
-const PILE_CARD_SIZE: Size = { width: CARD_WIDTH, height: CARD_HEIGHT };
 
 const CARDS_LEFT_LABEL: Point = {
   x: 485,
@@ -1416,15 +1424,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       CARD_BORDER_RADIUS,
     );
 
-    this.tweens.add({
-      targets: flyingCard,
-      x: DRAW_PILE_POSITION.x,
-      y: DRAW_PILE_POSITION.y,
-      displayWidth: CARD_WIDTH,
-      displayHeight: CARD_HEIGHT,
+    animateCardTo(this, flyingCard, DRAW_PILE_BOUNDS, {
       duration: CARD_FROM_DRAW_PILE_DURATION_MS,
       ease: CARD_FROM_DRAW_PILE_EASE,
-
       onComplete: () => {
         flyingCard.destroy();
         hand.removeCard();
