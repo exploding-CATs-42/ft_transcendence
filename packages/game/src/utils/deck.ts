@@ -126,3 +126,6 @@ export const drawOneCard = (deck: Deck): Card | undefined => {
   const card = cards[0];
   return card;
 };
+
+export const countKittensInDeck = (deck: Deck): number =>
+  deck.filter((card) => card.type === CardType.EXPLODING_KITTEN).length;
