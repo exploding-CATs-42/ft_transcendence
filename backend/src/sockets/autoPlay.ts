@@ -64,6 +64,6 @@ export const autoPlay = async (gameId: GameId, playerId: UserId) => {
 
     io.to(gameId).emit(ServerPublicEvents.CARD_DRAWN, publicPayload);
   } catch (error) {
-    console.log("Auto play could not draw a card: ", error);
+    console.error("Auto play could not draw a card: ", error);
   }
 };

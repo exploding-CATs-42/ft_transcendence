@@ -17,7 +17,6 @@ export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);
 
   io.on("connection", (socket: Socket) => {
-    console.log("User connected:", socket.id);
     const userId: UserId = socket.data.user.id;
 
     const cameOnline = !isUserOnline(userId);
@@ -32,7 +31,6 @@ export const initSockets = (io: Server) => {
     registerGameEventHandlers(io, socket);
 
     socket.on("disconnect", () => {
-      console.log("User disconnected:", socket.id);
       const wentOffline = !isUserOnline(userId);
       if (wentOffline) {
         broadcastOnlineStatusToFriends(userId, false);
