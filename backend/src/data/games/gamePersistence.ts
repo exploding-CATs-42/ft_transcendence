@@ -47,7 +47,6 @@ export async function loadGames(): Promise<PersistedGame[]> {
 
     const raw = await fs.readFile(FILE_PATH, "utf8");
     if (!raw.trim()) {
-      console.log("Persistence file is empty");
       return [];
     }
 

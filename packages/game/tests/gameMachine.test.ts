@@ -59,8 +59,6 @@ describe("game machine", () => {
   it("transitions to waiting.starting state when enough players confirmed their readiness", () => {
     const actor = createActor(gameMachine);
 
-    console.log(PLAYERS);
-
     actor.start();
     addPlayers(actor, PLAYERS);
     markAsReady(actor, PLAYERS);
