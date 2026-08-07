@@ -466,7 +466,18 @@ export async function drawCard(input: DrawCardParams, userId: UserId) {
 
 export async function selectPlayer(input: SelectPlayerPayload, userId: UserId) {
   const { game } = await requirePlayerInGame(userId, input.gameId);
-  await requirePlayerInGame(input.playerId, input.gameId);
+  const { player: targetPlayer } = await requirePlayerInGame(
+    input.playerId,
+    input.gameId,
+  );
+
+  if (userId === input.playerId) {
+    throw new SocketError("You can't select yourself");
+  }
+
+  if (targetPlayer.hand.length < 1) {
+    throw new SocketError(`${targetPlayer.name} doesn't have enough cards`);
+  }
 
   game.instance.send({
     type: GameEvents.SELECT_PLAYER,
