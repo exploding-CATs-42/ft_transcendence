@@ -6,6 +6,7 @@ paths:
       summary: Register a new user
       description: Creates a new user account without creating an authenticated session. Call /auth/login after registration to receive tokens.
       operationId: registerUser
+      security: []
       requestBody:
         required: true
         content:
@@ -54,6 +55,7 @@ paths:
       summary: Login user
       description: Authenticates a user, creates a new session, sets the refresh token HttpOnly cookie, and returns the access token.
       operationId: loginUser
+      security: []
       requestBody:
         required: true
         content:

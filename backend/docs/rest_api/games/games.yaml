@@ -3,8 +3,11 @@ paths:
     get:
       tags:
         - Games
-      summary: Get all games
-      description: Returns all games available in the system.
+      summary: List joinable games
+      description: >
+        Returns the games that are still in the waiting state, i.e. the lobby list.
+        Games that have already started and games that no longer exist are not
+        included.
       operationId: getGames
       security:
         - bearerAuth: []
@@ -15,11 +18,16 @@ paths:
             application/json:
               schema:
                 $ref: "./games.schemas.yaml#/components/schemas/GamesListResponse"
-                example:
-                  - id: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
-                    name: Friday Night Table
-                    maxPlayers: 4
-                    createdAt: 1745835176910
+              example:
+                - id: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
+                  name: Friday Night Table
+                  maxPlayers: 4
+                  createdAt: 1745835176910
+                  players:
+                    - id: bf85eb09-a2b7-4f66-8f26-90b98e2e9d07
+                      username: alexfox
+                      avatarUrl: null
+                      isOnline: true
         "401":
           description: Invalid or missing access token
           content:
@@ -88,13 +96,17 @@ paths:
               example:
                 message: User not found
         "409":
-          description: User already has an active or waiting game
+          description: >
+            User already has an active or waiting game. The response carries the id
+            of that game so the client can send the user back into it.
           content:
             application/json:
               schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+                $ref: "./games.schemas.yaml#/components/schemas/ExistingGameConflictResponse"
               example:
                 message: Player already has an active or waiting game
+                errors:
+                  existingGameId: 9cb92b7a-3b28-4af8-854f-a1b6efbda001
         "500":
           description: Server error
           content:
@@ -149,11 +161,75 @@ paths:
               example:
                 message: Internal server error
 
+  /games/{gameId}:
+    get:
+      tags:
+        - Games
+      summary: Get a game by id
+      description: >
+        Returns a single game by id, in any state. The caller does not need to be a
+        player in that game.
+      operationId: getGameById
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: gameId
+          in: path
+          required: true
+          description: Game id
+          schema:
+            type: string
+            format: uuid
+      responses:
+        "200":
+          description: Game returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./games.schemas.yaml#/components/schemas/GameResponse"
+        "400":
+          description: Validation error
+          content:
+            application/json:
+              schema:
+                $ref: "./games.schemas.yaml#/components/schemas/ValidationErrorResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "404":
+          description: Game or user not found
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                userNotFound:
+                  value:
+                    message: User not found
+                gameNotFound:
+                  value:
+                    message: Game not found
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
     delete:
       tags:
         - Games
       summary: Delete a game
-      description: Deletes a game by id for the authenticated user.
+      description: >
+        Deletes a game by id. Note that the endpoint does not check ownership: any
+        authenticated user whose account exists can delete any existing game.
       operationId: deleteGame
       security:
         - bearerAuth: []
