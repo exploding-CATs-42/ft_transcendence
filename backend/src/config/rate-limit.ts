@@ -5,7 +5,7 @@ const WINDOW_MS = ms("15 min");
 const rateLimitExcludedPaths = new Set(["/metrics"]);
 
 export const apiRateLimitConfig: Partial<Options> = {
-  limit: 100,
+  limit: 500,
   windowMs: WINDOW_MS,
   skip: (req) => rateLimitExcludedPaths.has(req.path),
 };
