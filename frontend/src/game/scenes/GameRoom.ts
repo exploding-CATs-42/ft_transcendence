@@ -119,15 +119,28 @@ const CARD_HEIGHT = 260 * 1.5;
 const CARD_BORDER_RADIUS = 20;
 
 const PILES_Y = 410;
+
+const PILE_CARD_SIZE: Size = { width: CARD_WIDTH, height: CARD_HEIGHT };
+
 const DRAW_PILE_POSITION: Point = {
   x: 560,
   y: PILES_Y,
 };
+
+const DRAW_PILE_BOUNDS: CardBounds = {
+  position: DRAW_PILE_POSITION,
+  size: PILE_CARD_SIZE,
+};
+
 const DISCARD_PILE_POSITION: Point = {
   x: 1050,
   y: PILES_Y,
 };
-const PILE_CARD_SIZE: Size = { width: CARD_WIDTH, height: CARD_HEIGHT };
+
+const DISCARD_PILE_BOUNDS: CardBounds = {
+  position: DISCARD_PILE_POSITION,
+  size: PILE_CARD_SIZE,
+};
 
 const CARDS_LEFT_LABEL: Point = {
   x: 485,
@@ -463,15 +476,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       } else {
         // move it to the discard pile and shrink it down to pile size
         this.scheduleDiscard(() => {
-          this.tweens.add({
-            targets: card.image,
-            x: DISCARD_PILE_POSITION.x,
-            y: DISCARD_PILE_POSITION.y,
-            displayWidth: CARD_WIDTH,
-            displayHeight: CARD_HEIGHT,
+          animateCardTo(this, card.image, DISCARD_PILE_BOUNDS, {
             duration: CARD_TO_DISCARD_DURATION_MS,
             ease: CARD_TO_DISCARD_EASE,
-            onComplete: () => this.setDiscardPile(card.image),
+            onComplete: () => {
+              card.image.setDepth(0);
+              this.setDiscardPile(card.image);
+            },
           });
         });
       }
@@ -501,8 +512,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private fillMyHandWithCards(cards: Card[]) {
     cards.forEach((card) => {
-      const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
-      const frame = getCardFrame(this, frameIndex);
+      const frame = this.getFrameFor(card.type);
       this.#myHand.addCard(card, frame);
     });
   }
@@ -550,10 +560,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#discardPileZone = this.createPileZone(DISCARD_PILE_POSITION);
 
     if (lastPlayedCard) {
-      const frame: Phaser.Textures.Frame = getCardFrame(
-        this,
-        CARD_TYPE_TO_FRAME_INDEX[lastPlayedCard.type],
-      );
+      const frame = this.getFrameFor(lastPlayedCard.type);
 
       this.setDiscardPile(this.addCard(frame, DISCARD_PILE_POSITION));
     }
@@ -696,6 +703,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     };
   }
 
+  private getHandBounds(targetX: number): CardBounds {
+    return {
+      position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
+      size: PILE_CARD_SIZE,
+    };
+  }
+
+  private getFrameFor(cardType: CardType) {
+    return getCardFrame(this, CARD_TYPE_TO_FRAME_INDEX[cardType]);
+  }
+
   // -------------------- ACTIONS --------------------
 
   private showOpponentTargetIcons(targets?: ReadonlyMap<string, number>) {
@@ -829,6 +847,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.setCurrentTurn(payload.currentTurnPlayerId ?? "");
     this.updateAttackIndicator();
+    this.fillOpponentHands(payload.players);
 
     if (payload.pendingComboSize) {
       this.applyComboSelection(
@@ -889,20 +908,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
       // and move it below the screen
       // at the x position calculated earlier
-      this.tweens.add({
-        targets: faceDownCard,
-        x: targetX,
-        y: SCREEN_HEIGHT + CARD_HEIGHT / 2,
+      animateCardTo(this, faceDownCard, this.getHandBounds(targetX), {
         duration: CARD_FROM_DRAW_PILE_DURATION_MS,
         ease: CARD_FROM_DRAW_PILE_EASE,
+        depth: 0,
 
         onComplete: () => {
-          // then destroy it
           faceDownCard.destroy();
 
-          // and spawn the real card into player's hand
-          const frameIndex = CARD_TYPE_TO_FRAME_INDEX[payload.card.type];
-          const frame = getCardFrame(this, frameIndex);
+          const frame = this.getFrameFor(payload.card.type);
+
           this.#myHand.addCard(payload.card, frame, insertIndex);
         },
       });
@@ -931,20 +946,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     if (!hand) return;
 
-    const { position, size } = hand.getTopCardBounds();
-
     const cardCover = this.textures.get(Textures.cardCover).get();
     const flyingCard = this.addCard(cardCover, DRAW_PILE_POSITION);
 
-    this.tweens.add({
-      targets: flyingCard,
-      x: position.x,
-      y: position.y,
-      displayWidth: size.width,
-      displayHeight: size.height,
+    animateCardTo(this, flyingCard, hand.getTopCardBounds(), {
       duration: CARD_FROM_DRAW_PILE_DURATION_MS,
       ease: CARD_FROM_DRAW_PILE_EASE,
-
       onComplete: () => {
         flyingCard.destroy();
         hand.addCard();
@@ -1167,8 +1174,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   private discardOpponentCard(playerId: string, cardType: CardType) {
-    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[cardType];
-    const cardFrame = getCardFrame(this, frameIndex);
+    const cardFrame = this.getFrameFor(cardType);
     const hand = this.#opponents.get(playerId);
 
     if (!hand) {
@@ -1182,15 +1188,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const flyingCard = this.addCard(cardFrame, position);
     flyingCard.setDisplaySize(size.width, size.height);
 
-    this.tweens.add({
-      targets: flyingCard,
-      x: DISCARD_PILE_POSITION.x,
-      y: DISCARD_PILE_POSITION.y,
-      displayWidth: CARD_WIDTH,
-      displayHeight: CARD_HEIGHT,
+    animateCardTo(this, flyingCard, DISCARD_PILE_BOUNDS, {
       duration: CARD_TO_DISCARD_DURATION_MS,
       ease: CARD_TO_DISCARD_EASE,
-      onComplete: () => this.setDiscardPile(flyingCard),
+
+      onComplete: () => {
+        flyingCard.setDepth(0);
+        this.setDiscardPile(flyingCard);
+      },
     });
   }
 
@@ -1220,8 +1225,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     insertIndex: number,
     targetX: number,
   ) => {
-    const frameIndex = CARD_TYPE_TO_FRAME_INDEX[card.type];
-    const frame = getCardFrame(this, frameIndex);
+    const frame = this.getFrameFor(card.type);
 
     const giverHand = giverId ? this.#opponents.get(giverId) : null;
 
@@ -1236,12 +1240,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const flyingCard = this.addCard(frame, position);
     flyingCard.setDisplaySize(size.width, size.height);
 
-    const toCardBounds: CardBounds = {
-      position: { x: targetX, y: SCREEN_HEIGHT + CARD_HEIGHT / 2 },
-      size: PILE_CARD_SIZE,
-    };
-
-    animateCardTo(this, flyingCard, toCardBounds, {
+    animateCardTo(this, flyingCard, this.getHandBounds(targetX), {
       duration: CARD_TRANSFER_DURATION_MS,
       ease: CARD_TRANSFER_EASE,
 
@@ -1411,6 +1410,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     if (!hand) return;
 
     const { position, size } = hand.getTopCardBounds();
+    hand.removeCard();
 
     const cardCover = this.textures.get(Textures.cardCover).get();
     const cardConfig: CardConfig = {
@@ -1424,15 +1424,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       CARD_BORDER_RADIUS,
     );
 
-    this.tweens.add({
-      targets: flyingCard,
-      x: DRAW_PILE_POSITION.x,
-      y: DRAW_PILE_POSITION.y,
-      displayWidth: CARD_WIDTH,
-      displayHeight: CARD_HEIGHT,
+    animateCardTo(this, flyingCard, DRAW_PILE_BOUNDS, {
       duration: CARD_FROM_DRAW_PILE_DURATION_MS,
       ease: CARD_FROM_DRAW_PILE_EASE,
-
       onComplete: () => {
         flyingCard.destroy();
         hand.removeCard();
