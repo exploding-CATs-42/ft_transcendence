@@ -1,0 +1,271 @@
+.scrollContainer {
+  --leaderboard-columns: minmax(150px, 1.6fr) repeat(3, minmax(30px, 0.4fr))
+    minmax(64px, 0.6fr);
+  --leaderboard-min-width: 410px;
+  --leaderboard-gap: 8px;
+  --leaderboard-inline-padding: 16px;
+  --sb-size: 10px;
+
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+
+  min-height: 0;
+
+  padding-right: var(--inner-right-padding);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+
+  scrollbar-width: none;
+}
+
+.scrollContainer::-webkit-scrollbar {
+  height: 0;
+}
+
+.headerRow,
+.row {
+  display: grid;
+  grid-template-columns: var(--leaderboard-columns);
+  gap: var(--leaderboard-gap);
+  align-items: center;
+
+  padding-inline: var(--leaderboard-inline-padding);
+}
+
+.headerRow {
+  flex: none;
+
+  padding-block: 6px;
+  padding-right: calc(var(--leaderboard-inline-padding) + var(--sb-size));
+
+  background-color: var(--exploding-kittens);
+}
+
+.headerCell {
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  text-align: center;
+
+  color: var(--off-white);
+}
+
+.playerHeader {
+  text-align: left;
+}
+
+.countHeader {
+  display: none;
+}
+
+.list {
+  scrollbar-gutter: stable;
+}
+
+.listColumns,
+.headerRow {
+  min-width: calc(var(--leaderboard-min-width) + var(--sb-size));
+}
+
+.list::-webkit-scrollbar {
+  height: 0;
+}
+
+.row {
+  min-width: var(--leaderboard-min-width);
+
+  padding-block: 6px;
+
+  color: var(--black);
+}
+
+.topRow {
+  --list-item-background: var(--gold-transparent);
+}
+
+.cell {
+  font-size: 16px;
+  line-height: 21px;
+  text-align: center;
+}
+
+.rank {
+  display: none;
+}
+
+.crown {
+  width: 20px;
+  height: 20px;
+
+  object-fit: contain;
+}
+
+.player {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  color: var(--black);
+}
+
+.player:hover,
+.player:focus-visible {
+  color: var(--exploding-kittens);
+}
+
+.username {
+  font-size: 20px;
+  line-height: 26px;
+
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.avatar {
+  flex: 0 0 45px;
+}
+
+@media only screen and (min-width: 768px) {
+  .scrollContainer {
+    --leaderboard-columns: 40px minmax(200px, 1.6fr)
+      repeat(3, minmax(48px, 0.5fr)) minmax(100px, 0.8fr);
+
+    --leaderboard-min-width: 532px;
+    --leaderboard-gap: 12px;
+    --leaderboard-inline-padding: 24px;
+    --sb-size: 15px;
+  }
+
+  .headerRow {
+    padding-block: 8px;
+  }
+
+  .headerCell {
+    font-size: 15px;
+    line-height: 20px;
+  }
+
+  .row {
+    padding-block: 8px;
+  }
+
+  .cell {
+    font-size: 22px;
+    line-height: 29px;
+  }
+
+  .rank {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+
+    line-height: 1;
+    font-size: 25px;
+  }
+
+  .crown {
+    width: 26px;
+    height: 26px;
+  }
+
+  .player {
+    gap: 14px;
+  }
+
+  .username {
+    font-size: 25px;
+    line-height: 33px;
+  }
+
+  .countHeader {
+    display: block;
+  }
+
+  .avatar {
+    flex: 0 0 50px;
+  }
+}
+
+@media only screen and (min-width: 1440px) {
+  .scrollContainer {
+    --leaderboard-columns: 80px minmax(420px, 1.6fr)
+      repeat(3, minmax(50px, 0.6fr)) minmax(100px, 0.7fr);
+
+    --leaderboard-min-width: 894px;
+    --leaderboard-gap: 16px;
+    --leaderboard-inline-padding: 32px;
+    --sb-size: 24px;
+  }
+
+  .headerCell {
+    font-size: 18px;
+    line-height: 23px;
+  }
+
+  .row {
+    padding-block: 4px;
+  }
+
+  .cell {
+    font-size: 28px;
+    line-height: 36px;
+  }
+
+  .rank {
+    font-size: 30px;
+  }
+
+  .crown {
+    width: 34px;
+    height: 34px;
+  }
+
+  .player {
+    gap: 16px;
+  }
+
+  .username {
+    font-size: 30px;
+    line-height: 39px;
+  }
+
+  .avatar {
+    flex: 0 0 70px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .scrollContainer {
+    --leaderboard-min-width: 1000px;
+  }
+
+  .headerCell {
+    font-size: 22px;
+    line-height: 29px;
+  }
+
+  .cell {
+    font-size: 34px;
+    line-height: 44px;
+  }
+
+  .rank {
+    font-size: 40px;
+  }
+
+  .crown {
+    width: 44px;
+    height: 44px;
+  }
+
+  .username {
+    font-size: 40px;
+    line-height: 52px;
+  }
+}
