@@ -1,0 +1,160 @@
+# Connection lifecycle: handshake authentication, state recovery after a drop, and
+# the presence events derived from socket connect/disconnect.
+
+channels:
+  # --- Client -> Server ---
+  reconnectGame:
+    address: reconnect-game
+    title: Reconnect to a game
+    description: >
+      Rejoin a game that is already in progress and receive a full `game-state`
+      snapshot. This is the recovery path for a player who dropped, reloaded, or was
+      told `RECONNECT_REQUIRED` in response to `join-game`.
+
+
+      Unlike `join-game`, the socket joins the room only after the service call
+      succeeds.
+    messages:
+      gameIdPayload:
+        name: ReconnectGame
+        title: Reconnect game
+        contentType: application/json
+        payload:
+          $ref: "./connection.schemas.yaml#/components/schemas/GameIdPayload"
+
+  # --- Server -> Client ---
+  gameState:
+    address: game-state
+    title: Game state snapshot
+    description: >
+      Full snapshot of a game in progress, sent to the reconnecting socket only.
+    messages:
+      gameState:
+        name: GameState
+        title: Game state
+        summary: Complete game state for the reconnecting player.
+        contentType: application/json
+        payload:
+          $ref: "./connection.schemas.yaml#/components/schemas/GameStatePayload"
+
+  playerDisconnected:
+    address: player-disconnected
+    title: Player disconnected
+    description: >
+      A player lost their last connected socket. Sent to everyone in that player's
+      current game.
+
+
+      The target room is resolved by looking up the player's current game in the
+      repository, not from the socket's rooms — by the time `disconnect` fires the
+      socket has already left every room.
+
+
+      Sixty seconds after this fires, if it is still that player's turn, the server
+      draws a card on their behalf and emits `card-drawn` with no client action
+      behind it.
+    messages:
+      playerId:
+        name: PlayerDisconnected
+        title: Player disconnected
+        contentType: application/json
+        payload:
+          $ref: "./connection.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  playerReconnected:
+    address: player-reconnected
+    title: Player reconnected
+    description: >
+      A player opened their first socket again. Sent to everyone in that player's
+      current game, and cancels any pending auto-play timer for them.
+
+
+      This fires on the underlying socket connecting, which is independent of the
+      `reconnect-game` event: the player is announced as back before they have
+      re-entered the room or received any state.
+    messages:
+      playerId:
+        name: PlayerReconnected
+        title: Player reconnected
+        contentType: application/json
+        payload:
+          $ref: "./connection.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  friendOnlineStatusChanged:
+    address: friend-online-status-changed
+    title: Friend online status changed
+    description: >
+      Presence update, delivered to each accepted friend of the user whose status
+      changed, addressed to that friend's personal room (a room named after their
+      user id).
+
+
+      Only edge transitions are sent: connecting a second tab or closing one of two
+      does not emit anything.
+    messages:
+      friendOnlineStatusChanged:
+        name: FriendOnlineStatusChanged
+        title: Friend online status changed
+        contentType: application/json
+        payload:
+          $ref: "./connection.schemas.yaml#/components/schemas/FriendOnlineStatusChangedPayload"
+
+operations:
+  onReconnectGame:
+    action: receive
+    channel:
+      $ref: "#/channels/reconnectGame"
+    summary: Rejoin an in-progress game and receive the full state.
+    description: >
+      Validates `gameId`, rebuilds the caller's view of the game, joins the socket to
+      the room, registers it in the socket map for private emits, and replies with
+      `game-state` on the acting socket. On failure emits `reconnect-game-error`.
+    tags:
+      - name: Connection
+    messages:
+      - $ref: "#/channels/reconnectGame/messages/gameIdPayload"
+    reply:
+      channel:
+        $ref: "#/channels/gameState"
+      messages:
+        - $ref: "#/channels/gameState/messages/gameState"
+
+  sendGameState:
+    action: send
+    channel:
+      $ref: "#/channels/gameState"
+    summary: Send the full game snapshot to the reconnecting socket (acting socket).
+    tags:
+      - name: Connection
+    messages:
+      - $ref: "#/channels/gameState/messages/gameState"
+
+  sendPlayerDisconnected:
+    action: send
+    channel:
+      $ref: "#/channels/playerDisconnected"
+    summary: Notify the player's game that they went offline (room, all).
+    tags:
+      - name: Connection
+    messages:
+      - $ref: "#/channels/playerDisconnected/messages/playerId"
+
+  sendPlayerReconnected:
+    action: send
+    channel:
+      $ref: "#/channels/playerReconnected"
+    summary: Notify the player's game that they came back online (room, all).
+    tags:
+      - name: Connection
+    messages:
+      - $ref: "#/channels/playerReconnected/messages/playerId"
+
+  sendFriendOnlineStatusChanged:
+    action: send
+    channel:
+      $ref: "#/channels/friendOnlineStatusChanged"
+    summary: Notify each friend that this user came online or went offline (per-user room).
+    tags:
+      - name: Connection
+    messages:
+      - $ref: "#/channels/friendOnlineStatusChanged/messages/friendOnlineStatusChanged"

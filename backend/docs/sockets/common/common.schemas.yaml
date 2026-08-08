@@ -1,0 +1,171 @@
+components:
+  schemas:
+    GameIdPayload:
+      type: object
+      required:
+        - gameId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+          description: Target game id; also the Socket.IO room name.
+          example: "8f3b2c1a-9d4e-4f7a-bc12-1a2b3c4d5e6f"
+
+    PlayerIdPayload:
+      type: object
+      required:
+        - playerId
+      properties:
+        playerId:
+          type: string
+          format: uuid
+          description: Id of the player the event refers to.
+          example: "2c4d6e8f-1a3b-4c5d-9e7f-0a1b2c3d4e5f"
+
+    EmptyPayload:
+      description: No payload is sent with this event.
+
+    CardType:
+      type: string
+      description: The kind of a card. Drives all gameplay rules.
+      enum:
+        - EXPLODING_KITTEN
+        - DEFUSE
+        - ATTACK
+        - SKIP
+        - FAVOR
+        - SHUFFLE
+        - SEE_THE_FUTURE
+        - NOPE
+        - TACOCAT
+        - HAIRY_POTATO_CAT
+        - BEARD_CAT
+        - CATTERMELON
+        - RAINBOW_RALPHING_CAT
+
+    ComboSize:
+      type: integer
+      description: Number of matching cat cards in a combo.
+      enum: [2, 3]
+
+    Card:
+      type: object
+      description: >
+        A single card instance. `id` is unique within a game and is what client
+        events refer to; every other field is copied from the card definition.
+      required:
+        - id
+        - type
+        - name
+        - description
+        - playable
+        - targetRequired
+        - comboEligible
+        - playableOutOfTurn
+      properties:
+        id:
+          type: integer
+          minimum: 0
+          maximum: 55
+          description: Unique card instance id within the game.
+          example: 17
+        type:
+          $ref: "#/components/schemas/CardType"
+        name:
+          type: string
+          example: See the Future
+        description:
+          type: string
+          example: Privately view the top three cards of the deck.
+        playable:
+          type: boolean
+          description: >
+            Whether the card can be played by clicking it. NOPE and DEFUSE are
+            false here on purpose: they are played through dedicated prompts
+            (`play-nope` / `play-defuse`), not from the hand.
+        targetRequired:
+          type: boolean
+          description: Whether playing the card requires selecting another player.
+        comboEligible:
+          type: boolean
+          description: Whether the card can be used as part of a cat-card combo.
+        playableOutOfTurn:
+          type: boolean
+          description: Whether the card may be played when it is not the player's turn.
+
+    PlayerView:
+      type: object
+      required:
+        - id
+        - name
+        - avatarUrl
+        - isConnected
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          description: Player display name (their username).
+        avatarUrl:
+          type: string
+          format: uri
+          nullable: true
+        isConnected:
+          type: boolean
+          description: >
+            Whether the player currently has at least one connected socket. Derived
+            live from socket presence.
+
+    GamePlayerView:
+      allOf:
+        - $ref: "#/components/schemas/PlayerView"
+        - type: object
+          required:
+            - isAlive
+          properties:
+            isAlive:
+              type: boolean
+              description: False once the player has exploded and been eliminated.
+
+    PublicPlayerView:
+      description: >
+        What every player may know about another player: their identity, whether
+        they are alive and connected, and how many cards they hold — but never
+        which cards.
+      allOf:
+        - $ref: "#/components/schemas/GamePlayerView"
+        - type: object
+          required:
+            - handSize
+          properties:
+            handSize:
+              type: integer
+              minimum: 0
+              description: Number of cards in the player's hand.
+
+    GameStartedPayload:
+      type: object
+      description: >
+        Personalised game-start snapshot. This event is emitted once per player
+        socket, not broadcast: `players` is rotated so the receiving player is
+        first, and `hand` is that player's own hand.
+      required:
+        - players
+        - hand
+        - deckSize
+      properties:
+        players:
+          type: array
+          description: All players, rotated to start with the receiving player.
+          items:
+            $ref: "#/components/schemas/PublicPlayerView"
+        hand:
+          type: array
+          description: The receiving player's own hand.
+          items:
+            $ref: "#/components/schemas/Card"
+        deckSize:
+          type: integer
+          minimum: 0
+          description: Number of cards left in the draw pile.
