@@ -1,4 +1,8 @@
-import type { ProfileUserWithStats, UserId } from "@exploding-cats/contracts";
+import type {
+  LeaderboardEntry,
+  ProfileUserWithStats,
+  UserId,
+} from "@exploding-cats/contracts";
 import { api } from "../axios";
 import type { UserGameHistoryItem } from "components/GameListItem/types";
 
@@ -12,7 +16,13 @@ const getUserById = async (userId: UserId): Promise<ProfileUserWithStats> => {
   return result.data.user;
 };
 
+const getLeaderboard = async (): Promise<LeaderboardEntry[]> => {
+  const result = await api.get("users/leaderboard");
+  return result.data.leaderboard;
+};
+
 export default {
   getUserGames,
   getUserById,
+  getLeaderboard,
 };
