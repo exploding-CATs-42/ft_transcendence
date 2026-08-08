@@ -20,6 +20,7 @@ const Navigation = ({ onLinkClick }: Props) => {
 
   const navLinks = [
     { path: "/lobby", label: "Play" },
+    ...(isLoggedIn ? [{ path: "/leaderboard", label: "Leaderboard" }] : []),
     { path: "/rules", label: "Rules" },
     { path: "/about", label: "About" },
   ];
