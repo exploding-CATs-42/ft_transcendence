@@ -4,7 +4,9 @@ paths:
       tags:
         - Users
       summary: Search users by username
-      description: Returns users whose username exactly matches the provided value, using case-insensitive comparison.
+      description:
+        Returns users whose username exactly matches the provided value, using
+        case-insensitive comparison.
       operationId: searchUsers
       security:
         - bearerAuth: []
@@ -16,7 +18,7 @@ paths:
           schema:
             type: string
             minLength: 3
-            maxLength: 30
+            maxLength: 20
             example: alex
       responses:
         "200":
@@ -53,7 +55,9 @@ paths:
       tags:
         - Users
       summary: Get public user profile
-      description: Returns public profile information for a user together with basic finished-game statistics.
+      description:
+        Returns public profile information for a user together with basic
+        finished-game statistics.
       operationId: getUserById
       security:
         - bearerAuth: []
