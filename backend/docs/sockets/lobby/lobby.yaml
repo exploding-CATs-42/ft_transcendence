@@ -1,0 +1,67 @@
+# The lobby channel is the only one that is broadcast to EVERY connected client
+# (`io.emit`), not to a room. It is also the only place where the REST API and the
+# realtime API are coupled: creating or deleting a game over HTTP triggers these
+# same broadcasts.
+#
+# There are no client -> server lobby events. The lobby is read over REST
+# (`GET /api/games`) and then kept live by these two events.
+
+channels:
+  lobbyGameUpdated:
+    address: lobby-game-updated
+    title: Lobby game updated
+    description: >
+      A joinable game was created or changed (a player joined or left) and every
+      client should add or refresh it in their lobby list.
+
+
+      Emitted after `POST /api/games`, and after the `join-game` and `leave-game`
+      socket events.
+    messages:
+      lobbyGameUpdated:
+        name: LobbyGameUpdated
+        title: Lobby game updated
+        contentType: application/json
+        payload:
+          $ref: "./lobby.schemas.yaml#/components/schemas/LobbyGameUpdatedPayload"
+
+  lobbyGameRemoved:
+    address: lobby-game-removed
+    title: Lobby game removed
+    description: >
+      A game is no longer joinable and every client should drop it from their lobby
+      list. This covers three distinct causes, all of which look the same on the
+      wire: the game was deleted, its last player left, or it started.
+
+
+      The server decides between this event and `lobby-game-updated` by checking
+      whether the game still exists and is still in the waiting state — so a client
+      that expected an update may legitimately receive a removal instead.
+    messages:
+      lobbyGameRemoved:
+        name: LobbyGameRemoved
+        title: Lobby game removed
+        contentType: application/json
+        payload:
+          $ref: "./lobby.schemas.yaml#/components/schemas/LobbyGameRemovedPayload"
+
+operations:
+  sendLobbyGameUpdated:
+    action: send
+    channel:
+      $ref: "#/channels/lobbyGameUpdated"
+    summary: Broadcast a created or changed joinable game (broadcast, all clients).
+    tags:
+      - name: Lobby
+    messages:
+      - $ref: "#/channels/lobbyGameUpdated/messages/lobbyGameUpdated"
+
+  sendLobbyGameRemoved:
+    action: send
+    channel:
+      $ref: "#/channels/lobbyGameRemoved"
+    summary: Broadcast that a game is no longer joinable (broadcast, all clients).
+    tags:
+      - name: Lobby
+    messages:
+      - $ref: "#/channels/lobbyGameRemoved/messages/lobbyGameRemoved"

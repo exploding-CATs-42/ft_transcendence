@@ -1,0 +1,104 @@
+components:
+  schemas:
+    GameIdPayload:
+      $ref: "../common/common.schemas.yaml#/components/schemas/GameIdPayload"
+
+    PlayerIdPayload:
+      $ref: "../common/common.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+    GameStatePayload:
+      type: object
+      description: >
+        Complete snapshot of a game in progress, sent to a single reconnecting
+        socket. It is the only way to recover state: the server never replays the
+        events a client missed while it was away.
+      required:
+        - players
+        - hand
+        - currentTurnPlayerId
+        - deckSize
+        - lastPlayedCards
+        - attackCount
+        - selectedPlayerId
+        - countdownEndsAt
+        - topCards
+        - machineState
+        - pendingComboSize
+        - pendingComboTargetPlayerId
+        - pendingComboRequestedCardType
+      properties:
+        players:
+          type: array
+          description: All players, rotated to start with the reconnecting player.
+          items:
+            $ref: "../common/common.schemas.yaml#/components/schemas/PublicPlayerView"
+        hand:
+          type: array
+          description: The reconnecting player's own hand.
+          items:
+            $ref: "../common/common.schemas.yaml#/components/schemas/Card"
+        currentTurnPlayerId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Whose turn it is, or null before the first turn begins.
+        deckSize:
+          type: integer
+          minimum: 0
+        lastPlayedCards:
+          type: array
+          nullable: true
+          description: Cards on top of the discard pile, or null if nothing was played yet.
+          items:
+            $ref: "../common/common.schemas.yaml#/components/schemas/Card"
+        attackCount:
+          type: integer
+          minimum: 0
+          description: Number of extra turns the current player still owes.
+        selectedPlayerId:
+          type: string
+          format: uuid
+          nullable: true
+          description: Player selected as the target of a pending action, if any.
+        countdownEndsAt:
+          type: integer
+          format: int64
+          nullable: true
+          description: End of a running pre-game countdown, or null.
+        topCards:
+          type: array
+          nullable: true
+          description: >
+            Top-of-deck cards the reconnecting player is currently allowed to see
+            after a See the Future, or null.
+          items:
+            $ref: "../common/common.schemas.yaml#/components/schemas/Card"
+        machineState:
+          type: string
+          nullable: true
+          description: Current state name of the server-side game state machine.
+        pendingComboSize:
+          nullable: true
+          allOf:
+            - $ref: "../common/common.schemas.yaml#/components/schemas/ComboSize"
+        pendingComboTargetPlayerId:
+          type: string
+          format: uuid
+          nullable: true
+        pendingComboRequestedCardType:
+          nullable: true
+          allOf:
+            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
+
+    FriendOnlineStatusChangedPayload:
+      type: object
+      required:
+        - userId
+        - isOnline
+      properties:
+        userId:
+          type: string
+          format: uuid
+          description: The friend whose presence changed.
+        isOnline:
+          type: boolean

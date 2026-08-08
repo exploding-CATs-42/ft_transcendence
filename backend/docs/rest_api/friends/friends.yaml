@@ -73,11 +73,27 @@ paths:
               example:
                 message: Friend request sent
         "400":
-          description: Validation error or invalid target
+          description: Validation error, or the target is the caller themselves
           content:
             application/json:
               schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                oneOf:
+                  - $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                  - $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              examples:
+                validationError:
+                  summary: Body failed schema validation
+                  value:
+                    message: Validation error
+                    errors:
+                      formErrors: []
+                      fieldErrors:
+                        userId:
+                          - Invalid uuid
+                selfTarget:
+                  summary: Target is the caller
+                  value:
+                    message: You cannot send a friend request to yourself
         "401":
           description: Invalid or missing access token
           content:
@@ -95,13 +111,24 @@ paths:
               example:
                 message: User not found
         "409":
-          description: Friend request already sent
+          description: A friendship relation with this user already exists
           content:
             application/json:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Friend request already sent
+              examples:
+                alreadySent:
+                  summary: Caller already has an outgoing pending request
+                  value:
+                    message: Friend request already sent
+                incomingPending:
+                  summary: The other user already sent a request to the caller
+                  value:
+                    message: This user has already sent you a friend request
+                alreadyFriends:
+                  summary: The relation is already accepted
+                  value:
+                    message: You cannot send a friend request to your friend
         "500":
           description: Server error
           content:
@@ -162,8 +189,15 @@ paths:
             application/json:
               schema:
                 $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
-              example:
-                message: Friendship cannot be deleted
+              examples:
+                notDeletable:
+                  summary: Relation is neither an outgoing pending request nor accepted
+                  value:
+                    message: Friendship cannot be deleted
+                selfTarget:
+                  summary: Target is the caller
+                  value:
+                    message: Invalid friendship target
         "500":
           description: Server error
           content:
@@ -240,6 +274,10 @@ paths:
                 outgoingRequest:
                   value:
                     message: You cannot accept or reject a request you sent
+                selfTarget:
+                  summary: Target is the caller
+                  value:
+                    message: Invalid friendship target
         "500":
           description: Server error
           content:

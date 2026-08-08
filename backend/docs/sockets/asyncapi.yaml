@@ -14,44 +14,143 @@ info:
     call (the server *sends*).
 
 
+    The server uses the default namespace `/` and the default path `/socket.io`;
+    neither is overridden. Nginx proxies both.
+
+
+    ### Event naming
+
+    Event names are inconsistently cased: some are kebab-case (`join-game`,
+    `card-drawn`) and some are SCREAMING_SNAKE (`TURN_CHANGED`, `COMBO_PLAYED`),
+    with no rule separating them. The literal strings in
+    `packages/contracts/src/sockets/events.ts` are the single source of truth for
+    both the backend and the frontend — never derive an event name from the
+    constant's key.
+
+
     ### Authentication
 
     Every connection must provide a valid JWT **access token** during the
     Socket.IO handshake:
 
+
     ```js
+
     const socket = io(URL, { auth: { token: accessToken } });
+
     ```
+
 
     The token is read from `socket.handshake.auth.token`. A missing token
     rejects the connection with `Authentication token missing`; an invalid
-    token rejects it with `Invalid token`. On success the decoded JWT payload
-    is stored on `socket.data` (its `sub` claim is the acting user id).
+    token rejects it with `Invalid token`. Both arrive on the client as
+    `connect_error` with a plain message — they are *not* `SocketErrorPayload`
+    objects and carry no error code.
+
+
+    On success only the user id is kept, as `socket.data.user = { id: sub }`;
+    the rest of the JWT payload is discarded.
+
+
+    ### Rooms
+
+    A socket belongs to two kinds of room, both named with a bare UUID:
+
+
+    - the **game room**, named after the `gameId`, joined on `join-game` or
+      `reconnect-game` and left on `leave-game`; and
+    - a **personal room**, named after the user's own id, joined automatically on
+      connection and used for presence and friend notifications.
+
+
+    Because both are plain UUIDs in one keyspace, a game room and a personal room
+    are indistinguishable by name.
+
+
+    Presence is derived from personal-room membership rather than a separate map,
+    so it is multi-tab safe: online/offline events fire only on the first and last
+    socket.
 
 
     ### Delivery scope
 
-    Waiting-room events are scoped to a **room** whose name is the `gameId`. The
-    server joins/leaves a socket from that room on `join-game` / `leave-game`.
     In the operations below, scope is one of:
+
 
     - **acting socket** — only the client that triggered the action
       (`socket.emit`).
+    - **single socket** — one specific player's socket, resolved through the
+      server's socket map (`socketsMap`). Note this map holds at most one socket
+      per user and is not cleaned up on disconnect, so these emits are silently
+      dropped for a player who has dropped or opened a second tab.
     - **room (others)** — everyone in the game room except the actor
       (`socket.to(room).emit`).
     - **room (all)** — everyone in the game room including the actor
       (`io.to(room).emit`).
-    - **broadcast** — every connected client (`io.emit`).
+    - **broadcast** — every connected client (`io.emit`). Only the lobby channel
+      uses this.
+
+
+    ### Acknowledgements
+
+    Every client event optionally accepts a Socket.IO acknowledgement callback. When
+    the client supplies one (`emitWithAck`, or a trailing callback), the server
+    replies with a `SocketAckPayload`:
+
+
+    ```js
+
+    const ack = await socket.timeout(5000).emitWithAck("join-game", { gameId });
+
+    // { ok: true } | { ok: false, code, message }
+
+    ```
+
+
+    **Supplying an acknowledgement suppresses the matching `*-error` event.** The
+    two error paths are mutually exclusive: with an ack the failure comes back on
+    the callback only; without one it arrives as the `*-error` event. The ack
+    variant also omits the `errors` details, carrying just `code` and `message`.
+
+
+    ### Reserved event names
+
+    Five constants exist in `events.ts` but are never emitted by the server and have
+    no channel here: `FAVOR_REQUESTED`, `FAVOR_RESOLVED`, `YOUR_HAND`,
+    `INSERT_KITTEN_PROMPT` and `FAVOR_MUST_GIVE`. Favor is implemented through
+    `select-player` / `give-card` and the `WAITING_FOR_*` events instead.
 
   tags:
     - name: Connection
-      description: Connection lifecycle and authentication.
+      description: Connection lifecycle, authentication, state recovery and presence.
+    - name: Lobby
+      description: Global broadcasts keeping every client's lobby list current.
     - name: Waiting Room
       description: Pre-game waiting room — join, leave, ready-up and countdown.
+    - name: Gameplay
+      description: Turn-by-turn play, from the first draw to game over.
     - name: Errors
       description: Per-action error events emitted back to the acting socket.
 
 channels:
+  # --- Connection ---
+  reconnectGame:
+    $ref: "./connection/connection.yaml#/channels/reconnectGame"
+  gameState:
+    $ref: "./connection/connection.yaml#/channels/gameState"
+  playerDisconnected:
+    $ref: "./connection/connection.yaml#/channels/playerDisconnected"
+  playerReconnected:
+    $ref: "./connection/connection.yaml#/channels/playerReconnected"
+  friendOnlineStatusChanged:
+    $ref: "./connection/connection.yaml#/channels/friendOnlineStatusChanged"
+
+  # --- Lobby ---
+  lobbyGameUpdated:
+    $ref: "./lobby/lobby.yaml#/channels/lobbyGameUpdated"
+  lobbyGameRemoved:
+    $ref: "./lobby/lobby.yaml#/channels/lobbyGameRemoved"
+
   # --- Waiting Room ---
   joinGame:
     $ref: "./waiting-room/waiting-room.yaml#/channels/joinGame"
@@ -79,17 +178,140 @@ channels:
     $ref: "./waiting-room/waiting-room.yaml#/channels/countdownCanceled"
   gameStarted:
     $ref: "./waiting-room/waiting-room.yaml#/channels/gameStarted"
+
+  # --- Gameplay: client -> server ---
+  drawCard:
+    $ref: "./gameplay/gameplay.yaml#/channels/drawCard"
+  playCard:
+    $ref: "./gameplay/gameplay.yaml#/channels/playCard"
+  playNope:
+    $ref: "./gameplay/gameplay.yaml#/channels/playNope"
+  playCombo:
+    $ref: "./gameplay/gameplay.yaml#/channels/playCombo"
+  selectComboTarget:
+    $ref: "./gameplay/gameplay.yaml#/channels/selectComboTarget"
+  resolveCombo:
+    $ref: "./gameplay/gameplay.yaml#/channels/resolveCombo"
+  playDefuse:
+    $ref: "./gameplay/gameplay.yaml#/channels/playDefuse"
+  insertKitten:
+    $ref: "./gameplay/gameplay.yaml#/channels/insertKitten"
+  selectPlayer:
+    $ref: "./gameplay/gameplay.yaml#/channels/selectPlayer"
+  giveCard:
+    $ref: "./gameplay/gameplay.yaml#/channels/giveCard"
+  seenTheFuture:
+    $ref: "./gameplay/gameplay.yaml#/channels/seenTheFuture"
+
+  # --- Gameplay: server -> client (private) ---
+  cardReceived:
+    $ref: "./gameplay/gameplay.yaml#/channels/cardReceived"
+  cardRemoved:
+    $ref: "./gameplay/gameplay.yaml#/channels/cardRemoved"
+  seeTheFuturePeek:
+    $ref: "./gameplay/gameplay.yaml#/channels/seeTheFuturePeek"
+  defusePrompt:
+    $ref: "./gameplay/gameplay.yaml#/channels/defusePrompt"
+  comboSelectionRequested:
+    $ref: "./gameplay/gameplay.yaml#/channels/comboSelectionRequested"
+
+  # --- Gameplay: server -> client (public) ---
+  cardDrawn:
+    $ref: "./gameplay/gameplay.yaml#/channels/cardDrawn"
+  cardPlayed:
+    $ref: "./gameplay/gameplay.yaml#/channels/cardPlayed"
+  nopePlayed:
+    $ref: "./gameplay/gameplay.yaml#/channels/nopePlayed"
+  nopeWindowResolved:
+    $ref: "./gameplay/gameplay.yaml#/channels/nopeWindowResolved"
+  comboPlayed:
+    $ref: "./gameplay/gameplay.yaml#/channels/comboPlayed"
+  comboTargetSelected:
+    $ref: "./gameplay/gameplay.yaml#/channels/comboTargetSelected"
+  comboTargetCleared:
+    $ref: "./gameplay/gameplay.yaml#/channels/comboTargetCleared"
+  comboResolved:
+    $ref: "./gameplay/gameplay.yaml#/channels/comboResolved"
+  cardGiven:
+    $ref: "./gameplay/gameplay.yaml#/channels/cardGiven"
+  turnChanged:
+    $ref: "./gameplay/gameplay.yaml#/channels/turnChanged"
+  turnSkipped:
+    $ref: "./gameplay/gameplay.yaml#/channels/turnSkipped"
+  deckShuffled:
+    $ref: "./gameplay/gameplay.yaml#/channels/deckShuffled"
+  playerLooksAtTheFuture:
+    $ref: "./gameplay/gameplay.yaml#/channels/playerLooksAtTheFuture"
+  playerSawTheFuture:
+    $ref: "./gameplay/gameplay.yaml#/channels/playerSawTheFuture"
+  explodingKittenDrawn:
+    $ref: "./gameplay/gameplay.yaml#/channels/explodingKittenDrawn"
+  playerDefused:
+    $ref: "./gameplay/gameplay.yaml#/channels/playerDefused"
+  kittenInserted:
+    $ref: "./gameplay/gameplay.yaml#/channels/kittenInserted"
+  playerEliminated:
+    $ref: "./gameplay/gameplay.yaml#/channels/playerEliminated"
+  playerSelected:
+    $ref: "./gameplay/gameplay.yaml#/channels/playerSelected"
+  waitingForPlayerSelection:
+    $ref: "./gameplay/gameplay.yaml#/channels/waitingForPlayerSelection"
+  waitingForFavorCardSelection:
+    $ref: "./gameplay/gameplay.yaml#/channels/waitingForFavorCardSelection"
+  gameOver:
+    $ref: "./gameplay/gameplay.yaml#/channels/gameOver"
+
   # --- Errors ---
   joinGameError:
     $ref: "./errors/errors.yaml#/channels/joinGameError"
+  reconnectGameError:
+    $ref: "./errors/errors.yaml#/channels/reconnectGameError"
   leaveGameError:
     $ref: "./errors/errors.yaml#/channels/leaveGameError"
   confirmStartError:
     $ref: "./errors/errors.yaml#/channels/confirmStartError"
   cancelStartError:
     $ref: "./errors/errors.yaml#/channels/cancelStartError"
+  drawCardError:
+    $ref: "./errors/errors.yaml#/channels/drawCardError"
+  playCardError:
+    $ref: "./errors/errors.yaml#/channels/playCardError"
+  playNopeError:
+    $ref: "./errors/errors.yaml#/channels/playNopeError"
+  playComboError:
+    $ref: "./errors/errors.yaml#/channels/playComboError"
+  resolveComboError:
+    $ref: "./errors/errors.yaml#/channels/resolveComboError"
+  playDefuseError:
+    $ref: "./errors/errors.yaml#/channels/playDefuseError"
+  insertKittenError:
+    $ref: "./errors/errors.yaml#/channels/insertKittenError"
+  selectPlayerError:
+    $ref: "./errors/errors.yaml#/channels/selectPlayerError"
+  giveCardError:
+    $ref: "./errors/errors.yaml#/channels/giveCardError"
+  seenTheFutureError:
+    $ref: "./errors/errors.yaml#/channels/seenTheFutureError"
 
 operations:
+  # --- Connection ---
+  onReconnectGame:
+    $ref: "./connection/connection.yaml#/operations/onReconnectGame"
+  sendGameState:
+    $ref: "./connection/connection.yaml#/operations/sendGameState"
+  sendPlayerDisconnected:
+    $ref: "./connection/connection.yaml#/operations/sendPlayerDisconnected"
+  sendPlayerReconnected:
+    $ref: "./connection/connection.yaml#/operations/sendPlayerReconnected"
+  sendFriendOnlineStatusChanged:
+    $ref: "./connection/connection.yaml#/operations/sendFriendOnlineStatusChanged"
+
+  # --- Lobby ---
+  sendLobbyGameUpdated:
+    $ref: "./lobby/lobby.yaml#/operations/sendLobbyGameUpdated"
+  sendLobbyGameRemoved:
+    $ref: "./lobby/lobby.yaml#/operations/sendLobbyGameRemoved"
+
   # --- Waiting Room ---
   onJoinGame:
     $ref: "./waiting-room/waiting-room.yaml#/operations/onJoinGame"
@@ -117,35 +339,221 @@ operations:
     $ref: "./waiting-room/waiting-room.yaml#/operations/sendCountdownCanceled"
   sendGameStarted:
     $ref: "./waiting-room/waiting-room.yaml#/operations/sendGameStarted"
+
+  # --- Gameplay: received ---
+  onDrawCard:
+    $ref: "./gameplay/gameplay.yaml#/operations/onDrawCard"
+  onPlayCard:
+    $ref: "./gameplay/gameplay.yaml#/operations/onPlayCard"
+  onPlayNope:
+    $ref: "./gameplay/gameplay.yaml#/operations/onPlayNope"
+  onPlayCombo:
+    $ref: "./gameplay/gameplay.yaml#/operations/onPlayCombo"
+  onSelectComboTarget:
+    $ref: "./gameplay/gameplay.yaml#/operations/onSelectComboTarget"
+  onResolveCombo:
+    $ref: "./gameplay/gameplay.yaml#/operations/onResolveCombo"
+  onPlayDefuse:
+    $ref: "./gameplay/gameplay.yaml#/operations/onPlayDefuse"
+  onInsertKitten:
+    $ref: "./gameplay/gameplay.yaml#/operations/onInsertKitten"
+  onSelectPlayer:
+    $ref: "./gameplay/gameplay.yaml#/operations/onSelectPlayer"
+  onGiveCard:
+    $ref: "./gameplay/gameplay.yaml#/operations/onGiveCard"
+  onSeenTheFuture:
+    $ref: "./gameplay/gameplay.yaml#/operations/onSeenTheFuture"
+
+  # --- Gameplay: sent ---
+  sendCardReceived:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendCardReceived"
+  sendCardRemoved:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendCardRemoved"
+  sendSeeTheFuturePeek:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendSeeTheFuturePeek"
+  sendDefusePrompt:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendDefusePrompt"
+  sendComboSelectionRequested:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendComboSelectionRequested"
+  sendCardDrawn:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendCardDrawn"
+  sendCardPlayed:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendCardPlayed"
+  sendNopePlayed:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendNopePlayed"
+  sendNopeWindowResolved:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendNopeWindowResolved"
+  sendComboPlayed:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendComboPlayed"
+  sendComboTargetSelected:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendComboTargetSelected"
+  sendComboTargetCleared:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendComboTargetCleared"
+  sendComboResolved:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendComboResolved"
+  sendCardGiven:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendCardGiven"
+  sendTurnChanged:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendTurnChanged"
+  sendTurnSkipped:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendTurnSkipped"
+  sendDeckShuffled:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendDeckShuffled"
+  sendPlayerLooksAtTheFuture:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendPlayerLooksAtTheFuture"
+  sendPlayerSawTheFuture:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendPlayerSawTheFuture"
+  sendExplodingKittenDrawn:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendExplodingKittenDrawn"
+  sendPlayerDefused:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendPlayerDefused"
+  sendKittenInserted:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendKittenInserted"
+  sendPlayerEliminated:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendPlayerEliminated"
+  sendPlayerSelected:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendPlayerSelected"
+  sendWaitingForPlayerSelection:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendWaitingForPlayerSelection"
+  sendWaitingForFavorCardSelection:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendWaitingForFavorCardSelection"
+  sendGameOver:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendGameOver"
+
   # --- Errors ---
   sendJoinGameError:
     $ref: "./errors/errors.yaml#/operations/sendJoinGameError"
+  sendReconnectGameError:
+    $ref: "./errors/errors.yaml#/operations/sendReconnectGameError"
   sendLeaveGameError:
     $ref: "./errors/errors.yaml#/operations/sendLeaveGameError"
   sendConfirmStartError:
     $ref: "./errors/errors.yaml#/operations/sendConfirmStartError"
   sendCancelStartError:
     $ref: "./errors/errors.yaml#/operations/sendCancelStartError"
+  sendDrawCardError:
+    $ref: "./errors/errors.yaml#/operations/sendDrawCardError"
+  sendPlayCardError:
+    $ref: "./errors/errors.yaml#/operations/sendPlayCardError"
+  sendPlayNopeError:
+    $ref: "./errors/errors.yaml#/operations/sendPlayNopeError"
+  sendPlayComboError:
+    $ref: "./errors/errors.yaml#/operations/sendPlayComboError"
+  sendResolveComboError:
+    $ref: "./errors/errors.yaml#/operations/sendResolveComboError"
+  sendPlayDefuseError:
+    $ref: "./errors/errors.yaml#/operations/sendPlayDefuseError"
+  sendInsertKittenError:
+    $ref: "./errors/errors.yaml#/operations/sendInsertKittenError"
+  sendSelectPlayerError:
+    $ref: "./errors/errors.yaml#/operations/sendSelectPlayerError"
+  sendGiveCardError:
+    $ref: "./errors/errors.yaml#/operations/sendGiveCardError"
+  sendSeenTheFutureError:
+    $ref: "./errors/errors.yaml#/operations/sendSeenTheFutureError"
 
 components:
   schemas:
-    # --- Waiting Room ---
+    # --- Shared ---
     GameIdPayload:
-      $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/GameIdPayload"
+      $ref: "./common/common.schemas.yaml#/components/schemas/GameIdPayload"
+    PlayerIdPayload:
+      $ref: "./common/common.schemas.yaml#/components/schemas/PlayerIdPayload"
+    EmptyPayload:
+      $ref: "./common/common.schemas.yaml#/components/schemas/EmptyPayload"
+    Card:
+      $ref: "./common/common.schemas.yaml#/components/schemas/Card"
+    CardType:
+      $ref: "./common/common.schemas.yaml#/components/schemas/CardType"
+    ComboSize:
+      $ref: "./common/common.schemas.yaml#/components/schemas/ComboSize"
+    PlayerView:
+      $ref: "./common/common.schemas.yaml#/components/schemas/PlayerView"
+    GamePlayerView:
+      $ref: "./common/common.schemas.yaml#/components/schemas/GamePlayerView"
+    PublicPlayerView:
+      $ref: "./common/common.schemas.yaml#/components/schemas/PublicPlayerView"
+    GameStartedPayload:
+      $ref: "./common/common.schemas.yaml#/components/schemas/GameStartedPayload"
+
+    # --- Connection ---
+    GameStatePayload:
+      $ref: "./connection/connection.schemas.yaml#/components/schemas/GameStatePayload"
+    FriendOnlineStatusChangedPayload:
+      $ref: "./connection/connection.schemas.yaml#/components/schemas/FriendOnlineStatusChangedPayload"
+
+    # --- Lobby ---
+    GameRecord:
+      $ref: "./lobby/lobby.schemas.yaml#/components/schemas/GameRecord"
+    LobbyGameUpdatedPayload:
+      $ref: "./lobby/lobby.schemas.yaml#/components/schemas/LobbyGameUpdatedPayload"
+    LobbyGameRemovedPayload:
+      $ref: "./lobby/lobby.schemas.yaml#/components/schemas/LobbyGameRemovedPayload"
+
+    # --- Waiting Room ---
     WaitingPlayerView:
       $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/WaitingPlayerView"
-    WaitingStateView:
-      $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/WaitingStateView"
     WaitingStatePayload:
       $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/WaitingStatePayload"
     PlayerJoinedPayload:
       $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/PlayerJoinedPayload"
-    PlayerIdPayload:
-      $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/PlayerIdPayload"
     CountdownStartedPayload:
       $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/CountdownStartedPayload"
-    EmptyPayload:
-      $ref: "./waiting-room/waiting-room.schemas.yaml#/components/schemas/EmptyPayload"
+
+    # --- Gameplay ---
+    PlayCardPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/PlayCardPayload"
+    PlayComboPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/PlayComboPayload"
+    SelectComboTargetPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/SelectComboTargetPayload"
+    ResolveComboPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ResolveComboPayload"
+    InsertKittenPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/InsertKittenPayload"
+    SelectPlayerPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/SelectPlayerPayload"
+    GiveCardPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/GiveCardPayload"
+    CardPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardPayload"
+    CardRemovalReason:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardRemovalReason"
+    CardRemovedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardRemovedPayload"
+    CardPlayedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardPlayedPayload"
+    NopePlayedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/NopePlayedPayload"
+    ComboPlayedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboPlayedPayload"
+    ComboTargetSelectedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboTargetSelectedPayload"
+    ComboResolvedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboResolvedPayload"
+    ComboSelectionRequestedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboSelectionRequestedPayload"
+    CardGivenPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardGivenPayload"
+    TurnChangedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/TurnChangedPayload"
+    TurnSkippedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/TurnSkippedPayload"
+    ShowedCardsToPlayerPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ShowedCardsToPlayerPayload"
+    DefusePromptPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/DefusePromptPayload"
+    PlayerDefusedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/PlayerDefusedPayload"
+    KittenInsertedPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/KittenInsertedPayload"
+    GameOverPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/GameOverPayload"
+
     # --- Errors ---
+    SocketErrorCode:
+      $ref: "./errors/errors.schemas.yaml#/components/schemas/SocketErrorCode"
     SocketErrorPayload:
       $ref: "./errors/errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+    SocketAckPayload:
+      $ref: "./errors/errors.schemas.yaml#/components/schemas/SocketAckPayload"

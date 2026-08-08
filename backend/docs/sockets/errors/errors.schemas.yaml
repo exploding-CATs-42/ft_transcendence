@@ -1,18 +1,100 @@
 components:
   schemas:
+    SocketErrorCode:
+      type: string
+      description: >
+        Machine-readable error cause. Clients should branch on this rather than on
+        `message`. Anything that is not one of the specific causes below arrives as
+        `UNKNOWN`, which is the default for every error the server does not classify.
+      enum:
+        - RECONNECT_REQUIRED
+        - GAME_IN_PROGRESS
+        - GAME_NOT_FOUND
+        - GAME_FULL
+        - ALREADY_IN_OTHER_GAME
+        - NOT_YOUR_TURN
+        - UNKNOWN
+
+    ValidationErrorDetails:
+      type: object
+      description: >
+        Zod's flattened issue report, produced by `error.flatten()`. Present when the
+        event payload failed schema validation.
+      required:
+        - formErrors
+        - fieldErrors
+      properties:
+        formErrors:
+          type: array
+          items:
+            type: string
+          example: []
+        fieldErrors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+          example:
+            gameId:
+              - Invalid uuid
+
     SocketErrorPayload:
       type: object
       required:
+        - code
         - message
       properties:
+        code:
+          $ref: "#/components/schemas/SocketErrorCode"
         message:
           type: string
-          description: Human-readable error message.
+          description: Human-readable error message. Not stable; do not branch on it.
           example: "Game not found"
         errors:
           description: >
-            Optional structured details (e.g. Zod validation issues). Present
-            for validation errors, otherwise omitted.
-          example:
-            - path: "gameId"
-              message: "Invalid uuid"
+            Optional structured details. For validation failures this is Zod's
+            flattened report. For `ALREADY_IN_OTHER_GAME` it is
+            `{ existingGameId }` — the only error code that carries domain data.
+            Omitted otherwise.
+          oneOf:
+            - $ref: "#/components/schemas/ValidationErrorDetails"
+            - type: object
+              required:
+                - existingGameId
+              properties:
+                existingGameId:
+                  type: string
+                  format: uuid
+                  description: Id of the game the player is already in.
+
+    SocketAckPayload:
+      description: >
+        Value passed to the acknowledgement callback when a client emits an event
+        with one (`emitWithAck` or a trailing callback). Note that supplying an ack
+        **suppresses** the matching `*-error` event: the server replies on the
+        callback instead. The failure variant carries `code` and `message` but never
+        the `errors` details.
+      oneOf:
+        - type: object
+          title: Success
+          required:
+            - ok
+          properties:
+            ok:
+              type: boolean
+              enum: [true]
+        - type: object
+          title: Failure
+          required:
+            - ok
+            - code
+            - message
+          properties:
+            ok:
+              type: boolean
+              enum: [false]
+            code:
+              $ref: "#/components/schemas/SocketErrorCode"
+            message:
+              type: string

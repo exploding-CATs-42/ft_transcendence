@@ -1,34 +1,52 @@
+# Every client event has a matching error event. The server emits it to the acting
+# socket only, and only when the client did NOT supply an acknowledgement callback
+# for that emit — with an ack, the failure is delivered on the callback instead.
+#
+# All 15 share the same SocketErrorPayload shape, so branch on `code`, not `message`.
+
 channels:
   joinGameError:
     address: join-game-error
     title: Join game error
+    description: >
+      Sent to the acting socket when `join-game` fails.
+      Carries the two codes that clients must act on rather than merely display:
+      `RECONNECT_REQUIRED` (emit `reconnect-game` instead) and
+      `ALREADY_IN_OTHER_GAME` (whose `errors.existingGameId` names the game the
+      player is already in).
     messages:
       socketError:
         name: JoinGameError
         title: Join game error
-        summary: Sent to the acting socket when join-game fails.
+        summary: Sent to the acting socket when `join-game` fails.
         contentType: application/json
         payload:
           $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
-        examples:
-          - name: validationError
-            payload:
-              message: "Validation failed"
-              errors:
-                - path: "gameId"
-                  message: "Invalid uuid"
-          - name: genericError
-            payload:
-              message: "Game not found"
+
+  reconnectGameError:
+    address: reconnect-game-error
+    title: Reconnect game error
+    description: >
+      Sent to the acting socket when `reconnect-game` fails.
+    messages:
+      socketError:
+        name: ReconnectGameError
+        title: Reconnect game error
+        summary: Sent to the acting socket when `reconnect-game` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
 
   leaveGameError:
     address: leave-game-error
     title: Leave game error
+    description: >
+      Sent to the acting socket when `leave-game` fails.
     messages:
       socketError:
         name: LeaveGameError
         title: Leave game error
-        summary: Sent to the acting socket when leave-game fails.
+        summary: Sent to the acting socket when `leave-game` fails.
         contentType: application/json
         payload:
           $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
@@ -36,11 +54,13 @@ channels:
   confirmStartError:
     address: confirm-start-error
     title: Confirm start error
+    description: >
+      Sent to the acting socket when `confirm-start` fails.
     messages:
       socketError:
         name: ConfirmStartError
         title: Confirm start error
-        summary: Sent to the acting socket when confirm-start fails.
+        summary: Sent to the acting socket when `confirm-start` fails.
         contentType: application/json
         payload:
           $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
@@ -48,11 +68,155 @@ channels:
   cancelStartError:
     address: cancel-start-error
     title: Cancel start error
+    description: >
+      Sent to the acting socket when `cancel-start` fails.
     messages:
       socketError:
         name: CancelStartError
         title: Cancel start error
-        summary: Sent to the acting socket when cancel-start fails.
+        summary: Sent to the acting socket when `cancel-start` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  drawCardError:
+    address: draw-card-error
+    title: Draw card error
+    description: >
+      Sent to the acting socket when `draw-card` fails.
+    messages:
+      socketError:
+        name: DrawCardError
+        title: Draw card error
+        summary: Sent to the acting socket when `draw-card` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  playCardError:
+    address: play-card-error
+    title: Play card error
+    description: >
+      Sent to the acting socket when `play-card` fails.
+    messages:
+      socketError:
+        name: PlayCardError
+        title: Play card error
+        summary: Sent to the acting socket when `play-card` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  playNopeError:
+    address: play-nope-error
+    title: Play nope error
+    description: >
+      Sent to the acting socket when `play-nope` fails.
+    messages:
+      socketError:
+        name: PlayNopeError
+        title: Play nope error
+        summary: Sent to the acting socket when `play-nope` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  playComboError:
+    address: play-combo-error
+    title: Play combo error
+    description: >
+      Sent to the acting socket when `play-combo` fails.
+    messages:
+      socketError:
+        name: PlayComboError
+        title: Play combo error
+        summary: Sent to the acting socket when `play-combo` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  resolveComboError:
+    address: resolve-combo-error
+    title: Resolve combo error
+    description: >
+      Sent to the acting socket when `resolve-combo` and `select-combo-target` fails.
+      Note this channel serves two client events: `resolve-combo` and also
+      `select-combo-target`, which has no dedicated error event of its own.
+    messages:
+      socketError:
+        name: ResolveComboError
+        title: Resolve combo error
+        summary: Sent to the acting socket when `resolve-combo` and `select-combo-target` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  playDefuseError:
+    address: play-defuse-error
+    title: Play defuse error
+    description: >
+      Sent to the acting socket when `play-defuse` fails.
+    messages:
+      socketError:
+        name: PlayDefuseError
+        title: Play defuse error
+        summary: Sent to the acting socket when `play-defuse` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  insertKittenError:
+    address: insert-kitten-error
+    title: Insert kitten error
+    description: >
+      Sent to the acting socket when `insert-kitten` fails.
+    messages:
+      socketError:
+        name: InsertKittenError
+        title: Insert kitten error
+        summary: Sent to the acting socket when `insert-kitten` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  selectPlayerError:
+    address: select-player-error
+    title: Select player error
+    description: >
+      Sent to the acting socket when `select-player` fails.
+    messages:
+      socketError:
+        name: SelectPlayerError
+        title: Select player error
+        summary: Sent to the acting socket when `select-player` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  giveCardError:
+    address: give-card-error
+    title: Give card error
+    description: >
+      Sent to the acting socket when `give-card` fails.
+    messages:
+      socketError:
+        name: GiveCardError
+        title: Give card error
+        summary: Sent to the acting socket when `give-card` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  seenTheFutureError:
+    address: seen-the-future-error
+    title: Seen the future error
+    description: >
+      Sent to the acting socket when `seen-the-future` fails.
+    messages:
+      socketError:
+        name: SeenTheFutureError
+        title: Seen the future error
+        summary: Sent to the acting socket when `seen-the-future` fails.
         contentType: application/json
         payload:
           $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
@@ -62,17 +226,27 @@ operations:
     action: send
     channel:
       $ref: "#/channels/joinGameError"
-    summary: Emitted to the acting socket when join-game fails.
+    summary: Emitted to the acting socket when `join-game` fails.
     tags:
       - name: Errors
     messages:
       - $ref: "#/channels/joinGameError/messages/socketError"
 
+  sendReconnectGameError:
+    action: send
+    channel:
+      $ref: "#/channels/reconnectGameError"
+    summary: Emitted to the acting socket when `reconnect-game` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/reconnectGameError/messages/socketError"
+
   sendLeaveGameError:
     action: send
     channel:
       $ref: "#/channels/leaveGameError"
-    summary: Emitted to the acting socket when leave-game fails.
+    summary: Emitted to the acting socket when `leave-game` fails.
     tags:
       - name: Errors
     messages:
@@ -82,7 +256,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/confirmStartError"
-    summary: Emitted to the acting socket when confirm-start fails.
+    summary: Emitted to the acting socket when `confirm-start` fails.
     tags:
       - name: Errors
     messages:
@@ -92,8 +266,108 @@ operations:
     action: send
     channel:
       $ref: "#/channels/cancelStartError"
-    summary: Emitted to the acting socket when cancel-start fails.
+    summary: Emitted to the acting socket when `cancel-start` fails.
     tags:
       - name: Errors
     messages:
       - $ref: "#/channels/cancelStartError/messages/socketError"
+
+  sendDrawCardError:
+    action: send
+    channel:
+      $ref: "#/channels/drawCardError"
+    summary: Emitted to the acting socket when `draw-card` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/drawCardError/messages/socketError"
+
+  sendPlayCardError:
+    action: send
+    channel:
+      $ref: "#/channels/playCardError"
+    summary: Emitted to the acting socket when `play-card` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/playCardError/messages/socketError"
+
+  sendPlayNopeError:
+    action: send
+    channel:
+      $ref: "#/channels/playNopeError"
+    summary: Emitted to the acting socket when `play-nope` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/playNopeError/messages/socketError"
+
+  sendPlayComboError:
+    action: send
+    channel:
+      $ref: "#/channels/playComboError"
+    summary: Emitted to the acting socket when `play-combo` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/playComboError/messages/socketError"
+
+  sendResolveComboError:
+    action: send
+    channel:
+      $ref: "#/channels/resolveComboError"
+    summary: Emitted to the acting socket when `resolve-combo` and `select-combo-target` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/resolveComboError/messages/socketError"
+
+  sendPlayDefuseError:
+    action: send
+    channel:
+      $ref: "#/channels/playDefuseError"
+    summary: Emitted to the acting socket when `play-defuse` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/playDefuseError/messages/socketError"
+
+  sendInsertKittenError:
+    action: send
+    channel:
+      $ref: "#/channels/insertKittenError"
+    summary: Emitted to the acting socket when `insert-kitten` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/insertKittenError/messages/socketError"
+
+  sendSelectPlayerError:
+    action: send
+    channel:
+      $ref: "#/channels/selectPlayerError"
+    summary: Emitted to the acting socket when `select-player` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/selectPlayerError/messages/socketError"
+
+  sendGiveCardError:
+    action: send
+    channel:
+      $ref: "#/channels/giveCardError"
+    summary: Emitted to the acting socket when `give-card` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/giveCardError/messages/socketError"
+
+  sendSeenTheFutureError:
+    action: send
+    channel:
+      $ref: "#/channels/seenTheFutureError"
+    summary: Emitted to the acting socket when `seen-the-future` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/seenTheFutureError/messages/socketError"

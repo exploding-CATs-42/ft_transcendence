@@ -6,10 +6,23 @@ info:
   description: REST API documentation for the ft_transcendence backend.
 
 servers:
-  - url: http://localhost:8080/api
-    description: Docker + Nginx local development
-  - url: http://localhost:3000/api
-    description: Backend-only local development
+  - url: https://localhost:{httpsPort}/api
+    description: >
+      Docker + Nginx local development. Nginx terminates TLS on 443 (published as
+      NGINX_HTTPS_PORT) and strips the /api prefix before proxying to the backend.
+      Plain HTTP on NGINX_PORT only issues a 301 redirect to HTTPS.
+    variables:
+      httpsPort:
+        default: "8443"
+        description: Host port mapped to the Nginx HTTPS port (NGINX_HTTPS_PORT).
+  - url: http://localhost:{backendPort}
+    description: >
+      Backend-only local development, bypassing Nginx. The Express app mounts its
+      routers at the root, so there is no /api prefix on this server.
+    variables:
+      backendPort:
+        default: "3000"
+        description: Port the backend listens on (BACKEND_PORT).
 
 tags:
   - name: Auth
@@ -54,6 +67,8 @@ paths:
     $ref: "games/games.yaml#/paths/~1games"
   /games/current:
     $ref: "games/games.yaml#/paths/~1games~1current"
+  /games/{gameId}:
+    $ref: "games/games.yaml#/paths/~1games~1{gameId}"
 
 components:
   securitySchemes:

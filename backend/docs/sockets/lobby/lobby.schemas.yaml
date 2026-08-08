@@ -1,0 +1,68 @@
+components:
+  schemas:
+    GameRecord:
+      type: object
+      description: >
+        A lobby entry. The same shape the REST API returns from `GET /api/games`.
+      required:
+        - id
+        - name
+        - maxPlayers
+        - createdAt
+        - players
+      properties:
+        id:
+          type: string
+          format: uuid
+        name:
+          type: string
+          example: Friday Night Table
+        maxPlayers:
+          type: integer
+          minimum: 2
+          maximum: 5
+        createdAt:
+          type: integer
+          format: int64
+          description: Creation timestamp (Unix epoch, milliseconds).
+          example: 1745835176910
+        players:
+          type: array
+          description: Players currently in the game.
+          items:
+            type: object
+            required:
+              - id
+              - username
+              - avatarUrl
+              - isOnline
+            properties:
+              id:
+                type: string
+                format: uuid
+              username:
+                type: string
+              avatarUrl:
+                type: string
+                format: uri
+                nullable: true
+              isOnline:
+                type: boolean
+
+    LobbyGameUpdatedPayload:
+      type: object
+      required:
+        - game
+      properties:
+        game:
+          $ref: "#/components/schemas/GameRecord"
+
+    LobbyGameRemovedPayload:
+      type: object
+      required:
+        - gameId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+          description: Id of the game that is no longer joinable.
