@@ -26,6 +26,22 @@ export type MyProfileUserWithStats = MyProfileUser & GameStats;
 
 export type FriendUser = ProfileUser;
 
+export type LeaderboardEntry = ProfileUserWithStats & {
+  rank: number;
+};
+
+export function getExplodedTimes(stats: GameStats): number {
+  return stats.totalGames - stats.wins;
+}
+
+export function getSuccessRate(stats: GameStats): number {
+  if (stats.totalGames === 0) {
+    return 0;
+  }
+
+  return Math.round((stats.wins / stats.totalGames) * 100);
+}
+
 export interface UserGameHistoryItem {
   gameId: string;
   gameName: string;

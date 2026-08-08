@@ -8,3 +8,4 @@ export { useFriends } from "./friends/useFriends";
 export { useGames } from "./games/useGames";
 export { useUser } from "./user/useUser";
 export { useFriendsActions } from "./friends/useFriendsActions";
+export { useLeaderboard } from "./leaderboard/useLeaderboard";

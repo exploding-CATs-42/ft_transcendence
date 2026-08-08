@@ -1,5 +1,6 @@
 // Project level
 import {
+  getLeaderboardController,
   getUserByIdController,
   getUserGamesController,
   searchUsersController,
@@ -25,6 +26,7 @@ export const usersRouter = createAuthenticatedRouter();
  */
 
 usersRouter.get("/", errorHandler(searchUsersController));
+usersRouter.get("/leaderboard", errorHandler(getLeaderboardController));
 usersRouter.get("/:userId", errorHandler(getUserByIdController));
 usersRouter.get("/:userId/games", errorHandler(getUserGamesController));
 usersRouter.get("/:userId/friends", errorHandler(listFriendsController));
