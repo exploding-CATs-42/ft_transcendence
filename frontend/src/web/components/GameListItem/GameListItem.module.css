@@ -40,6 +40,12 @@
   line-height: 26px;
 
   color: var(--black);
+
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 @media only screen and (min-width: 420px) {
