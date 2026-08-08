@@ -108,7 +108,10 @@ paths:
       tags:
         - Users
       summary: List a user's friendship relations
-      description: Returns all friendship relations for the specified user.
+      description: >
+        Returns all friendship relations for the specified user. Handled by the same
+        controller as GET /me/friends, so the optional "view" filter applies here too.
+        An unknown user id yields an empty list rather than a 404.
       operationId: getUserFriends
       security:
         - bearerAuth: []
@@ -120,6 +123,16 @@ paths:
           schema:
             type: string
             format: uuid
+        - name: view
+          in: query
+          required: false
+          description: Optional filter for which relations to return. Defaults to all relations.
+          schema:
+            type: string
+            enum:
+              - friends_and_requests
+              - accepted
+              - incoming
       responses:
         "200":
           description: Friendship relations returned successfully
@@ -155,7 +168,7 @@ paths:
       tags:
         - Users
       summary: Get user game history
-      description: Returns finished games for a user.
+      description: Returns a user's finished games, most recently ended first.
       operationId: getUserGames
       security:
         - bearerAuth: []

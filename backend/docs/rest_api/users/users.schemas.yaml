@@ -17,16 +17,13 @@ components:
       type: object
       required:
         - isOnline
-        - lastSeenAt
       properties:
         isOnline:
           type: boolean
+          description: >
+            Derived live from socket presence: true while the user has at least one
+            connected socket. It is not persisted, so there is no last-seen value.
           example: false
-        lastSeenAt:
-          type: string
-          format: date-time
-          nullable: true
-          example: "2026-04-28T10:00:00.000Z"
 
     User:
       type: object

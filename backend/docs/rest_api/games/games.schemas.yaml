@@ -7,6 +7,7 @@ components:
         - name
         - maxPlayers
         - createdAt
+        - players
       properties:
         id:
           type: string
@@ -20,9 +21,15 @@ components:
           format: int64
           description: Creation timestamp (Unix epoch, milliseconds)
           example: 1745835176910
+        players:
+          type: array
+          description: Players currently in the game.
+          items:
+            $ref: "../users/users.schemas.yaml#/components/schemas/ProfileUser"
 
     CreateGameRequest:
       type: object
+      additionalProperties: false
       required:
         - gameName
         - maxPlayers
@@ -31,11 +38,15 @@ components:
           type: string
           minLength: 3
           maxLength: 30
+          description: Trimmed before validation.
           example: Friday Night Table
         maxPlayers:
           type: integer
           minimum: 2
           maximum: 5
+          description: >
+            Coerced to a number, so a numeric string is also accepted. Unknown
+            properties are rejected with a 400.
           example: 4
 
     GameResponse:
@@ -51,8 +62,30 @@ components:
     CurrentGameResponse:
       type: object
       nullable: true
+      description: >
+        The user's active or waiting game. The endpoint responds with 200 and a body
+        of literal `null` when the user is not in a game — it does not 404.
       allOf:
         - $ref: "#/components/schemas/GameRecord"
+
+    ExistingGameConflictResponse:
+      type: object
+      required:
+        - message
+        - errors
+      properties:
+        message:
+          type: string
+          example: Player already has an active or waiting game
+        errors:
+          type: object
+          required:
+            - existingGameId
+          properties:
+            existingGameId:
+              type: string
+              format: uuid
+              description: Id of the game the user is already in.
 
     MessageResponse:
       type: object
