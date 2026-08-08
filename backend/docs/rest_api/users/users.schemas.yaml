@@ -79,6 +79,28 @@ components:
     FriendUser:
         $ref: "#/components/schemas/ProfileUser"
 
+    LeaderboardEntry:
+      allOf:
+        - $ref: "#/components/schemas/ProfileUserWithStats"
+        - type: object
+          required:
+            - rank
+          properties:
+            rank:
+              type: integer
+              description: Position in the leaderboard, starting at 1.
+              example: 1
+
+    LeaderboardResponse:
+      type: object
+      required:
+        - leaderboard
+      properties:
+        leaderboard:
+          type: array
+          items:
+            $ref: "#/components/schemas/LeaderboardEntry"
+
     UserResponse:
       type: object
       required:

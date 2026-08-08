@@ -48,6 +48,42 @@ paths:
               example:
                 message: Internal server error
 
+  /users/leaderboard:
+    get:
+      tags:
+        - Users
+      summary: Get the leaderboard
+      description: >
+        Returns every registered user together with their finished-game
+        statistics, ordered by wins, then success rate, then games played,
+        then username.
+      operationId: getLeaderboard
+      security:
+        - bearerAuth: []
+      responses:
+        "200":
+          description: Leaderboard returned successfully
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/LeaderboardResponse"
+        "401":
+          description: Invalid or missing access token
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid token
+        "500":
+          description: Server error
+          content:
+            application/json:
+              schema:
+                $ref: "./users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Internal server error
+
   /users/{userId}:
     get:
       tags:
