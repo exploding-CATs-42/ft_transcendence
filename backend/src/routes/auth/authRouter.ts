@@ -7,10 +7,11 @@ import {
   refreshController,
   registerController,
 } from "controllers/authController";
+import { loginRateLimiter } from "middlewares";
 
 export const authRouter = express.Router();
 
 authRouter.post("/register", registerController);
-authRouter.post("/login", loginController);
+authRouter.post("/login", loginRateLimiter, loginController);
 authRouter.post("/logout", logoutController);
 authRouter.post("/refresh", refreshController);
