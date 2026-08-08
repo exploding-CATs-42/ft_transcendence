@@ -7,6 +7,7 @@ import {
   getUserGamesParamsSchema,
 } from "schemas";
 import {
+  getLeaderboard,
   getPublicUserById,
   getUserGames,
   searchUsersByUsername,
@@ -22,6 +23,14 @@ export async function searchUsersController(
 
   const users = await searchUsersByUsername(query.username);
   res.status(200).json({ users });
+}
+
+export async function getLeaderboardController(
+  _req: AuthenticatedRequest,
+  res: Response,
+) {
+  const leaderboard = await getLeaderboard();
+  res.status(200).json({ leaderboard });
 }
 
 export async function getUserByIdController(
