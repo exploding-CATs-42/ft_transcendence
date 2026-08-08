@@ -10,6 +10,9 @@ import "./styles/global.css";
 const HomePage = lazy(() => import("./pages/HomePage/HomePage.jsx"));
 const ProfilePage = lazy(() => import("./pages/ProfilePage/ProfilePage.jsx"));
 const LobbyPage = lazy(() => import("./pages/LobbyPage/LobbyPage"));
+const LeaderboardPage = lazy(
+  () => import("./pages/LeaderboardPage/LeaderboardPage"),
+);
 const GamePage = lazy(() => import("./pages/GamePage/GamePage.jsx"));
 const NotFoundPage = lazy(() => import("./pages/NotFoundPage/NotFoundPage.js"));
 const AuthPage = lazy(() => import("./pages/AuthPage/AuthPage"));
@@ -40,6 +43,7 @@ function App() {
           <Route path="users/:userId" element={<ProfilePage />} />
           <Route path="profile" element={<ProfilePage />} />
           <Route path="lobby" element={<LobbyPage />} />
+          <Route path="leaderboard" element={<LeaderboardPage />} />
           <Route path="game" element={<GamePage />} />
         </Route>
 
