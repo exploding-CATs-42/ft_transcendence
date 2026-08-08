@@ -1,0 +1,439 @@
+components:
+  schemas:
+    # --- Client -> Server payloads ---
+    GameIdPayload:
+      $ref: "../common/common.schemas.yaml#/components/schemas/GameIdPayload"
+
+    PlayerIdPayload:
+      $ref: "../common/common.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+    PlayCardPayload:
+      type: object
+      required:
+        - gameId
+        - cardId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        cardId:
+          type: integer
+          minimum: 0
+          maximum: 55
+          description: Id of a card in the caller's hand. Coerced, so a numeric string works.
+
+    PlayComboPayload:
+      type: object
+      required:
+        - gameId
+        - cardIds
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        cardIds:
+          type: array
+          minItems: 2
+          maxItems: 3
+          description: Ids of the matching cat cards being combined.
+          items:
+            type: integer
+            minimum: 0
+
+    SelectComboTargetPayload:
+      type: object
+      required:
+        - gameId
+        - targetPlayerId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        targetPlayerId:
+          type: string
+          format: uuid
+          description: The player the combo is aimed at.
+
+    ResolveComboPayload:
+      type: object
+      description: >
+        Used for three different steps, distinguished by which optional field is
+        present: declaring a two-card combo (`targetPlayerId` only), resolving it by
+        picking a blind card position (`cardIndex`), or resolving a three-card combo
+        by naming a card type (`requestedCardType`).
+      required:
+        - gameId
+        - targetPlayerId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        targetPlayerId:
+          type: string
+          format: uuid
+        cardIndex:
+          type: integer
+          minimum: 0
+          description: Blind position in the target's hand, for a two-card combo.
+        requestedCardType:
+          description: The named card type, for a three-card combo.
+          allOf:
+            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
+
+    InsertKittenPayload:
+      type: object
+      required:
+        - gameId
+        - explodingKittenPosition
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        explodingKittenPosition:
+          type: integer
+          minimum: 0
+          description: >
+            Index in the deck at which to bury the defused Exploding Kitten. The
+            server does not reveal the chosen position to anyone.
+
+    SelectPlayerPayload:
+      type: object
+      required:
+        - gameId
+        - playerId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        playerId:
+          type: string
+          format: uuid
+          description: The player chosen as the target of the pending action.
+
+    GiveCardPayload:
+      type: object
+      required:
+        - gameId
+        - playerIdFrom
+        - playerIdTo
+        - cardId
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        playerIdFrom:
+          type: string
+          format: uuid
+        playerIdTo:
+          type: string
+          format: uuid
+        cardId:
+          type: integer
+          minimum: 0
+          maximum: 55
+
+    # --- Server -> Client payloads ---
+    CardPayload:
+      type: object
+      description: A card revealed privately to one player, with its full contents.
+      required:
+        - playerId
+        - card
+      properties:
+        playerId:
+          type: string
+          format: uuid
+          description: The player who now holds the card.
+        card:
+          $ref: "../common/common.schemas.yaml#/components/schemas/Card"
+
+    CardRemovalReason:
+      type: string
+      description: Why a card left the player's hand.
+      enum:
+        - PLAYED
+        - STOLEN
+        - GIVEN_AWAY
+        - EXPLODED
+        - INSERTED_INTO_DECK
+
+    CardRemovedPayload:
+      type: object
+      description: >
+        Tells a single player to drop a card from their own hand. Always private —
+        other players learn only that something happened, via the matching public
+        event.
+      required:
+        - cardId
+        - reason
+      properties:
+        cardId:
+          type: integer
+          minimum: 0
+          maximum: 55
+        reason:
+          $ref: "#/components/schemas/CardRemovalReason"
+
+    CardPlayedPayload:
+      type: object
+      required:
+        - playerId
+        - cardType
+        - nopeWindowExpiresAt
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        cardType:
+          $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
+        nopeWindowExpiresAt:
+          type: integer
+          format: int64
+          description: >
+            Unix epoch timestamp in milliseconds at which the Nope window closes.
+            Sent as -1 when the played card was a Defuse, which is a known
+            placeholder rather than a meaningful timestamp.
+
+    NopePlayedPayload:
+      type: object
+      required:
+        - playerId
+        - nopeWindowExpiresAt
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        nopeWindowExpiresAt:
+          type: integer
+          format: int64
+          description: New window end, extended by this Nope.
+
+    ComboPlayedPayload:
+      type: object
+      required:
+        - playerId
+        - cardTypes
+        - nopeWindowExpiresAt
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        cardTypes:
+          type: array
+          items:
+            $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
+        nopeWindowExpiresAt:
+          type: integer
+          format: int64
+
+    ComboTargetSelectedPayload:
+      type: object
+      required:
+        - playerId
+        - targetPlayerId
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        targetPlayerId:
+          type: string
+          format: uuid
+
+    ComboResolvedPayload:
+      type: object
+      description: >
+        Outcome of a combo. For a three-card combo the payload is not identical for
+        everyone: the actor and the target receive `requestedCardType`, while all
+        other players receive a redacted copy without it, so bystanders never learn
+        which card was named.
+      required:
+        - playerId
+        - targetPlayerId
+        - comboSize
+        - cardStolen
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        targetPlayerId:
+          type: string
+          format: uuid
+        comboSize:
+          $ref: "../common/common.schemas.yaml#/components/schemas/ComboSize"
+        requestedCardType:
+          description: >
+            Present only for three-card combos, and only in the copies sent to the
+            actor and the target.
+          allOf:
+            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
+        cardStolen:
+          type: boolean
+          description: False when the target held nothing to take.
+
+    ComboSelectionRequestedPayload:
+      type: object
+      description: >
+        Prompts the acting player to choose a combo target, and for a three-card
+        combo a card type. Despite being a public-events constant, it is sent to one
+        socket only.
+      required:
+        - playerId
+        - comboSize
+        - targets
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        comboSize:
+          $ref: "../common/common.schemas.yaml#/components/schemas/ComboSize"
+        targets:
+          type: array
+          description: Selectable opponents and how many cards each holds.
+          items:
+            type: object
+            required:
+              - playerId
+              - handSize
+            properties:
+              playerId:
+                type: string
+                format: uuid
+              handSize:
+                type: integer
+                minimum: 0
+        targetPlayerId:
+          type: string
+          format: uuid
+          description: Already-chosen target, when re-prompting.
+        requestedCardType:
+          allOf:
+            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
+
+    CardGivenPayload:
+      type: object
+      required:
+        - playerIdFrom
+        - playerIdTo
+      properties:
+        playerIdFrom:
+          type: string
+          format: uuid
+        playerIdTo:
+          type: string
+          format: uuid
+
+    TurnChangedPayload:
+      type: object
+      required:
+        - playerId
+        - attackCount
+      properties:
+        playerId:
+          type: string
+          format: uuid
+          description: The player whose turn it now is.
+        attackCount:
+          type: integer
+          minimum: 0
+          description: Extra turns this player still owes after an Attack.
+
+    TurnSkippedPayload:
+      type: object
+      required:
+        - playerId
+        - attackCount
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        attackCount:
+          type: integer
+          minimum: 0
+
+    ShowedCardsToPlayerPayload:
+      type: object
+      description: The See the Future peek, sent privately to the player who played it.
+      required:
+        - playerId
+        - cards
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        cards:
+          type: array
+          description: Top cards of the deck, in draw order.
+          items:
+            $ref: "../common/common.schemas.yaml#/components/schemas/Card"
+
+    DefusePromptPayload:
+      type: object
+      description: >
+        Sent privately to the player who just drew an Exploding Kitten. If
+        `canDefuse` is false they hold no Defuse and the prompt is only a countdown
+        to their elimination.
+      required:
+        - playerId
+        - endsAt
+        - canDefuse
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        endsAt:
+          type: integer
+          format: int64
+          description: Unix epoch ms deadline for playing the Defuse.
+        canDefuse:
+          type: boolean
+
+    PlayerDefusedPayload:
+      type: object
+      required:
+        - playerId
+        - deckSize
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        deckSize:
+          type: integer
+          minimum: 0
+          description: Deck size after the kitten was reinserted.
+
+    KittenInsertedPayload:
+      type: object
+      required:
+        - playerId
+        - cardId
+      properties:
+        playerId:
+          type: string
+          format: uuid
+        cardId:
+          type: integer
+          description: >
+            Id of the reinserted Exploding Kitten. Its position in the deck is
+            deliberately not included.
+
+    GameOverPayload:
+      type: object
+      required:
+        - winner
+      properties:
+        winner:
+          type: object
+          required:
+            - id
+            - name
+            - avatarUrl
+          properties:
+            id:
+              type: string
+              format: uuid
+            name:
+              type: string
+            avatarUrl:
+              type: string
+              format: uri
+              nullable: true
