@@ -95,6 +95,23 @@ export function trackGameState(): CleanupFunction {
     };
   };
 
+  const setConnected = (playerId: string, isConnected: boolean) => {
+    if (!cachedState) return;
+
+    cachedState = {
+      ...cachedState,
+      players: cachedState.players.map((player) =>
+        player.id === playerId ? { ...player, isConnected } : player,
+      ),
+    };
+  };
+
+  const onDisconnected = ({ playerId }: PlayerIdPayload) =>
+    setConnected(playerId, false);
+
+  const onReconnected = ({ playerId }: PlayerIdPayload) =>
+    setConnected(playerId, true);
+
   // Reload: server already sends a full snapshot.
   const onState = (payload: GameStatePayload) => {
     cachedState = payload;
@@ -113,11 +130,15 @@ export function trackGameState(): CleanupFunction {
   socket.on(ServerPrivateEvents.GAME_STARTED, onStarted);
   socket.on(ServerPrivateEvents.GAME_STATE, onState);
   socket.on(ServerPublicEvents.TURN_CHANGED, onTurn);
+  socket.on(ServerPublicEvents.PLAYER_DISCONNECTED, onDisconnected);
+  socket.on(ServerPublicEvents.PLAYER_RECONNECTED, onReconnected);
 
   return () => {
     socket.off(ServerPrivateEvents.GAME_STARTED, onStarted);
     socket.off(ServerPrivateEvents.GAME_STATE, onState);
     socket.off(ServerPublicEvents.TURN_CHANGED, onTurn);
+    socket.off(ServerPublicEvents.PLAYER_DISCONNECTED, onDisconnected);
+    socket.off(ServerPublicEvents.PLAYER_RECONNECTED, onReconnected);
     cachedState = null;
   };
 }
