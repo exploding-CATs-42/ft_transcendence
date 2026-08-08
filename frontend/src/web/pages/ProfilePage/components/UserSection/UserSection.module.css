@@ -1,5 +1,6 @@
 .section {
   min-height: min-content;
+  min-width: 0;
   display: grid;
   grid-template-columns: max-content max-content max-content auto;
   grid-template-areas: "avatar nameContainer editButton logoutButton";
@@ -25,6 +26,18 @@
   gap: 8px;
 }
 
+.username {
+  min-width: 0;
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copyButton {
+  flex: 0 0 auto;
+}
+
 .copyIcon {
   fill: var(--off-white);
 }
@@ -34,9 +47,15 @@
   fill: var(--throw-throw-burrito);
 }
 
+@media only screen and (min-width: 450px) {
+  .section {
+    grid-template-columns: max-content minmax(0, max-content) auto max-content;
+  }
+}
+
 @media only screen and (min-width: 768px) {
   .section {
-    grid-template-columns: auto auto;
+    grid-template-columns: minmax(0, auto) auto;
     grid-template-areas:
       "avatar logoutButton"
       "nameContainer editButton";
@@ -66,7 +85,7 @@
   .section {
     --top-padding: 83px;
 
-    grid-template-columns: auto auto;
+    grid-template-columns: minmax(0, auto) auto;
     grid-template-areas:
       "avatar avatar"
       "nameContainer editButton"

@@ -34,10 +34,10 @@ const UserSection = ({ user, updateUser, isMyProfile }: Props) => {
       />
 
       <div className={s.nameContainer}>
-        <span>{user.username}</span>
+        <span className={s.username}>{user.username}</span>
 
         <Button className={s.copyButton} onClick={copyUserIdToClipboard}>
-          <Icon name="copy" className={s.copyIcon} width={15} height={15} />
+          <Icon name="copy" className={s.copyIcon} width={20} height={20} />
         </Button>
       </div>
 
