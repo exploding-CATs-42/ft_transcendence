@@ -47,6 +47,8 @@ paths:
     $ref: "auth/auth.yaml#/paths/~1auth~1refresh"
   /users:
     $ref: "users/users.yaml#/paths/~1users"
+  /users/leaderboard:
+    $ref: "users/users.yaml#/paths/~1users~1leaderboard"
   /users/{userId}:
     $ref: "users/users.yaml#/paths/~1users~1{userId}"
   /users/{userId}/games:
@@ -99,6 +101,10 @@ components:
       $ref: "users/users.schemas.yaml#/components/schemas/UserResponse"
     UserSearchResponse:
       $ref: "users/users.schemas.yaml#/components/schemas/UserSearchResponse"
+    LeaderboardEntry:
+      $ref: "users/users.schemas.yaml#/components/schemas/LeaderboardEntry"
+    LeaderboardResponse:
+      $ref: "users/users.schemas.yaml#/components/schemas/LeaderboardResponse"
     UserGameHistoryItem:
       $ref: "users/users.schemas.yaml#/components/schemas/UserGameHistoryItem"
     UserGamesResponse:
