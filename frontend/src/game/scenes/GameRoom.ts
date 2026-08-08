@@ -820,6 +820,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#kittensInDeck = payload.kittensInDeck;
     this.refreshExplodingKittenRisk();
 
+    payload.players.forEach((player) => {
+      this.#players.get(player.id)?.player?.setConnected(player.isConnected);
+    });
+
     this.setCurrentTurn(payload.currentTurnPlayerId ?? "");
     this.updateAttackIndicator();
 
