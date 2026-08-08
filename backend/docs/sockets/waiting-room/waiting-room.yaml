@@ -72,19 +72,32 @@ channels:
         examples:
           - name: example
             payload:
-              waitingState:
-                players:
-                  - id: "8f3b2c1a-9d4e-4f7a-bc12-1a2b3c4d5e6f"
-                    name: "Alice"
-                    isConfirmed: true
-                  - id: "2c4d6e8f-1a3b-4c5d-9e7f-0a1b2c3d4e5f"
-                    name: "Bob"
-                    isConfirmed: false
+              players:
+                - id: "8f3b2c1a-9d4e-4f7a-bc12-1a2b3c4d5e6f"
+                  name: "Alice"
+                  avatarUrl: null
+                  isConnected: true
+                  isConfirmed: true
+                - id: "2c4d6e8f-1a3b-4c5d-9e7f-0a1b2c3d4e5f"
+                  name: "Bob"
+                  avatarUrl: "https://res.cloudinary.com/example/image/upload/bob.png"
+                  isConnected: true
+                  isConfirmed: false
+              meId: "8f3b2c1a-9d4e-4f7a-bc12-1a2b3c4d5e6f"
+              countdownEndsAt: null
 
   leftGame:
     address: left-game
     title: Left game
-    description: Acknowledges to the leaving socket that it has left the room. No payload.
+    description: >
+      Acknowledges to the leaving socket that it has left the room. No payload.
+
+
+      The same event is also emitted to the **whole room** by game cleanup, 60
+      seconds after `GAME_OVER`, when the finished game is deleted and all sockets
+      are forced out of the room. Clients therefore treat `left-game` as a general
+      "you are no longer in a game, return to the lobby" signal rather than strictly
+      an acknowledgement of their own `leave-game`.
     messages:
       empty:
         name: LeftGame
@@ -189,14 +202,21 @@ channels:
   gameStarted:
     address: game-started
     title: Game started
-    description: The countdown completed and the game has started. No payload.
+    description: >
+      The countdown completed and the game has started. Unlike every other
+      waiting-room event this is **not** a room broadcast: the server loops over the
+      players and emits once per player socket, so each player receives their own
+      hand and a `players` array rotated to start with themselves. A player whose
+      socket is not in the socket map at that moment never receives it and must
+      recover the state via `reconnect-game`.
     messages:
-      empty:
+      gameStarted:
         name: GameStarted
         title: Game started
-        summary: Event carries no payload.
+        summary: Personalised start-of-game snapshot, sent to one player socket.
+        contentType: application/json
         payload:
-          $ref: "./waiting-room.schemas.yaml#/components/schemas/EmptyPayload"
+          $ref: "./waiting-room.schemas.yaml#/components/schemas/GameStartedPayload"
 
 operations:
   # --- Waiting room: received by the server ---
@@ -206,9 +226,26 @@ operations:
       $ref: "#/channels/joinGame"
     summary: Join a game's waiting room.
     description: >
-      Validates `gameId`, joins the socket to the room, then replies to the
-      acting socket with `waiting-state` and notifies other room members with
-      `player-joined`. On failure emits `join-game-error` to the acting socket.
+      Validates `gameId`, joins the socket to the room, then sends the acting socket
+      a `waiting-state` snapshot and notifies other room members with `player-joined`
+      (only when the player was not already in the game). Finally broadcasts the
+      updated game to the lobby via `lobby-game-updated`.
+
+
+      The socket joins the room *before* the join is validated and is removed again
+      if it fails, so a rejected join leaves no trace.
+
+
+      Failure is reported on `join-game-error`, or through the acknowledgement
+      callback when the client supplied one — never both. Two codes need specific
+      handling: `RECONNECT_REQUIRED` means the caller is already in this game and it
+      is mid-play, so the client must emit `reconnect-game` instead; and
+      `ALREADY_IN_OTHER_GAME` carries `errors.existingGameId`.
+
+
+      The `reply` below describes `waiting-state`, which is the meaningful response,
+      but note it is an independent server-initiated emit rather than a Socket.IO
+      acknowledgement.
     tags:
       - name: Waiting Room
     messages:
@@ -223,11 +260,21 @@ operations:
     action: receive
     channel:
       $ref: "#/channels/leaveGame"
-    summary: Leave a game's waiting room.
+    summary: Leave a game.
     description: >
       Validates `gameId`, removes the socket from the room, acknowledges with
       `left-game` to the acting socket, and notifies the whole room with
-      `player-left`. On failure emits `leave-game-error`.
+      `player-left`. Then broadcasts `lobby-game-updated` or `lobby-game-removed`
+      to every connected client. On failure emits `leave-game-error`.
+
+
+      This is not limited to the waiting room — it is also how a player quits a game
+      that is already in progress; there is no separate forfeit event.
+
+
+      Edge case: when the last player leaves, the game itself is deleted and
+      `player-left` is broadcast with `playerId` set to the empty string rather than
+      a real id.
     tags:
       - name: Waiting Room
     messages:
@@ -352,8 +399,13 @@ operations:
     action: send
     channel:
       $ref: "#/channels/gameStarted"
-    summary: Notify the room that the game has started (room, all).
+    summary: Send each player their personalised start-of-game snapshot (per socket).
+    description: >
+      Emitted once per player, to that player's own socket, when the game machine
+      starts the game. Immediately afterwards the server also emits
+      `lobby-game-removed` to every connected client, since a started game can no
+      longer be joined from the lobby.
     tags:
       - name: Waiting Room
     messages:
-      - $ref: "#/channels/gameStarted/messages/empty"
+      - $ref: "#/channels/gameStarted/messages/gameStarted"

@@ -1,0 +1,968 @@
+# Everything that happens between `game-started` and `GAME_OVER`.
+#
+# Two different sources emit on these channels:
+#   * the event listeners, directly in response to a client event; and
+#   * the game state machine, relayed by the broadcaster. Machine-driven events can
+#     therefore arrive with no client event of yours behind them.
+#
+# The recurring privacy pattern: a private event carries the card contents to the one
+# player entitled to see them (`card-received`, `card-removed`,
+# `SEE_THE_FUTURE_PEEK`), while a public event tells the room only that something
+# happened (`card-drawn`, `card-played`, `CARD_GIVEN`).
+
+channels:
+  # ------------------------------------------------------------------
+  # Client -> Server
+  # ------------------------------------------------------------------
+  drawCard:
+    address: draw-card
+    title: Draw a card
+    description: >
+      Draw the top card and end the turn. If it is an Exploding Kitten the machine
+      takes over with `EXPLODING_KITTEN_DRAWN` and `DEFUSE_PROMPT` instead of
+      `card-received`.
+    messages:
+      gameIdPayload:
+        name: DrawCard
+        title: Draw card
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/GameIdPayload"
+
+  playCard:
+    address: play-card
+    title: Play a card
+    description: >
+      Play a single card from hand. Note that Nope and Defuse are not played this
+      way — they have their own events and are marked `playable: false` on the card
+      so clients do not offer them as ordinary plays.
+    messages:
+      playCard:
+        name: PlayCard
+        title: Play card
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayCardPayload"
+
+  playNope:
+    address: play-nope
+    title: Play a Nope
+    description: >
+      Cancel the pending action during its Nope window. Playable out of turn. Each
+      Nope extends the window, so a Nope can itself be Noped.
+    messages:
+      playCard:
+        name: PlayNope
+        title: Play nope
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayCardPayload"
+
+  playCombo:
+    address: play-combo
+    title: Play a cat-card combo
+    description: >
+      Declare a combo of two or three matching cat cards. The server answers with
+      `COMBO_SELECTION_REQUESTED` on the acting socket to collect the target.
+    messages:
+      playCombo:
+        name: PlayCombo
+        title: Play combo
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayComboPayload"
+
+  selectComboTarget:
+    address: select-combo-target
+    title: Select the combo target
+    description: >
+      Name the player a declared combo is aimed at.
+
+
+      Failures on this event are reported on `resolve-combo-error`; there is no
+      `select-combo-target-error`.
+    messages:
+      selectComboTarget:
+        name: SelectComboTarget
+        title: Select combo target
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/SelectComboTargetPayload"
+
+  resolveCombo:
+    address: resolve-combo
+    title: Resolve a combo
+    description: >
+      Carry out a declared combo. Sent up to three ways depending on the step — see
+      `ResolveComboPayload`.
+    messages:
+      resolveCombo:
+        name: ResolveCombo
+        title: Resolve combo
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ResolveComboPayload"
+
+  playDefuse:
+    address: play-defuse
+    title: Play a Defuse
+    description: >
+      Defuse the Exploding Kitten just drawn, in response to `DEFUSE_PROMPT`. The
+      server then expects `insert-kitten` to choose where to bury it.
+    messages:
+      gameIdPayload:
+        name: PlayDefuse
+        title: Play defuse
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/GameIdPayload"
+
+  insertKitten:
+    address: insert-kitten
+    title: Insert the defused kitten
+    description: >
+      Choose where in the deck to bury the defused Exploding Kitten. The chosen
+      position is never revealed to anyone, including in `KITTEN_INSERTED`.
+    messages:
+      insertKitten:
+        name: InsertKitten
+        title: Insert kitten
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/InsertKittenPayload"
+
+  selectPlayer:
+    address: select-player
+    title: Select a target player
+    description: >
+      Choose the target of a pending action that requires one, such as Favor. The
+      server emits nothing directly; the machine responds with `PLAYER_SELECTED`.
+    messages:
+      selectPlayer:
+        name: SelectPlayer
+        title: Select player
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/SelectPlayerPayload"
+
+  giveCard:
+    address: give-card
+    title: Give a card to another player
+    description: Hand over a chosen card, satisfying a Favor.
+    messages:
+      giveCard:
+        name: GiveCard
+        title: Give card
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/GiveCardPayload"
+
+  seenTheFuture:
+    address: seen-the-future
+    title: Acknowledge the See the Future peek
+    description: >
+      Tell the server the player has finished looking at the peeked cards, so play
+      can continue.
+    messages:
+      gameIdPayload:
+        name: SeenTheFuture
+        title: Seen the future
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/GameIdPayload"
+
+  # ------------------------------------------------------------------
+  # Server -> Client: private (one socket)
+  # ------------------------------------------------------------------
+  cardReceived:
+    address: card-received
+    title: Card received
+    description: >
+      A card entered the receiving player's hand, with its full contents. Sent to
+      that player only — after drawing, after stealing with a combo, and to the
+      recipient of a Favor.
+    messages:
+      cardPayload:
+        name: CardReceived
+        title: Card received
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/CardPayload"
+
+  cardRemoved:
+    address: card-removed
+    title: Card removed
+    description: >
+      A card left the receiving player's hand. Sent to that player only, with a
+      `reason` explaining why.
+    messages:
+      cardRemoved:
+        name: CardRemoved
+        title: Card removed
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/CardRemovedPayload"
+
+  seeTheFuturePeek:
+    address: SEE_THE_FUTURE_PEEK
+    title: See the Future peek
+    description: >
+      The top cards of the deck, revealed privately to the player who played See the
+      Future. Everyone else gets the contentless `player-looks-at-the-future`.
+    messages:
+      showedCards:
+        name: SeeTheFuturePeek
+        title: See the Future peek
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ShowedCardsToPlayerPayload"
+
+  defusePrompt:
+    address: DEFUSE_PROMPT
+    title: Defuse prompt
+    description: >
+      Sent privately to the player who drew an Exploding Kitten, giving them a
+      deadline to play a Defuse.
+    messages:
+      defusePrompt:
+        name: DefusePrompt
+        title: Defuse prompt
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/DefusePromptPayload"
+
+  comboSelectionRequested:
+    address: COMBO_SELECTION_REQUESTED
+    title: Combo selection requested
+    description: >
+      Asks the acting player to pick a combo target, and for a three-card combo a
+      card type. Sent to that one socket despite the SCREAMING_SNAKE name that
+      elsewhere marks public events.
+    messages:
+      comboSelectionRequested:
+        name: ComboSelectionRequested
+        title: Combo selection requested
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ComboSelectionRequestedPayload"
+
+  # ------------------------------------------------------------------
+  # Server -> Client: public (room)
+  # ------------------------------------------------------------------
+  cardDrawn:
+    address: card-drawn
+    title: Card drawn
+    description: >
+      A player drew a card. Carries only the player id — the card itself goes
+      privately to them via `card-received`.
+
+
+      This event also fires with no client action behind it: 60 seconds after a
+      disconnected player's turn begins, the server draws for them automatically.
+    messages:
+      playerId:
+        name: CardDrawn
+        title: Card drawn
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  cardPlayed:
+    address: card-played
+    title: Card played
+    description: >
+      A player played a card, opening a Nope window. Sent to the room except the
+      actor, who already knows and instead received `card-removed`.
+    messages:
+      cardPlayed:
+        name: CardPlayed
+        title: Card played
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/CardPlayedPayload"
+
+  nopePlayed:
+    address: NOPE_PLAYED
+    title: Nope played
+    description: A Nope was played, extending the current Nope window.
+    messages:
+      nopePlayed:
+        name: NopePlayed
+        title: Nope played
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/NopePlayedPayload"
+
+  nopeWindowResolved:
+    address: NOPE_WINDOW_RESOLVED
+    title: Nope window resolved
+    description: >
+      The Nope window closed and the pending action has now been applied or
+      cancelled. No payload; the resulting state arrives as separate events.
+    messages:
+      empty:
+        name: NopeWindowResolved
+        title: Nope window resolved
+        payload:
+          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
+
+  comboPlayed:
+    address: COMBO_PLAYED
+    title: Combo played
+    description: A combo was declared, opening a Nope window. Sent to the room except the actor.
+    messages:
+      comboPlayed:
+        name: ComboPlayed
+        title: Combo played
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ComboPlayedPayload"
+
+  comboTargetSelected:
+    address: COMBO_TARGET_SELECTED
+    title: Combo target selected
+    description: The acting player named their combo target.
+    messages:
+      comboTargetSelected:
+        name: ComboTargetSelected
+        title: Combo target selected
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ComboTargetSelectedPayload"
+
+  comboTargetCleared:
+    address: COMBO_TARGET_CLEARED
+    title: Combo target cleared
+    description: The combo finished; clients should drop any target highlight. No payload.
+    messages:
+      empty:
+        name: ComboTargetCleared
+        title: Combo target cleared
+        payload:
+          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
+
+  comboResolved:
+    address: COMBO_RESOLVED
+    title: Combo resolved
+    description: >
+      The combo was carried out.
+
+
+      For a two-card combo this is one room-wide emit. For a three-card combo the
+      server emits it three separate times with two different payloads: the actor and
+      the target each receive a copy including `requestedCardType`, and everyone else
+      receives a redacted copy without it. Clients must not assume every player saw
+      the same payload.
+    messages:
+      comboResolved:
+        name: ComboResolved
+        title: Combo resolved
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ComboResolvedPayload"
+
+  cardGiven:
+    address: CARD_GIVEN
+    title: Card given
+    description: >
+      A card changed hands via a Favor. Names both players but never the card; the
+      two players involved learn it through `card-removed` and `card-received`.
+    messages:
+      cardGiven:
+        name: CardGiven
+        title: Card given
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/CardGivenPayload"
+
+  turnChanged:
+    address: TURN_CHANGED
+    title: Turn changed
+    description: The turn passed to another player.
+    messages:
+      turnChanged:
+        name: TurnChanged
+        title: Turn changed
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/TurnChangedPayload"
+
+  turnSkipped:
+    address: TURN_SKIPPED
+    title: Turn skipped
+    description: A player ended their turn without drawing, via Skip or Attack.
+    messages:
+      turnSkipped:
+        name: TurnSkipped
+        title: Turn skipped
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/TurnSkippedPayload"
+
+  deckShuffled:
+    address: DECK_SHUFFLED
+    title: Deck shuffled
+    description: >
+      The deck was shuffled, so any previously peeked cards are stale. No payload.
+    messages:
+      empty:
+        name: DeckShuffled
+        title: Deck shuffled
+        payload:
+          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
+
+  playerLooksAtTheFuture:
+    address: player-looks-at-the-future
+    title: Player looks at the future
+    description: >
+      Someone is peeking at the deck. Sent to the room except that player, and
+      carries no cards. No payload.
+    messages:
+      empty:
+        name: PlayerLooksAtTheFuture
+        title: Player looks at the future
+        payload:
+          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
+
+  playerSawTheFuture:
+    address: PLAYER_SAW_THE_FUTURE
+    title: Player saw the future
+    description: >
+      The peek finished. Sent to the room except that player. No payload.
+    messages:
+      empty:
+        name: PlayerSawTheFuture
+        title: Player saw the future
+        payload:
+          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
+
+  explodingKittenDrawn:
+    address: EXPLODING_KITTEN_DRAWN
+    title: Exploding Kitten drawn
+    description: >
+      Someone drew an Exploding Kitten. The room learns it happened; only the
+      unlucky player receives `DEFUSE_PROMPT`. No payload.
+    messages:
+      empty:
+        name: ExplodingKittenDrawn
+        title: Exploding Kitten drawn
+        payload:
+          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
+
+  playerDefused:
+    address: PLAYER_DEFUSED
+    title: Player defused
+    description: A player survived by playing a Defuse.
+    messages:
+      playerDefused:
+        name: PlayerDefused
+        title: Player defused
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayerDefusedPayload"
+
+  kittenInserted:
+    address: KITTEN_INSERTED
+    title: Kitten inserted
+    description: The defused kitten went back into the deck, at a position kept secret.
+    messages:
+      kittenInserted:
+        name: KittenInserted
+        title: Kitten inserted
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/KittenInsertedPayload"
+
+  playerEliminated:
+    address: PLAYER_ELIMINATED
+    title: Player eliminated
+    description: A player exploded and is out of the game.
+    messages:
+      playerId:
+        name: PlayerEliminated
+        title: Player eliminated
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  playerSelected:
+    address: PLAYER_SELECTED
+    title: Player selected
+    description: A target player was chosen for the pending action.
+    messages:
+      playerId:
+        name: PlayerSelected
+        title: Player selected
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  waitingForPlayerSelection:
+    address: WAITING_FOR_PLAYER_SELECTION
+    title: Waiting for player selection
+    description: The game is waiting for the acting player to choose a target. No payload.
+    messages:
+      empty:
+        name: WaitingForPlayerSelection
+        title: Waiting for player selection
+        payload:
+          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
+
+  waitingForFavorCardSelection:
+    address: WAITING_FOR_FAVOR_CARD_SELECTION
+    title: Waiting for favor card selection
+    description: >
+      The game is waiting for the named player to hand over a card. The payload names
+      who everyone is waiting on.
+    messages:
+      playerId:
+        name: WaitingForFavorCardSelection
+        title: Waiting for favor card selection
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  gameOver:
+    address: GAME_OVER
+    title: Game over
+    description: >
+      One player remains and the game has ended.
+
+
+      Sixty seconds later the game is deleted: every socket is forced out of the room
+      and receives `left-game`.
+    messages:
+      gameOver:
+        name: GameOver
+        title: Game over
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/GameOverPayload"
+
+operations:
+  # --- Received by the server ---
+  onDrawCard:
+    action: receive
+    channel:
+      $ref: "#/channels/drawCard"
+    summary: Draw the top card of the deck.
+    description: >
+      Emits `card-received` to the acting socket and `card-drawn` to the whole room.
+      On failure emits `draw-card-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/drawCard/messages/gameIdPayload"
+
+  onPlayCard:
+    action: receive
+    channel:
+      $ref: "#/channels/playCard"
+    summary: Play a single card from hand.
+    description: >
+      Emits `card-removed` to the acting socket and `card-played` to the rest of the
+      room. On failure emits `play-card-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playCard/messages/playCard"
+
+  onPlayNope:
+    action: receive
+    channel:
+      $ref: "#/channels/playNope"
+    summary: Nope the pending action.
+    description: >
+      Emits `card-removed` to the acting socket and `NOPE_PLAYED` to the rest of the
+      room. On failure emits `play-nope-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playNope/messages/playCard"
+
+  onPlayCombo:
+    action: receive
+    channel:
+      $ref: "#/channels/playCombo"
+    summary: Declare a cat-card combo.
+    description: >
+      Emits `card-removed` to the acting socket; the machine then sends
+      `COMBO_SELECTION_REQUESTED` to that same socket to collect the target. On
+      failure emits `play-combo-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playCombo/messages/playCombo"
+
+  onSelectComboTarget:
+    action: receive
+    channel:
+      $ref: "#/channels/selectComboTarget"
+    summary: Name the target of a declared combo.
+    description: >
+      Emits `COMBO_TARGET_SELECTED` to the whole room. On failure emits
+      `resolve-combo-error`, not a dedicated event.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/selectComboTarget/messages/selectComboTarget"
+
+  onResolveCombo:
+    action: receive
+    channel:
+      $ref: "#/channels/resolveCombo"
+    summary: Carry out a declared combo.
+    description: >
+      When the combo is only being declared, emits `COMBO_PLAYED` to the room except
+      the actor. When it resolves, emits `card-removed` to the victim and
+      `card-received` to the thief if a card was taken, then `COMBO_TARGET_CLEARED`
+      and `COMBO_RESOLVED` — the latter fanned out asymmetrically for a three-card
+      combo. On failure emits `resolve-combo-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/resolveCombo/messages/resolveCombo"
+
+  onPlayDefuse:
+    action: receive
+    channel:
+      $ref: "#/channels/playDefuse"
+    summary: Defuse the drawn Exploding Kitten.
+    description: >
+      Emits `card-removed` to the acting socket and `card-played` to the rest of the
+      room, the latter with the placeholder `nopeWindowExpiresAt: -1`. On failure
+      emits `play-defuse-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playDefuse/messages/gameIdPayload"
+
+  onInsertKitten:
+    action: receive
+    channel:
+      $ref: "#/channels/insertKitten"
+    summary: Bury the defused kitten at a chosen position.
+    description: >
+      Emits `card-removed` to the acting socket; the machine then broadcasts
+      `KITTEN_INSERTED` and `TURN_CHANGED`. On failure emits `insert-kitten-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/insertKitten/messages/insertKitten"
+
+  onSelectPlayer:
+    action: receive
+    channel:
+      $ref: "#/channels/selectPlayer"
+    summary: Choose the target of a pending action.
+    description: >
+      Emits nothing directly; the machine responds with `PLAYER_SELECTED`. On failure
+      emits `select-player-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/selectPlayer/messages/selectPlayer"
+
+  onGiveCard:
+    action: receive
+    channel:
+      $ref: "#/channels/giveCard"
+    summary: Hand a card to another player.
+    description: >
+      Emits `card-removed` to the giver's socket, `card-received` to the receiver's,
+      and `CARD_GIVEN` to the whole room. Both private emits go through the socket
+      map, so a player who is disconnected silently misses them. On failure emits
+      `give-card-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/giveCard/messages/giveCard"
+
+  onSeenTheFuture:
+    action: receive
+    channel:
+      $ref: "#/channels/seenTheFuture"
+    summary: Acknowledge the See the Future peek.
+    description: >
+      Lets the machine continue, which emits `PLAYER_SAW_THE_FUTURE` to the rest of
+      the room. On failure emits `seen-the-future-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/seenTheFuture/messages/gameIdPayload"
+
+  # --- Sent by the server: private ---
+  sendCardReceived:
+    action: send
+    channel:
+      $ref: "#/channels/cardReceived"
+    summary: Reveal a gained card to its new owner (single socket).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/cardReceived/messages/cardPayload"
+
+  sendCardRemoved:
+    action: send
+    channel:
+      $ref: "#/channels/cardRemoved"
+    summary: Tell a player to drop a card from their hand (single socket).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/cardRemoved/messages/cardRemoved"
+
+  sendSeeTheFuturePeek:
+    action: send
+    channel:
+      $ref: "#/channels/seeTheFuturePeek"
+    summary: Reveal the top cards to the peeking player (single socket).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/seeTheFuturePeek/messages/showedCards"
+
+  sendDefusePrompt:
+    action: send
+    channel:
+      $ref: "#/channels/defusePrompt"
+    summary: Prompt the exploding player to defuse (single socket).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/defusePrompt/messages/defusePrompt"
+
+  sendComboSelectionRequested:
+    action: send
+    channel:
+      $ref: "#/channels/comboSelectionRequested"
+    summary: Ask the acting player to complete their combo (single socket).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/comboSelectionRequested/messages/comboSelectionRequested"
+
+  # --- Sent by the server: public ---
+  sendCardDrawn:
+    action: send
+    channel:
+      $ref: "#/channels/cardDrawn"
+    summary: Announce that a player drew a card (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/cardDrawn/messages/playerId"
+
+  sendCardPlayed:
+    action: send
+    channel:
+      $ref: "#/channels/cardPlayed"
+    summary: Announce a played card (room, others).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/cardPlayed/messages/cardPlayed"
+
+  sendNopePlayed:
+    action: send
+    channel:
+      $ref: "#/channels/nopePlayed"
+    summary: Announce a Nope and the extended window (room, others).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/nopePlayed/messages/nopePlayed"
+
+  sendNopeWindowResolved:
+    action: send
+    channel:
+      $ref: "#/channels/nopeWindowResolved"
+    summary: Announce that the Nope window closed (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/nopeWindowResolved/messages/empty"
+
+  sendComboPlayed:
+    action: send
+    channel:
+      $ref: "#/channels/comboPlayed"
+    summary: Announce a declared combo (room, others).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/comboPlayed/messages/comboPlayed"
+
+  sendComboTargetSelected:
+    action: send
+    channel:
+      $ref: "#/channels/comboTargetSelected"
+    summary: Announce the chosen combo target (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/comboTargetSelected/messages/comboTargetSelected"
+
+  sendComboTargetCleared:
+    action: send
+    channel:
+      $ref: "#/channels/comboTargetCleared"
+    summary: Announce that the combo finished (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/comboTargetCleared/messages/empty"
+
+  sendComboResolved:
+    action: send
+    channel:
+      $ref: "#/channels/comboResolved"
+    summary: Announce the combo outcome (room, all — redacted for bystanders).
+    description: >
+      A two-card combo is a single room-wide emit. A three-card combo is emitted
+      three times: to the actor, to the target, and to everyone else with
+      `requestedCardType` stripped out.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/comboResolved/messages/comboResolved"
+
+  sendCardGiven:
+    action: send
+    channel:
+      $ref: "#/channels/cardGiven"
+    summary: Announce that a card changed hands (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/cardGiven/messages/cardGiven"
+
+  sendTurnChanged:
+    action: send
+    channel:
+      $ref: "#/channels/turnChanged"
+    summary: Announce the new current player (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/turnChanged/messages/turnChanged"
+
+  sendTurnSkipped:
+    action: send
+    channel:
+      $ref: "#/channels/turnSkipped"
+    summary: Announce a skipped turn (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/turnSkipped/messages/turnSkipped"
+
+  sendDeckShuffled:
+    action: send
+    channel:
+      $ref: "#/channels/deckShuffled"
+    summary: Announce that the deck was shuffled (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/deckShuffled/messages/empty"
+
+  sendPlayerLooksAtTheFuture:
+    action: send
+    channel:
+      $ref: "#/channels/playerLooksAtTheFuture"
+    summary: Announce that a player is peeking at the deck (room, others).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playerLooksAtTheFuture/messages/empty"
+
+  sendPlayerSawTheFuture:
+    action: send
+    channel:
+      $ref: "#/channels/playerSawTheFuture"
+    summary: Announce that the peek finished (room, others).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playerSawTheFuture/messages/empty"
+
+  sendExplodingKittenDrawn:
+    action: send
+    channel:
+      $ref: "#/channels/explodingKittenDrawn"
+    summary: Announce that an Exploding Kitten was drawn (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/explodingKittenDrawn/messages/empty"
+
+  sendPlayerDefused:
+    action: send
+    channel:
+      $ref: "#/channels/playerDefused"
+    summary: Announce a successful defuse (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playerDefused/messages/playerDefused"
+
+  sendKittenInserted:
+    action: send
+    channel:
+      $ref: "#/channels/kittenInserted"
+    summary: Announce that the kitten went back into the deck (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/kittenInserted/messages/kittenInserted"
+
+  sendPlayerEliminated:
+    action: send
+    channel:
+      $ref: "#/channels/playerEliminated"
+    summary: Announce that a player exploded (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playerEliminated/messages/playerId"
+
+  sendPlayerSelected:
+    action: send
+    channel:
+      $ref: "#/channels/playerSelected"
+    summary: Announce the selected target player (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/playerSelected/messages/playerId"
+
+  sendWaitingForPlayerSelection:
+    action: send
+    channel:
+      $ref: "#/channels/waitingForPlayerSelection"
+    summary: Announce that a target selection is pending (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/waitingForPlayerSelection/messages/empty"
+
+  sendWaitingForFavorCardSelection:
+    action: send
+    channel:
+      $ref: "#/channels/waitingForFavorCardSelection"
+    summary: Announce that a favor card selection is pending (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/waitingForFavorCardSelection/messages/playerId"
+
+  sendGameOver:
+    action: send
+    channel:
+      $ref: "#/channels/gameOver"
+    summary: Announce the winner (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/gameOver/messages/gameOver"
