@@ -49,6 +49,7 @@ const renderSlot = (slot: GameSlot, key: string, winnerId: string | null) => {
       {!isPlaceholder && (
         <>
           <Avatar
+            className={s.avatar}
             variant="game"
             src={slot.player.avatarUrl}
             status={slot.player.isOnline}
