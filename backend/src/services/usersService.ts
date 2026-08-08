@@ -1,5 +1,9 @@
 // Project level
-import { ProfileUserWithStats } from "@exploding-cats/contracts";
+import {
+  getSuccessRate,
+  LeaderboardEntry,
+  ProfileUserWithStats,
+} from "@exploding-cats/contracts";
 import { prisma, publicProfileSelect } from "lib/prisma";
 import { toProfileUser, toProfileUserWithStats } from "mappers";
 import { UserGameHistoryItem } from "../../../packages/contracts/src/shared/users";
@@ -92,6 +96,79 @@ export async function searchUsersByUsername(
       return toProfileUserWithStats(user, stats);
     }),
   );
+}
+
+function compareLeaderboardEntries(
+  left: ProfileUserWithStats,
+  right: ProfileUserWithStats,
+): number {
+  if (left.wins !== right.wins) {
+    return right.wins - left.wins;
+  }
+
+  const successRateDifference = getSuccessRate(right) - getSuccessRate(left);
+
+  if (successRateDifference !== 0) {
+    return successRateDifference;
+  }
+
+  if (left.totalGames !== right.totalGames) {
+    return right.totalGames - left.totalGames;
+  }
+
+  return left.username.localeCompare(right.username);
+}
+
+/**
+ * Returns every registered user with their finished-game statistics,
+ * ordered from the strongest player to the weakest one.
+ */
+export async function getLeaderboard(): Promise<LeaderboardEntry[]> {
+  const [users, playedGroups, winGroups] = await Promise.all([
+    prisma.user.findMany({
+      select: publicProfileSelect,
+    }),
+    prisma.userGame.groupBy({
+      by: ["userId"],
+      where: {
+        game: {
+          endedAt: {
+            not: null,
+          },
+        },
+      },
+      _count: { _all: true },
+    }),
+    prisma.game.groupBy({
+      by: ["winnerUserId"],
+      where: {
+        winnerUserId: {
+          not: null,
+        },
+        endedAt: {
+          not: null,
+        },
+      },
+      _count: { _all: true },
+    }),
+  ]);
+
+  const totalGamesByUserId = new Map(
+    playedGroups.map((group) => [group.userId, group._count._all]),
+  );
+  const winsByUserId = new Map(
+    winGroups.map((group) => [group.winnerUserId, group._count._all]),
+  );
+
+  return users
+    .map((user) =>
+      toProfileUserWithStats(user, {
+        totalGames: totalGamesByUserId.get(user.id) ?? 0,
+        wins: winsByUserId.get(user.id) ?? 0,
+      }),
+    )
+    .sort(compareLeaderboardEntries)
+    .map((user, index) => ({ ...user, rank: index + 1 }));
 }
 
 export async function getUserGames(
