@@ -3,7 +3,7 @@ import { passwordSchema } from "../auth";
 
 export const updateMeSchema = z
   .object({
-    username: z.string().trim().min(3).max(30).optional(),
+    username: z.string().trim().min(3).max(20).optional(),
     email: z.string().trim().toLowerCase().pipe(z.email()).optional(),
     passwordOld: z.string().min(8).max(128).optional(),
     passwordNew: passwordSchema.optional(),
