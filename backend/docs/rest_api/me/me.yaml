@@ -43,7 +43,15 @@ paths:
       tags:
         - Me
       summary: Update current user profile
-      description: Updates the authenticated user's profile fields. At least one field must be provided. Both passwordOld and passwordNew must be provided together to change password.
+      description: >
+        Updates the authenticated user's profile fields. At least one field must be
+        provided. Both passwordOld and passwordNew must be provided together to change
+        the password, and the new password must differ from the current one.
+
+
+        Note that the username is not checked for uniqueness before the write, so
+        submitting a username that is already taken currently fails as a 500 rather
+        than a 409.
       operationId: updateMe
       security:
         - bearerAuth: []
@@ -122,7 +130,14 @@ paths:
       tags:
         - Me
       summary: Update user avatar
-      description: Updates the authenticated user's avatar. Accepts image file upload via multipart form data.
+      description: >
+        Updates the authenticated user's avatar. Accepts an image file upload via
+        multipart form data, uploads it to Cloudinary, and stores the resulting URL.
+
+
+        The file must be at most 2 MB and have an image/* content type. Files that
+        breach either limit are rejected by the upload middleware and currently
+        surface as a 500 rather than a 400.
       operationId: updateMeAvatar
       security:
         - bearerAuth: []
@@ -138,7 +153,7 @@ paths:
                 avatar:
                   type: string
                   format: binary
-                  description: Avatar image file
+                  description: Avatar image file (max 2 MB, image/* only)
       responses:
         "200":
           description: Avatar updated successfully
@@ -147,11 +162,13 @@ paths:
               schema:
                 $ref: "./me.schemas.yaml#/components/schemas/UpdateAvatarResponse"
         "400":
-          description: Invalid file or validation error
+          description: No file was supplied in the request
           content:
             application/json:
               schema:
-                $ref: "../users/users.schemas.yaml#/components/schemas/ValidationErrorResponse"
+                $ref: "../users/users.schemas.yaml#/components/schemas/ApiErrorResponse"
+              example:
+                message: Invalid file
         "401":
           description: Invalid or missing access token
           content:
@@ -180,8 +197,10 @@ paths:
     get:
       tags:
         - Me
-      summary: Get current user's games
-      description: Retrieves all games that the authenticated user is participating in or has participated in.
+      summary: Get current user's game history
+      description: >
+        Retrieves the authenticated user's finished games, most recently ended first.
+        Games that are still waiting or in progress are not included.
       operationId: getMeGames
       security:
         - bearerAuth: []
