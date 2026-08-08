@@ -9,8 +9,11 @@ export type {
   MyProfileUser,
   MyProfileUserWithStats,
   FriendUser,
+  LeaderboardEntry,
   UserGameHistoryItem,
 } from "./users";
+
+export { getExplodedTimes, getSuccessRate } from "./users";
 
 export type { AccessToken } from "./tokens";
 export type { FriendItem } from "./friends";
