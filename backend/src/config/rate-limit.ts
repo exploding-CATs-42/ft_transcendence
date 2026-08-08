@@ -1,10 +1,12 @@
 import type { Request } from "express";
-import type { Options } from "express-rate-limit";
+import type { Options, RateLimitInfo } from "express-rate-limit";
 import { ipKeyGenerator } from "express-rate-limit";
 import ms from "ms";
 
 const WINDOW_MS = ms("15 min");
 const rateLimitExcludedPaths = new Set(["/metrics"]);
+
+type RateLimitedRequest = Request & { rateLimit?: RateLimitInfo };
 
 const getIpKey = (req: Request): string =>
   req.ip ? ipKeyGenerator(req.ip) : "unknown-ip";
@@ -20,11 +22,28 @@ const getLoginKey = (req: Request): string => {
   return `${getIpKey(req)}:${account}`;
 };
 
+const createHandler =
+  (message: string): Options["handler"] =>
+  (req, res) => {
+    const resetTime = (req as RateLimitedRequest).rateLimit?.resetTime;
+
+    const retryAfterSeconds = resetTime
+      ? Math.max(1, Math.ceil((resetTime.getTime() - Date.now()) / 1000))
+      : undefined;
+
+    if (retryAfterSeconds) {
+      res.setHeader("Retry-After", retryAfterSeconds);
+    }
+
+    res.status(429).json({ message, retryAfterSeconds });
+  };
+
 export const apiRateLimitConfig: Partial<Options> = {
   limit: 500,
   windowMs: WINDOW_MS,
   keyGenerator: getIpKey,
   skip: (req) => rateLimitExcludedPaths.has(req.path),
+  handler: createHandler("Too many requests"),
 };
 
 /**
@@ -38,4 +57,5 @@ export const loginRateLimitConfig: Partial<Options> = {
   windowMs: WINDOW_MS,
   keyGenerator: getLoginKey,
   skipSuccessfulRequests: true,
+  handler: createHandler("Too many login attempts"),
 };
