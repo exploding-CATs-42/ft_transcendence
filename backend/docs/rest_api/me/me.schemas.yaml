@@ -25,7 +25,7 @@ components:
         username:
           type: string
           minLength: 3
-          maxLength: 30
+          maxLength: 20
           example: alex_new
         email:
           type: string
@@ -42,9 +42,9 @@ components:
           minLength: 8
           maxLength: 128
           description: >
-            New password - required when updating password. Must include an uppercase
-            letter, a lowercase letter, a number, and a special character, and must
-            differ from the current password.
+            New password - required when updating password. Must include an
+            uppercase letter, a lowercase letter, a number, and a special
+            character, and must differ from the current password.
           example: NewPassword123!
 
     UpdateMeResponse:
@@ -74,3 +74,13 @@ components:
           type: array
           items:
             $ref: "../users/users.schemas.yaml#/components/schemas/UserGameHistoryItem"
+            description: Game object with game details
+
+    MessageResponse:
+      type: object
+      required:
+        - message
+      properties:
+        message:
+          type: string
+          example: Operation completed
