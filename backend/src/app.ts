@@ -22,6 +22,9 @@ export const io = new Server(server, ioOptions);
 restoreGames();
 initGamePersistence();
 
+// Trust the single nginx proxy so req.ip is the real client IP.
+app.set("trust proxy", 1);
+
 app.use(pino(prettyFormat()));
 app.use(cors(corsOptions));
 app.use(cookieParser());
@@ -29,7 +32,6 @@ app.use(express.json());
 app.use(httpMetricsMiddleware);
 app.use(userOperationMetricsMiddleware);
 app.use(apiRateLimiter);
-app.set("trust proxy", 1);
 
 setupRouting(app);
 initOnlineUsers(io);
