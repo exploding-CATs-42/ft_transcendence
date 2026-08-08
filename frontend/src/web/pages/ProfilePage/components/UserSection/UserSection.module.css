@@ -1,11 +1,12 @@
 .section {
   min-height: min-content;
   display: grid;
-  grid-template-columns: max-content max-content max-content auto;
+  grid-template-columns: 45px minmax(0, 1fr) 20px max-content;
   grid-template-areas: "avatar nameContainer editButton logoutButton";
   align-items: center;
   padding-block: 5px;
-  padding-inline: 25px;
+  padding-inline-end: 15px;
+  padding-inline-start: 25px;
 }
 
 .avatar {
@@ -14,7 +15,7 @@
 
 .nameContainer {
   font-size: 20px;
-  margin-left: 8px;
+  margin: 0 10px 0 10px;
   grid-area: nameContainer;
   text-align: center;
 
@@ -40,6 +41,12 @@
 .copyButton:hover .copyIcon,
 .copyButton:focus-visible .copyIcon {
   fill: var(--throw-throw-burrito);
+}
+
+@media only screen and (min-width: 450px) {
+  .section {
+    grid-template-columns: max-content max-content auto max-content;
+  }
 }
 
 @media only screen and (min-width: 768px) {
