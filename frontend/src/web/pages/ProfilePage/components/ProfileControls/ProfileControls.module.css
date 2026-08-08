@@ -1,5 +1,4 @@
 .editButton {
-  margin-left: 8px;
   grid-area: editButton;
 }
 
@@ -14,7 +13,7 @@
 
 .logoutButton {
   border: 1px solid #fffdfdd4;
-  margin-left: auto;
+  margin-left: 8px;
   grid-area: logoutButton;
   padding-inline: 10px;
   padding-block: 4px;
@@ -54,6 +53,7 @@
     padding-inline: 13px;
     padding-block: 7px;
     align-self: flex-start;
+    margin-left: 0;
   }
 
   .logoutIcon {
