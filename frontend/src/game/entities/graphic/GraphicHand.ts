@@ -301,8 +301,7 @@ export class GraphicHand {
       this.reflowCards();
     }
 
-    if (reason !== CardRemovalReason.INSERTED_INTO_DECK)
-      this.#onCardDropCallback(card);
+    if (reason === CardRemovalReason.PLAYED) this.#onCardDropCallback(card);
     return card;
   }
 

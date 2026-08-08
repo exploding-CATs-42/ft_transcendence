@@ -59,7 +59,7 @@ export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
   );
 
   // Shuffle regular cards
-  shuffle(mainDeck);
+  // shuffle(mainDeck);
 
   // Deal defuses and regular cards
   const DEFUSES_AMOUNT = DEFAULT_GAME_RULES.defusesDealtPerPlayer;
@@ -77,7 +77,7 @@ export const dealInitialCards = (deck: Deck, players: Player[]): Deck => {
   const finalDeck = [...mainDeck, ...defusesToInsert, ...kittensToInsert];
 
   // and shuffle it again to distribute the kittens inside the deck
-  shuffle(finalDeck);
+  // shuffle(finalDeck);
 
   return finalDeck;
 };

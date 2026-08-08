@@ -1,5 +1,9 @@
 // Project level
 import {
+  CardGivenPayload,
+  CardReceivedPayload,
+  CardRemovalReason,
+  CardRemovedPayload,
   CountdownStartedPayload,
   DefusePromptPayload,
   GameStartedPayload,
@@ -14,6 +18,7 @@ import {
   KittenInsertedPayload,
   PlayerEliminatedPayload,
   GameOverPayload,
+  CardReceivalReason,
 } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
@@ -124,9 +129,9 @@ export function attachGameBroadcaster(game: Game) {
     io.to(gameId).emit(ServerPublicEvents.WAITING_FOR_PLAYER_SELECTION);
   });
 
-  broadcaster.on(GameOutEvents.WAITING_FOR_FAVOR_CARD_SELECTION, (event) => {
+  broadcaster.on(GameOutEvents.WAITING_FOR_CARD_ID_SELECTION, (event) => {
     io.to(gameId).emit(
-      ServerPublicEvents.WAITING_FOR_FAVOR_CARD_SELECTION,
+      ServerPublicEvents.WAITING_FOR_CARD_ID_SELECTION,
       event.payload,
     );
   });
@@ -136,16 +141,64 @@ export function attachGameBroadcaster(game: Game) {
     socket?.to(gameId).emit(ServerPublicEvents.PLAYER_SAW_THE_FUTURE);
   });
 
-  broadcaster.on(GameOutEvents.COMBO_SELECTION_REQUESTED, (event) => {
-    socketsMap
-      .get(event.payload.playerId)
-      ?.emit(ServerPublicEvents.COMBO_SELECTION_REQUESTED, event.payload);
+  broadcaster.on(GameOutEvents.WAITING_FOR_CARD_INDEX_SELECTION, (event) => {
+    io.to(gameId).emit(
+      ServerPublicEvents.WAITING_FOR_CARD_INDEX_SELECTION,
+      event.payload,
+    );
+  });
+
+  broadcaster.on(GameOutEvents.WAITING_FOR_CARD_TYPE_SELECTION, (event) => {
+    io.to(gameId).emit(
+      ServerPublicEvents.WAITING_FOR_CARD_TYPE_SELECTION,
+      event.payload,
+    );
+  });
+
+  broadcaster.on(GameOutEvents.CARD_GIVEN, (event) => {
+    const { playerIdFrom, playerIdTo, card, reason } = event.payload;
+
+    const socketPlayerFrom = socketsMap.get(playerIdFrom);
+    const cardRemovedPayload: CardRemovedPayload = {
+      cardId: card.id,
+      reason:
+        reason === CardReceivalReason.FAVOR
+          ? CardRemovalReason.GIVEN_AWAY
+          : CardRemovalReason.STOLEN,
+    };
+    socketPlayerFrom?.emit(
+      ServerPrivateEvents.CARD_REMOVED,
+      cardRemovedPayload,
+    );
+
+    const socketPlayerTo = socketsMap.get(playerIdTo);
+    const cardReceivedPayload: CardReceivedPayload = {
+      card,
+      reason,
+      playerIdFrom,
+    };
+    socketPlayerTo?.emit(
+      ServerPrivateEvents.CARD_RECEIVED,
+      cardReceivedPayload,
+    );
+
+    const cardGivenPayload: CardGivenPayload = {
+      playerIdFrom,
+      playerIdTo,
+    };
+    io.to(gameId).emit(ServerPublicEvents.CARD_GIVEN, cardGivenPayload);
+  });
+
+  broadcaster.on(GameOutEvents.NO_CARD_OF_REQUESTED_TYPE, (event) => {
+    io.to(gameId).emit(
+      ServerPublicEvents.NO_CARD_OF_REQUESTED_TYPE,
+      event.payload,
+    );
   });
 }
 
-/* broadcaster - is a function that just repeats/broadcasts events
- * emitted by the machine to the outside world. it's as simple/stupid as a parrot
- * it hears something - it repeats/broadcasts it
+/* broadcaster - is a function that broadcasts events
+ * emitted by the machine to the outside world.
  */
 
 // broadcaster example

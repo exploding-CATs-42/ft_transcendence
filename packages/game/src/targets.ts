@@ -69,4 +69,12 @@ export const GameTargets = {
     GameStates.PLAYING,
     GameStates.WAITING_FOR_COMBO_SELECTION,
   ),
+  WAITING_FOR_RANDOM_CARD_SELECTION: getStatePath(
+    GameStates.PLAYING,
+    GameStates.WAITING_FOR_RANDOM_CARD_SELECTION,
+  ),
+  WAITING_FOR_CARD_TYPE_SELECTION: getStatePath(
+    GameStates.PLAYING,
+    GameStates.WAITING_FOR_CARD_TYPE_SELECTION,
+  ),
 } as const satisfies Record<keyof typeof GameStates, string>;

@@ -1,5 +1,5 @@
 // Local level
-import type { Card, ComboSize } from "./types";
+import type { Card, CardType } from "./types";
 
 export interface TurnChangedPayload {
   playerId: string;
@@ -9,11 +9,6 @@ export interface TurnChangedPayload {
 export interface TurnSkippedPayload {
   playerId: string;
   attackCount: number;
-}
-
-export interface CardPayload {
-  playerId: string;
-  card: Card;
 }
 
 export interface ShowedCardsToPlayerPayload {
@@ -55,7 +50,7 @@ export interface PlayerSelectedPayload {
   playerId: string;
 }
 
-export interface WaitingForFavorCardSelectionPayload {
+export interface WaitingForCardIdSelectionPayload {
   playerId: string;
 }
 
@@ -63,10 +58,32 @@ export interface PlayerSawTheFuturePayload {
   playerId: string;
 }
 
-export interface ComboSelectionRequestedPayload {
-  playerId: string;
-  comboSize: ComboSize;
-  targets: Array<{ playerId: string; handSize: number }>;
-  targetPlayerId?: string;
-  requestedCardType?: Card["type"];
+export interface WaitingForCardIndexSelectionPayload {
+  targetPlayerId: string;
+}
+
+export interface WaitingForCardTypeSelectionPayload {
+  targetPlayerId: string;
+}
+
+export const CardReceivalReason = {
+  DRAW: "DRAW",
+  FAVOR: "FAVOR",
+  CAT_PAIR: "CAT_PAIR",
+  CAT_TRIPLE: "CAT_TRIPLE",
+} as const;
+
+export type CardReceivalReason =
+  (typeof CardReceivalReason)[keyof typeof CardReceivalReason];
+
+export interface CardGivenPayload {
+  card: Card;
+  playerIdFrom: string;
+  playerIdTo: string;
+  reason: CardReceivalReason;
+}
+
+export interface NoCardOfRequestedTypePayload {
+  cardType: CardType;
+  targetPlayerId: string;
 }

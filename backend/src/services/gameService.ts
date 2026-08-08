@@ -8,7 +8,7 @@ import {
   DrawCardParams,
   GetGameParams,
   InsertKittenParams,
-  GiveCardPayload,
+  ChooseCardIdPayload,
   JoinGameParams,
   LeaveGameParams,
   PlayCardParams,
@@ -17,8 +17,8 @@ import {
   PlayNopeParams,
   ReconnectGameParams,
   SeenTheFuturePayload,
-  ResolveComboParams,
-  SelectComboTargetParams,
+  ChooseCardIndexPayload,
+  ChooseCardTypePayload,
 } from "schemas";
 import {
   type Card,
@@ -350,11 +350,6 @@ export async function reconnectGame(
     topCards = context.deck.slice(0, 3);
   }
 
-  const isWaitingForThisPlayersCombo =
-    snapshot.matches({
-      [GameStates.PLAYING]: GameStates.WAITING_FOR_COMBO_SELECTION,
-    }) && context.pendingCombo?.playerId === player.id;
-
   return {
     players: orderedPlayers.map(toPublicPlayerView),
     hand: player.hand,
@@ -366,15 +361,6 @@ export async function reconnectGame(
     countdownEndsAt: context.countdownEndsAt,
     topCards,
     machineState,
-    pendingComboSize: isWaitingForThisPlayersCombo
-      ? context.pendingCombo!.comboSize
-      : null,
-    pendingComboTargetPlayerId: isWaitingForThisPlayersCombo
-      ? (context.pendingCombo!.targetPlayerId ?? null)
-      : null,
-    pendingComboRequestedCardType: isWaitingForThisPlayersCombo
-      ? (context.pendingCombo!.requestedCardType ?? null)
-      : null,
   };
 }
 
@@ -474,19 +460,12 @@ export async function selectPlayer(input: SelectPlayerPayload, userId: UserId) {
   return { playerId: input.playerId };
 }
 
-export async function giveCard(input: GiveCardPayload, userId: UserId) {
-  const { game, player } = await requirePlayerInGame(userId, input.gameId);
-  await requirePlayerInGame(input.playerIdTo, input.gameId);
-
-  const card = player.hand.find((c) => c.id === input.cardId);
-  if (!card) throw new SocketError("Card is not in your hand");
-
+export async function chooseCardId(input: ChooseCardIdPayload, userId: UserId) {
+  const { game } = await requirePlayerInGame(userId, input.gameId);
   game.instance.send({
-    type: GameEvents.PASS_CARD_BY_ID,
+    type: GameEvents.CHOOSE_CARD_ID,
     ...input,
   });
-
-  return { card };
 }
 
 function getPlayableCard(player: Player, cardId: number): Card {
@@ -582,15 +561,16 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
     cardIds: cards.map((card) => card.id),
   });
 
-  const { lastPlayedCards, pendingCombo } = game.instance.getSnapshot().context;
+  const { lastPlayedCards, pendingAction, nopeWindow } =
+    game.instance.getSnapshot().context;
   const lastPlayedCardIds = new Set(lastPlayedCards?.map((card) => card.id));
 
   if (
     !lastPlayedCards ||
     lastPlayedCards.length !== cards.length ||
     cards.some((card) => !lastPlayedCardIds.has(card.id)) ||
-    !pendingCombo ||
-    pendingCombo.playerId !== player.id
+    !pendingAction ||
+    !nopeWindow
   ) {
     throw new SocketError("Could not play combo");
   }
@@ -598,140 +578,7 @@ export async function playCombo(input: PlayComboParams, userId: UserId) {
   return {
     playerId: player.id,
     cards: lastPlayedCards,
-  };
-}
-
-export async function resolveCombo(input: ResolveComboParams, userId: UserId) {
-  const { game, player } = await requirePlayerInGame(userId, input.gameId);
-  const beforeContext = game.instance.getSnapshot().context;
-  const pendingCombo = beforeContext.pendingCombo;
-
-  if (!pendingCombo || pendingCombo.playerId !== player.id) {
-    throw new SocketError("No combo is waiting for your selection");
-  }
-
-  const targetPlayer = beforeContext.players.find(
-    (candidate) => candidate.id === input.targetPlayerId,
-  );
-  if (
-    !targetPlayer ||
-    targetPlayer.id === player.id ||
-    !targetPlayer.isAlive ||
-    (!pendingCombo.targetPlayerId && targetPlayer.hand.length === 0)
-  ) {
-    throw new SocketError("Choose a living opponent who has cards");
-  }
-
-  if (!pendingCombo.targetPlayerId) {
-    if (
-      (pendingCombo.comboSize === 2 &&
-        (input.cardIndex !== undefined ||
-          input.requestedCardType !== undefined)) ||
-      (pendingCombo.comboSize === 3 &&
-        (input.cardIndex !== undefined ||
-          input.requestedCardType === undefined))
-    ) {
-      throw new SocketError("Invalid declaration for this combo");
-    }
-
-    game.instance.send({
-      type: GameEvents.RESOLVE_COMBO,
-      playerId: player.id,
-      targetPlayerId: targetPlayer.id,
-      ...(input.requestedCardType
-        ? { requestedCardType: input.requestedCardType }
-        : {}),
-    });
-
-    const declaredContext = game.instance.getSnapshot().context;
-    if (
-      declaredContext.pendingCombo?.targetPlayerId !== targetPlayer.id ||
-      !declaredContext.nopeWindow ||
-      !declaredContext.lastPlayedCards
-    ) {
-      throw new SocketError("Could not declare combo");
-    }
-
-    return {
-      status: "declared" as const,
-      playerId: player.id,
-      cards: declaredContext.lastPlayedCards,
-      nopeWindowExpiresAt: declaredContext.nopeWindow.endsAt,
-    };
-  }
-
-  if (input.targetPlayerId !== pendingCombo.targetPlayerId) {
-    throw new SocketError(
-      "Combo target cannot be changed after the Nope window",
-    );
-  }
-
-  if (
-    (pendingCombo.comboSize === 2 &&
-      (input.cardIndex === undefined ||
-        input.requestedCardType !== undefined)) ||
-    (pendingCombo.comboSize === 3 &&
-      (input.cardIndex !== undefined ||
-        input.requestedCardType !== pendingCombo.requestedCardType))
-  ) {
-    throw new SocketError("Invalid selection for this combo");
-  }
-
-  const card =
-    pendingCombo.comboSize === 2
-      ? targetPlayer.hand[input.cardIndex!]
-      : targetPlayer.hand.find(
-          (candidate) => candidate.type === input.requestedCardType,
-        );
-
-  if (pendingCombo.comboSize === 2 && !card) {
-    throw new SocketError("Selected card does not exist");
-  }
-
-  const comboSelectionEvent =
-    pendingCombo.comboSize === 2
-      ? {
-          type: GameEvents.RESOLVE_COMBO,
-          playerId: player.id,
-          targetPlayerId: targetPlayer.id,
-          cardIndex: input.cardIndex!,
-        }
-      : {
-          type: GameEvents.RESOLVE_COMBO,
-          playerId: player.id,
-          targetPlayerId: targetPlayer.id,
-          requestedCardType: input.requestedCardType!,
-        };
-  game.instance.send(comboSelectionEvent);
-
-  const afterContext = game.instance.getSnapshot().context;
-  if (afterContext.pendingCombo !== null) {
-    throw new SocketError("Could not resolve combo");
-  }
-
-  if (card) {
-    const updatedPlayer = afterContext.players.find(
-      (candidate) => candidate.id === player.id,
-    );
-    const updatedTarget = afterContext.players.find(
-      (candidate) => candidate.id === targetPlayer.id,
-    );
-    const wasTransferred =
-      updatedPlayer?.hand.some((candidate) => candidate.id === card.id) &&
-      !updatedTarget?.hand.some((candidate) => candidate.id === card.id);
-
-    if (!wasTransferred) {
-      throw new SocketError("Could not transfer selected card");
-    }
-  }
-
-  return {
-    status: "resolved" as const,
-    playerId: player.id,
-    targetPlayerId: targetPlayer.id,
-    comboSize: pendingCombo.comboSize,
-    requestedCardType: input.requestedCardType,
-    card: card ?? null,
+    nopeWindowExpiresAt: nopeWindow.endsAt,
   };
 }
 
@@ -806,37 +653,24 @@ export async function confirmPlayerSeenTheCards(
   game.instance.send({ type: GameEvents.SEEN_THE_FUTURE });
 }
 
-export async function selectComboTarget(
-  input: SelectComboTargetParams,
+export async function chooseCardIndex(
+  input: ChooseCardIndexPayload,
   userId: UserId,
 ) {
-  const { game, player } = await requirePlayerInGame(userId, input.gameId);
-  const context = game.instance.getSnapshot().context;
-  const pendingCombo = context.pendingCombo;
+  const { game } = await requirePlayerInGame(userId, input.gameId);
+  game.instance.send({
+    type: GameEvents.CHOOSE_CARD_INDEX,
+    cardIndex: input.cardIndex,
+  });
+}
 
-  if (
-    !pendingCombo ||
-    pendingCombo.playerId !== player.id ||
-    context.currentTurnPlayerId !== player.id
-  ) {
-    throw new SocketError("No combo is waiting for your selection");
-  }
-
-  const target = context.players.find(
-    (candidate) => candidate.id === input.targetPlayerId,
-  );
-
-  if (
-    !target ||
-    target.id === player.id ||
-    !target.isAlive ||
-    target.hand.length === 0
-  ) {
-    throw new SocketError("Choose a living opponent who has cards");
-  }
-
-  return {
-    playerId: player.id,
-    targetPlayerId: target.id,
-  };
+export async function chooseCardType(
+  input: ChooseCardTypePayload,
+  userId: UserId,
+) {
+  const { game } = await requirePlayerInGame(userId, input.gameId);
+  game.instance.send({
+    type: GameEvents.CHOOSE_CARD_TYPE,
+    cardType: input.cardType,
+  });
 }

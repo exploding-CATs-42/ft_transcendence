@@ -11,10 +11,10 @@ export const ClientEvents = {
   INSERT_KITTEN: "insert-kitten",
   PLAY_NOPE: "play-nope",
   SELECT_PLAYER: "select-player",
-  GIVE_CARD: "give-card",
   SEEN_THE_FUTURE: "seen-the-future",
-  RESOLVE_COMBO: "resolve-combo",
-  SELECT_COMBO_TARGET: "select-combo-target",
+  CHOOSE_CARD_ID: "choose-card-id",
+  CHOOSE_CARD_INDEX: "choose-card-index",
+  CHOOSE_CARD_TYPE: "choose-card-type",
 } as const;
 
 export const ServerPublicEvents = {
@@ -44,15 +44,14 @@ export const ServerPublicEvents = {
   DECK_SHUFFLED: "DECK_SHUFFLED",
   TURN_SKIPPED: "TURN_SKIPPED",
   GAME_OVER: "GAME_OVER",
-  PLAYER_SELECTED: "PLAYER_SELECTED",
-  CARD_GIVEN: "CARD_GIVEN",
-  WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
-  WAITING_FOR_FAVOR_CARD_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
   PLAYER_SAW_THE_FUTURE: "PLAYER_SAW_THE_FUTURE",
-  COMBO_SELECTION_REQUESTED: "COMBO_SELECTION_REQUESTED",
-  COMBO_RESOLVED: "COMBO_RESOLVED",
-  COMBO_TARGET_SELECTED: "COMBO_TARGET_SELECTED",
-  COMBO_TARGET_CLEARED: "COMBO_TARGET_CLEARED",
+  WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
+  PLAYER_SELECTED: "PLAYER_SELECTED",
+  WAITING_FOR_CARD_ID_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
+  WAITING_FOR_CARD_INDEX_SELECTION: "WAITING_FOR_RANDOM_CARD_SELECTION",
+  WAITING_FOR_CARD_TYPE_SELECTION: "WAITING_FOR_CARD_TYPE_SELECTION",
+  CARD_GIVEN: "CARD_GIVEN",
+  NO_CARD_OF_REQUESTED_TYPE: "NO_CARD_OF_REQUESTED_TYPE",
 } as const;
 
 export const ServerPrivateEvents = {
@@ -83,7 +82,8 @@ export const ServerErrorEvents = {
   INSERT_KITTEN_ERROR: "insert-kitten-error",
   PLAY_NOPE_ERROR: "play-nope-error",
   SELECT_PLAYER_ERROR: "select-player-error",
-  GIVE_CARD_ERROR: "give-card-error",
   SEEN_THE_FUTURE_ERROR: "seen-the-future-error",
-  RESOLVE_COMBO_ERROR: "resolve-combo-error",
+  CHOOSE_CARD_ID_ERROR: "choose-card-id-error",
+  CHOOSE_CARD_INDEX_ERROR: "choose-card-index-error",
+  CHOOSE_CARD_TYPE_ERROR: "choose-card-type-error",
 } as const;

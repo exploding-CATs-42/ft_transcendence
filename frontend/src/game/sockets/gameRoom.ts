@@ -7,9 +7,6 @@ import {
   type CardPlayedPayload,
   type CardRemovedPayload,
   type ComboPlayedPayload,
-  type ComboResolvedPayload,
-  type ComboSelectionRequestedPayload,
-  type ComboTargetSelectedPayload,
   type DefusePromptPayload,
   type GameStartedPayload,
   type GameStatePayload,
@@ -19,20 +16,24 @@ import {
   type SocketErrorPayload,
   type TurnChangedPayload,
   type TurnSkippedPayload,
+  type CardReceivedPayload,
 } from "@exploding-cats/contracts";
 import type {
-  CardPayload,
+  CardType,
   GameOverPayload,
   KittenInsertedPayload,
+  NoCardOfRequestedTypePayload,
   PlayerDefusedPayload,
   PlayerSelectedPayload,
-  WaitingForFavorCardSelectionPayload,
+  WaitingForCardIdSelectionPayload,
+  WaitingForCardIndexSelectionPayload,
+  WaitingForCardTypeSelectionPayload,
 } from "@exploding-cats/game-core";
 import { socket } from "socket";
 import { emit, leaveGame } from "./gameSession";
 
 export interface GameRoomHandlers {
-  onCardReceived(card: CardPayload): void;
+  onCardReceived(card: CardReceivedPayload): void;
   onCardDrawn(payload: PlayerIdPayload): void;
   onGameState(payload: GameStatePayload): void;
   onTurnChanged(payload: TurnChangedPayload): void;
@@ -47,11 +48,6 @@ export interface GameRoomHandlers {
   onTurnSkipped(payload: TurnSkippedPayload): void;
   onComboPlayed(payload: ComboPlayedPayload): void;
   onComboPlayError(payload: SocketErrorPayload): void;
-  onComboSelectionRequested(payload: ComboSelectionRequestedPayload): void;
-  onComboTargetSelected(payload: ComboTargetSelectedPayload): void;
-  onComboTargetCleared(): void;
-  onComboResolved(payload: ComboResolvedPayload): void;
-  onComboResolutionError(payload: SocketErrorPayload): void;
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
   onKittenDrawn(): void;
   onKittenInserted(payload: KittenInsertedPayload): void;
@@ -61,12 +57,17 @@ export interface GameRoomHandlers {
   onPlayerSelected(payload: PlayerSelectedPayload): void;
   onCardGiven(payload: CardGivenPayload): void;
   onWaitingForPlayerSelection(): void;
-  onWaitingForFavorCardSelection(
-    payload: WaitingForFavorCardSelectionPayload,
-  ): void;
+  onWaitingForCardIdSelection(payload: WaitingForCardIdSelectionPayload): void;
   onPlayerLeft(payload: PlayerIdPayload): void;
   onPlayerSawTheFuture(): void;
   onPlayerLooksAtTheFuture(): void;
+  onWaitingForCardIndexSelection(
+    payload: WaitingForCardIndexSelectionPayload,
+  ): void;
+  onWaitingForCardTypeSelection(
+    payload: WaitingForCardTypeSelectionPayload,
+  ): void;
+  onNoCardOfRequestedType(payload: NoCardOfRequestedTypePayload): void;
 }
 
 export type CleanupFunction = () => void;
@@ -87,9 +88,6 @@ export function trackGameState(): CleanupFunction {
       selectedPlayerId: null,
       countdownEndsAt: null,
       topCards: null,
-      pendingComboSize: null,
-      pendingComboTargetPlayerId: null,
-      pendingComboRequestedCardType: null,
     };
   };
 
@@ -143,14 +141,6 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.TURN_SKIPPED, handlers.onTurnSkipped],
     [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
     [ServerErrorEvents.PLAY_COMBO_ERROR, handlers.onComboPlayError],
-    [
-      ServerPublicEvents.COMBO_SELECTION_REQUESTED,
-      handlers.onComboSelectionRequested,
-    ],
-    [ServerPublicEvents.COMBO_TARGET_SELECTED, handlers.onComboTargetSelected],
-    [ServerPublicEvents.COMBO_TARGET_CLEARED, handlers.onComboTargetCleared],
-    [ServerPublicEvents.COMBO_RESOLVED, handlers.onComboResolved],
-    [ServerErrorEvents.RESOLVE_COMBO_ERROR, handlers.onComboResolutionError],
     [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
     [ServerPublicEvents.GAME_OVER, handlers.onGameOver],
     [ServerPublicEvents.NOPE_PLAYED, handlers.onNopePlayed],
@@ -162,14 +152,26 @@ export function attachGameRoomSockets(
       handlers.onWaitingForPlayerSelection,
     ],
     [
-      ServerPublicEvents.WAITING_FOR_FAVOR_CARD_SELECTION,
-      handlers.onWaitingForFavorCardSelection,
+      ServerPublicEvents.WAITING_FOR_CARD_ID_SELECTION,
+      handlers.onWaitingForCardIdSelection,
     ],
     [ServerPublicEvents.PLAYER_LEFT, handlers.onPlayerLeft],
     [ServerPublicEvents.PLAYER_SAW_THE_FUTURE, handlers.onPlayerSawTheFuture],
     [
       ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE,
       handlers.onPlayerLooksAtTheFuture,
+    ],
+    [
+      ServerPublicEvents.WAITING_FOR_CARD_INDEX_SELECTION,
+      handlers.onWaitingForCardIndexSelection,
+    ],
+    [
+      ServerPublicEvents.WAITING_FOR_CARD_TYPE_SELECTION,
+      handlers.onWaitingForCardTypeSelection,
+    ],
+    [
+      ServerPublicEvents.NO_CARD_OF_REQUESTED_TYPE,
+      handlers.onNoCardOfRequestedType,
     ],
   ] as const;
 
@@ -189,34 +191,19 @@ export const playCard = (cardId: number) =>
   emit(ClientEvents.PLAY_CARD, { cardId });
 export const playCombo = (cardIds: number[]) =>
   emit(ClientEvents.PLAY_COMBO, { cardIds });
-export const selectComboTarget = (targetPlayerId: string) =>
-  emit(ClientEvents.SELECT_COMBO_TARGET, { targetPlayerId });
-export const declareTwoCardCombo = (targetPlayerId: string) =>
-  emit(ClientEvents.RESOLVE_COMBO, { targetPlayerId });
-export const resolveTwoCardCombo = (
-  targetPlayerId: string,
-  cardIndex: number,
-) => emit(ClientEvents.RESOLVE_COMBO, { targetPlayerId, cardIndex });
-export const resolveThreeCardCombo = (
-  targetPlayerId: string,
-  requestedCardType: import("@exploding-cats/game-core").CardType,
-) =>
-  emit(ClientEvents.RESOLVE_COMBO, {
-    targetPlayerId,
-    requestedCardType,
-  });
 export const playDefuse = () => emit(ClientEvents.PLAY_DEFUSE);
 export const insertKitten = (explodingKittenPosition: number) =>
   emit(ClientEvents.INSERT_KITTEN, { explodingKittenPosition });
 export const playNope = (cardId: number) =>
   emit(ClientEvents.PLAY_NOPE, { cardId });
+export const seenTheFuture = () => emit(ClientEvents.SEEN_THE_FUTURE);
 export const selectPlayer = (playerId: string) =>
   emit(ClientEvents.SELECT_PLAYER, { playerId });
+export const chooseCardId = (cardId: number) =>
+  emit(ClientEvents.CHOOSE_CARD_ID, { cardId });
+export const chooseCardIndex = (cardIndex: number) =>
+  emit(ClientEvents.CHOOSE_CARD_INDEX, { cardIndex });
+export const chooseCardType = (cardType: CardType) =>
+  emit(ClientEvents.CHOOSE_CARD_TYPE, { cardType });
 
 export const leaveCurrentGame = leaveGame;
-export const giveCard = (
-  playerIdFrom: string,
-  playerIdTo: string,
-  cardId: number,
-) => emit(ClientEvents.GIVE_CARD, { playerIdFrom, playerIdTo, cardId });
-export const seenTheFuture = () => emit(ClientEvents.SEEN_THE_FUTURE);
