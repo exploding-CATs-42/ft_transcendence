@@ -33,7 +33,7 @@ const ProfileControls = ({ user, updateUser }: Props) => {
           toggleOpenEditPlayerModal(true);
         }}
       >
-        <Icon name="pencil" className={s.editIcon} width={15} height={15} />
+        <Icon name="pencil" className={s.editIcon} width={20} height={20} />
       </Button>
 
       <EditPlayerModal
@@ -44,7 +44,7 @@ const ProfileControls = ({ user, updateUser }: Props) => {
       />
 
       <Button className={s.logoutButton} onClick={logoutUser}>
-        <Icon name="log-out" className={s.logoutIcon} width={15} height={15} />
+        <Icon name="log-out" className={s.logoutIcon} width={20} height={20} />
         <span className={s.logoutText}>Sign out</span>
       </Button>
     </>
