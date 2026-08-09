@@ -1,12 +1,8 @@
-// Libraries
-import { useEffect, useState } from "react";
 // Project level
 import { Avatar, LinkButton } from "components";
-import { useAuth } from "hooks";
-import api from "api";
+import { useAuth, useProfile } from "hooks";
 // Local level
 import s from "./Navigation.module.css";
-import type { PublicUser } from "@exploding-cats/contracts";
 
 interface Props {
   onLinkClick?: () => void;
@@ -14,9 +10,8 @@ interface Props {
 
 const Navigation = ({ onLinkClick }: Props) => {
   const { authStatus } = useAuth();
+  const { profile } = useProfile();
   const isLoggedIn = authStatus === "authenticated";
-
-  const [user, setUser] = useState<PublicUser | null>(null);
 
   const navLinks = [
     { path: "/lobby", label: "Play" },
@@ -24,30 +19,6 @@ const Navigation = ({ onLinkClick }: Props) => {
     { path: "/rules", label: "Rules" },
     { path: "/about", label: "About" },
   ];
-
-  useEffect(() => {
-    if (!isLoggedIn) return;
-
-    let isActive = true;
-
-    const loadUser = async () => {
-      try {
-        const userData = await api.me.getMe();
-
-        if (isActive) {
-          setUser(userData);
-        }
-      } catch (error) {
-        console.error("Cannot retrieve user", error);
-      }
-    };
-
-    void loadUser();
-
-    return () => {
-      isActive = false;
-    };
-  }, [isLoggedIn]);
 
   return (
     <>
@@ -73,11 +44,11 @@ const Navigation = ({ onLinkClick }: Props) => {
           className={s.profile}
           onClick={() => onLinkClick?.()}
         >
-          <span className={s.username}>{user?.username}</span>
+          <span className={s.username}>{profile?.username}</span>
           <Avatar
             className={s.avatar}
             variant="badge"
-            src={user?.avatarUrl ?? null}
+            src={profile?.avatarUrl ?? null}
             showStatus={false}
           />
         </LinkButton>
