@@ -56,6 +56,14 @@ export class PlayerSeat {
     this.player = null;
   }
 
+  destroy() {
+    this.onClick = null;
+    this.player = null;
+    this.hand = null;
+
+    this.#container.destroy();
+  }
+
   addHand(hand: OpponentHand) {
     if (this.hand) return;
 
