@@ -1,7 +1,13 @@
 // Local level
-import { type GameEvent, type GameOutEvent, GameOutEvents } from "./events";
+import { CardReceivalReason } from "./eventPayloads";
+import {
+  type GameEvent,
+  GameEvents,
+  type GameOutEvent,
+  GameOutEvents,
+} from "./events";
 import type { GameContext } from "./gameMachine";
-import { CardType } from "./types";
+import { CardType, PendingActionType } from "./types";
 import { countKittensInDeck } from "./utils/deck";
 
 type GameEmitterArgs = {
@@ -137,10 +143,10 @@ export const waitingForPlayerSelection = (): GameOutEvent => ({
   type: GameOutEvents.WAITING_FOR_PLAYER_SELECTION,
 });
 
-export const waitingForFavorCardSelection = ({
+export const waitingForCardIdSelection = ({
   context,
 }: GameEmitterArgs): GameOutEvent => ({
-  type: GameOutEvents.WAITING_FOR_FAVOR_CARD_SELECTION,
+  type: GameOutEvents.WAITING_FOR_CARD_ID_SELECTION,
   payload: { playerId: context.selectedPlayerId! },
 });
 
@@ -151,36 +157,62 @@ export const playerSawTheFuture = ({
   payload: { playerId: context.currentTurnPlayerId! },
 });
 
-export const comboSelectionRequested = ({
+export const waitingForCardIndexSelection = ({
   context,
 }: GameEmitterArgs): GameOutEvent => ({
-  type: GameOutEvents.COMBO_SELECTION_REQUESTED,
-  payload: {
-    playerId: context.pendingCombo!.playerId,
-    comboSize: context.pendingCombo!.comboSize,
-    ...(context.pendingCombo!.targetPlayerId
-      ? { targetPlayerId: context.pendingCombo!.targetPlayerId }
-      : {}),
-    ...(context.pendingCombo!.requestedCardType
-      ? { requestedCardType: context.pendingCombo!.requestedCardType }
-      : {}),
-    targets: context.players
-      .filter(
-        (player) =>
-          player.id !== context.pendingCombo!.playerId &&
-          (!context.pendingCombo!.targetPlayerId ||
-            player.id === context.pendingCombo!.targetPlayerId) &&
-          player.isAlive &&
-          (player.hand.length > 0 ||
-            (Boolean(context.pendingCombo!.targetPlayerId) &&
-              context.pendingCombo!.comboSize === 3)),
-      )
-      .map((player) => ({
-        playerId: player.id,
-        handSize: player.hand.length,
-      })),
-  },
+  type: GameOutEvents.WAITING_FOR_CARD_INDEX_SELECTION,
+  payload: { targetPlayerId: context.selectedPlayerId! },
 });
+
+export const waitingForCardTypeSelection = ({
+  context,
+}: GameEmitterArgs): GameOutEvent => ({
+  type: GameOutEvents.WAITING_FOR_CARD_TYPE_SELECTION,
+  payload: { targetPlayerId: context.selectedPlayerId! },
+});
+
+export const cardGiven = ({ context }: GameEmitterArgs): GameOutEvent => {
+  let reason;
+  const action = context.pendingAction;
+  if (action === PendingActionType.FAVOR) {
+    reason = CardReceivalReason.FAVOR;
+  } else if (action === PendingActionType.CAT_PAIR) {
+    reason = CardReceivalReason.CAT_PAIR;
+  } else if (action === PendingActionType.CAT_TRIPLE) {
+    reason = CardReceivalReason.CAT_TRIPLE;
+  } else {
+    throw Error("Unknown card receival reason");
+  }
+
+  return {
+    type: GameOutEvents.CARD_GIVEN,
+    payload: {
+      card: context.givenCard!,
+      playerIdFrom: context.selectedPlayerId!,
+      playerIdTo: context.currentTurnPlayerId!,
+      reason,
+    },
+  };
+};
+
+export const noCardOfRequestedType = ({
+  context,
+  event,
+}: GameEmitterArgs): GameOutEvent => {
+  if (event.type !== GameEvents.CHOOSE_CARD_TYPE) {
+    throw new Error(
+      `noCardOfRequestedType emitted for unexpected event: ${event.type}`,
+    );
+  }
+
+  return {
+    type: GameOutEvents.NO_CARD_OF_REQUESTED_TYPE,
+    payload: {
+      cardType: event.cardType,
+      targetPlayerId: context.selectedPlayerId!,
+    },
+  };
+};
 
 /* emitter - is a function that emits an "event" object to the "outside world",
  * giving it it's type and optional payload.

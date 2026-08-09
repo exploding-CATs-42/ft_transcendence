@@ -4,6 +4,7 @@ import type {
   ComboSize,
   ShowedCardsToPlayerPayload,
   GameStates,
+  CardReceivalReason,
 } from "@exploding-cats/game-core";
 import type { GameRecord } from "../shared";
 import type { PublicPlayerView, WaitingPlayerView } from "./views";
@@ -104,9 +105,6 @@ export interface GameStatePayload {
   countdownEndsAt: number | null;
   topCards: Card[] | null;
   machineState: GameStates | null;
-  pendingComboSize: ComboSize | null;
-  pendingComboTargetPlayerId: string | null;
-  pendingComboRequestedCardType: CardType | null;
 }
 
 export interface FriendOnlineStatusChangedPayload {
@@ -128,4 +126,24 @@ export interface CardGivenPayload {
 export interface ComboTargetSelectedPayload {
   playerId: string;
   targetPlayerId: string;
+}
+
+export type CardReceivedPayload =
+  | {
+      card: Card;
+      reason: typeof CardReceivalReason.DRAW;
+    }
+  | {
+      card: Card;
+      reason:
+        | typeof CardReceivalReason.FAVOR
+        | typeof CardReceivalReason.CAT_PAIR
+        | typeof CardReceivalReason.CAT_TRIPLE;
+      playerIdFrom: string;
+    };
+
+export interface CardStolenPayload {
+  playerIdFrom: string;
+  playerIdTo: string;
+  cardType?: CardType;
 }

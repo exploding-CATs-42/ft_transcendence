@@ -5,25 +5,26 @@ import {
   CardType,
   GameStates,
   type Card,
-  type CardPayload,
   type ExplodingKittenDrawnPayload,
   type GameOverPayload,
   type KittenInsertedPayload,
-  type ComboSize,
   type PlayerDefusedPayload,
   type PlayerEliminatedPayload,
   type PlayerSelectedPayload,
-  type WaitingForFavorCardSelectionPayload,
+  type WaitingForCardIdSelectionPayload,
+  type WaitingForCardIndexSelectionPayload,
+  type WaitingForCardTypeSelectionPayload,
+  CardReceivalReason,
+  type NoCardOfRequestedTypePayload,
 } from "@exploding-cats/game-core";
 import {
   CardRemovalReason,
   type CardGivenPayload,
   type CardPlayedPayload,
+  type CardReceivedPayload,
   type CardRemovedPayload,
+  type CardStolenPayload,
   type ComboPlayedPayload,
-  type ComboResolvedPayload,
-  type ComboSelectionRequestedPayload,
-  type ComboTargetSelectedPayload,
   type DefusePromptPayload,
   type GameStatePayload,
   type NopePlayedPayload,
@@ -86,7 +87,7 @@ import {
   getCachedGameState,
   drawCard,
   playDefuse,
-  giveCard,
+  chooseCardId,
   leaveCurrentGame,
   playCard,
   playCombo,
@@ -96,11 +97,8 @@ import {
   type GameRoomHandlers,
   insertKitten,
   seenTheFuture,
-  declareTwoCardCombo,
-  resolveTwoCardCombo,
-  resolveThreeCardCombo,
-  selectComboTarget,
-  syncGameState,
+  chooseCardIndex,
+  chooseCardType,
 } from "../sockets";
 import { ShuffleAnimation } from "../animations";
 
@@ -237,11 +235,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #drawPileSize = 0;
   #kittensInDeck = 0;
   #explodingKittenRiskBar: ExplodingKittenRiskBar | null = null;
-  #pendingComboSize: ComboSize | null = null;
-  #pendingComboTargets = new Map<string, number>();
-  #isComboPlayPending = false;
-  #isComboResolutionPending = false;
-  #isStolenCardRemoval = false;
   #nextDiscardStartsAt = 0;
 
   constructor() {
@@ -256,8 +249,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     if (!gameData) {
       throw new Error("Game room started without game data");
     }
-
-    this.resetComboState();
 
     const { players, hand: cards, deckSize, kittensInDeck } = gameData;
 
@@ -309,20 +300,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.events.once(Phaser.Scenes.Events.SHUTDOWN, this.cleanup);
     this.events.once(Phaser.Scenes.Events.DESTROY, this.cleanup);
 
-    if (gameData.pendingComboSize) {
-      this.onComboSelectionRequested({
-        playerId: this.#meId!,
-        comboSize: gameData.pendingComboSize,
-        targets: this.getComboTargets(gameData.players),
-        ...(gameData.pendingComboTargetPlayerId
-          ? { targetPlayerId: gameData.pendingComboTargetPlayerId }
-          : {}),
-        ...(gameData.pendingComboRequestedCardType
-          ? { requestedCardType: gameData.pendingComboRequestedCardType }
-          : {}),
-      });
-    }
-
     // Subscribe last: everything is initialized before cached socket events are handled.
     this.#detachSockets = attachGameRoomSockets(this);
 
@@ -336,8 +313,18 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         this.onWaitingForPlayerSelection();
       } else if (state === GameStates.WAITING_FOR_FAVOR_CARD_SELECTION) {
         this.onPlayerSelected({ playerId: gameData.selectedPlayerId! });
-        this.onWaitingForFavorCardSelection({
+        this.onWaitingForCardIdSelection({
           playerId: gameData.selectedPlayerId!,
+        });
+      } else if (state === GameStates.WAITING_FOR_RANDOM_CARD_SELECTION) {
+        this.onPlayerSelected({ playerId: gameData.selectedPlayerId! });
+        this.onWaitingForCardIndexSelection({
+          targetPlayerId: gameData.selectedPlayerId!,
+        });
+      } else if (state === GameStates.WAITING_FOR_CARD_TYPE_SELECTION) {
+        this.onPlayerSelected({ playerId: gameData.selectedPlayerId! });
+        this.onWaitingForCardTypeSelection({
+          targetPlayerId: gameData.selectedPlayerId!,
         });
       } else if (state === GameStates.WAITING_FOR_DEFUSE_CARD) {
         if (this.isMyTurn()) {
@@ -388,18 +375,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     );
   }
 
-  private getComboTargets(players: readonly PublicPlayerView[]) {
-    return players
-      .filter(
-        (player) =>
-          player.id !== this.#meId && player.isAlive && player.handSize > 0,
-      )
-      .map((player) => ({
-        playerId: player.id,
-        handSize: player.handSize,
-      }));
-  }
-
   private createPlayers(players: Player[]) {
     return players.map((player) => {
       return new GraphicPlayer(this, { x: 0, y: 0 }, player, NAME_LABEL_CONFIG);
@@ -446,35 +421,21 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   private isMyTurn = () => this.#meId === this.#currentTurnPlayerId;
   private isFavorModeActive = () => this.#favorModeActive;
 
-  private giveCard = (cardId: number) => {
-    giveCard(this.#meId!, this.#currentTurnPlayerId!, cardId);
-  };
-
   private createMyHand() {
     const onCardDrop = (card: GraphicCard) => {
-      if (this.#isStolenCardRemoval) {
-        this.giveCardToOpponent(card.image);
-        return;
-      }
-
-      if (this.#favorModeActive) {
-        this.hideFavorUI();
-        this.giveCardToOpponent(card.image);
-      } else {
-        // move it to the discard pile and shrink it down to pile size
-        this.scheduleDiscard(() => {
-          this.tweens.add({
-            targets: card.image,
-            x: DISCARD_PILE_POSITION.x,
-            y: DISCARD_PILE_POSITION.y,
-            displayWidth: CARD_WIDTH,
-            displayHeight: CARD_HEIGHT,
-            duration: CARD_TO_DISCARD_DURATION_MS,
-            ease: CARD_TO_DISCARD_EASE,
-            onComplete: () => this.setDiscardPile(card.image),
-          });
+      // move it to the discard pile and shrink it down to pile size
+      this.scheduleDiscard(() => {
+        this.tweens.add({
+          targets: card.image,
+          x: DISCARD_PILE_POSITION.x,
+          y: DISCARD_PILE_POSITION.y,
+          displayWidth: CARD_WIDTH,
+          displayHeight: CARD_HEIGHT,
+          duration: CARD_TO_DISCARD_DURATION_MS,
+          ease: CARD_TO_DISCARD_EASE,
+          onComplete: () => this.setDiscardPile(card.image),
         });
-      }
+      });
     };
 
     this.#myHand = new GraphicHand(
@@ -487,7 +448,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         onKindComboPlay: this.playSelectedKindCombo,
       },
       this.isFavorModeActive,
-      this.giveCard,
+      chooseCardId,
     );
   }
 
@@ -648,13 +609,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onPlayerLeft = (payload: PlayerIdPayload) => {
     this.removePlayer(payload.playerId);
-
-    if (this.#pendingComboTargets.delete(payload.playerId)) {
-      this.#isComboResolutionPending = false;
-      this.cleanModal();
-      this.showOpponentTargetIcons(this.#pendingComboTargets);
-      syncGameState();
-    }
   };
 
   private removePlayer(playerId: string) {
@@ -725,74 +679,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private selectOpponent = (playerId: string) => {
-    if (this.#isComboResolutionPending) return;
-    if (this.#pendingComboSize && !this.#pendingComboTargets.has(playerId))
-      return;
-
     this.#players.forEach((seat, id) => {
       seat.onClick = null;
       seat.setCursorPointer(false);
       seat.setTargetIconVisible(id === playerId);
     });
 
-    if (!this.#pendingComboSize) {
-      selectPlayer(playerId);
-      return;
-    }
-
-    selectComboTarget(playerId);
-
-    if (this.#pendingComboSize === 2) {
-      this.#isComboResolutionPending = true;
-      this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
-      declareTwoCardCombo(playerId);
-      return;
-    }
-
-    const targetName =
-      this.#players.get(playerId)?.player?.name ?? "the selected player";
-    const view = new ChooseCardByNameView(this, targetName);
-    this.#notification.showMessageFor(NotificationMode.SELECT_CARD);
-    view.onSelection = (requestedCardType) => {
-      if (this.#isComboResolutionPending) return;
-
-      this.#isComboResolutionPending = true;
-      this.cleanModal();
-      this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
-      this.#incomingCardFromPlayerId = playerId;
-      resolveThreeCardCombo(playerId, requestedCardType);
-    };
-    this.#modal.setContent(view);
-    this.#modal.setVisible(true);
+    selectPlayer(playerId);
   };
-
-  private hideComboSelection() {
-    this.#players.forEach((seat) => {
-      seat.onClick = null;
-      seat.setCursorPointer(false);
-    });
-
-    this.hideTargetIcons();
-    this.resetComboState();
-  }
 
   private hideTargetIcons() {
     this.#players.forEach((seat) => seat.setTargetIconVisible(false));
-  }
-
-  private resetComboState() {
-    this.#pendingComboSize = null;
-    this.#pendingComboTargets.clear();
-    this.#isComboPlayPending = false;
-    this.#isComboResolutionPending = false;
-  }
-
-  private scheduleComboStateSync() {
-    this.time.delayedCall(1000, () => {
-      if (this.#isComboPlayPending || this.#isComboResolutionPending) {
-        syncGameState();
-      }
-    });
   }
 
   private hideFavorUI() {
@@ -844,42 +741,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.setCurrentTurn(payload.currentTurnPlayerId ?? "");
     this.updateAttackIndicator();
 
-    if (payload.pendingComboSize) {
-      this.applyComboSelection(
-        {
-          playerId: this.#meId,
-          comboSize: payload.pendingComboSize,
-          targets: this.getComboTargets(payload.players),
-          ...(payload.pendingComboTargetPlayerId
-            ? { targetPlayerId: payload.pendingComboTargetPlayerId }
-            : {}),
-          ...(payload.pendingComboRequestedCardType
-            ? {
-                requestedCardType: payload.pendingComboRequestedCardType,
-              }
-            : {}),
-        },
-        this.#isComboResolutionPending,
-      );
-      return;
-    }
-
-    if (this.#isComboPlayPending || this.#isComboResolutionPending) {
-      this.cleanModal();
-      this.hideComboSelection();
-      this.scene.restart(payload);
-      return;
-    }
-
-    if (this.#pendingComboSize) {
-      this.cleanModal();
-      this.hideComboSelection();
-    }
-
     this.updateDrawPileInteractivity();
   };
 
-  onCardReceived = (payload: CardPayload): void => {
+  onCardReceived = (payload: CardReceivedPayload): void => {
     if (!this.#myHand) return;
 
     this.#myHand.clearKindComboSelection();
@@ -896,7 +761,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     if (cardCount === 0) targetX = HAND_POSITION.x;
     else targetX = startX + spacing * insertIndex - spacing / 2;
 
-    if (this.#incomingCardFromPlayerId === null) {
+    const { reason } = payload;
+    if (reason === CardReceivalReason.DRAW) {
       // Create face down card
       const cardCover = this.textures.get(Textures.cardCover).get();
       const faceDownCard = this.addCard(cardCover, DRAW_PILE_POSITION);
@@ -920,24 +786,21 @@ export class GameRoom extends Scene implements GameRoomHandlers {
           this.#myHand.addCard(payload.card, frame, insertIndex);
         },
       });
-
-      return;
-    }
-
-    if (this.#favorModeActive) {
+    } else {
+      this.#modal.setVisible(false);
       this.#notification.hide();
       this.#favorModeActive = false;
+
+      this.takeCardFromOpponent(
+        this.#incomingCardFromPlayerId,
+        payload.card,
+        insertIndex,
+        targetX,
+      );
+      this.#incomingCardFromPlayerId = null;
+
       this.updateDrawPileInteractivity();
     }
-
-    this.takeCardFromOpponent(
-      this.#incomingCardFromPlayerId,
-      payload.card,
-      insertIndex,
-      targetX,
-    );
-
-    this.#incomingCardFromPlayerId = null;
   };
 
   private drawOpponentCard(playerId: string) {
@@ -1025,7 +888,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const cardIds = this.#selectedCardPlay.cardIds;
     this.#myHand.clearKindComboSelection();
-    this.#isComboPlayPending = true;
     this.#drawPile?.disableInteractive(true);
     playCombo(cardIds);
   };
@@ -1168,22 +1030,33 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   onCardRemoved = (payload: CardRemovedPayload): void => {
-    this.#isStolenCardRemoval = payload.reason === CardRemovalReason.STOLEN;
-    const card = this.#myHand.removeCard(payload.cardId, payload.reason);
-    this.#isStolenCardRemoval = false;
-
-    if (payload.reason === CardRemovalReason.INSERTED_INTO_DECK)
-      this.animateCardToDrawPile(card.image);
-
-    const isSelectingComboTarget =
-      this.#isComboPlayPending || this.#pendingComboSize !== null;
+    const { cardId, reason } = payload;
+    const card = this.#myHand.removeCard(cardId, reason);
 
     if (
-      this.isMyTurn() &&
-      card.data.type !== CardType.DEFUSE &&
-      !isSelectingComboTarget
-    )
+      reason === CardRemovalReason.PLAYED &&
+      card.data.type !== CardType.DEFUSE
+    ) {
       this.#notification.showMessageFor(NotificationMode.WAITING_FOR_NOPES);
+    } else if (reason === CardRemovalReason.INSERTED_INTO_DECK) {
+      this.animateCardToDrawPile(card.image);
+    } else if (reason === CardRemovalReason.GIVEN_AWAY) {
+      this.tweens.add({
+        targets: card.image,
+        x: FAVOR_CARD_DROP_ZONE.x,
+        y: FAVOR_CARD_DROP_ZONE.y,
+        displayWidth: CARD_WIDTH,
+        displayHeight: CARD_HEIGHT,
+        duration: 300,
+        ease: "Back.Out",
+        onComplete: () => {
+          card.image.destroy();
+          this.hideFavorUI();
+        },
+      });
+    } else if (reason === CardRemovalReason.STOLEN) {
+      card.image.destroy();
+    }
   };
 
   private discardOpponentCard(playerId: string, cardType: CardType) {
@@ -1213,26 +1086,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       onComplete: () => this.setDiscardPile(flyingCard),
     });
   }
-
-  private giveCardToOpponent = (cardImage: Phaser.GameObjects.Image) => {
-    this.#notification.hide();
-
-    const receiverHand = this.#opponents.get(this.#currentTurnPlayerId!);
-
-    if (!receiverHand) {
-      cardImage.destroy();
-      return;
-    }
-
-    animateCardTo(this, cardImage, receiverHand.getTopCardBounds(), {
-      duration: CARD_TRANSFER_DURATION_MS,
-      ease: CARD_TRANSFER_EASE,
-      onComplete: () => {
-        cardImage.destroy();
-        receiverHand.addCard();
-      },
-    });
-  };
 
   private takeCardFromOpponent = (
     giverId: string | null,
@@ -1331,17 +1184,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#notification.hide();
     this.#nopeButton.hide();
     this.hideTargetIcons();
-
-    if (
-      this.#isComboPlayPending ||
-      this.#pendingComboSize ||
-      this.#isComboResolutionPending
-    ) {
-      this.cleanModal();
-      this.hideComboSelection();
-      this.updateDrawPileInteractivity();
-      return;
-    }
     this.updateDrawPileInteractivity();
   };
 
@@ -1520,152 +1362,21 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       });
     });
 
+    const playerName = this.#players.get(payload.playerId)?.player?.name;
+    const mode =
+      payload.cardTypes.length === 2
+        ? NotificationMode.CAT_PAIR_PLAYED
+        : NotificationMode.CAT_TRIPLE_PLAYED;
+    this.#notification.showMessageFor(mode, playerName);
+
     this.startNopeWindow(payload.playerId, payload.nopeWindowExpiresAt);
     this.#drawPile?.disableInteractive(true);
   };
 
-  onComboSelectionRequested = (
-    payload: ComboSelectionRequestedPayload,
-  ): void => {
-    this.applyComboSelection(payload);
-  };
-
-  onComboTargetSelected = (payload: ComboTargetSelectedPayload): void => {
-    this.#players.forEach((seat, playerId) => {
-      seat.setTargetIconVisible(playerId === payload.targetPlayerId);
-    });
-  };
-
-  onComboTargetCleared = (): void => {
-    this.hideTargetIcons();
-  };
-
-  private applyComboSelection(
-    payload: ComboSelectionRequestedPayload,
-    recoverPendingRequest = false,
-  ) {
-    if (payload.playerId !== this.#meId) return;
-
-    const selectionAlreadyOpen = this.#pendingComboSize === payload.comboSize;
-    this.#pendingComboSize = payload.comboSize;
-    this.#pendingComboTargets = new Map(
-      payload.targets.map((target) => [target.playerId, target.handSize]),
-    );
-    this.#isComboPlayPending = false;
-    this.#drawPile?.disableInteractive(true);
-
-    if (payload.targetPlayerId) {
-      const targetPlayerId = payload.targetPlayerId;
-      const cardsAmount = this.#pendingComboTargets.get(targetPlayerId) ?? 0;
-
-      this.#isComboResolutionPending = false;
-      this.cleanModal();
-
-      if (payload.comboSize === 2) {
-        this.#notification.showMessageFor(NotificationMode.SELECT_CARD);
-        const view = new ChooseRandomCardView(this, cardsAmount);
-        view.onSelection = (cardIndex) => {
-          if (this.#isComboResolutionPending) return;
-
-          this.#isComboResolutionPending = true;
-          this.#incomingCardFromPlayerId = targetPlayerId;
-          resolveTwoCardCombo(targetPlayerId, cardIndex);
-          this.scheduleComboStateSync();
-        };
-        this.#modal.setContent(view);
-        this.#modal.setVisible(true);
-        return;
-      }
-
-      if (payload.requestedCardType) {
-        this.#isComboResolutionPending = true;
-        this.#incomingCardFromPlayerId = targetPlayerId;
-        resolveThreeCardCombo(targetPlayerId, payload.requestedCardType);
-        this.scheduleComboStateSync();
-      }
-      return;
-    }
-
-    if (selectionAlreadyOpen && !recoverPendingRequest) return;
-
-    this.#isComboResolutionPending = false;
-    this.cleanModal();
-    this.showOpponentTargetIcons(this.#pendingComboTargets);
-    this.#notification.showMessageFor(NotificationMode.SELECT_PLAYER);
-  }
-
   onComboPlayError = (payload: SocketErrorPayload): void => {
     this.#myHand.clearKindComboSelection();
-    this.#isComboPlayPending = false;
     this.updateDrawPileInteractivity();
     this.#notification.showTransientMessage(payload.message);
-  };
-
-  onComboResolutionError = (payload: SocketErrorPayload): void => {
-    this.#notification.showTransientMessage(payload.message);
-    if (!this.#pendingComboSize) return;
-
-    this.#isComboResolutionPending = false;
-    this.cleanModal();
-    this.showOpponentTargetIcons(this.#pendingComboTargets);
-    syncGameState();
-  };
-
-  onComboResolved = (payload: ComboResolvedPayload): void => {
-    this.#notification.hide();
-    this.hideTargetIcons();
-
-    if (!payload.cardStolen) {
-      this.#incomingCardFromPlayerId = null;
-    }
-
-    const isComboPlayer = this.#meId === payload.playerId;
-    const isComboTarget = this.#meId === payload.targetPlayerId;
-
-    if (payload.cardStolen && !isComboTarget && !isComboPlayer) {
-      this.passCardBetweenOpponents(payload.targetPlayerId, payload.playerId);
-    }
-
-    const playerName =
-      this.#players.get(payload.playerId)?.player?.name ?? "A player";
-    const targetName =
-      this.#players.get(payload.targetPlayerId)?.player?.name ?? "the player";
-
-    if (isComboPlayer) {
-      this.cleanModal();
-      this.hideComboSelection();
-      this.updateDrawPileInteractivity();
-    }
-
-    if (payload.comboSize === 3) {
-      if (!isComboPlayer && !isComboTarget) {
-        const message = payload.cardStolen
-          ? `${playerName} stole a card from ${targetName}`
-          : `${playerName} did not steal a card from ${targetName}`;
-
-        this.#notification.showTransientMessage(message);
-        return;
-      }
-
-      const requestedCard =
-        payload.requestedCardType?.replaceAll("_", " ") ?? "the requested card";
-      const message = isComboPlayer
-        ? payload.cardStolen
-          ? `You stole ${requestedCard} from ${targetName}`
-          : `${targetName} does not have ${requestedCard}`
-        : payload.cardStolen
-          ? `${playerName} stole your ${requestedCard}`
-          : `${playerName} requested ${requestedCard}, but you did not have it`;
-      this.#notification.showTransientMessage(message);
-      return;
-    }
-
-    const message = isComboPlayer
-      ? `You stole a random card from ${targetName}`
-      : isComboTarget
-        ? `${playerName} stole one of your cards`
-        : `${playerName} stole a card from ${targetName}`;
-    this.#notification.showTransientMessage(message);
   };
 
   onPlayerLooksAtTheFuture = (): void => {
@@ -1689,24 +1400,20 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     const { playerId } = payload;
 
-    const players = [...this.#players.values()];
-    for (let i = 0; i < players.length; ++i) {
-      const seat = players[i]!;
+    this.#players.forEach((seat) => {
       seat.onClick = null;
       seat.setCursorPointer(false);
-      if (seat.player?.id !== playerId) players[i]?.setTargetIconVisible(false);
-      else players[i]?.setTargetIconVisible(true);
-    }
+      if (seat.player?.id !== playerId) seat.setTargetIconVisible(false);
+      else seat.setTargetIconVisible(true);
+    });
   };
 
   onCardGiven = (payload: CardGivenPayload): void => {
     this.#notification.hide();
 
-    const players = [...this.#players.values()];
-    for (let i = 0; i < players.length; ++i) {
-      const seat = players[i]!;
+    this.#players.forEach((seat) => {
       seat.setTargetIconVisible(false);
-    }
+    });
 
     const { playerIdFrom, playerIdTo } = payload;
 
@@ -1728,9 +1435,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     }
   };
 
-  onWaitingForFavorCardSelection = (
-    payload: WaitingForFavorCardSelectionPayload,
-  ) => {
+  onWaitingForCardIdSelection = (payload: WaitingForCardIdSelectionPayload) => {
     this.#incomingCardFromPlayerId =
       this.#meId === payload.playerId ? null : payload.playerId;
 
@@ -1752,6 +1457,104 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onPlayerSawTheFuture = (): void => {
     this.#notification.hide();
+  };
+
+  onWaitingForCardIndexSelection = (
+    payload: WaitingForCardIndexSelectionPayload,
+  ): void => {
+    if (this.isMyTurn()) {
+      const targetPlayer = this.#players.get(payload.targetPlayerId);
+      const view = new ChooseRandomCardView(
+        this,
+        targetPlayer!.hand!.getCount(),
+      );
+      view.onSelection = (cardIndex) => {
+        chooseCardIndex(cardIndex);
+      };
+      this.#modal.setContent(view);
+      this.#modal.setVisible(true);
+    } else {
+      const currentTurnPlayer = this.#players.get(this.#currentTurnPlayerId!);
+      this.#notification.showMessageFor(
+        NotificationMode.WAITING_FOR_CARD_SELECTION,
+        currentTurnPlayer?.player?.name,
+      );
+    }
+  };
+
+  onWaitingForCardTypeSelection = (
+    payload: WaitingForCardTypeSelectionPayload,
+  ): void => {
+    if (this.isMyTurn()) {
+      const targetPlayer = this.#players.get(payload.targetPlayerId);
+      const view = new ChooseCardByNameView(this, targetPlayer!.player!.name);
+      view.onSelection = (cardType: CardType) => {
+        chooseCardType(cardType);
+      };
+      this.#modal.setContent(view);
+      this.#modal.setVisible(true);
+    } else {
+      const currentTurnPlayer = this.#players.get(this.#currentTurnPlayerId!);
+      this.#notification.showMessageFor(
+        NotificationMode.WAITING_FOR_CARD_SELECTION,
+        currentTurnPlayer?.player?.name,
+      );
+    }
+  };
+
+  onNoCardOfRequestedType = (payload: NoCardOfRequestedTypePayload): void => {
+    this.#players.forEach((seat) => {
+      seat.setTargetIconVisible(false);
+    });
+
+    if (this.isMyTurn()) {
+      this.#modal.setVisible(false);
+    }
+
+    const cardType = payload.cardType.replaceAll("_", " ");
+    const currentTurnPlayer = this.#players.get(
+      this.#currentTurnPlayerId!,
+    )!.player!;
+    const targetPlayer = this.#players.get(payload.targetPlayerId)!.player!;
+
+    if (this.#meId === targetPlayer.id) {
+      this.#notification.showTransientMessage(
+        `${currentTurnPlayer.name} requested ${cardType}`,
+      );
+    } else {
+      this.#notification.showTransientMessage(
+        `${targetPlayer.name} does not have ${cardType} card`,
+      );
+    }
+  };
+
+  onCardStolen = (payload: CardStolenPayload): void => {
+    this.#players.forEach((seat) => {
+      seat.setTargetIconVisible(false);
+    });
+
+    const { playerIdFrom, playerIdTo } = payload;
+
+    this.passCardBetweenOpponents(playerIdFrom, playerIdTo);
+
+    if (this.isMyTurn()) return;
+
+    const targetPlayer = this.#players.get(playerIdFrom)!.player!;
+
+    const playerToName = this.#players.get(playerIdTo)!.player!.name;
+    let playerFromName = targetPlayer.name;
+    if (this.#meId === targetPlayer.id) {
+      playerFromName = "you";
+    }
+
+    let message;
+    if (payload.cardType) {
+      const cardType = payload.cardType.replaceAll("_", " ");
+      message = `${playerToName} stole ${cardType} from ${playerFromName}`;
+    } else {
+      message = `${playerToName} stole a card from ${playerFromName}`;
+    }
+    this.#notification.showTransientMessage(message);
   };
 
   private cleanup = () => {

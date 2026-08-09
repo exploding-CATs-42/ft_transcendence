@@ -20,14 +20,8 @@ export const GameGuards = {
   IS_NOPED: "isNoped",
   CAN_PLAY_NOPE: "canPlayNope",
   HAS_REMAINING_TURNS: "hasRemainingTurns",
-  LAST_PLAYED_CARD_OF_TYPE: "lastPlayedCardOfType",
   PENDING_ACTION_OF_TYPE: "pendingActionOfType",
-  HAS_PENDING_COMBO: "hasPendingCombo",
-  IS_PENDING_COMBO_PLAYERS_TURN: "isPendingComboPlayersTurn",
-  HAS_ELIGIBLE_COMBO_TARGET: "hasEligibleComboTarget",
-  CAN_RESOLVE_COMBO: "canResolveCombo",
-  CAN_DECLARE_COMBO: "canDeclareCombo",
-  HAS_DECLARED_COMBO: "hasDeclaredCombo",
+  HAS_CARD_OF_THAT_TYPE: "hasCardOfThatType",
 } as const;
 
 export interface GameGuardArgs {
@@ -60,6 +54,16 @@ export const hasCardOfType = (
 ) => {
   if (event.type !== GameEvents.PLAY_CARD) return false;
   return event.card.type === params.cardType;
+};
+
+export const hasCardOfThatType = ({ context, event }: GameGuardArgs) => {
+  if (event.type !== GameEvents.CHOOSE_CARD_TYPE) return false;
+  const targetPlayer = context.players.find(
+    (p) => p.id === context.selectedPlayerId,
+  );
+  if (!targetPlayer) throw Error("Player is not selected");
+  const card = targetPlayer.hand.find((card) => card.type === event.cardType);
+  return card ? true : false;
 };
 
 export const hasExtraTurns = ({ context }: GameGuardArgs) => {
@@ -141,127 +145,9 @@ export const canPlayNope = ({ context, event }: GameGuardArgs) => {
   return player?.isAlive ?? false;
 };
 
-export const lastPlayedCardOfType = (
-  { context }: GameGuardArgs,
-  params: { cardType: CardType },
-) => {
-  const cards = context.lastPlayedCards!;
-  return cards[0]?.type === params.cardType;
-};
-
 export const pendingActionOfType = (
   { context }: GameGuardArgs,
   params: { actionType: PendingActionType },
 ) => {
   return context.pendingAction === params.actionType;
-};
-
-export const hasPendingCombo = ({ context }: GameGuardArgs) => {
-  return Boolean(context.pendingCombo);
-};
-
-export const isPendingComboPlayersTurn = ({ context }: GameGuardArgs) => {
-  const playerId = context.pendingCombo?.playerId;
-
-  return (
-    playerId !== undefined &&
-    context.currentTurnPlayerId === playerId &&
-    context.players.some((player) => player.id === playerId && player.isAlive)
-  );
-};
-
-export const hasEligibleComboTarget = ({ context }: GameGuardArgs) => {
-  const pendingCombo = context.pendingCombo;
-  if (!pendingCombo) return false;
-
-  if (pendingCombo.targetPlayerId) {
-    const targetPlayer = context.players.find(
-      (player) => player.id === pendingCombo.targetPlayerId,
-    );
-
-    return Boolean(
-      targetPlayer?.isAlive &&
-      (pendingCombo.comboSize === 3 || targetPlayer.hand.length > 0),
-    );
-  }
-
-  return context.players.some(
-    (player) =>
-      player.id !== pendingCombo.playerId &&
-      player.isAlive &&
-      player.hand.length > 0,
-  );
-};
-
-export const canResolveCombo = ({ context, event }: GameGuardArgs) => {
-  if (event.type !== GameEvents.RESOLVE_COMBO) return false;
-
-  const pendingCombo = context.pendingCombo;
-  if (
-    !pendingCombo ||
-    !pendingCombo.targetPlayerId ||
-    pendingCombo.playerId !== event.playerId ||
-    context.currentTurnPlayerId !== event.playerId ||
-    event.targetPlayerId !== pendingCombo.targetPlayerId
-  ) {
-    return false;
-  }
-
-  const targetPlayer = context.players.find(
-    (player) => player.id === event.targetPlayerId,
-  );
-  if (!targetPlayer?.isAlive) return false;
-  if (pendingCombo.comboSize === 2 && targetPlayer.hand.length === 0) {
-    return false;
-  }
-
-  if (pendingCombo.comboSize === 2) {
-    return (
-      event.requestedCardType === undefined &&
-      Number.isInteger(event.cardIndex) &&
-      event.cardIndex! >= 0 &&
-      event.cardIndex! < targetPlayer.hand.length
-    );
-  }
-
-  return (
-    event.cardIndex === undefined &&
-    event.requestedCardType === pendingCombo.requestedCardType
-  );
-};
-
-export const canDeclareCombo = ({ context, event }: GameGuardArgs) => {
-  if (event.type !== GameEvents.RESOLVE_COMBO) return false;
-
-  const pendingCombo = context.pendingCombo;
-  if (
-    !pendingCombo ||
-    pendingCombo.targetPlayerId !== undefined ||
-    pendingCombo.playerId !== event.playerId ||
-    context.currentTurnPlayerId !== event.playerId ||
-    event.targetPlayerId === event.playerId
-  ) {
-    return false;
-  }
-
-  const targetPlayer = context.players.find(
-    (player) => player.id === event.targetPlayerId,
-  );
-  if (!targetPlayer?.isAlive || targetPlayer.hand.length === 0) return false;
-
-  return pendingCombo.comboSize === 2
-    ? event.cardIndex === undefined && event.requestedCardType === undefined
-    : event.cardIndex === undefined && event.requestedCardType !== undefined;
-};
-
-export const hasDeclaredCombo = ({ context }: GameGuardArgs) => {
-  const pendingCombo = context.pendingCombo;
-  if (!pendingCombo?.targetPlayerId) return false;
-
-  const targetPlayer = context.players.find(
-    (player) => player.id === pendingCombo.targetPlayerId,
-  );
-  if (!targetPlayer?.isAlive) return false;
-
-  return pendingCombo.comboSize === 3 || targetPlayer.hand.length > 0;
 };

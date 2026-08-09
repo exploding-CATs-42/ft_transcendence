@@ -39,6 +39,8 @@ export const NotificationMode = {
   WAITING_FOR_NOPES: "WAITING_FOR_NOPES",
   INSERTING_KITTEN: "INSERTING_KITTEN",
   TURN_CHANGED: "TURN_CHANGED",
+  CAT_PAIR_PLAYED: "CAT_PAIR_PLAYED",
+  CAT_TRIPLE_PLAYED: "CAT_TRIPLE_PLAYED",
 } as const;
 
 export type NotificationMode =
@@ -162,6 +164,10 @@ export class Notification extends Phaser.GameObjects.Container {
       text = `${playerName} is placing kitten back into the deck`;
     } else if (mode === NotificationMode.TURN_CHANGED) {
       text = `${playerName}\`s turn`;
+    } else if (mode === NotificationMode.CAT_PAIR_PLAYED) {
+      text = `${playerName} played 2 of a kind combo`;
+    } else if (mode === NotificationMode.CAT_TRIPLE_PLAYED) {
+      text = `${playerName} played 3 of a kind combo`;
     }
 
     if (mode === NotificationMode.TURN_CHANGED) {
