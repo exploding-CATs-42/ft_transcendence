@@ -1,7 +1,7 @@
 # ft_transcendence
 
 This project is run and developed via Docker Compose and `Makefile`.
-Below is the working command sequence for developers, including the required step-by-step order.
+Below are the commands for initial setup and daily development.
 
 ## 1) Requirements
 
@@ -41,26 +41,21 @@ At minimum, verify these values:
   - `VITE_BASE_URL`
   - `VITE_WS_BASE_URL`
 
-## 3) Recommended Startup Order (Required)
+## 3) Initial Project Setup
 
 ```bash
-make build
-make deps
-make prisma-deploy
-make seed
+make setup
 ```
 
-What each step does:
+This single command:
 
-1. `make build`:
-  - builds and starts `nginx`, `backend`, `frontend`, and `postgres` containers.
-2. `make deps`:
-  - installs `pnpm` dependencies inside `backend` and `frontend` containers.
-  - required because `node_modules` are mounted as separate volumes.
-3. `make prisma-deploy`:
-  - applies existing Prisma migrations to the database.
-4. `make seed`:
-  - seeds the database with initial data.
+1. Generates the Prisma client.
+2. Builds and starts `nginx`, `backend`, `frontend`, and `postgres` containers.
+3. Installs `pnpm` dependencies inside the backend and frontend containers.
+4. Applies existing Prisma migrations to the database.
+5. Seeds the database with initial development data.
+
+The individual commands remain available for troubleshooting and partial setup.
 
 After that, the app is available at:
 
@@ -92,6 +87,7 @@ make seed
 
 ### Containers
 
+- `make setup` - build and initialize the complete development environment
 - `make up` - start containers
 - `make build` - rebuild and start containers
 - `make down` - stop and remove containers
@@ -152,10 +148,7 @@ cp infra/env/.env.example infra/env/.env
 cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 
-make build
-make deps
-make prisma-deploy
-make seed
+make setup
 ```
 
 Open in browser: `http://localhost:8080`
