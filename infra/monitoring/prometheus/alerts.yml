@@ -2,10 +2,68 @@ groups:
   - name: transcendence-availability
     rules:
       - alert: ServiceUnavailable
-        expr: probe_success{job="blackbox"} == 0
+        expr:
+          probe_success{job="blackbox", layer="edge",
+          service=~"frontend|backend"} == 0
         for: 30s
         labels:
-          severity: warning
+          severity: critical
         annotations:
           summary: "{{ $labels.service }} is unavailable"
-          description: "The {{ $labels.service }} service has failed availability checks for more than 30 seconds."
+          description:
+            "The {{ $labels.service }} service has failed availability checks
+            for more than 30 seconds."
+          impact:
+            "Users may be unable to access the affected part of the application."
+          action:
+            "Check the target container, Docker network, and Blackbox probe
+            details."
+
+  - name: transcendence-user-operations
+    rules:
+      - alert: UserOperationsFailing
+        expr:
+          sum(increase(user_operation_total{status="server_error"}[2m])) >= 3
+        for: 10s
+        labels:
+          severity: critical
+          service: backend
+        annotations:
+          summary: "Critical user operations are failing"
+          description:
+            "At least three authentication, profile, or friendship operations
+            returned server errors within two minutes."
+          impact: "Users may be unable to sign in or manage their account."
+          action: "Inspect backend logs and PostgreSQL availability."
+
+  - name: backend-performance
+    rules:
+      - alert: BackendLatencyHigh
+        expr: |
+          (
+            histogram_quantile(
+              0.95 ,
+              sum by (le) (
+                rate(http_request_duration_seconds_bucket[1m])
+                )
+              ) > 0.5
+          )
+          and 
+          (
+          sum(increase(http_request_duration_seconds_count[1m])) >= 20
+          )
+        for: 15s
+        labels:
+          severity: warning
+          service: backend
+        annotations:
+          summary: "Backend response time is degraded"
+          description:
+            "The backend p95 latency exceeded 500 ms with at least 20 requests
+            in one minute."
+          impact:
+            "User operations are becoming slow and may start failing if the
+            pressure continues."
+          action:
+            "Inspect request rate, slow routes, backend CPU, and PostgreSQL
+            response time."
