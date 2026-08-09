@@ -28,24 +28,42 @@ scrape_configs:
           - "https://nginx/health"
         labels:
           service: "nginx"
+          layer: "edge"
+          module: "https_2xx_self_signed"
+
+      - targets:
+          - "https://nginx/"
+        labels:
+          service: "frontend"
+          layer: "edge"
+          module: "https_2xx_self_signed"
+
+      - targets:
+          - "https://nginx/api"
+        labels:
+          service: "backend"
+          layer: "edge"
           module: "https_2xx_self_signed"
 
       - targets:
           - "http://frontend:5173/"
         labels:
           service: "frontend"
+          layer: "internal"
           module: "http_2xx"
 
       - targets:
           - "http://backend:3000/metrics"
         labels:
           service: "backend"
+          layer: "internal"
           module: "http_2xx"
 
       - targets:
           - "postgres:5432"
         labels:
           service: "postgres"
+          layer: "dependency"
           module: "tcp_connect"
 
     relabel_configs:
