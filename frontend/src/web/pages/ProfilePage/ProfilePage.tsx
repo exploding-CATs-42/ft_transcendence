@@ -2,8 +2,7 @@
 import { useMemo } from "react";
 import { useLocation, Navigate, useParams } from "react-router-dom";
 //Project level
-import type { MyProfileUser } from "@exploding-cats/contracts";
-import { useFriends, useGames, useUser } from "hooks";
+import { useFriends, useGames, useProfile, useUser } from "hooks";
 import { LoadingScreen } from "../../components";
 //Local level
 import { ListSection, StatsSection, UserSection } from "./components";
@@ -20,7 +19,8 @@ const ProfilePage = () => {
     isMyProfile,
   });
   const { games, gamesLoading } = useGames({ userId, isMyProfile });
-  const { user, updateUser, userLoading } = useUser({ userId, isMyProfile });
+  const { user, userLoading } = useUser({ userId, isMyProfile });
+  const { profile, updateProfile } = useProfile();
 
   const loading = friendsLoading || gamesLoading || userLoading;
 
@@ -39,11 +39,11 @@ const ProfilePage = () => {
   return (
     <div className={s.pageContainer}>
       <div className={s.flexContainer}>
-        {isMyProfile ? (
+        {isMyProfile && profile ? (
           <UserSection
             isMyProfile={true}
-            user={user as MyProfileUser}
-            updateUser={updateUser}
+            user={profile}
+            updateUser={updateProfile}
           />
         ) : (
           <UserSection isMyProfile={false} user={user} />
