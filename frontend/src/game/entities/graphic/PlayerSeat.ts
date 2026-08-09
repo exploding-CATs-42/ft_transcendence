@@ -103,7 +103,9 @@ export class PlayerSeat {
     );
 
     container.on("pointerdown", () => {
-      if (this.onClick) this.onClick(this.player!.id);
+      if (!this.onClick || !this.player) return;
+
+      this.onClick(this.player.id);
     });
   }
 
