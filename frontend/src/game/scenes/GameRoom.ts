@@ -658,16 +658,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   private removePlayer(playerId: string) {
-    const player = this.#players.get(playerId);
+    const seat = this.#players.get(playerId);
 
-    if (!player) return;
+    if (!seat) return;
 
-    this.#players.forEach((seat) => {
-      if (seat.player?.id === playerId) seat.removePlayer();
-    });
-
-    this.#players.delete(playerId);
     this.removePLayerHand(playerId);
+
+    seat.destroy();
+    this.#players.delete(playerId);
   }
 
   private removePLayerHand(playerId: string) {
