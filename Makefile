@@ -15,7 +15,12 @@ up: ## Start containers in detached mode
 ## Build images and start containers
 build: prisma-generate
 	$(COMPOSE) up --build -d --remove-orphans
-	docker logs ft-backend -f
+
+setup: ## Build and initialize the project, database, and seed data
+	$(MAKE) build
+	$(MAKE) deps
+	$(MAKE) prisma-deploy
+	$(MAKE) seed
 
 down: ## Stop and remove containers
 	$(COMPOSE) down
@@ -239,7 +244,7 @@ help: ## Show available make commands
 		}' $(MAKEFILE_LIST)
 	@echo ""
 
-.PHONY: help all up build down re ps clean \
+.PHONY: help all up build setup down re ps clean \
 logs logs-backend logs-frontend logs-nginx logs-postgres \
 backend-shell frontend-shell db-shell \
 deps deps-backend deps-frontend \
