@@ -3,3 +3,4 @@ export type {
   AccessToken,
   AuthStatus,
 } from "../../context/AuthContext";
+export type { ProfileContextValue } from "../../context/ProfileContext";
