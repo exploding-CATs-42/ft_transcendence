@@ -11,7 +11,7 @@ import {
   CardType,
   type NopeWindow,
   PendingActionType,
-  type PendingCombo,
+  type Player,
 } from "./types";
 
 export const GameActions = {
@@ -40,9 +40,11 @@ export const GameActions = {
   ADD_NOPE: "addNope",
   SELECT_PLAYER: "selectPlayer",
   PASS_CARD_BY_ID: "passCardById",
-  RESOLVE_COMBO: "resolveCombo",
-  DECLARE_COMBO: "declareCombo",
-  CLEAR_PENDING_COMBO: "clearPendingCombo",
+  PASS_CARD_BY_INDEX: "passCardByIndex",
+  PASS_CARD_BY_TYPE: "passCardByType",
+  CLEAR_PENDING_ACTION: "clearPendingAction",
+  CLEAR_GIVEN_CARD: "clearGivenCard",
+  CLEAR_SELECTED_PLAYER: "clearSelectedPlayer",
 } as const;
 
 export interface GameActionArgs {
@@ -337,10 +339,6 @@ export const playCombo = ({ context, event }: GameActionArgs) => {
     players: updatedPlayers,
     lastPlayedCards: playedCards as Card[],
     pendingAction,
-    pendingCombo: {
-      playerId,
-      comboSize: cardIds.length,
-    } as PendingCombo,
   };
 };
 
@@ -426,8 +424,7 @@ export const insertKitten = ({ context, event }: GameActionArgs) => {
 export const setNopeWindow = ({ context, event }: GameActionArgs) => {
   if (
     event.type !== GameEvents.PLAY_CARD &&
-    event.type !== GameEvents.PLAY_COMBO &&
-    event.type !== GameEvents.RESOLVE_COMBO
+    event.type !== GameEvents.PLAY_COMBO
   ) {
     return context;
   }
@@ -444,22 +441,6 @@ export const setNopeWindow = ({ context, event }: GameActionArgs) => {
   };
 
   return { nopeWindow };
-};
-
-export const declareCombo = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEvents.RESOLVE_COMBO || !context.pendingCombo) {
-    return context;
-  }
-
-  return {
-    pendingCombo: {
-      ...context.pendingCombo,
-      targetPlayerId: event.targetPlayerId,
-      ...(event.requestedCardType
-        ? { requestedCardType: event.requestedCardType }
-        : {}),
-    },
-  };
 };
 
 export const clearNopeWindow = () => {
@@ -486,72 +467,88 @@ export const selectPlayer = ({ context, event }: GameActionArgs) => {
 };
 
 export const passCardById = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEvents.PASS_CARD_BY_ID) return context;
+  if (event.type !== GameEvents.CHOOSE_CARD_ID) return context;
 
   const players = context.players.slice();
+  const { playerFrom, playerTo } = getTransferParticipants(context, players);
+
+  const cardIndex = playerFrom.hand.findIndex(
+    (card) => card.id === event.cardId,
+  );
+  const card = removeCardFrom(playerFrom, cardIndex);
+  addCardAtRandomIndexTo(playerTo, card);
+
+  return { players, givenCard: card };
+};
+
+export const passCardByIndex = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.CHOOSE_CARD_INDEX) return context;
+
+  const players = context.players.slice();
+  const { playerFrom, playerTo } = getTransferParticipants(context, players);
+
+  const cardIndex = event.cardIndex;
+  const card = removeCardFrom(playerFrom, cardIndex);
+  addCardAtRandomIndexTo(playerTo, card);
+
+  return { players, givenCard: card };
+};
+
+export const passCardByType = ({ context, event }: GameActionArgs) => {
+  if (event.type !== GameEvents.CHOOSE_CARD_TYPE) return context;
+
+  const players = context.players.slice();
+  const { playerFrom, playerTo } = getTransferParticipants(context, players);
+
+  const cardIndex = playerFrom.hand.findIndex(
+    (card) => card.type === event.cardType,
+  );
+  const card = removeCardFrom(playerFrom, cardIndex);
+  addCardAtRandomIndexTo(playerTo, card);
+
+  return { players, givenCard: card };
+};
+
+const getTransferParticipants = (context: GameContext, players: Player[]) => {
+  const playerIdFrom = context.selectedPlayerId;
+  const playerIdTo = context.currentTurnPlayerId;
+
   let playerFrom;
   let playerTo;
-  for (let i = 0; i < players.length; ++i) {
-    if (players[i]?.id === event.playerIdFrom) playerFrom = players[i];
-    else if (players[i]?.id === event.playerIdTo) playerTo = players[i];
+  for (const player of players) {
+    if (player.id === playerIdFrom) playerFrom = player;
+    else if (player.id === playerIdTo) playerTo = player;
   }
 
   if (!playerFrom) throw Error("playerFrom is undefined");
   if (!playerTo) throw Error("playerTo is undefined");
 
-  const cardIndex = playerFrom.hand.findIndex(
-    (card) => card.id === event.cardId,
-  );
-  const card = playerFrom.hand.splice(cardIndex, 1)[0];
-  if (!card) throw Error("playerFrom doesn't have the card");
-
-  const randomIndex = Math.floor(Math.random() * (playerTo.hand.length + 1));
-  playerTo.hand.splice(randomIndex, 0, card);
-
-  return { players, pendingAction: null };
+  return { playerFrom, playerTo };
 };
 
-export const resolveCombo = ({ context, event }: GameActionArgs) => {
-  if (event.type !== GameEvents.RESOLVE_COMBO || !context.pendingCombo) {
-    return context;
-  }
+const removeCardFrom = (player: Player, cardIndex: number) => {
+  if (cardIndex < 0 || cardIndex > player.hand.length)
+    throw Error("Card index is outside of player hand bounds");
 
-  const { playerId, targetPlayerId } = event;
-  const player = context.players.find((candidate) => candidate.id === playerId);
-  const targetPlayer = context.players.find(
-    (candidate) => candidate.id === targetPlayerId,
-  );
+  const card = player.hand.splice(cardIndex, 1)[0];
+  if (!card) throw Error("Player doesn't have that card");
 
-  if (!player || !targetPlayer) return context;
-
-  const stolenCard =
-    context.pendingCombo.comboSize === 2
-      ? targetPlayer.hand[event.cardIndex!]
-      : targetPlayer.hand.find(
-          (card) => card.type === context.pendingCombo!.requestedCardType,
-        );
-
-  if (!stolenCard) return context;
-
-  const players = context.players.map((candidate) => {
-    if (candidate.id === playerId) {
-      return { ...candidate, hand: [...candidate.hand, stolenCard] };
-    }
-
-    if (candidate.id === targetPlayerId) {
-      return {
-        ...candidate,
-        hand: candidate.hand.filter((card) => card.id !== stolenCard.id),
-      };
-    }
-
-    return candidate;
-  });
-
-  return { players };
+  return card;
 };
 
-export const clearPendingCombo = () => ({
-  pendingCombo: null,
+const addCardAtRandomIndexTo = (player: Player, card: Card) => {
+  const randomIndex = Math.floor(Math.random() * (player.hand.length + 1));
+  player.hand.splice(randomIndex, 0, card);
+};
+
+export const clearPendingAction = (): Partial<GameContext> => ({
   pendingAction: null,
+});
+
+export const clearGivenCard = (): Partial<GameContext> => ({
+  givenCard: null,
+});
+
+export const clearSelectedPlayer = (): Partial<GameContext> => ({
+  selectedPlayerId: null,
 });

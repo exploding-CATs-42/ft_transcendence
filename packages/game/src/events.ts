@@ -1,4 +1,4 @@
-import type { Card, Player } from "./types";
+import type { Card, CardType, Player } from "./types";
 import type {
   ShowedCardsToPlayerPayload,
   TurnChangedPayload,
@@ -9,10 +9,13 @@ import type {
   PlayerEliminatedPayload,
   GameOverPayload,
   PlayerSelectedPayload,
-  WaitingForFavorCardSelectionPayload,
+  WaitingForCardIdSelectionPayload,
   PlayerSawTheFuturePayload,
-  ComboSelectionRequestedPayload,
   ExplodingKittenDrawnPayload,
+  WaitingForCardIndexSelectionPayload,
+  WaitingForCardTypeSelectionPayload,
+  CardGivenPayload,
+  NoCardOfRequestedTypePayload,
 } from "./eventPayloads";
 
 // Events sent TO the machine
@@ -27,10 +30,11 @@ export const GameEvents = {
   PLAY_DEFUSE: "PLAY_DEFUSE",
   INSERT_KITTEN: "INSERT_KITTEN",
   PLAY_NOPE: "PLAY_NOPE",
-  SELECT_PLAYER: "SELECT_PLAYER",
-  PASS_CARD_BY_ID: "PASS_CARD_BY_ID",
   SEEN_THE_FUTURE: "SEEN_THE_FUTURE",
-  RESOLVE_COMBO: "RESOLVE_COMBO",
+  SELECT_PLAYER: "SELECT_PLAYER",
+  CHOOSE_CARD_ID: "CHOOSE_CARD_ID",
+  CHOOSE_CARD_INDEX: "CHOOSE_CARD_INDEX",
+  CHOOSE_CARD_TYPE: "CHOOSE_CARD_TYPE",
 } as const;
 
 export type GameEvents = (typeof GameEvents)[keyof typeof GameEvents];
@@ -66,20 +70,19 @@ export type GameEvent =
     }
   | { type: typeof GameEvents.SELECT_PLAYER; playerId: Player["id"] }
   | {
-      type: typeof GameEvents.PASS_CARD_BY_ID;
+      type: typeof GameEvents.CHOOSE_CARD_ID;
       cardId: number;
-      playerIdFrom: string;
-      playerIdTo: string;
     }
   | {
       type: typeof GameEvents.SEEN_THE_FUTURE;
     }
   | {
-      type: typeof GameEvents.RESOLVE_COMBO;
-      playerId: Player["id"];
-      targetPlayerId: Player["id"];
-      cardIndex?: number;
-      requestedCardType?: Card["type"];
+      type: typeof GameEvents.CHOOSE_CARD_INDEX;
+      cardIndex: number;
+    }
+  | {
+      type: typeof GameEvents.CHOOSE_CARD_TYPE;
+      cardType: CardType;
     };
 
 // Events emitted FROM the machine
@@ -101,17 +104,12 @@ export const GameOutEvents = {
   NOPE_WINDOW_RESOLVED: "NOPE_WINDOW_RESOLVED",
   PLAYER_SELECTED: "PLAYER_SELECTED",
   WAITING_FOR_PLAYER_SELECTION: "WAITING_FOR_PLAYER_SELECTION",
-  WAITING_FOR_FAVOR_CARD_SELECTION: "WAITING_FOR_FAVOR_CARD_SELECTION",
   PLAYER_SAW_THE_FUTURE: "PLAYER_SAW_THE_FUTURE",
-  COMBO_SELECTION_REQUESTED: "COMBO_SELECTION_REQUESTED",
-
-  //   COMBO_PLAYED: "COMBO_PLAYED",
-  //   NOPE_PLAYED: "NOPE_PLAYED",
-  //   PLAYER_DEFUSED: "PLAYER_DEFUSED",
-  //   KITTEN_INSERTED: "KITTEN_INSERTED",
-  //   FAVOR_REQUESTED: "FAVOR_REQUESTED",
-  //   FAVOR_RESOLVED: "FAVOR_RESOLVED",
-  //   DECK_SHUFFLED: "DECK_SHUFFLED",
+  WAITING_FOR_CARD_ID_SELECTION: "WAITING_FOR_CARD_ID_SELECTION",
+  WAITING_FOR_CARD_INDEX_SELECTION: "WAITING_FOR_CARD_INDEX_SELECTION",
+  WAITING_FOR_CARD_TYPE_SELECTION: "WAITING_FOR_CARD_TYPE_SELECTION",
+  CARD_GIVEN: "CARD_GIVEN",
+  NO_CARD_OF_REQUESTED_TYPE: "NO_CARD_OF_REQUESTED_TYPE",
 } as const;
 
 export type GameOutEvents = (typeof GameOutEvents)[keyof typeof GameOutEvents];
@@ -129,10 +127,6 @@ export type GameOutEvent =
   | { type: typeof GameOutEvents.DECK_SHUFFLED }
   | { type: typeof GameOutEvents.TURN_SKIPPED; payload: TurnSkippedPayload }
   | { type: typeof GameOutEvents.NOPE_WINDOW_RESOLVED }
-  | {
-      type: typeof GameOutEvents.COMBO_SELECTION_REQUESTED;
-      payload: ComboSelectionRequestedPayload;
-    }
   | {
       type: typeof GameOutEvents.SHOWED_TOP_CARDS;
       payload: ShowedCardsToPlayerPayload;
@@ -169,10 +163,26 @@ export type GameOutEvent =
       type: typeof GameOutEvents.WAITING_FOR_PLAYER_SELECTION;
     }
   | {
-      type: typeof GameOutEvents.WAITING_FOR_FAVOR_CARD_SELECTION;
-      payload: WaitingForFavorCardSelectionPayload;
-    }
-  | {
       type: typeof GameOutEvents.PLAYER_SAW_THE_FUTURE;
       payload: PlayerSawTheFuturePayload;
+    }
+  | {
+      type: typeof GameOutEvents.WAITING_FOR_CARD_ID_SELECTION;
+      payload: WaitingForCardIdSelectionPayload;
+    }
+  | {
+      type: typeof GameOutEvents.WAITING_FOR_CARD_INDEX_SELECTION;
+      payload: WaitingForCardIndexSelectionPayload;
+    }
+  | {
+      type: typeof GameOutEvents.WAITING_FOR_CARD_TYPE_SELECTION;
+      payload: WaitingForCardTypeSelectionPayload;
+    }
+  | {
+      type: typeof GameOutEvents.CARD_GIVEN;
+      payload: CardGivenPayload;
+    }
+  | {
+      type: typeof GameOutEvents.NO_CARD_OF_REQUESTED_TYPE;
+      payload: NoCardOfRequestedTypePayload;
     };

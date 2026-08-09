@@ -18,6 +18,8 @@ export const GameStates = {
   WAITING_FOR_FAVOR_CARD_SELECTION: "waitingForFavorCardSelection",
   PLAYER_LOOKS_AT_THE_FUTURE: "PLAYER_LOOKS_AT_THE_FUTURE",
   WAITING_FOR_COMBO_SELECTION: "waitingForComboSelection",
+  WAITING_FOR_RANDOM_CARD_SELECTION: "waitingForRandomCardSelection",
+  WAITING_FOR_CARD_TYPE_SELECTION: "waitingForCardTypeSelection",
 } as const;
 
 export type GameStates = (typeof GameStates)[keyof typeof GameStates];

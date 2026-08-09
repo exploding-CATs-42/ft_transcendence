@@ -1,5 +1,5 @@
 // Libraries
-import { and, assign, emit, not, setup } from "xstate";
+import { and, assign, emit, or, setup } from "xstate";
 // Local level
 import {
   GAME_MACHINE_ID,
@@ -34,16 +34,17 @@ import {
   addNope,
   selectPlayer,
   passCardById,
-  resolveCombo,
-  declareCombo,
-  clearPendingCombo,
+  clearPendingAction,
+  passCardByIndex,
+  passCardByType,
+  clearGivenCard,
+  clearSelectedPlayer,
 } from "./actions";
 import {
   type Player,
   type Deck,
   type Card,
   type NopeWindow,
-  type PendingCombo,
   CardType,
   PendingActionType,
 } from "./types";
@@ -62,15 +63,9 @@ import {
   isNoped,
   canPlayNope,
   hasRemainingTurns,
-  lastPlayedCardOfType,
   pendingActionOfType,
   leavesSingleAlivePlayer,
-  hasPendingCombo,
-  isPendingComboPlayersTurn,
-  hasEligibleComboTarget,
-  canResolveCombo,
-  canDeclareCombo,
-  hasDeclaredCombo,
+  hasCardOfThatType,
 } from "./guards";
 import {
   countdownCanceled,
@@ -89,9 +84,12 @@ import {
   playerEliminated,
   gameOver,
   waitingForPlayerSelection,
-  waitingForFavorCardSelection,
+  waitingForCardIdSelection,
   playerSawTheFuture,
-  comboSelectionRequested,
+  waitingForCardIndexSelection,
+  waitingForCardTypeSelection,
+  cardGiven,
+  noCardOfRequestedType,
 } from "./emitters";
 import { GameStates } from "./states";
 import { GameTargets } from "./targets";
@@ -108,7 +106,7 @@ export interface GameContext {
   nopeWindow: NopeWindow | null;
   selectedPlayerId: string | null;
   pendingAction: PendingActionType | null;
-  pendingCombo: PendingCombo | null;
+  givenCard: Card | null;
 }
 
 export const gameMachine = setup({
@@ -145,9 +143,11 @@ export const gameMachine = setup({
     [GameActions.ADD_NOPE]: assign(addNope),
     [GameActions.SELECT_PLAYER]: assign(selectPlayer),
     [GameActions.PASS_CARD_BY_ID]: assign(passCardById),
-    [GameActions.RESOLVE_COMBO]: assign(resolveCombo),
-    [GameActions.DECLARE_COMBO]: assign(declareCombo),
-    [GameActions.CLEAR_PENDING_COMBO]: assign(clearPendingCombo),
+    [GameActions.PASS_CARD_BY_INDEX]: assign(passCardByIndex),
+    [GameActions.PASS_CARD_BY_TYPE]: assign(passCardByType),
+    [GameActions.CLEAR_PENDING_ACTION]: assign(clearPendingAction),
+    [GameActions.CLEAR_GIVEN_CARD]: assign(clearGivenCard),
+    [GameActions.CLEAR_SELECTED_PLAYER]: assign(clearSelectedPlayer),
   },
   guards: {
     [GameGuards.HAS_ENOUGH_PLAYERS]: hasEnoughPlayers,
@@ -163,14 +163,8 @@ export const gameMachine = setup({
     [GameGuards.IS_NOPED]: isNoped,
     [GameGuards.CAN_PLAY_NOPE]: canPlayNope,
     [GameGuards.HAS_REMAINING_TURNS]: hasRemainingTurns,
-    [GameGuards.LAST_PLAYED_CARD_OF_TYPE]: lastPlayedCardOfType,
     [GameGuards.PENDING_ACTION_OF_TYPE]: pendingActionOfType,
-    [GameGuards.HAS_PENDING_COMBO]: hasPendingCombo,
-    [GameGuards.IS_PENDING_COMBO_PLAYERS_TURN]: isPendingComboPlayersTurn,
-    [GameGuards.HAS_ELIGIBLE_COMBO_TARGET]: hasEligibleComboTarget,
-    [GameGuards.CAN_RESOLVE_COMBO]: canResolveCombo,
-    [GameGuards.CAN_DECLARE_COMBO]: canDeclareCombo,
-    [GameGuards.HAS_DECLARED_COMBO]: hasDeclaredCombo,
+    [GameGuards.HAS_CARD_OF_THAT_TYPE]: hasCardOfThatType,
   },
 }).createMachine({
   id: GAME_MACHINE_ID,
@@ -188,6 +182,7 @@ export const gameMachine = setup({
     selectedPlayerId: null,
     pendingAction: null,
     pendingCombo: null,
+    givenCard: null,
   }),
   states: {
     [GameStates.WAITING]: {
@@ -269,10 +264,6 @@ export const gameMachine = setup({
           },
         },
         [GameStates.WAITING_FOR_PLAYER_ACTIONS]: {
-          always: {
-            guard: GameGuards.HAS_PENDING_COMBO,
-            target: GameStates.WAITING_FOR_COMBO_SELECTION,
-          },
           on: {
             [GameEvents.DRAW_CARD]: [
               {
@@ -291,7 +282,8 @@ export const gameMachine = setup({
             },
             [GameEvents.PLAY_COMBO]: {
               guard: GameGuards.IS_PLAYERS_TURN,
-              actions: GameActions.PLAY_COMBO,
+              actions: [GameActions.PLAY_COMBO, GameActions.SET_NOPE_WINDOW],
+              target: GameStates.WAITING_FOR_NOPES,
             },
           },
         },
@@ -316,20 +308,21 @@ export const gameMachine = setup({
           always: [
             {
               guard: GameGuards.IS_NOPED,
-              actions: GameActions.CLEAR_PENDING_COMBO,
+              actions: GameActions.CLEAR_PENDING_ACTION,
               target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
             },
             {
-              guard: and([
-                GameGuards.HAS_PENDING_COMBO,
-                GameGuards.HAS_DECLARED_COMBO,
+              guard: or([
+                {
+                  type: GameGuards.PENDING_ACTION_OF_TYPE,
+                  params: { actionType: PendingActionType.CAT_PAIR },
+                },
+                {
+                  type: GameGuards.PENDING_ACTION_OF_TYPE,
+                  params: { actionType: PendingActionType.CAT_TRIPLE },
+                },
               ]),
-              target: GameTargets.WAITING_FOR_COMBO_SELECTION,
-            },
-            {
-              guard: GameGuards.HAS_PENDING_COMBO,
-              actions: GameActions.CLEAR_PENDING_COMBO,
-              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+              target: GameTargets.SELECTING_PLAYER,
             },
             {
               guard: {
@@ -388,41 +381,6 @@ export const gameMachine = setup({
               target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
             },
           ],
-        },
-        [GameStates.WAITING_FOR_COMBO_SELECTION]: {
-          entry: emit(comboSelectionRequested),
-          always: [
-            {
-              guard: not(GameGuards.IS_PENDING_COMBO_PLAYERS_TURN),
-              actions: GameActions.CLEAR_PENDING_COMBO,
-              target: GameStates.CHANGING_TURN,
-            },
-            {
-              guard: not(GameGuards.HAS_ELIGIBLE_COMBO_TARGET),
-              actions: GameActions.CLEAR_PENDING_COMBO,
-              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-            },
-          ],
-          on: {
-            [GameEvents.RESOLVE_COMBO]: [
-              {
-                guard: GameGuards.CAN_DECLARE_COMBO,
-                actions: [
-                  GameActions.DECLARE_COMBO,
-                  GameActions.SET_NOPE_WINDOW,
-                ],
-                target: GameStates.WAITING_FOR_NOPES,
-              },
-              {
-                guard: GameGuards.CAN_RESOLVE_COMBO,
-                actions: [
-                  GameActions.RESOLVE_COMBO,
-                  GameActions.CLEAR_PENDING_COMBO,
-                ],
-                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
-              },
-            ],
-          },
         },
         [GameStates.CHECKING_DRAWN_CARD]: {
           always: [
@@ -497,23 +455,88 @@ export const gameMachine = setup({
         [GameStates.SELECTING_PLAYER]: {
           entry: emit(waitingForPlayerSelection),
           on: {
-            [GameEvents.SELECT_PLAYER]: {
-              guard: {
-                type: GameGuards.PENDING_ACTION_OF_TYPE,
-                params: { actionType: PendingActionType.FAVOR },
+            [GameEvents.SELECT_PLAYER]: [
+              {
+                guard: {
+                  type: GameGuards.PENDING_ACTION_OF_TYPE,
+                  params: { actionType: PendingActionType.FAVOR },
+                },
+                actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
+                target: GameTargets.WAITING_FOR_FAVOR_CARD_SELECTION,
               },
-              actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
-              target: GameTargets.WAITING_FOR_FAVOR_CARD_SELECTION,
-            },
+              {
+                guard: {
+                  type: GameGuards.PENDING_ACTION_OF_TYPE,
+                  params: { actionType: PendingActionType.CAT_PAIR },
+                },
+                actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
+                target: GameTargets.WAITING_FOR_RANDOM_CARD_SELECTION,
+              },
+              {
+                guard: {
+                  type: GameGuards.PENDING_ACTION_OF_TYPE,
+                  params: { actionType: PendingActionType.CAT_TRIPLE },
+                },
+                actions: [GameActions.SELECT_PLAYER, emit(playerSelected)],
+                target: GameTargets.WAITING_FOR_CARD_TYPE_SELECTION,
+              },
+            ],
           },
         },
         [GameStates.WAITING_FOR_FAVOR_CARD_SELECTION]: {
-          entry: emit(waitingForFavorCardSelection),
+          entry: emit(waitingForCardIdSelection),
           on: {
-            [GameEvents.PASS_CARD_BY_ID]: {
-              actions: GameActions.PASS_CARD_BY_ID,
+            [GameEvents.CHOOSE_CARD_ID]: {
+              actions: [
+                GameActions.PASS_CARD_BY_ID,
+                emit(cardGiven),
+                GameActions.CLEAR_PENDING_ACTION,
+                GameActions.CLEAR_SELECTED_PLAYER,
+                GameActions.CLEAR_GIVEN_CARD,
+              ],
               target: GameTargets.WAITING_FOR_PLAYER_ACTIONS,
             },
+          },
+        },
+        [GameStates.WAITING_FOR_RANDOM_CARD_SELECTION]: {
+          entry: emit(waitingForCardIndexSelection),
+          on: {
+            [GameEvents.CHOOSE_CARD_INDEX]: {
+              actions: [
+                GameActions.PASS_CARD_BY_INDEX,
+                emit(cardGiven),
+                GameActions.CLEAR_PENDING_ACTION,
+                GameActions.CLEAR_SELECTED_PLAYER,
+                GameActions.CLEAR_GIVEN_CARD,
+              ],
+              target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+            },
+          },
+        },
+        [GameStates.WAITING_FOR_CARD_TYPE_SELECTION]: {
+          entry: emit(waitingForCardTypeSelection),
+          on: {
+            [GameEvents.CHOOSE_CARD_TYPE]: [
+              {
+                guard: GameGuards.HAS_CARD_OF_THAT_TYPE,
+                actions: [
+                  GameActions.PASS_CARD_BY_TYPE,
+                  emit(cardGiven),
+                  GameActions.CLEAR_PENDING_ACTION,
+                  GameActions.CLEAR_SELECTED_PLAYER,
+                  GameActions.CLEAR_GIVEN_CARD,
+                ],
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+              },
+              {
+                actions: [
+                  emit(noCardOfRequestedType),
+                  GameActions.CLEAR_PENDING_ACTION,
+                  GameActions.CLEAR_SELECTED_PLAYER,
+                ],
+                target: GameStates.WAITING_FOR_PLAYER_ACTIONS,
+              },
+            ],
           },
         },
         [GameStates.PLAYER_LOOKS_AT_THE_FUTURE]: {

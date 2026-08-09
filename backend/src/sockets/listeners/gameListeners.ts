@@ -14,10 +14,10 @@ import {
   reconnectGame,
   playNope,
   selectPlayer,
-  giveCard,
+  chooseCardId,
   confirmPlayerSeenTheCards,
-  resolveCombo,
-  selectComboTarget,
+  chooseCardType,
+  chooseCardIndex,
 } from "services";
 import { withErrorHandler } from "utils";
 import {
@@ -45,17 +45,16 @@ import {
   PlayNopeParams,
   SelectPlayerPayload,
   selectPlayerSchema,
-  giveCardSchema,
-  GiveCardPayload,
+  chooseCardIdSchema,
+  ChooseCardIdPayload,
   SeenTheFuturePayload,
   seenTheFutureSchema,
-  ResolveComboParams,
-  resolveComboSchema,
-  SelectComboTargetParams,
-  selectComboTargetSchema,
+  chooseCardIndexSchema,
+  ChooseCardIndexPayload,
+  chooseCardTypeSchema,
+  ChooseCardTypePayload,
 } from "schemas";
 import {
-  CardGivenPayload,
   CardPlayedPayload,
   CardRemovedPayload,
   ComboPlayedPayload,
@@ -68,12 +67,12 @@ import {
   ServerPublicEvents,
   WaitingStatePayload,
   NopePlayedPayload,
-  ComboResolvedPayload,
+  CardReceivedPayload,
 } from "@exploding-cats/contracts";
-import { CardPayload } from "@exploding-cats/game-core";
 // Local level
 import { broadcastLobbyGameChanged } from "../broadcasters";
 import { socketsMap } from "../socketsMap";
+import { CardReceivalReason } from "@exploding-cats/game-core";
 
 export const registerGameEventHandlers = (io: Server, socket: Socket) => {
   socket.on(
@@ -200,7 +199,10 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
         const room = parsed.gameId;
 
-        const privatePayload: CardPayload = { playerId, card };
+        const privatePayload: CardReceivedPayload = {
+          card,
+          reason: CardReceivalReason.DRAW,
+        };
         const publicPayload: PlayerIdPayload = { playerId };
 
         socket.emit(ServerPrivateEvents.CARD_RECEIVED, privatePayload);
@@ -276,7 +278,10 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.PLAY_COMBO_ERROR,
       async (parsed: PlayComboParams) => {
-        const { cards } = await playCombo(parsed, socket.data.user.id);
+        const { playerId, cards, nopeWindowExpiresAt } = await playCombo(
+          parsed,
+          socket.data.user.id,
+        );
 
         cards.forEach((card) => {
           const cardRemovedPayload: CardRemovedPayload = {
@@ -286,107 +291,15 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
 
           socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
         });
-      },
-    ),
-  );
 
-  socket.on(
-    ClientEvents.SELECT_COMBO_TARGET,
-    withErrorHandler(
-      selectComboTargetSchema,
-      socket,
-      ServerErrorEvents.RESOLVE_COMBO_ERROR,
-      async (parsed: SelectComboTargetParams) => {
-        const payload = await selectComboTarget(parsed, socket.data.user.id);
-
-        io.to(parsed.gameId).emit(
-          ServerPublicEvents.COMBO_TARGET_SELECTED,
-          payload,
-        );
-      },
-    ),
-  );
-
-  socket.on(
-    ClientEvents.RESOLVE_COMBO,
-    withErrorHandler(
-      resolveComboSchema,
-      socket,
-      ServerErrorEvents.RESOLVE_COMBO_ERROR,
-      async (parsed: ResolveComboParams) => {
-        const result = await resolveCombo(parsed, socket.data.user.id);
-
-        if (result.status === "declared") {
-          const comboPlayedPayload: ComboPlayedPayload = {
-            playerId: result.playerId,
-            cardTypes: result.cards.map((card) => card.type),
-            nopeWindowExpiresAt: result.nopeWindowExpiresAt,
-          };
-
-          socket
-            .to(parsed.gameId)
-            .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
-          return;
-        }
-
-        const { playerId, targetPlayerId, comboSize, requestedCardType, card } =
-          result;
-        const targetSocket = socketsMap.get(targetPlayerId);
-
-        if (card) {
-          const cardRemovedPayload: CardRemovedPayload = {
-            cardId: card.id,
-            reason: "STOLEN",
-          };
-          targetSocket?.emit(
-            ServerPrivateEvents.CARD_REMOVED,
-            cardRemovedPayload,
-          );
-
-          const cardReceivedPayload: CardPayload = { playerId, card };
-          socket.emit(ServerPrivateEvents.CARD_RECEIVED, cardReceivedPayload);
-        }
-
-        const comboResolvedPayload: ComboResolvedPayload = {
+        const comboPlayedPayload: ComboPlayedPayload = {
           playerId,
-          targetPlayerId,
-          comboSize,
-          ...(requestedCardType ? { requestedCardType } : {}),
-          cardStolen: card !== null,
+          cardTypes: cards.map((card) => card.type),
+          nopeWindowExpiresAt: nopeWindowExpiresAt,
         };
-
-        io.to(parsed.gameId).emit(ServerPublicEvents.COMBO_TARGET_CLEARED);
-
-        if (comboSize === 3) {
-          socket.emit(ServerPublicEvents.COMBO_RESOLVED, comboResolvedPayload);
-
-          targetSocket?.emit(
-            ServerPublicEvents.COMBO_RESOLVED,
-            comboResolvedPayload,
-          );
-
-          const excludedSocketIds = [socket.id, targetSocket?.id].filter(
-            (socketId): socketId is string => socketId !== undefined,
-          );
-
-          const observerPayload: ComboResolvedPayload = {
-            playerId,
-            targetPlayerId,
-            comboSize,
-            cardStolen: card !== null,
-          };
-
-          io.to(parsed.gameId)
-            .except(excludedSocketIds)
-            .emit(ServerPublicEvents.COMBO_RESOLVED, observerPayload);
-
-          return;
-        }
-
-        io.to(parsed.gameId).emit(
-          ServerPublicEvents.COMBO_RESOLVED,
-          comboResolvedPayload,
-        );
+        socket
+          .to(parsed.gameId)
+          .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
       },
     ),
   );
@@ -458,38 +371,37 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
   );
 
   socket.on(
-    ClientEvents.GIVE_CARD,
+    ClientEvents.CHOOSE_CARD_ID,
     withErrorHandler(
-      giveCardSchema,
+      chooseCardIdSchema,
       socket,
-      ServerErrorEvents.GIVE_CARD_ERROR,
-      async (parsed: GiveCardPayload) => {
-        const { card } = await giveCard(parsed, socket.data.user.id);
-        const { playerIdFrom, playerIdTo, cardId } = parsed;
+      ServerErrorEvents.CHOOSE_CARD_ID_ERROR,
+      async (parsed: ChooseCardIdPayload) => {
+        await chooseCardId(parsed, socket.data.user.id);
+      },
+    ),
+  );
 
-        const socketPlayerFrom = socketsMap.get(playerIdFrom);
-        const cardRemovedPayload: CardRemovedPayload = {
-          cardId,
-          reason: "GIVEN_AWAY",
-        };
-        socketPlayerFrom?.emit(
-          ServerPrivateEvents.CARD_REMOVED,
-          cardRemovedPayload,
-        );
+  socket.on(
+    ClientEvents.CHOOSE_CARD_INDEX,
+    withErrorHandler(
+      chooseCardIndexSchema,
+      socket,
+      ServerErrorEvents.CHOOSE_CARD_INDEX_ERROR,
+      async (parsed: ChooseCardIndexPayload) => {
+        await chooseCardIndex(parsed, socket.data.user.id);
+      },
+    ),
+  );
 
-        const socketPlayerTo = socketsMap.get(playerIdTo);
-        const cardReceivedPayload: CardPayload = { card, playerId: playerIdTo };
-        socketPlayerTo?.emit(
-          ServerPrivateEvents.CARD_RECEIVED,
-          cardReceivedPayload,
-        );
-
-        const room = parsed.gameId;
-        const cardGivenPayload: CardGivenPayload = {
-          playerIdFrom,
-          playerIdTo,
-        };
-        io.to(room).emit(ServerPublicEvents.CARD_GIVEN, cardGivenPayload);
+  socket.on(
+    ClientEvents.CHOOSE_CARD_TYPE,
+    withErrorHandler(
+      chooseCardTypeSchema,
+      socket,
+      ServerErrorEvents.CHOOSE_CARD_TYPE_ERROR,
+      async (parsed: ChooseCardTypePayload) => {
+        await chooseCardType(parsed, socket.data.user.id);
       },
     ),
   );
