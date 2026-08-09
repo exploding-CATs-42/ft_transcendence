@@ -43,8 +43,17 @@ function getUserOperation(req: Request): UserOperation | undefined {
   return exactUserOperationRoutes[`${req.method} ${path}`];
 }
 
-function getUserOperationStatus(statusCode: number) {
-  return statusCode >= 200 && statusCode < 400 ? "success" : "failure";
+type UserOperationStatus = "success" | "rejected" | "server_error";
+
+function getUserOperationStatus(statusCode: number): UserOperationStatus {
+  if (statusCode >= 200 && statusCode < 400) {
+    return "success";
+  }
+
+  if (statusCode >= 400 && statusCode < 500) {
+    return "rejected";
+  }
+  return "server_error";
 }
 
 export function userOperationMetricsMiddleware(
