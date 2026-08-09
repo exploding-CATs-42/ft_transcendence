@@ -10,11 +10,12 @@
 
 .plusButton {
   position: absolute;
-  bottom: 4px;
-  right: 4px;
 
-  width: 26px;
-  height: 26px;
+  bottom: -2px;
+  right: -2px;
+
+  width: 17px;
+  height: 17px;
 
   border-radius: 50%;
   border: none;
@@ -42,4 +43,14 @@
 .wrapper:hover .plusButton {
   transform: scale(1.1);
   background: var(--zombie-kittens-hover);
+}
+
+@media only screen and (min-width: 768px) {
+  .plusButton {
+    bottom: 4px;
+    right: 4px;
+
+    width: 26px;
+    height: 26px;
+  }
 }
