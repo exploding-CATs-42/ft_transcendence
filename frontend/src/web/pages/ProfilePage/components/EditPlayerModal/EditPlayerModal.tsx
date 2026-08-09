@@ -24,7 +24,6 @@ import {
   avatarSchema,
   updateMeSchema,
   type MyProfileUser,
-  type ProfileUser,
   type UpdateMeRequestBody,
 } from "@exploding-cats/contracts";
 
@@ -37,7 +36,7 @@ interface Props {
   isOpen: boolean;
   toggleModal: () => void;
   user: MyProfileUser;
-  updateUser: (updates: ProfileUser) => void;
+  updateUser: (updates: Partial<MyProfileUser>) => void;
 }
 
 const ModalView = {

@@ -10,7 +10,7 @@ type Props =
   | {
       isMyProfile: true;
       user: MyProfileUser;
-      updateUser: (updates: ProfileUser) => void;
+      updateUser: (updates: Partial<MyProfileUser>) => void;
     }
   | {
       isMyProfile: false;

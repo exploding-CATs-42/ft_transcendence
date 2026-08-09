@@ -1,14 +1,14 @@
 import api from "api";
 import { useAuth, useModal } from "hooks";
 import { Button, Icon } from "components";
-import type { MyProfileUser, ProfileUser } from "@exploding-cats/contracts";
+import type { MyProfileUser } from "@exploding-cats/contracts";
 
 import { EditPlayerModal } from "../../components";
 import s from "./ProfileControls.module.css";
 
 type Props = {
   user: MyProfileUser;
-  updateUser: (updates: ProfileUser) => void;
+  updateUser: (updates: Partial<MyProfileUser>) => void;
 };
 
 const ProfileControls = ({ user, updateUser }: Props) => {
