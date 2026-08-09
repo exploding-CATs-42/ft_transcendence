@@ -548,6 +548,18 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   private createDiscardPile(lastPlayedCard: Card | null = null) {
     this.#discardPileZone = this.createPileZone(DISCARD_PILE_POSITION);
+    this.#discardPileZone
+      .setInteractive({
+        hitArea: new Phaser.Geom.Rectangle(
+          DISCARD_PILE_POSITION.x,
+          DISCARD_PILE_POSITION.y,
+          CARD_WIDTH,
+          CARD_HEIGHT,
+        ),
+        hitAreaCallback: Phaser.Geom.Rectangle.Contains,
+        useHandCursor: true,
+      })
+      .on("pointerdown", this.playSelectedKindCombo);
 
     if (lastPlayedCard) {
       const frame: Phaser.Textures.Frame = getCardFrame(
@@ -1029,11 +1041,17 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const canPlaySelectedCards = this.isMyTurn() && this.#selectedCardPlay;
 
     if (canPlaySelectedCards) {
-      this.#discardPile?.setInteractive({ useHandCursor: true });
+      if (this.#discardPile) {
+        this.#discardPile.setInteractive({ useHandCursor: true });
+        this.#discardPileZone?.disableInteractive(true);
+      } else {
+        this.#discardPileZone?.setInteractive();
+      }
       return;
     }
 
     this.#discardPile?.disableInteractive(true);
+    this.#discardPileZone?.disableInteractive(true);
   }
 
   private startNopeWindow = (
