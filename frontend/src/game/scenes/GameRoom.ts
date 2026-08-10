@@ -767,6 +767,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     if (!this.#myHand) return;
 
     this.#myHand.clearKindComboSelection();
+    this.#notification.hide();
 
     // Generate random insert index
     const cardCount = this.#myHand.getCount();
@@ -812,8 +813,22 @@ export class GameRoom extends Scene implements GameRoomHandlers {
         insertIndex,
         targetX,
       );
-      this.#incomingCardFromPlayerId = null;
 
+      const cardType = payload.card.type.replaceAll("_", " ");
+      const playerFromName = this.getPlayerNameById(
+        this.#incomingCardFromPlayerId!,
+      );
+
+      let message = `You received ${cardType} from ${playerFromName}`;
+      if (reason === "CAT_PAIR" || reason === "CAT_TRIPLE") {
+        message = `You stole ${cardType} from ${playerFromName}`;
+      } else if (reason === "FAVOR") {
+        message = `${playerFromName} gave you ${cardType}`;
+      }
+
+      this.#notification.showTransientMessage(message);
+
+      this.#incomingCardFromPlayerId = null;
       this.updateDrawPileInteractivity();
     }
   };
@@ -1039,6 +1054,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onCardRemoved = (payload: CardRemovedPayload): void => {
     const { cardId, reason } = payload;
     const card = this.#myHand.removeCard(cardId, reason);
+    const cardType = card.data.type.replaceAll("_", " ");
+
+    this.#notification.hide();
 
     if (
       reason === CardRemovalReason.PLAYED &&
@@ -1063,6 +1081,8 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       });
     } else if (reason === CardRemovalReason.STOLEN) {
       card.image.destroy();
+      const message = `Your ${cardType} was stolen`;
+      this.#notification.showTransientMessage(message);
     }
   };
 
@@ -1403,8 +1423,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardGiven = (payload: CardGivenPayload): void => {
-    this.#notification.hide();
-
     this.#players.forEach((seat) => {
       seat.setTargetIconVisible(false);
     });
@@ -1412,6 +1430,16 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     const { playerIdFrom, playerIdTo } = payload;
 
     if (this.#meId === playerIdFrom || this.#meId === playerIdTo) return;
+
+    this.#notification.hide();
+
+    const playerFromName = this.getPlayerNameById(playerIdFrom);
+    const playerToName = this.getPlayerNameById(playerIdTo);
+
+    if (playerFromName && playerToName) {
+      const message = `${playerFromName} gave card to ${playerToName}`;
+      this.#notification.showTransientMessage(message);
+    }
 
     this.passCardBetweenOpponents(playerIdFrom, playerIdTo);
   };
@@ -1456,6 +1484,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onWaitingForCardIndexSelection = (
     payload: WaitingForCardIndexSelectionPayload,
   ): void => {
+    this.#incomingCardFromPlayerId =
+      this.#meId === payload.targetPlayerId ? null : payload.targetPlayerId;
+
     if (this.isMyTurn()) {
       const targetPlayer = this.#players.get(payload.targetPlayerId);
       const view = new ChooseRandomCardView(
@@ -1479,6 +1510,9 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onWaitingForCardTypeSelection = (
     payload: WaitingForCardTypeSelectionPayload,
   ): void => {
+    this.#incomingCardFromPlayerId =
+      this.#meId === payload.targetPlayerId ? null : payload.targetPlayerId;
+
     if (this.isMyTurn()) {
       const targetPlayer = this.#players.get(payload.targetPlayerId);
       const view = new ChooseCardByNameView(this, targetPlayer!.player!.name);
@@ -1531,15 +1565,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
     this.passCardBetweenOpponents(playerIdFrom, playerIdTo);
 
-    if (this.isMyTurn()) return;
+    if (this.isMyTurn() || this.#meId === playerIdFrom) return;
 
     const targetPlayer = this.#players.get(playerIdFrom)!.player!;
 
     const playerToName = this.#players.get(playerIdTo)!.player!.name;
-    let playerFromName = targetPlayer.name;
-    if (this.#meId === targetPlayer.id) {
-      playerFromName = "you";
-    }
+    const playerFromName = targetPlayer.name;
 
     let message;
     if (payload.cardType) {
