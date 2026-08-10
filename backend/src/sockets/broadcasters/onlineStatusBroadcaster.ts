@@ -3,8 +3,8 @@ import {
   ServerPrivateEvents,
   UserId,
 } from "@exploding-cats/contracts";
-import { io } from "../../app";
 import { listOnlineStatusRecipientIds } from "services";
+import { emitToPlayer } from "sockets/emitters";
 
 export async function broadcastOnlineStatusToFriends(
   userId: UserId,
@@ -14,7 +14,8 @@ export async function broadcastOnlineStatusToFriends(
   const privatePayload: FriendOnlineStatusChangedPayload = { userId, isOnline };
 
   recipientIds.forEach((friendId) => {
-    io.to(friendId).emit(
+    emitToPlayer(
+      friendId,
       ServerPrivateEvents.FRIEND_ONLINE_STATUS_CHANGED,
       privatePayload,
     );

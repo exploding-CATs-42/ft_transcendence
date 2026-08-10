@@ -72,6 +72,7 @@ import {
 // Local level
 import { broadcastLobbyGameChanged } from "../broadcasters";
 import { socketsMap } from "../socketsMap";
+import { emitToPlayer } from "../emitters";
 import { CardReceivalReason } from "@exploding-cats/game-core";
 
 export const registerGameEventHandlers = (io: Server, socket: Socket) => {
@@ -140,14 +141,16 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.LEAVE_GAME_ERROR,
       async (parsed: LeaveGameParams) => {
-        const { playerId } = await leaveGame(parsed, socket.data.user.id);
+        const userId = socket.data.user.id;
+
+        const { playerId } = await leaveGame(parsed, userId);
         const room = parsed.gameId;
         await socket.leave(room);
-        socketsMap.delete(socket.data.user.id);
+        socketsMap.delete(userId);
 
         const publicPayload: PlayerIdPayload = { playerId };
 
-        socket.emit(ServerPrivateEvents.LEFT_GAME);
+        emitToPlayer(userId, ServerPrivateEvents.LEFT_GAME);
         io.to(room).emit(ServerPublicEvents.PLAYER_LEFT, publicPayload);
         broadcastLobbyGameChanged(parsed.gameId);
       },
@@ -205,7 +208,11 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         };
         const publicPayload: PlayerIdPayload = { playerId };
 
-        socket.emit(ServerPrivateEvents.CARD_RECEIVED, privatePayload);
+        emitToPlayer(
+          playerId,
+          ServerPrivateEvents.CARD_RECEIVED,
+          privatePayload,
+        );
         io.to(room).emit(ServerPublicEvents.CARD_DRAWN, publicPayload);
       },
     ),
@@ -235,7 +242,11 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           nopeWindowExpiresAt,
         };
 
-        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        emitToPlayer(
+          playerId,
+          ServerPrivateEvents.CARD_REMOVED,
+          cardRemovedPayload,
+        );
         socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
       },
     ),
@@ -265,7 +276,11 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           nopeWindowExpiresAt,
         };
 
-        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        emitToPlayer(
+          playerId,
+          ServerPrivateEvents.CARD_REMOVED,
+          cardRemovedPayload,
+        );
         socket.to(room).emit(ServerPublicEvents.NOPE_PLAYED, nopePlayedPayload);
       },
     ),
@@ -289,7 +304,11 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
             reason: "PLAYED",
           };
 
-          socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+          emitToPlayer(
+            playerId,
+            ServerPrivateEvents.CARD_REMOVED,
+            cardRemovedPayload,
+          );
         });
 
         const comboPlayedPayload: ComboPlayedPayload = {
@@ -331,7 +350,11 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           nopeWindowExpiresAt: -1, // TODO: Replace with the real expiration timestamp.
         };
 
-        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        emitToPlayer(
+          playerId,
+          ServerPrivateEvents.CARD_REMOVED,
+          cardRemovedPayload,
+        );
         socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
       },
     ),
@@ -344,16 +367,22 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
       socket,
       ServerErrorEvents.INSERT_KITTEN_ERROR,
       async (parsed: InsertKittenParams) => {
+        const userId = socket.data.user.id;
+
         // The machine broadcasts KITTEN_INSERTED (and the subsequent
         // TURN_CHANGED) via the game broadcaster in response to INSERT_KITTEN;
         // here we only forward the chosen position into the machine and remove.
-        const { card } = await insertKitten(parsed, socket.data.user.id);
+        const { card } = await insertKitten(parsed, userId);
 
         const cardRemovedPayload: CardRemovedPayload = {
           cardId: card.id,
           reason: "INSERTED_INTO_DECK",
         };
-        socket.emit(ServerPrivateEvents.CARD_REMOVED, cardRemovedPayload);
+        emitToPlayer(
+          userId,
+          ServerPrivateEvents.CARD_REMOVED,
+          cardRemovedPayload,
+        );
       },
     ),
   );
