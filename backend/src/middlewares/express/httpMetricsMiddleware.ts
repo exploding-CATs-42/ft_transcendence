@@ -4,9 +4,13 @@ import {
   httpRequestDurationSeconds,
 } from "../../metrics/httpMetrics";
 
-function getRouteLabel(req: Request) {
+function getRouteLabel(req: Request, res: Response) {
   if (req.route?.path && typeof req.route.path === "string") {
-    return `${req.baseUrl}${req.route.path}`;
+    const storedBaseUrl = res.locals["metricsRouteBase"];
+    const baseUrl =
+      typeof storedBaseUrl === "string" ? storedBaseUrl : req.baseUrl;
+
+    return `${baseUrl}${req.route.path}`;
   }
 
   return "unmatched";
@@ -27,7 +31,7 @@ export function httpMetricsMiddleware(
     const durationSeconds =
       Number(process.hrtime.bigint() - startedAt) / 1_000_000_000;
 
-    const route = getRouteLabel(req);
+    const route = getRouteLabel(req, res);
 
     if (shouldSkipHttpMetrics(req, route)) {
       return;
