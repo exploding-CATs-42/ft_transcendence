@@ -241,7 +241,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   #nopeButton!: NopeButton;
   #favorCardDropZone!: Phaser.GameObjects.Graphics;
   #favorModeActive: boolean = false;
-  #incomingCardFromPlayerId: string | null = null;
   #isAlive = true;
   #notification!: Notification;
   #insertingKittenNotificationTimer: Phaser.Time.TimerEvent | null = null;
@@ -808,16 +807,14 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       this.#favorModeActive = false;
 
       this.takeCardFromOpponent(
-        this.#incomingCardFromPlayerId,
+        payload.playerIdFrom,
         payload.card,
         insertIndex,
         targetX,
       );
 
       const cardType = payload.card.type.replaceAll("_", " ");
-      const playerFromName = this.getPlayerNameById(
-        this.#incomingCardFromPlayerId!,
-      );
+      const playerFromName = this.getPlayerNameById(payload.playerIdFrom);
 
       let message = `You received ${cardType} from ${playerFromName}`;
       if (reason === "CAT_PAIR" || reason === "CAT_TRIPLE") {
@@ -828,7 +825,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
       this.#notification.showTransientMessage(message);
 
-      this.#incomingCardFromPlayerId = null;
       this.updateDrawPileInteractivity();
     }
   };
@@ -879,7 +875,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onTurnChanged = (payload: TurnChangedPayload) => {
-    this.#incomingCardFromPlayerId = null;
     this.#currentTurnPlayerId = payload.playerId;
     this.#attackCount = payload.attackCount;
 
@@ -1066,21 +1061,11 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     } else if (reason === CardRemovalReason.INSERTED_INTO_DECK) {
       this.animateCardToDrawPile(card.image);
     } else if (reason === CardRemovalReason.GIVEN_AWAY) {
-      this.tweens.add({
-        targets: card.image,
-        x: FAVOR_CARD_DROP_ZONE.x,
-        y: FAVOR_CARD_DROP_ZONE.y,
-        displayWidth: CARD_WIDTH,
-        displayHeight: CARD_HEIGHT,
-        duration: 300,
-        ease: "Back.Out",
-        onComplete: () => {
-          card.image.destroy();
-          this.hideFavorUI();
-        },
-      });
+      this.hideFavorUI();
+      this.giveCardToOpponent(card.image);
     } else if (reason === CardRemovalReason.STOLEN) {
-      card.image.destroy();
+      this.giveCardToOpponent(card.image);
+
       const message = `Your ${cardType} was stolen`;
       this.#notification.showTransientMessage(message);
     }
@@ -1112,15 +1097,33 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     });
   }
 
+  private giveCardToOpponent = (cardImage: Phaser.GameObjects.Image) => {
+    const receiverHand = this.#opponents.get(this.#currentTurnPlayerId!);
+
+    if (!receiverHand) {
+      cardImage.destroy();
+      return;
+    }
+
+    animateCardTo(this, cardImage, receiverHand.getTopCardBounds(), {
+      duration: CARD_TRANSFER_DURATION_MS,
+      ease: CARD_TRANSFER_EASE,
+      onComplete: () => {
+        cardImage.destroy();
+        receiverHand.addCard();
+      },
+    });
+  };
+
   private takeCardFromOpponent = (
-    giverId: string | null,
+    giverId: string,
     card: Card,
     insertIndex: number,
     targetX: number,
   ) => {
     const frame = this.getFrameFor(card.type);
 
-    const giverHand = giverId ? this.#opponents.get(giverId) : null;
+    const giverHand = this.#opponents.get(giverId);
 
     if (!giverHand) {
       this.#myHand.addCard(card, frame, insertIndex);
@@ -1423,9 +1426,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardGiven = (payload: CardGivenPayload): void => {
-    this.#players.forEach((seat) => {
-      seat.setTargetIconVisible(false);
-    });
+    this.hideTargetIcons();
 
     const { playerIdFrom, playerIdTo } = payload;
 
@@ -1458,9 +1459,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onWaitingForCardIdSelection = (payload: WaitingForCardIdSelectionPayload) => {
-    this.#incomingCardFromPlayerId =
-      this.#meId === payload.playerId ? null : payload.playerId;
-
     if (this.#meId === payload.playerId) {
       this.showFavorUI();
       this.#notification.showMessageFor(NotificationMode.SELECT_CARD);
@@ -1484,9 +1482,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onWaitingForCardIndexSelection = (
     payload: WaitingForCardIndexSelectionPayload,
   ): void => {
-    this.#incomingCardFromPlayerId =
-      this.#meId === payload.targetPlayerId ? null : payload.targetPlayerId;
-
     if (this.isMyTurn()) {
       const targetPlayer = this.#players.get(payload.targetPlayerId);
       const view = new ChooseRandomCardView(
@@ -1510,9 +1505,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   onWaitingForCardTypeSelection = (
     payload: WaitingForCardTypeSelectionPayload,
   ): void => {
-    this.#incomingCardFromPlayerId =
-      this.#meId === payload.targetPlayerId ? null : payload.targetPlayerId;
-
     if (this.isMyTurn()) {
       const targetPlayer = this.#players.get(payload.targetPlayerId);
       const view = new ChooseCardByNameView(this, targetPlayer!.player!.name);
@@ -1531,9 +1523,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onNoCardOfRequestedType = (payload: NoCardOfRequestedTypePayload): void => {
-    this.#players.forEach((seat) => {
-      seat.setTargetIconVisible(false);
-    });
+    this.hideTargetIcons();
 
     if (this.isMyTurn()) {
       this.#modal.setVisible(false);
@@ -1557,13 +1547,13 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   onCardStolen = (payload: CardStolenPayload): void => {
-    this.#players.forEach((seat) => {
-      seat.setTargetIconVisible(false);
-    });
+    this.hideTargetIcons();
 
     const { playerIdFrom, playerIdTo } = payload;
 
-    this.passCardBetweenOpponents(playerIdFrom, playerIdTo);
+    if (this.#meId !== playerIdFrom && this.#meId !== playerIdTo) {
+      this.passCardBetweenOpponents(playerIdFrom, playerIdTo);
+    }
 
     if (this.isMyTurn() || this.#meId === playerIdFrom) return;
 
