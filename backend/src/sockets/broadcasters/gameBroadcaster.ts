@@ -24,8 +24,7 @@ import {
 } from "@exploding-cats/game-core";
 import { Game } from "data/types";
 import { io } from "../../app";
-import { socketsMap } from "sockets/socketsMap";
-import { emitToPlayer } from "sockets/emitters";
+import { emitToGameExceptPlayer, emitToPlayer } from "sockets/emitters";
 import { toGameStartedPayload } from "mappers";
 // Local level
 import { broadcastLobbyGameRemoved } from "./lobbyBroadcaster";
@@ -80,7 +79,6 @@ export function attachGameBroadcaster(game: Game) {
 
   broadcaster.on(GameOutEvents.SHOWED_TOP_CARDS, (event) => {
     const { playerId } = event.payload;
-    const socket = socketsMap.get(playerId);
 
     emitToPlayer(
       playerId,
@@ -88,7 +86,11 @@ export function attachGameBroadcaster(game: Game) {
       event.payload,
     );
 
-    socket?.to(gameId).emit(ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE);
+    emitToGameExceptPlayer(
+      gameId,
+      playerId,
+      ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE,
+    );
   });
 
   broadcaster.on(GameOutEvents.EXPLODING_KITTEN_DRAWN, (event) => {
@@ -148,8 +150,11 @@ export function attachGameBroadcaster(game: Game) {
   });
 
   broadcaster.on(GameOutEvents.PLAYER_SAW_THE_FUTURE, (event) => {
-    const socket = socketsMap.get(event.payload.playerId);
-    socket?.to(gameId).emit(ServerPublicEvents.PLAYER_SAW_THE_FUTURE);
+    emitToGameExceptPlayer(
+      gameId,
+      event.payload.playerId,
+      ServerPublicEvents.PLAYER_SAW_THE_FUTURE,
+    );
   });
 
   broadcaster.on(GameOutEvents.WAITING_FOR_CARD_INDEX_SELECTION, (event) => {

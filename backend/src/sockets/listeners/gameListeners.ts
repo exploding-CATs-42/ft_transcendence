@@ -72,7 +72,7 @@ import {
 // Local level
 import { broadcastLobbyGameChanged } from "../broadcasters";
 import { socketsMap } from "../socketsMap";
-import { emitToPlayer } from "../emitters";
+import { emitToGameExceptPlayer, emitToPlayer } from "../emitters";
 import { CardReceivalReason } from "@exploding-cats/game-core";
 
 export const registerGameEventHandlers = (io: Server, socket: Socket) => {
@@ -101,9 +101,12 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           socket.emit(ServerPrivateEvents.WAITING_STATE, privatePayload);
 
           if (isNewPlayer) {
-            socket
-              .to(room)
-              .emit(ServerPublicEvents.PLAYER_JOINED, publicPayload);
+            emitToGameExceptPlayer(
+              room,
+              player.id,
+              ServerPublicEvents.PLAYER_JOINED,
+              publicPayload,
+            );
           }
 
           broadcastLobbyGameChanged(parsed.gameId);
@@ -247,7 +250,12 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           ServerPrivateEvents.CARD_REMOVED,
           cardRemovedPayload,
         );
-        socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
+        emitToGameExceptPlayer(
+          room,
+          playerId,
+          ServerPublicEvents.CARD_PLAYED,
+          cardPlayedPayload,
+        );
       },
     ),
   );
@@ -281,7 +289,12 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           ServerPrivateEvents.CARD_REMOVED,
           cardRemovedPayload,
         );
-        socket.to(room).emit(ServerPublicEvents.NOPE_PLAYED, nopePlayedPayload);
+        emitToGameExceptPlayer(
+          room,
+          playerId,
+          ServerPublicEvents.NOPE_PLAYED,
+          nopePlayedPayload,
+        );
       },
     ),
   );
@@ -316,9 +329,12 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           cardTypes: cards.map((card) => card.type),
           nopeWindowExpiresAt: nopeWindowExpiresAt,
         };
-        socket
-          .to(parsed.gameId)
-          .emit(ServerPublicEvents.COMBO_PLAYED, comboPlayedPayload);
+        emitToGameExceptPlayer(
+          parsed.gameId,
+          playerId,
+          ServerPublicEvents.COMBO_PLAYED,
+          comboPlayedPayload,
+        );
       },
     ),
   );
@@ -355,7 +371,12 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
           ServerPrivateEvents.CARD_REMOVED,
           cardRemovedPayload,
         );
-        socket.to(room).emit(ServerPublicEvents.CARD_PLAYED, cardPlayedPayload);
+        emitToGameExceptPlayer(
+          room,
+          playerId,
+          ServerPublicEvents.CARD_PLAYED,
+          cardPlayedPayload,
+        );
       },
     ),
   );
