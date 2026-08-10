@@ -30,18 +30,18 @@ queries.
 
 | Dashboard | File | Content |
 | --- | --- | --- |
-| Backend Metrics | `backend-api.json` | Request rate, status codes, response time, slow routes, 5xx responses, and user operations |
+| Health | `backend-api.json` | Edge availability, active critical alerts, backend latency, user operation outcomes, HTTP response classes, and request rate |
 
-The dashboard visualizes backend application metrics collected from
-`backend:3000/metrics`.
+The dashboard presents the user-facing health of the application and follows
+the RED monitoring method:
 
-Service availability is checked by Blackbox Exporter and used by the
-`ServiceUnavailable` Prometheus alert. Availability can be inspected with the
-following Prometheus query and does not require a separate Grafana dashboard:
+- **Rate:** backend requests per second.
+- **Errors:** HTTP response classes and failed user operations.
+- **Duration:** global and per-route p95 request latency.
 
-```promql
-probe_success{job="blackbox"}
-```
+Blackbox Exporter checks whether users can reach the frontend and backend
+through the external HTTPS Nginx entry point. Prometheus alert state is also
+shown directly on the dashboard.
 
 ## Updating a Dashboard
 
