@@ -72,21 +72,36 @@ info:
     socket.
 
 
+    ### One account, many windows
+
+    A player is identified by their user id, never by a socket. The same account may
+    have several windows open on one game: they all authenticate with the same token,
+    all join the game room, and all share a single seat — the state machine holds one
+    `Player` per account no matter how many windows joined.
+
+    Delivery therefore addresses the **personal room** rather than any one socket, so
+    every window of an account stays in sync. The helpers in
+    `backend/src/sockets/emitters.ts` are the only supported way to do this.
+
+
     ### Delivery scope
 
     In the operations below, scope is one of:
 
 
-    - **acting socket** — only the client that triggered the action
-      (`socket.emit`).
-    - **single socket** — one specific player's socket, resolved through the
-      server's socket map (`socketsMap`). Note this map holds at most one socket
-      per user and is not cleaned up on disconnect, so these emits are silently
-      dropped for a player who has dropped or opened a second tab.
-    - **room (others)** — everyone in the game room except the actor
-      (`socket.to(room).emit`).
-    - **room (all)** — everyone in the game room including the actor
+    - **player (all windows)** — one specific player, addressed through their
+      personal room (`emitToPlayer`). Every window that account has open receives
+      it. Used for everything private to a player: their hand, and prompts aimed at
+      them.
+    - **room (others)** — everyone in the game room except *every window* of the
+      named player (`emitToGameExceptPlayer`). Used for public events describing
+      what one player just did.
+    - **room (all)** — everyone in the game room, the acting player included
       (`io.to(room).emit`).
+    - **acting socket** — only the single client that triggered the action
+      (`socket.emit`). Reserved for direct replies to a request — `waiting-state`,
+      `game-state` and the per-action `*-error` events — never for state changes,
+      which must reach every window.
     - **broadcast** — every connected client (`io.emit`). Only the lobby channel
       uses this.
 

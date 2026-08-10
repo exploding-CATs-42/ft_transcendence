@@ -205,15 +205,15 @@ channels:
     description: >
       The countdown completed and the game has started. Unlike every other
       waiting-room event this is **not** a room broadcast: the server loops over the
-      players and emits once per player socket, so each player receives their own
-      hand and a `players` array rotated to start with themselves. A player whose
-      socket is not in the socket map at that moment never receives it and must
-      recover the state via `reconnect-game`.
+      players and emits once per player, so each player receives their own hand and a
+      `players` array rotated to start with themselves. Each emit is addressed to the
+      player's personal room, so every window that account has open receives the same
+      snapshot.
     messages:
       gameStarted:
         name: GameStarted
         title: Game started
-        summary: Personalised start-of-game snapshot, sent to one player socket.
+        summary: Personalised start-of-game snapshot, sent to every window of one player.
         contentType: application/json
         payload:
           $ref: "./waiting-room.schemas.yaml#/components/schemas/GameStartedPayload"
@@ -262,10 +262,17 @@ operations:
       $ref: "#/channels/leaveGame"
     summary: Leave a game.
     description: >
-      Validates `gameId`, removes the socket from the room, acknowledges with
-      `left-game` to the acting socket, and notifies the whole room with
-      `player-left`. Then broadcasts `lobby-game-updated` or `lobby-game-removed`
-      to every connected client. On failure emits `leave-game-error`.
+      Validates `gameId`, removes **every window of the leaving account** from the
+      room, acknowledges with `left-game` to all of them, and notifies the rest of
+      the room with `player-left`. Then broadcasts `lobby-game-updated` or
+      `lobby-game-removed` to every connected client. On failure emits
+      `leave-game-error`.
+
+
+      Leaving is per account, not per window: the player holds one seat regardless of
+      how many windows are open on the game, so removing the seat has to take all of
+      those windows out with it. The room removal happens before `player-left` is
+      broadcast, so the leaver's own windows never see the event about themselves.
 
 
       This is not limited to the waiting room — it is also how a player quits a game
@@ -328,7 +335,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/leftGame"
-    summary: Acknowledge a leave to the leaving socket (acting socket).
+    summary: Acknowledge a leave to the leaving player (player, all windows).
     tags:
       - name: Waiting Room
     messages:
@@ -399,7 +406,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/gameStarted"
-    summary: Send each player their personalised start-of-game snapshot (per socket).
+    summary: Send each player their personalised start-of-game snapshot (player, all windows).
     description: >
       Emitted once per player, to that player's own socket, when the game machine
       starts the game. Immediately afterwards the server also emits

@@ -107,8 +107,9 @@ operations:
     summary: Rejoin an in-progress game and receive the full state.
     description: >
       Validates `gameId`, rebuilds the caller's view of the game, joins the socket to
-      the room, registers it in the socket map for private emits, and replies with
-      `game-state` on the acting socket. On failure emits `reconnect-game-error`.
+      the room, and replies with `game-state` on the acting socket — only the window
+      that asked needs the snapshot, since the others already hold one. On failure
+      emits `reconnect-game-error`.
     tags:
       - name: Connection
     messages:
@@ -153,7 +154,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/friendOnlineStatusChanged"
-    summary: Notify each friend that this user came online or went offline (per-user room).
+    summary: Notify each friend that this user came online or went offline (player, all windows).
     tags:
       - name: Connection
     messages:
