@@ -257,7 +257,7 @@ Prometheus evaluates three user-facing rules:
 | --- | --- | --- | --- |
 | `ServiceUnavailable` | critical | Edge frontend or backend probe fails for 30 seconds | Detects that users cannot reach the application |
 | `UserOperationsFailing` | critical | At least three monitored operations return server errors within two minutes, sustained for 10 seconds | Detects failures in authentication, profile, or friendship workflows |
-| `BackendLatencyHigh` | warning | Backend p95 exceeds 500 ms with at least 20 requests in one minute, sustained for 15 seconds | Detects meaningful latency degradation while avoiding low-traffic noise |
+| `BackendLatencyHigh` | warning | Backend p95 exceeds 500 ms with at least 20 requests in one minute, sustained for 20 seconds | Detects meaningful latency degradation while avoiding low-traffic noise |
 
 The availability alert intentionally uses only `layer="edge"`. Internal probes
 remain diagnostic signals and do not create duplicate notifications for the
@@ -383,10 +383,20 @@ dynamically, so recreating those containers does not require an Nginx restart.
 
 ### Configuration changes are not loaded
 
-Prometheus and Alertmanager do not automatically apply every bind-mounted file
-change in this local setup. Restart the affected container after validation:
+Prometheus and Alertmanager use file-level bind mounts. Editors may replace a
+configuration file with a new inode when saving, while an existing container
+continues reading the old mounted inode. Recreate the affected service after
+validation so Docker mounts the current file:
 
 ```bash
-docker restart ft-prometheus
-docker restart ft-alertmanager
+docker compose \
+  --env-file infra/env/.env \
+  -f infra/docker/compose.dev.yml \
+  up -d --force-recreate --no-deps prometheus
+
+docker compose \
+  --env-file infra/env/.env \
+  -f infra/docker/compose.dev.yml \
+  --profile alerts \
+  up -d --force-recreate --no-deps alertmanager
 ```

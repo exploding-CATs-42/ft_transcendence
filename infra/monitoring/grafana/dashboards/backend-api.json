@@ -285,7 +285,7 @@
         "type": "prometheus",
         "uid": "prometheus"
       },
-      "description": "95th percentile of backend request duration over the last 5 minutes.\nValues above 0.5 seconds indicate degraded user experience.",
+      "description": "95th percentile of backend request duration over the last minute.\nValues above 0.5 seconds indicate degraded user experience. The alert also requires at least 20 requests within the same minute.",
       "fieldConfig": {
         "defaults": {
           "color": {
@@ -353,7 +353,7 @@
         {
           "editorMode": "code",
           "exemplar": false,
-          "expr": "histogram_quantile(\n    0.95,\n    sum by (le) (\n        rate(http_request_duration_seconds_bucket[5m])\n    )\n)",
+          "expr": "histogram_quantile(\n    0.95,\n    sum by (le) (\n        rate(http_request_duration_seconds_bucket[1m])\n    )\n)",
           "format": "table",
           "instant": true,
           "legendFormat": "p95",
@@ -871,6 +871,6 @@
   "timezone": "browser",
   "title": "Health",
   "uid": "ffqfij73fm5fkb",
-  "version": 44,
+  "version": 45,
   "weekStart": ""
 }
