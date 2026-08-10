@@ -25,6 +25,7 @@ import {
 import { Game } from "data/types";
 import { io } from "../../app";
 import { socketsMap } from "sockets/socketsMap";
+import { emitToPlayer } from "sockets/emitters";
 import { toGameStartedPayload } from "mappers";
 // Local level
 import { broadcastLobbyGameRemoved } from "./lobbyBroadcaster";
@@ -36,7 +37,6 @@ export function attachGameBroadcaster(game: Game) {
     const players = event.players;
 
     players.forEach((player) => {
-      const socket = socketsMap.get(player.id);
       const payload: GameStartedPayload = toGameStartedPayload(
         players,
         player.id,
@@ -44,7 +44,7 @@ export function attachGameBroadcaster(game: Game) {
         event.kittensInDeck,
       );
 
-      socket?.emit(ServerPrivateEvents.GAME_STARTED, payload);
+      emitToPlayer(player.id, ServerPrivateEvents.GAME_STARTED, payload);
     });
 
     // The countdown starts the game on its own, so this is the only chance to
@@ -79,9 +79,16 @@ export function attachGameBroadcaster(game: Game) {
   });
 
   broadcaster.on(GameOutEvents.SHOWED_TOP_CARDS, (event) => {
-    const socket = socketsMap.get(event.payload.playerId)!;
-    socket.emit(ServerPrivateEvents.SEE_THE_FUTURE_PEEK, event.payload);
-    socket.to(gameId).emit(ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE);
+    const { playerId } = event.payload;
+    const socket = socketsMap.get(playerId);
+
+    emitToPlayer(
+      playerId,
+      ServerPrivateEvents.SEE_THE_FUTURE_PEEK,
+      event.payload,
+    );
+
+    socket?.to(gameId).emit(ServerPublicEvents.PLAYER_LOOKS_AT_THE_FUTURE);
   });
 
   broadcaster.on(GameOutEvents.EXPLODING_KITTEN_DRAWN, (event) => {
@@ -94,8 +101,7 @@ export function attachGameBroadcaster(game: Game) {
     const { playerId } = event.payload;
     const payload: DefusePromptPayload = event.payload;
 
-    const socket = socketsMap.get(playerId);
-    socket?.emit(ServerPrivateEvents.DEFUSE_PROMPT, payload);
+    emitToPlayer(playerId, ServerPrivateEvents.DEFUSE_PROMPT, payload);
   });
 
   broadcaster.on(GameOutEvents.PLAYER_DEFUSED, (event) => {
@@ -168,7 +174,6 @@ export function attachGameBroadcaster(game: Game) {
       reason: receivalReason,
     } = event.payload;
 
-    const socketPlayerFrom = socketsMap.get(playerIdFrom);
     const cardRemovedPayload: CardRemovedPayload = {
       cardId: card.id,
       reason:
@@ -176,18 +181,19 @@ export function attachGameBroadcaster(game: Game) {
           ? CardRemovalReason.GIVEN_AWAY
           : CardRemovalReason.STOLEN,
     };
-    socketPlayerFrom?.emit(
+    emitToPlayer(
+      playerIdFrom,
       ServerPrivateEvents.CARD_REMOVED,
       cardRemovedPayload,
     );
 
-    const socketPlayerTo = socketsMap.get(playerIdTo);
     const cardReceivedPayload: CardReceivedPayload = {
       card,
       reason: receivalReason,
       playerIdFrom,
     };
-    socketPlayerTo?.emit(
+    emitToPlayer(
+      playerIdTo,
       ServerPrivateEvents.CARD_RECEIVED,
       cardReceivedPayload,
     );
