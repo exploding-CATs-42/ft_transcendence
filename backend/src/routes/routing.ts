@@ -1,5 +1,5 @@
 // Libraries
-import type { Express } from "express";
+import type { Express, Router } from "express";
 // Project level
 import { errorMiddleware } from "middlewares";
 // Local level
@@ -11,18 +11,29 @@ import { metricsRouter } from "./metrics";
 import { friendsRouter } from "./friends";
 import { gamesRouter } from "./games";
 
+function mountRouter(app: Express, path: string, router: Router) {
+  app.use(
+    path,
+    (req, res, next) => {
+      res.locals["metricsRouteBase"] = req.baseUrl;
+      next();
+    },
+    router,
+  );
+}
+
 export const setupRouting = (app: Express) => {
   app.get("/", (_, res) => {
     return res.json({ message: "Hello world!" });
   });
 
-  app.use("/metrics", metricsRouter);
-  app.use("/docs", docsRouter);
-  app.use("/auth", authRouter);
-  app.use("/users", usersRouter);
-  app.use("/me", meRouter);
-  app.use("/me/friends", friendsRouter);
-  app.use("/games", gamesRouter);
+  mountRouter(app, "/metrics", metricsRouter);
+  mountRouter(app, "/docs", docsRouter);
+  mountRouter(app, "/auth", authRouter);
+  mountRouter(app, "/users", usersRouter);
+  mountRouter(app, "/me", meRouter);
+  mountRouter(app, "/me/friends", friendsRouter);
+  mountRouter(app, "/games", gamesRouter);
 
   app.use((_, res) => {
     res.status(404).json({ message: "Route not found" });
