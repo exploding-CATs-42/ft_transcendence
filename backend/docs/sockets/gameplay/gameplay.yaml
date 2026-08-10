@@ -172,7 +172,7 @@ channels:
           $ref: "./gameplay.schemas.yaml#/components/schemas/GameIdPayload"
 
   # ------------------------------------------------------------------
-  # Server -> Client: private (one socket)
+  # Server -> Client: private (player, all windows)
   # ------------------------------------------------------------------
   cardReceived:
     address: card-received
@@ -236,8 +236,8 @@ channels:
     title: Combo selection requested
     description: >
       Asks the acting player to pick a combo target, and for a three-card combo a
-      card type. Sent to that one socket despite the SCREAMING_SNAKE name that
-      elsewhere marks public events.
+      card type. Sent privately to that one player — every window they have open —
+      despite the SCREAMING_SNAKE name that elsewhere marks public events.
     messages:
       comboSelectionRequested:
         name: ComboSelectionRequested
@@ -696,7 +696,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/cardReceived"
-    summary: Reveal a gained card to its new owner (single socket).
+    summary: Reveal a gained card to its new owner (player, all windows).
     tags:
       - name: Gameplay
     messages:
@@ -706,7 +706,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/cardRemoved"
-    summary: Tell a player to drop a card from their hand (single socket).
+    summary: Tell a player to drop a card from their hand (player, all windows).
     tags:
       - name: Gameplay
     messages:
@@ -716,7 +716,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/seeTheFuturePeek"
-    summary: Reveal the top cards to the peeking player (single socket).
+    summary: Reveal the top cards to the peeking player (player, all windows).
     tags:
       - name: Gameplay
     messages:
@@ -726,7 +726,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/defusePrompt"
-    summary: Prompt the exploding player to defuse (single socket).
+    summary: Prompt the exploding player to defuse (player, all windows).
     tags:
       - name: Gameplay
     messages:
@@ -736,7 +736,7 @@ operations:
     action: send
     channel:
       $ref: "#/channels/comboSelectionRequested"
-    summary: Ask the acting player to complete their combo (single socket).
+    summary: Ask the acting player to complete their combo (player, all windows).
     tags:
       - name: Gameplay
     messages:

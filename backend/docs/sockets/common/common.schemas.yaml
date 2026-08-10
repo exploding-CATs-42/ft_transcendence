@@ -147,9 +147,10 @@ components:
     GameStartedPayload:
       type: object
       description: >
-        Personalised game-start snapshot. This event is emitted once per player
-        socket, not broadcast: `players` is rotated so the receiving player is
-        first, and `hand` is that player's own hand.
+        Personalised game-start snapshot. This event is emitted once per player, not
+        broadcast: `players` is rotated so the receiving player is first, and `hand`
+        is that player's own hand. Each emit reaches every window that player has
+        open.
       required:
         - players
         - hand
