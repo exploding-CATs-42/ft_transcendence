@@ -52,7 +52,7 @@ groups:
           (
           sum(increase(http_request_duration_seconds_count[1m])) >= 20
           )
-        for: 15s
+        for: 20s
         labels:
           severity: warning
           service: backend
@@ -65,5 +65,5 @@ groups:
             "User operations are becoming slow and may start failing if the
             pressure continues."
           action:
-            "Inspect request rate, slow routes, backend CPU, and PostgreSQL
-            response time."
+            "Inspect request rate, latency by route, backend logs, and PostgreSQL
+            availability."
