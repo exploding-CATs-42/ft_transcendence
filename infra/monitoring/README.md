@@ -3,9 +3,10 @@
 Local monitoring for `ft_transcendence` provides:
 
 - backend application metrics;
-- a provisioned Grafana dashboard;
-- lightweight availability checks for the main services;
-- optional Telegram notifications when a service becomes unavailable or recovers.
+- a provisioned user-facing health dashboard;
+- external HTTPS and internal availability checks;
+- Prometheus alert rules for availability, user operations, and latency;
+- optional Telegram notifications when an alert fires or resolves.
 
 The setup intentionally stays small for local development. It does not collect
 container CPU or memory metrics and does not probe game or Socket.IO traffic.
@@ -34,10 +35,11 @@ active and resolved alerts; it does not perform checks itself.
 | Area | Implementation |
 | --- | --- |
 | Application metrics | Backend `GET /metrics` |
-| Visualization | Provisioned Backend Metrics Grafana dashboard |
-| HTTP availability | Nginx, frontend, backend |
+| Visualization | Provisioned Health Grafana dashboard |
+| Edge availability | Frontend and backend through HTTPS Nginx |
+| Internal diagnostics | Nginx, frontend, backend, and PostgreSQL probes |
 | TCP availability | PostgreSQL |
-| Alert rule | `ServiceUnavailable` |
+| Alert rules | `ServiceUnavailable`, `UserOperationsFailing`, `BackendLatencyHigh` |
 | Notifications | Optional Telegram receiver |
 
 The monitoring scope does not include cAdvisor, postgres-exporter, host resource
@@ -139,20 +141,8 @@ Blackbox Exporter starts with the regular stack. Alertmanager belongs to the
 `alerts` Compose profile and stays off by default, so normal development does
 not send Telegram messages.
 
-This is a development-only noise-control rule. Before the final project
-submission, choose one explicit alerting mode:
-
-- remove the `alerts` profile from Alertmanager so it starts with the regular
-  stack; or
-- keep the profile and include `make alerts-up` in the final startup and demo
-  procedure.
-
-The current Blackbox HTTP targets are also intended for local development.
-After HTTPS is configured at the Nginx gateway, change the Nginx availability
-target from `http://nginx/health` to the final HTTPS endpoint and validate its
-TLS certificate. The `ServiceUnavailable` rule does not need to change because
-it still evaluates `probe_success`. Internal frontend and backend probes should
-remain HTTP unless those containers are also configured to terminate TLS.
+This profile prevents development notifications from becoming noisy. Start it
+explicitly before an alerting demonstration.
 
 Enable notifications when testing:
 
@@ -206,21 +196,24 @@ strings, or message content as labels.
 
 ## Availability Checks
 
-Blackbox Exporter defines two modules:
+Blackbox Exporter defines three modules:
 
 | Module | Probe | Timeout |
 | --- | --- | --- |
 | `http_2xx` | Successful HTTP `2xx` response over IPv4 | 5 seconds |
+| `https_2xx_self_signed` | Successful HTTPS `2xx` response using the local certificate | 5 seconds |
 | `tcp_connect` | Successful TCP connection | 5 seconds |
 
 Prometheus runs the following checks every 30 seconds:
 
-| Service label | Target | Module |
+| Service and layer labels | Target | Module |
 | --- | --- | --- |
-| `nginx` | `http://nginx/health` | `http_2xx` |
-| `frontend` | `http://frontend:5173/` | `http_2xx` |
-| `backend` | `http://backend:3000/metrics` | `http_2xx` |
-| `postgres` | `postgres:5432` | `tcp_connect` |
+| `nginx`, `edge` | `https://nginx/health` | `https_2xx_self_signed` |
+| `frontend`, `edge` | `https://nginx/` | `https_2xx_self_signed` |
+| `backend`, `edge` | `https://nginx/api` | `https_2xx_self_signed` |
+| `frontend`, `internal` | `http://frontend:5173/` | `http_2xx` |
+| `backend`, `internal` | `http://backend:3000/metrics` | `http_2xx` |
+| `postgres`, `dependency` | `postgres:5432` | `tcp_connect` |
 
 The result is exposed as:
 
@@ -229,10 +222,12 @@ probe_success = 1  # available
 probe_success = 0  # unavailable
 ```
 
-The frontend check performs one HTTP request only. It does not execute
-JavaScript or load assets. The backend check uses the rate-limit-excluded
-`/metrics` route. The PostgreSQL check opens a TCP connection without running
-queries. None of the checks use `/socket.io`.
+The edge probes represent the real user path through HTTPS Nginx. Internal
+probes help distinguish a gateway problem from an application-container
+problem. Each frontend check performs one HTTP request without executing
+JavaScript or loading assets. The internal backend check uses the
+rate-limit-excluded `/metrics` route. The PostgreSQL check opens a TCP
+connection without running queries. None of the checks use `/socket.io`.
 
 Nginx provides a direct `/health` response that does not proxy to frontend or
 backend. This prevents a frontend outage from producing a false Nginx alert.
@@ -252,19 +247,21 @@ Inspect current availability in Prometheus with:
 probe_success{job="blackbox"}
 ```
 
-All four results should normally equal `1`.
+All six results should normally equal `1`.
 
-## Alert Rule
+## Alert Rules
 
-Prometheus defines one availability rule:
+Prometheus evaluates three user-facing rules:
 
-```promql
-probe_success{job="blackbox"} == 0
-```
+| Alert | Severity | Condition | Purpose |
+| --- | --- | --- | --- |
+| `ServiceUnavailable` | critical | Edge frontend or backend probe fails for 30 seconds | Detects that users cannot reach the application |
+| `UserOperationsFailing` | critical | At least three monitored operations return server errors within two minutes, sustained for 10 seconds | Detects failures in authentication, profile, or friendship workflows |
+| `BackendLatencyHigh` | warning | Backend p95 exceeds 500 ms with at least 20 requests in one minute, sustained for 15 seconds | Detects meaningful latency degradation while avoiding low-traffic noise |
 
-The `ServiceUnavailable` alert becomes active after a check remains unsuccessful
-for 30 seconds. The alert inherits the `service` label, so Alertmanager can send
-separate messages for `nginx`, `frontend`, `backend`, and `postgres`.
+The availability alert intentionally uses only `layer="edge"`. Internal probes
+remain diagnostic signals and do not create duplicate notifications for the
+same user-visible incident.
 
 Alert delivery timing is intentionally conservative for local development:
 
@@ -272,13 +269,13 @@ Alert delivery timing is intentionally conservative for local development:
 | --- | --- | --- |
 | Blackbox scrape interval | 30 seconds | Limits probe traffic |
 | Probe timeout | 5 seconds | Bounds each check |
-| Alert `for` | 30 seconds | Ignores very short failures |
+| Availability `for` | 30 seconds | Ignores very short failures |
 | Alertmanager `group_wait` | 10 seconds | Groups initial notifications |
 | Alertmanager `group_interval` | 30 seconds | Delivers state changes promptly |
 | Alertmanager `repeat_interval` | 4 hours | Avoids repeated notification noise |
 
-Depending on scrape alignment, a firing notification normally arrives in about
-40–70 seconds. Resolved notifications are enabled.
+Depending on scrape alignment, an availability notification normally arrives
+in about 40–70 seconds. Resolved notifications are enabled.
 
 The custom Telegram template includes the status, service name, alert name, and
 description. It deliberately omits Alertmanager's default `Source` URL because a
@@ -306,10 +303,18 @@ Provisioned dashboard:
 infra/monitoring/grafana/dashboards/backend-api.json
 ```
 
-The dashboard covers backend request rate, response status, latency, slow routes,
-5xx responses, and user operations. Availability probes are used for alerting
-and can be inspected directly in Prometheus; they do not require a separate
-Grafana dashboard.
+The `Health` dashboard combines edge availability, active critical alerts,
+global and per-route p95 latency, user operation outcomes, HTTP response
+classes, and request rate. These panels cover the RED signals: Rate, Errors,
+and Duration.
+
+Grafana administrator credentials come from `infra/env/.env`. Anonymous access
+is disabled by Grafana by default. An unauthenticated API request should return
+`401 Unauthorized`:
+
+```bash
+curl -i http://localhost:${GRAFANA_PORT}/api/search
+```
 
 ## Safe End-to-End Test
 
@@ -366,14 +371,15 @@ running and that Blackbox Exporter is attached to `transcendence_net`.
 
 ### Nginx fails together with frontend
 
-Check the host health endpoint:
+Check the external HTTPS health endpoint:
 
 ```bash
-curl -i http://localhost:${NGINX_PORT}/health
+curl -sk -i https://localhost:${NGINX_HTTPS_PORT}/health
 ```
 
 If it does not return `200 OK`, rebuild the Nginx image so it contains the latest
-`nginx.conf`.
+`nginx.conf`. Nginx resolves the Docker frontend and backend service names
+dynamically, so recreating those containers does not require an Nginx restart.
 
 ### Configuration changes are not loaded
 
