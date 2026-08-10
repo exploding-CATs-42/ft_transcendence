@@ -55,6 +55,12 @@ export interface GameActionArgs {
 export const addPlayer = ({ context, event }: GameActionArgs) => {
   if (event.type !== GameEvents.JOIN_GAME) return context;
 
+  const isAlreadySeated = context.players.some(
+    (player) => player.id === event.player.id,
+  );
+
+  if (isAlreadySeated) return context;
+
   return {
     players: [...context.players, event.player],
   };
