@@ -16,11 +16,9 @@ up: ## Start containers in detached mode
 build: prisma-generate
 	$(COMPOSE) up --build -d --remove-orphans
 
-setup: ## Build and initialize the project, database, and seed data
+setup: ## Build the project and apply pending database migrations
 	$(MAKE) build
-	$(MAKE) deps
 	$(MAKE) prisma-deploy
-	$(MAKE) seed
 
 down: ## Stop and remove containers
 	$(COMPOSE) down

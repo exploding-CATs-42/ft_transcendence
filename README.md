@@ -51,11 +51,15 @@ This single command:
 
 1. Generates the Prisma client.
 2. Builds and starts `nginx`, `backend`, `frontend`, and `postgres` containers.
-3. Installs `pnpm` dependencies inside the backend and frontend containers.
-4. Applies existing Prisma migrations to the database.
-5. Seeds the database with initial development data.
+3. Applies existing Prisma migrations to the database.
 
 The individual commands remain available for troubleshooting and partial setup.
+
+To add optional development seed data, run:
+
+```bash
+make seed
+```
 
 After that, the app is available at:
 
@@ -73,7 +77,6 @@ If you changed Dockerfiles or image-level dependencies:
 
 ```bash
 make build
-make deps
 ```
 
 If you changed the Prisma schema:
@@ -87,7 +90,7 @@ make seed
 
 ### Containers
 
-- `make setup` - build and initialize the complete development environment
+- `make setup` - build the project and apply pending database migrations
 - `make up` - start containers
 - `make build` - rebuild and start containers
 - `make down` - stop and remove containers
@@ -136,7 +139,7 @@ make seed
   - check that `DATABASE_URL` in `backend/.env` uses host `postgres`, not `localhost`.
 
 2. Module not found in `backend` or `frontend`:
-  - run `make deps` after `make build`.
+  - run `make build` to rebuild the dependency container.
 
 3. Env changed but nothing updated:
   - restart containers: `make down && make up`.
@@ -149,6 +152,12 @@ cp backend/.env.example backend/.env
 cp frontend/.env.example frontend/.env
 
 make setup
+```
+
+Optionally load development seed data:
+
+```bash
+make seed
 ```
 
 Open in browser: `http://localhost:8080`
