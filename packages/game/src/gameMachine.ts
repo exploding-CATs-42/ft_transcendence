@@ -251,6 +251,10 @@ export const gameMachine = setup({
             target: GameTargets.GAME_OVER,
           },
           {
+            guard: GameGuards.IS_PLAYERS_TURN,
+            actions: [GameActions.REMOVE_PLAYER, emit(turnChanged)],
+          },
+          {
             actions: GameActions.REMOVE_PLAYER,
           },
         ],
