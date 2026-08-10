@@ -71,7 +71,6 @@ import {
 } from "@exploding-cats/contracts";
 // Local level
 import { broadcastLobbyGameChanged } from "../broadcasters";
-import { socketsMap } from "../socketsMap";
 import { emitToGameExceptPlayer, emitToPlayer } from "../emitters";
 import { CardReceivalReason } from "@exploding-cats/game-core";
 
@@ -89,7 +88,6 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         try {
           const { players, player, countdownEndsAt, isNewPlayer } =
             await joinGame(parsed, socket.data.user.id);
-          socketsMap.set(player.id, socket);
 
           const privatePayload: WaitingStatePayload = {
             players,
@@ -128,7 +126,6 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const gameState = await reconnectGame(parsed, socket.data.user.id);
         const room = parsed.gameId;
         await socket.join(room);
-        socketsMap.set(socket.data.user.id, socket);
 
         const payload: GameStatePayload = gameState;
 
@@ -149,7 +146,6 @@ export const registerGameEventHandlers = (io: Server, socket: Socket) => {
         const { playerId } = await leaveGame(parsed, userId);
         const room = parsed.gameId;
         await socket.leave(room);
-        socketsMap.delete(userId);
 
         const publicPayload: PlayerIdPayload = { playerId };
 

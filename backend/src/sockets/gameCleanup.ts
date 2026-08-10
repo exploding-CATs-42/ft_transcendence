@@ -4,7 +4,6 @@ import { Game, GameId } from "data/types";
 import { io } from "../app";
 import { ServerPrivateEvents } from "@exploding-cats/contracts";
 import { cancelAutoPlay } from "./autoPlay";
-import { socketsMap } from "./socketsMap";
 
 const GAME_OVER_CLEANUP_DELAY_MS = 60000;
 
@@ -49,7 +48,6 @@ export const deleteGame = (gameId: GameId) => {
 
   players.forEach((player) => {
     cancelAutoPlay(player.id);
-    socketsMap.delete(player.id);
   });
 
   io.to(gameId).emit(ServerPrivateEvents.LEFT_GAME);
