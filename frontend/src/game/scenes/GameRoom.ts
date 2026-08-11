@@ -1523,6 +1523,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
 
   onNoCardOfRequestedType = (payload: NoCardOfRequestedTypePayload): void => {
     this.hideTargetIcons();
+    this.updateDrawPileInteractivity();
 
     if (this.isMyTurn()) {
       this.#modal.setVisible(false);
