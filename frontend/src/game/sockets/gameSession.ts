@@ -9,6 +9,7 @@ import {
   SocketErrorCodes,
   type SocketErrorPayload,
 } from "@exploding-cats/contracts";
+import { GAME_SESSION_ERROR_EVENTS } from "./errorEvents";
 
 let gameId = "";
 
@@ -42,11 +43,22 @@ export function connectToGameSession(
     toast(message);
     onFatalError();
   };
+  const onGameSessionError = ({ message }: SocketErrorPayload) => {
+    toast(message);
+  };
+
   if (socket.connected) join();
   socket.on("connect", join);
   socket.on(ServerErrorEvents.JOIN_GAME_ERROR, onJoinGameError);
+  GAME_SESSION_ERROR_EVENTS.forEach((event) => {
+    socket.on(event, onGameSessionError);
+  });
+
   return () => {
     socket.off("connect", join);
     socket.off(ServerErrorEvents.JOIN_GAME_ERROR, onJoinGameError);
+    GAME_SESSION_ERROR_EVENTS.forEach((event) => {
+      socket.off(event, onGameSessionError);
+    });
   };
 }

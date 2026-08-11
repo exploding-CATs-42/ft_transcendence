@@ -19,6 +19,7 @@ import {
 } from "@exploding-cats/game-core";
 import {
   CardRemovalReason,
+  ServerErrorEvents,
   type CardGivenPayload,
   type CardPlayedPayload,
   type CardReceivedPayload,
@@ -52,6 +53,8 @@ import {
   addFullscreenToggle,
   animateCardTo,
   getCardFrame,
+  getCardPlayValidationMessage,
+  getDrawCardValidationMessage,
 } from "../utils";
 import {
   GraphicPlayer,
@@ -94,6 +97,7 @@ import {
   playNope,
   selectPlayer,
   type CleanupFunction,
+  type GameRoomErrorEvent,
   type GameRoomHandlers,
   insertKitten,
   seenTheFuture,
@@ -456,6 +460,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       {
         onKindComboSelectionChange: this.emitKindComboSelectionChange,
         onKindComboPlay: this.playSelectedKindCombo,
+        onActionBlocked: this.showActionValidationError,
       },
       this.isFavorModeActive,
       chooseCardId,
@@ -498,11 +503,12 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   }
 
   private updateDrawPileInteractivity() {
-    if (this.isMyTurn()) {
-      this.#drawPile?.setInteractive({ useHandCursor: true });
-    } else {
+    if (!this.#isAlive) {
       this.#drawPile?.disableInteractive(true);
+      return;
     }
+
+    this.#drawPile?.setInteractive({ useHandCursor: this.isMyTurn() });
   }
 
   private createDrawPile() {
@@ -891,19 +897,37 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   private drawCard = () => {
-    if (!this.isMyTurn()) return;
+    const validationMessage = getDrawCardValidationMessage(this.isMyTurn());
+    if (validationMessage) {
+      this.showActionValidationError(validationMessage);
+      return;
+    }
+
     drawCard();
   };
 
   private playSelectedKindCombo = () => {
-    if (!this.isMyTurn() || !this.#selectedCardPlay) return;
+    const selection = this.#selectedCardPlay;
+    if (!selection) return;
 
-    if (this.#selectedCardPlay.kind === "single-card") {
-      playCard(this.#selectedCardPlay.cardId);
+    const validationMessage = getCardPlayValidationMessage({
+      isMyTurn: this.isMyTurn(),
+      isCombo: selection.kind !== "single-card",
+      playable: selection.playable,
+      comboEligible: selection.comboEligible,
+    });
+
+    if (validationMessage) {
+      this.showActionValidationError(validationMessage);
       return;
     }
 
-    const cardIds = this.#selectedCardPlay.cardIds;
+    if (selection.kind === "single-card") {
+      playCard(selection.cardId);
+      return;
+    }
+
+    const cardIds = selection.cardIds;
     this.#myHand.clearKindComboSelection();
     this.#drawPile?.disableInteractive(true);
     playCombo(cardIds);
@@ -915,14 +939,30 @@ export class GameRoom extends Scene implements GameRoomHandlers {
   };
 
   private updateComboPlayInteractivity() {
-    const canPlaySelectedCards = this.isMyTurn() && this.#selectedCardPlay;
+    const hasSelectedCards = Boolean(this.#selectedCardPlay);
+    const canPlaySelectedCards =
+      hasSelectedCards &&
+      this.#selectedCardPlay !== null &&
+      getCardPlayValidationMessage({
+        isMyTurn: this.isMyTurn(),
+        isCombo: this.#selectedCardPlay.kind !== "single-card",
+        playable: this.#selectedCardPlay.playable,
+        comboEligible: this.#selectedCardPlay.comboEligible,
+      }) === null;
 
-    if (canPlaySelectedCards) {
+    if (hasSelectedCards) {
       if (this.#discardPile) {
-        this.#discardPile.setInteractive({ useHandCursor: true });
+        this.#discardPile.setInteractive({
+          useHandCursor: canPlaySelectedCards,
+        });
         this.#discardPileZone?.disableInteractive(true);
       } else {
         this.#discardPileZone?.setInteractive();
+        if (this.#discardPileZone?.input) {
+          this.#discardPileZone.input.cursor = canPlaySelectedCards
+            ? "pointer"
+            : "default";
+        }
       }
       return;
     }
@@ -930,6 +970,10 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#discardPile?.disableInteractive(true);
     this.#discardPileZone?.disableInteractive(true);
   }
+
+  private showActionValidationError = (message: string) => {
+    this.#notification.showTransientMessage(message);
+  };
 
   private startNopeWindow = (
     lastPlayerId: string,
@@ -1389,9 +1433,15 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     this.#drawPile?.disableInteractive(true);
   };
 
-  onComboPlayError = (payload: SocketErrorPayload): void => {
-    this.#myHand.clearKindComboSelection();
-    this.updateDrawPileInteractivity();
+  onGameError = (
+    event: GameRoomErrorEvent,
+    payload: SocketErrorPayload,
+  ): void => {
+    if (event === ServerErrorEvents.PLAY_COMBO_ERROR) {
+      this.#myHand.clearKindComboSelection();
+      this.updateDrawPileInteractivity();
+    }
+
     this.#notification.showTransientMessage(payload.message);
   };
 
