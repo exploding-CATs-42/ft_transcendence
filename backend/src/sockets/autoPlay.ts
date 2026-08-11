@@ -20,7 +20,7 @@ export const attachAutoPlay = (game: Game) => {
   });
 };
 
-export const startAutoPlay = (gameId: GameId, playerId: UserId) => {
+const startAutoPlay = (gameId: GameId, playerId: UserId) => {
   if (isUserOnline(playerId)) return;
 
   cancelAutoPlay(playerId);

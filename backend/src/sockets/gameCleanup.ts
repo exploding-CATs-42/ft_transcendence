@@ -19,7 +19,7 @@ export const attachGameCleanup = (game: Game) => {
   }
 };
 
-export const scheduleGameCleanup = (gameId: GameId) => {
+const scheduleGameCleanup = (gameId: GameId) => {
   cancelGameCleanup(gameId);
 
   timers.set(
@@ -28,7 +28,7 @@ export const scheduleGameCleanup = (gameId: GameId) => {
   );
 };
 
-export const cancelGameCleanup = (gameId: GameId) => {
+const cancelGameCleanup = (gameId: GameId) => {
   const timer = timers.get(gameId);
 
   if (!timer) return;

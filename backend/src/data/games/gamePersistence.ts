@@ -28,7 +28,7 @@ export function initGamePersistence() {
   initialized = true;
 }
 
-export async function ensurePersistenceDir() {
+async function ensurePersistenceDir() {
   const dir = path.dirname(FILE_PATH);
 
   await fs.mkdir(dir, { recursive: true });
@@ -60,7 +60,7 @@ export async function loadGames(): Promise<PersistedGame[]> {
   return persistedGames;
 }
 
-export async function saveGames(): Promise<void> {
+async function saveGames(): Promise<void> {
   const games = GameStore.getAllGames();
 
   try {
@@ -78,7 +78,7 @@ export async function saveGames(): Promise<void> {
   }
 }
 
-export function createSaveLoop() {
+function createSaveLoop() {
   let timeout: ReturnType<typeof setTimeout>;
   let stopped = false;
 
@@ -101,12 +101,12 @@ export function createSaveLoop() {
   };
 }
 
-export function setupSignalHandlers(handler: () => void): void {
+function setupSignalHandlers(handler: () => void): void {
   process.on("SIGINT", handler);
   process.on("SIGTERM", handler);
 }
 
-export async function shutdown(stop: () => void) {
+async function shutdown(stop: () => void) {
   console.log("Shutdown detected");
 
   stop();

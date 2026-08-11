@@ -16,7 +16,7 @@ export const toWaitingPlayerView = (p: Player): WaitingPlayerView => ({
   isConnected: isUserOnline(p.id),
 });
 
-export const toGamePlayerView = (p: Player): GamePlayerView => ({
+const toGamePlayerView = (p: Player): GamePlayerView => ({
   id: p.id,
   name: p.name,
   avatarUrl: p.avatarUrl,

@@ -7,7 +7,6 @@ import { CardType, PendingActionType } from "./types";
 
 export const GameGuards = {
   HAS_ENOUGH_PLAYERS: "hasEnoughPlayers",
-  HAS_ENOUGH_CARDS: "hasEnoughCards",
   HAS_CARD_OF_TYPE: "hasCardOfType",
   IS_ENOUGH_CARDS_IN_DECK: "isEnoughCardsInDeck",
   HAS_EXTRA_TURNS: "hasExtraTurns",
@@ -38,14 +37,6 @@ export const hasEnoughPlayers = ({ context }: GameGuardArgs) => {
 
 export const isEnoughCardsInDeck = ({ context }: GameGuardArgs) => {
   return context.deck.length >= 1;
-};
-
-export const hasEnoughCards = ({ context }: GameGuardArgs): boolean => {
-  const player = context.players.find(
-    (p) => p.id === context.currentTurnPlayerId,
-  );
-
-  return (player?.hand.length ?? 0) > 0;
 };
 
 export const hasCardOfType = (
