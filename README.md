@@ -98,6 +98,8 @@ First, create the three `.env` files from their templates:
 cp infra/env/.env.example infra/env/.env
 cp backend/.env.example   backend/.env
 cp frontend/.env.example  frontend/.env
+cp infra/secrets/telegram_chat_id.example  infra/secrets/telegram_chat_id
+cp infra/secrets/telegram_bot_token.example  infra/secrets/telegram_bot_token
 ```
 
 Fill in the values (see [Configuration](#configuration) below), then bring the whole stack up
