@@ -39,8 +39,6 @@ export const ServerPublicEvents = {
   PLAYER_DEFUSED: "PLAYER_DEFUSED",
   PLAYER_ELIMINATED: "PLAYER_ELIMINATED",
   KITTEN_INSERTED: "KITTEN_INSERTED",
-  FAVOR_REQUESTED: "FAVOR_REQUESTED",
-  FAVOR_RESOLVED: "FAVOR_RESOLVED",
   DECK_SHUFFLED: "DECK_SHUFFLED",
   TURN_SKIPPED: "TURN_SKIPPED",
   GAME_OVER: "GAME_OVER",
@@ -58,7 +56,6 @@ export const ServerPublicEvents = {
 export const ServerPrivateEvents = {
   LEFT_GAME: "left-game",
   WAITING_STATE: "waiting-state",
-  YOUR_HAND: "YOUR_HAND",
   GAME_STATE: "game-state",
   CARD_RECEIVED: "card-received",
   GAME_STARTED: "game-started",
@@ -66,8 +63,6 @@ export const ServerPrivateEvents = {
   FRIEND_ONLINE_STATUS_CHANGED: "friend-online-status-changed",
   SEE_THE_FUTURE_PEEK: "SEE_THE_FUTURE_PEEK",
   DEFUSE_PROMPT: "DEFUSE_PROMPT",
-  INSERT_KITTEN_PROMPT: "INSERT_KITTEN_PROMPT",
-  FAVOR_MUST_GIVE: "FAVOR_MUST_GIVE",
 } as const;
 
 export const ServerErrorEvents = {
