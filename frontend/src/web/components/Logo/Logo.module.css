@@ -3,4 +3,8 @@
     drop-shadow(-1px -1px 0 var(--off-white));
   filter: drop-shadow(1px 1px 0 var(--off-white))
     drop-shadow(-1px -1px 0 var(--off-white));
+
+  min-width: 51px;
+  min-height: 51px;
+  margin-right: 30px;
 }

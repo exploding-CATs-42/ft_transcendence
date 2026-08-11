@@ -37,6 +37,12 @@
   border: 1px solid var(--light);
   box-shadow: 0px 4px 4px 0px var(--shadow);
   background-color: var(--exploding-kittens);
+
+  width: fit-content;
+  max-width: 100%;
+  min-width: 0;
+
+  margin-left: 30px;
 }
 
 .avatar {
@@ -113,13 +119,6 @@
 
   .avatar {
     flex: 0 0 auto;
-  }
-
-  .username {
-    min-width: 0;
-    flex: auto;
-    overflow: visible;
-    text-overflow: unset;
   }
 }
 
