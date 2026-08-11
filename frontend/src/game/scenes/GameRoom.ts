@@ -508,7 +508,7 @@ export class GameRoom extends Scene implements GameRoomHandlers {
       return;
     }
 
-    this.#drawPile?.setInteractive({ useHandCursor: this.isMyTurn() });
+    this.#drawPile?.setInteractive({ useHandCursor: true });
   }
 
   private createDrawPile() {
