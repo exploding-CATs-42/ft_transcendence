@@ -127,14 +127,6 @@ info:
     the callback only; without one it arrives as the `*-error` event. The ack
     variant also omits the `errors` details, carrying just `code` and `message`.
 
-
-    ### Reserved event names
-
-    Five constants exist in `events.ts` but are never emitted by the server and have
-    no channel here: `FAVOR_REQUESTED`, `FAVOR_RESOLVED`, `YOUR_HAND`,
-    `INSERT_KITTEN_PROMPT` and `FAVOR_MUST_GIVE`. Favor is implemented through
-    `select-player` / `give-card` and the `WAITING_FOR_*` events instead.
-
   tags:
     - name: Connection
       description: Connection lifecycle, authentication, state recovery and presence.
