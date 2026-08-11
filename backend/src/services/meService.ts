@@ -148,6 +148,14 @@ export async function updateMeAvatar(
     throw new ApiError("Invalid file", 400);
   }
 
+  if (user.avatarPublicId) {
+    try {
+      await cloudinary.removeImage(user.avatarPublicId);
+    } catch {
+      console.error("Impossible to remove old user avatar");
+    }
+  }
+
   const result = await cloudinary.uploadImage(file);
 
   const updatedUser = await prisma.user.update({
