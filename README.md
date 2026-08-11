@@ -1252,8 +1252,8 @@ defined once in `@exploding-cats/contracts` and shared by both sides.
 | Category | Count | Examples |
 | --- | --- | --- |
 | Client → server | 16 | `join-game`, `reconnect-game`, `draw-card`, `play-card`, `play-combo`, `play-nope`, `play-defuse`, `insert-kitten`, `select-player`, `choose-card-type` |
-| Server broadcast | 35 | `player-joined`, `TURN_CHANGED`, `card-played`, `NOPE_PLAYED`, `EXPLODING_KITTEN_DRAWN`, `PLAYER_ELIMINATED`, `GAME_OVER` |
-| Server private | 12 | `YOUR_HAND`, `game-state`, `SEE_THE_FUTURE_PEEK`, `DEFUSE_PROMPT`, `card-received` |
+| Server broadcast | 33 | `player-joined`, `TURN_CHANGED`, `card-played`, `NOPE_PLAYED`, `EXPLODING_KITTEN_DRAWN`, `PLAYER_ELIMINATED`, `GAME_OVER` |
+| Server private | 9 | `game-state`, `SEE_THE_FUTURE_PEEK`, `DEFUSE_PROMPT`, `card-received`, `friend-online-status-changed` |
 | Errors | 16 | `join-game-error`, `draw-card-error`, `play-combo-error` |
 
 Errors carry typed codes — `RECONNECT_REQUIRED`, `GAME_IN_PROGRESS`, `GAME_NOT_FOUND`,
