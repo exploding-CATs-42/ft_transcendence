@@ -6,6 +6,7 @@ import { ZodSchema } from "zod";
 import { SocketAckPayload, SocketErrorCodes } from "@exploding-cats/contracts";
 import { AuthenticatedRequest } from "types";
 import { SocketError, ValidationError } from "errors";
+import { gameOperationTotal } from "../metrics/gameOperationMetrics";
 // Local level
 import { validate } from "./validate";
 
@@ -28,6 +29,19 @@ export type SocketHandler<T> = (parsed: T) => Promise<void>;
 
 export type SocketAck = (response: SocketAckPayload) => void;
 
+type GameOperationStatus = "success" | "rejected" | "server_error";
+
+function getGameOperation(errorEvent: string): string {
+  return errorEvent.replace(/-error$/, "");
+}
+
+function recordGameOperation(errorEvent: string, status: GameOperationStatus) {
+  gameOperationTotal.inc({
+    operation: getGameOperation(errorEvent),
+    status,
+  });
+}
+
 export function withErrorHandler<T>(
   schema: ZodSchema<T>,
   socket: Socket,
@@ -44,9 +58,18 @@ export function withErrorHandler<T>(
 
       await event(parsed);
 
+      recordGameOperation(errorEvent, "success");
+
       reply?.({ ok: true });
     } catch (error) {
       console.error("Socket error: ", error);
+
+      const status =
+        error instanceof SocketError || error instanceof ValidationError
+          ? "rejected"
+          : "server_error";
+
+      recordGameOperation(errorEvent, status);
 
       const code =
         error instanceof SocketError ? error.code : SocketErrorCodes.UNKNOWN;
