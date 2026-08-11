@@ -2,6 +2,7 @@ import type { CardConfig, Point, SpacingConfig } from "game/@types";
 import { SCREEN_HEIGHT } from "game/constants";
 import {
   addCardVisual,
+  getCardPlayValidationMessage,
   getCardSpacing,
   getHandStartX,
   getSelectedCardOutlineColor,
@@ -47,6 +48,8 @@ export interface SingleCardSelection {
   kind: "single-card";
   cardId: number;
   cardType: CardType;
+  playable: boolean;
+  comboEligible: boolean;
 }
 
 export interface KindComboSelection {
@@ -54,16 +57,20 @@ export interface KindComboSelection {
   label: "two of a kind" | "three of a kind";
   cardIds: number[];
   cardType: CardType;
+  playable: boolean;
+  comboEligible: boolean;
 }
 
 export type CardPlaySelection = SingleCardSelection | KindComboSelection;
 
 type OnKindComboSelectionChange = (selection: CardPlaySelection | null) => void;
 type OnKindComboPlay = () => void;
+type OnActionBlocked = (message: string) => void;
 
 interface GraphicHandOptions {
   onKindComboSelectionChange?: OnKindComboSelectionChange;
   onKindComboPlay?: OnKindComboPlay;
+  onActionBlocked?: OnActionBlocked;
 }
 
 export class GraphicHand {
@@ -80,6 +87,7 @@ export class GraphicHand {
   #onCardDropCallback: onCardDropCallback;
   #onKindComboSelectionChange: OnKindComboSelectionChange | null;
   #onKindComboPlay: OnKindComboPlay | null;
+  #onActionBlocked: OnActionBlocked | null;
   #isMyTurn: () => boolean;
   #isFavorModeActive: () => boolean;
   #giveCard: (cardId: number) => void;
@@ -100,6 +108,7 @@ export class GraphicHand {
     this.#onKindComboSelectionChange =
       options.onKindComboSelectionChange ?? null;
     this.#onKindComboPlay = options.onKindComboPlay ?? null;
+    this.#onActionBlocked = options.onActionBlocked ?? null;
     this.#isMyTurn = isMyTurn;
     this.#isFavorModeActive = isFavorModeActive;
     this.#giveCard = giveCard;
@@ -324,9 +333,22 @@ export class GraphicHand {
   }
 
   private playCard(cardId: number) {
-    if (this.#isMyTurn()) {
-      playCard(cardId);
+    const card = this.#cardsData.get(cardId)?.data;
+    if (!card) return;
+
+    const validationMessage = getCardPlayValidationMessage({
+      isMyTurn: this.#isMyTurn(),
+      isCombo: false,
+      playable: card.playable,
+      comboEligible: card.comboEligible,
+    });
+
+    if (validationMessage) {
+      this.#onActionBlocked?.(validationMessage);
+      return;
     }
+
+    playCard(cardId);
   }
 
   private attachCardSelectionHandler(graphicCard: GraphicCard) {
@@ -408,6 +430,8 @@ export class GraphicHand {
       label,
       cardIds: selectedCards.map((card) => card.data.id),
       cardType: selectedCard.data.type,
+      playable: selectedCard.data.playable,
+      comboEligible: selectedCard.data.comboEligible,
     };
   }
 
@@ -421,6 +445,8 @@ export class GraphicHand {
         kind: "single-card",
         cardId: selectedCard.data.id,
         cardType: selectedCard.data.type,
+        playable: selectedCard.data.playable,
+        comboEligible: selectedCard.data.comboEligible,
       };
     }
 

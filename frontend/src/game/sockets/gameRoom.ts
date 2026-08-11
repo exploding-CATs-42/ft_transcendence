@@ -1,6 +1,5 @@
 import {
   ClientEvents,
-  ServerErrorEvents,
   ServerPrivateEvents,
   ServerPublicEvents,
   type CardGivenPayload,
@@ -34,6 +33,7 @@ import type {
 } from "@exploding-cats/game-core";
 import { socket } from "socket";
 import { emit, leaveGame } from "./gameSession";
+import { GAME_ROOM_ERROR_EVENTS, type GameRoomErrorEvent } from "./errorEvents";
 
 export interface GameRoomHandlers {
   onCardReceived(card: CardReceivedPayload): void;
@@ -50,7 +50,7 @@ export interface GameRoomHandlers {
   onDeckShuffled(): void;
   onTurnSkipped(payload: TurnSkippedPayload): void;
   onComboPlayed(payload: ComboPlayedPayload): void;
-  onComboPlayError(payload: SocketErrorPayload): void;
+  onGameError(event: GameRoomErrorEvent, payload: SocketErrorPayload): void;
   onSeeTheFuturePeek(payload: SeeTheFuturePeekPayload): void;
   onKittenDrawn(payload: ExplodingKittenDrawnPayload): void;
   onKittenInserted(payload: KittenInsertedPayload): void;
@@ -165,7 +165,6 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.DECK_SHUFFLED, handlers.onDeckShuffled],
     [ServerPublicEvents.TURN_SKIPPED, handlers.onTurnSkipped],
     [ServerPublicEvents.COMBO_PLAYED, handlers.onComboPlayed],
-    [ServerErrorEvents.PLAY_COMBO_ERROR, handlers.onComboPlayError],
     [ServerPrivateEvents.SEE_THE_FUTURE_PEEK, handlers.onSeeTheFuturePeek],
     [ServerPublicEvents.GAME_OVER, handlers.onGameOver],
     [ServerPublicEvents.NOPE_PLAYED, handlers.onNopePlayed],
@@ -201,12 +200,25 @@ export function attachGameRoomSockets(
     [ServerPublicEvents.CARD_STOLEN, handlers.onCardStolen],
   ] as const;
 
+  const errorSubscriptions = GAME_ROOM_ERROR_EVENTS.map((event) => {
+    const handler = (payload: SocketErrorPayload) =>
+      handlers.onGameError(event, payload);
+
+    return [event, handler] as const;
+  });
+
   subscriptions.forEach(([event, handler]) => {
+    socket.on(event, handler);
+  });
+  errorSubscriptions.forEach(([event, handler]) => {
     socket.on(event, handler);
   });
 
   return () => {
     subscriptions.forEach(([event, handler]) => {
+      socket.off(event, handler);
+    });
+    errorSubscriptions.forEach(([event, handler]) => {
       socket.off(event, handler);
     });
   };
