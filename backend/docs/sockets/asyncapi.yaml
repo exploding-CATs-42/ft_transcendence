@@ -203,18 +203,18 @@ channels:
     $ref: "./gameplay/gameplay.yaml#/channels/playNope"
   playCombo:
     $ref: "./gameplay/gameplay.yaml#/channels/playCombo"
-  selectComboTarget:
-    $ref: "./gameplay/gameplay.yaml#/channels/selectComboTarget"
-  resolveCombo:
-    $ref: "./gameplay/gameplay.yaml#/channels/resolveCombo"
   playDefuse:
     $ref: "./gameplay/gameplay.yaml#/channels/playDefuse"
   insertKitten:
     $ref: "./gameplay/gameplay.yaml#/channels/insertKitten"
   selectPlayer:
     $ref: "./gameplay/gameplay.yaml#/channels/selectPlayer"
-  giveCard:
-    $ref: "./gameplay/gameplay.yaml#/channels/giveCard"
+  chooseCardId:
+    $ref: "./gameplay/gameplay.yaml#/channels/chooseCardId"
+  chooseCardIndex:
+    $ref: "./gameplay/gameplay.yaml#/channels/chooseCardIndex"
+  chooseCardType:
+    $ref: "./gameplay/gameplay.yaml#/channels/chooseCardType"
   seenTheFuture:
     $ref: "./gameplay/gameplay.yaml#/channels/seenTheFuture"
 
@@ -227,8 +227,6 @@ channels:
     $ref: "./gameplay/gameplay.yaml#/channels/seeTheFuturePeek"
   defusePrompt:
     $ref: "./gameplay/gameplay.yaml#/channels/defusePrompt"
-  comboSelectionRequested:
-    $ref: "./gameplay/gameplay.yaml#/channels/comboSelectionRequested"
 
   # --- Gameplay: server -> client (public) ---
   cardDrawn:
@@ -241,12 +239,10 @@ channels:
     $ref: "./gameplay/gameplay.yaml#/channels/nopeWindowResolved"
   comboPlayed:
     $ref: "./gameplay/gameplay.yaml#/channels/comboPlayed"
-  comboTargetSelected:
-    $ref: "./gameplay/gameplay.yaml#/channels/comboTargetSelected"
-  comboTargetCleared:
-    $ref: "./gameplay/gameplay.yaml#/channels/comboTargetCleared"
-  comboResolved:
-    $ref: "./gameplay/gameplay.yaml#/channels/comboResolved"
+  cardStolen:
+    $ref: "./gameplay/gameplay.yaml#/channels/cardStolen"
+  noCardOfRequestedType:
+    $ref: "./gameplay/gameplay.yaml#/channels/noCardOfRequestedType"
   cardGiven:
     $ref: "./gameplay/gameplay.yaml#/channels/cardGiven"
   turnChanged:
@@ -273,6 +269,10 @@ channels:
     $ref: "./gameplay/gameplay.yaml#/channels/waitingForPlayerSelection"
   waitingForFavorCardSelection:
     $ref: "./gameplay/gameplay.yaml#/channels/waitingForFavorCardSelection"
+  waitingForRandomCardSelection:
+    $ref: "./gameplay/gameplay.yaml#/channels/waitingForRandomCardSelection"
+  waitingForCardTypeSelection:
+    $ref: "./gameplay/gameplay.yaml#/channels/waitingForCardTypeSelection"
   gameOver:
     $ref: "./gameplay/gameplay.yaml#/channels/gameOver"
 
@@ -295,18 +295,20 @@ channels:
     $ref: "./errors/errors.yaml#/channels/playNopeError"
   playComboError:
     $ref: "./errors/errors.yaml#/channels/playComboError"
-  resolveComboError:
-    $ref: "./errors/errors.yaml#/channels/resolveComboError"
   playDefuseError:
     $ref: "./errors/errors.yaml#/channels/playDefuseError"
   insertKittenError:
     $ref: "./errors/errors.yaml#/channels/insertKittenError"
   selectPlayerError:
     $ref: "./errors/errors.yaml#/channels/selectPlayerError"
-  giveCardError:
-    $ref: "./errors/errors.yaml#/channels/giveCardError"
   seenTheFutureError:
     $ref: "./errors/errors.yaml#/channels/seenTheFutureError"
+  chooseCardIdError:
+    $ref: "./errors/errors.yaml#/channels/chooseCardIdError"
+  chooseCardIndexError:
+    $ref: "./errors/errors.yaml#/channels/chooseCardIndexError"
+  chooseCardTypeError:
+    $ref: "./errors/errors.yaml#/channels/chooseCardTypeError"
 
 operations:
   # --- Connection ---
@@ -364,18 +366,18 @@ operations:
     $ref: "./gameplay/gameplay.yaml#/operations/onPlayNope"
   onPlayCombo:
     $ref: "./gameplay/gameplay.yaml#/operations/onPlayCombo"
-  onSelectComboTarget:
-    $ref: "./gameplay/gameplay.yaml#/operations/onSelectComboTarget"
-  onResolveCombo:
-    $ref: "./gameplay/gameplay.yaml#/operations/onResolveCombo"
   onPlayDefuse:
     $ref: "./gameplay/gameplay.yaml#/operations/onPlayDefuse"
   onInsertKitten:
     $ref: "./gameplay/gameplay.yaml#/operations/onInsertKitten"
   onSelectPlayer:
     $ref: "./gameplay/gameplay.yaml#/operations/onSelectPlayer"
-  onGiveCard:
-    $ref: "./gameplay/gameplay.yaml#/operations/onGiveCard"
+  onChooseCardId:
+    $ref: "./gameplay/gameplay.yaml#/operations/onChooseCardId"
+  onChooseCardIndex:
+    $ref: "./gameplay/gameplay.yaml#/operations/onChooseCardIndex"
+  onChooseCardType:
+    $ref: "./gameplay/gameplay.yaml#/operations/onChooseCardType"
   onSeenTheFuture:
     $ref: "./gameplay/gameplay.yaml#/operations/onSeenTheFuture"
 
@@ -388,8 +390,6 @@ operations:
     $ref: "./gameplay/gameplay.yaml#/operations/sendSeeTheFuturePeek"
   sendDefusePrompt:
     $ref: "./gameplay/gameplay.yaml#/operations/sendDefusePrompt"
-  sendComboSelectionRequested:
-    $ref: "./gameplay/gameplay.yaml#/operations/sendComboSelectionRequested"
   sendCardDrawn:
     $ref: "./gameplay/gameplay.yaml#/operations/sendCardDrawn"
   sendCardPlayed:
@@ -400,12 +400,10 @@ operations:
     $ref: "./gameplay/gameplay.yaml#/operations/sendNopeWindowResolved"
   sendComboPlayed:
     $ref: "./gameplay/gameplay.yaml#/operations/sendComboPlayed"
-  sendComboTargetSelected:
-    $ref: "./gameplay/gameplay.yaml#/operations/sendComboTargetSelected"
-  sendComboTargetCleared:
-    $ref: "./gameplay/gameplay.yaml#/operations/sendComboTargetCleared"
-  sendComboResolved:
-    $ref: "./gameplay/gameplay.yaml#/operations/sendComboResolved"
+  sendCardStolen:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendCardStolen"
+  sendNoCardOfRequestedType:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendNoCardOfRequestedType"
   sendCardGiven:
     $ref: "./gameplay/gameplay.yaml#/operations/sendCardGiven"
   sendTurnChanged:
@@ -432,6 +430,10 @@ operations:
     $ref: "./gameplay/gameplay.yaml#/operations/sendWaitingForPlayerSelection"
   sendWaitingForFavorCardSelection:
     $ref: "./gameplay/gameplay.yaml#/operations/sendWaitingForFavorCardSelection"
+  sendWaitingForRandomCardSelection:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendWaitingForRandomCardSelection"
+  sendWaitingForCardTypeSelection:
+    $ref: "./gameplay/gameplay.yaml#/operations/sendWaitingForCardTypeSelection"
   sendGameOver:
     $ref: "./gameplay/gameplay.yaml#/operations/sendGameOver"
 
@@ -454,18 +456,20 @@ operations:
     $ref: "./errors/errors.yaml#/operations/sendPlayNopeError"
   sendPlayComboError:
     $ref: "./errors/errors.yaml#/operations/sendPlayComboError"
-  sendResolveComboError:
-    $ref: "./errors/errors.yaml#/operations/sendResolveComboError"
   sendPlayDefuseError:
     $ref: "./errors/errors.yaml#/operations/sendPlayDefuseError"
   sendInsertKittenError:
     $ref: "./errors/errors.yaml#/operations/sendInsertKittenError"
   sendSelectPlayerError:
     $ref: "./errors/errors.yaml#/operations/sendSelectPlayerError"
-  sendGiveCardError:
-    $ref: "./errors/errors.yaml#/operations/sendGiveCardError"
   sendSeenTheFutureError:
     $ref: "./errors/errors.yaml#/operations/sendSeenTheFutureError"
+  sendChooseCardIdError:
+    $ref: "./errors/errors.yaml#/operations/sendChooseCardIdError"
+  sendChooseCardIndexError:
+    $ref: "./errors/errors.yaml#/operations/sendChooseCardIndexError"
+  sendChooseCardTypeError:
+    $ref: "./errors/errors.yaml#/operations/sendChooseCardTypeError"
 
 components:
   schemas:
@@ -520,16 +524,16 @@ components:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/PlayCardPayload"
     PlayComboPayload:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/PlayComboPayload"
-    SelectComboTargetPayload:
-      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/SelectComboTargetPayload"
-    ResolveComboPayload:
-      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ResolveComboPayload"
     InsertKittenPayload:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/InsertKittenPayload"
     SelectPlayerPayload:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/SelectPlayerPayload"
-    GiveCardPayload:
-      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/GiveCardPayload"
+    ChooseCardIdPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ChooseCardIdPayload"
+    ChooseCardIndexPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ChooseCardIndexPayload"
+    ChooseCardTypePayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ChooseCardTypePayload"
     CardPayload:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardPayload"
     CardRemovalReason:
@@ -542,12 +546,12 @@ components:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/NopePlayedPayload"
     ComboPlayedPayload:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboPlayedPayload"
-    ComboTargetSelectedPayload:
-      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboTargetSelectedPayload"
-    ComboResolvedPayload:
-      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboResolvedPayload"
-    ComboSelectionRequestedPayload:
-      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/ComboSelectionRequestedPayload"
+    TargetPlayerIdPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/TargetPlayerIdPayload"
+    CardStolenPayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardStolenPayload"
+    NoCardOfRequestedTypePayload:
+      $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/NoCardOfRequestedTypePayload"
     CardGivenPayload:
       $ref: "./gameplay/gameplay.schemas.yaml#/components/schemas/CardGivenPayload"
     TurnChangedPayload:

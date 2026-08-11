@@ -40,46 +40,6 @@ components:
             type: integer
             minimum: 0
 
-    SelectComboTargetPayload:
-      type: object
-      required:
-        - gameId
-        - targetPlayerId
-      properties:
-        gameId:
-          type: string
-          format: uuid
-        targetPlayerId:
-          type: string
-          format: uuid
-          description: The player the combo is aimed at.
-
-    ResolveComboPayload:
-      type: object
-      description: >
-        Used for three different steps, distinguished by which optional field is
-        present: declaring a two-card combo (`targetPlayerId` only), resolving it by
-        picking a blind card position (`cardIndex`), or resolving a three-card combo
-        by naming a card type (`requestedCardType`).
-      required:
-        - gameId
-        - targetPlayerId
-      properties:
-        gameId:
-          type: string
-          format: uuid
-        targetPlayerId:
-          type: string
-          format: uuid
-        cardIndex:
-          type: integer
-          minimum: 0
-          description: Blind position in the target's hand, for a two-card combo.
-        requestedCardType:
-          description: The named card type, for a three-card combo.
-          allOf:
-            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
-
     InsertKittenPayload:
       type: object
       required:
@@ -110,27 +70,52 @@ components:
           format: uuid
           description: The player chosen as the target of the pending action.
 
-    GiveCardPayload:
+    ChooseCardIdPayload:
       type: object
+      description: >
+        Names a specific card by id. Sent by the player satisfying a Favor, and by
+        the actor resolving a three-card combo once the target type is known.
       required:
         - gameId
-        - playerIdFrom
-        - playerIdTo
         - cardId
       properties:
         gameId:
-          type: string
-          format: uuid
-        playerIdFrom:
-          type: string
-          format: uuid
-        playerIdTo:
           type: string
           format: uuid
         cardId:
           type: integer
           minimum: 0
           maximum: 55
+
+    ChooseCardIndexPayload:
+      type: object
+      description: >
+        Picks a card by blind position in the target's hand, for a two-card combo.
+        The chooser never learns what the card is before picking.
+      required:
+        - gameId
+        - cardIndex
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        cardIndex:
+          type: integer
+          minimum: 0
+          maximum: 55
+
+    ChooseCardTypePayload:
+      type: object
+      description: Names the card type demanded by a three-card combo.
+      required:
+        - gameId
+        - cardType
+      properties:
+        gameId:
+          type: string
+          format: uuid
+        cardType:
+          $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
 
     # --- Server -> Client payloads ---
     CardPayload:
@@ -226,88 +211,58 @@ components:
           type: integer
           format: int64
 
-    ComboTargetSelectedPayload:
+    TargetPlayerIdPayload:
       type: object
+      description: >
+        Names the player everyone is waiting on. Used by the `WAITING_FOR_*`
+        selection prompts that identify a target rather than the actor.
       required:
-        - playerId
         - targetPlayerId
       properties:
-        playerId:
-          type: string
-          format: uuid
         targetPlayerId:
           type: string
           format: uuid
 
-    ComboResolvedPayload:
+    CardStolenPayload:
       type: object
       description: >
-        Outcome of a combo. For a three-card combo the payload is not identical for
-        everyone: the actor and the target receive `requestedCardType`, while all
-        other players receive a redacted copy without it, so bystanders never learn
-        which card was named.
-      required:
-        - playerId
-        - targetPlayerId
-        - comboSize
-        - cardStolen
-      properties:
-        playerId:
-          type: string
-          format: uuid
-        targetPlayerId:
-          type: string
-          format: uuid
-        comboSize:
-          $ref: "../common/common.schemas.yaml#/components/schemas/ComboSize"
-        requestedCardType:
-          description: >
-            Present only for three-card combos, and only in the copies sent to the
-            actor and the target.
-          allOf:
-            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
-        cardStolen:
-          type: boolean
-          description: False when the target held nothing to take.
+        A card changed hands via a cat-card combo. Names both players but never the
+        card id; the two players involved learn that through `card-removed` and
+        `card-received`.
 
-    ComboSelectionRequestedPayload:
-      type: object
-      description: >
-        Prompts the acting player to choose a combo target, and for a three-card
-        combo a card type. Despite being a public-events constant, it is sent to one
-        socket only.
+
+        `cardType` is present only for a three-card combo, where the demanded type
+        was already public. A two-card combo takes a blind card, so revealing its
+        type would leak information the thief is not entitled to.
       required:
-        - playerId
-        - comboSize
-        - targets
+        - playerIdFrom
+        - playerIdTo
       properties:
-        playerId:
+        playerIdFrom:
           type: string
           format: uuid
-        comboSize:
-          $ref: "../common/common.schemas.yaml#/components/schemas/ComboSize"
-        targets:
-          type: array
-          description: Selectable opponents and how many cards each holds.
-          items:
-            type: object
-            required:
-              - playerId
-              - handSize
-            properties:
-              playerId:
-                type: string
-                format: uuid
-              handSize:
-                type: integer
-                minimum: 0
+        playerIdTo:
+          type: string
+          format: uuid
+        cardType:
+          description: Present for three-card combos only.
+          allOf:
+            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
+
+    NoCardOfRequestedTypePayload:
+      type: object
+      description: >
+        A three-card combo named a type the target does not hold, so nothing is
+        taken. The turn continues.
+      required:
+        - cardType
+        - targetPlayerId
+      properties:
+        cardType:
+          $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
         targetPlayerId:
           type: string
           format: uuid
-          description: Already-chosen target, when re-prompting.
-        requestedCardType:
-          allOf:
-            - $ref: "../common/common.schemas.yaml#/components/schemas/CardType"
 
     CardGivenPayload:
       type: object
