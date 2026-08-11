@@ -1,3 +1,4 @@
+import clsx from "clsx";
 // Project level
 import { Avatar, Button, Icon, Section } from "components";
 // Local level
@@ -25,7 +26,7 @@ const UserSection = ({ user, updateUser, isMyProfile }: Props) => {
   }
 
   return (
-    <Section className={s.section}>
+    <Section className={clsx(s.section, { [s.readOnly]: !isMyProfile })}>
       <Avatar
         className={s.avatar}
         variant="profile"
