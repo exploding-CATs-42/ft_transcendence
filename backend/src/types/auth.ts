@@ -1,11 +1,6 @@
 import { PublicUser, User } from "@exploding-cats/contracts";
 import { Request } from "express";
 
-export interface AuthResponse {
-  user: User;
-  accessToken: string;
-}
-
 export interface RegisterResponse {
   user: PublicUser;
 }
@@ -23,18 +18,6 @@ export interface AuthSessionResponse {
 export interface RefreshSessionResponse {
   accessToken: string;
   refreshToken: string;
-}
-
-export interface ApiErrorResponse {
-  message: string;
-}
-
-export interface ValidationErrorResponse {
-  message: string;
-  errors: {
-    formErrors: string[];
-    fieldErrors: Record<string, string[]>;
-  };
 }
 
 export interface AccessTokenPayload {

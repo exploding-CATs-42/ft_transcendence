@@ -1,7 +1,6 @@
 import type {
   Card,
   CardType,
-  ComboSize,
   ShowedCardsToPlayerPayload,
   GameStates,
   CardReceivalReason,
@@ -61,22 +60,6 @@ export interface ComboPlayedPayload {
   nopeWindowExpiresAt: number;
 }
 
-export interface ComboSelectionRequestedPayload {
-  playerId: string;
-  comboSize: ComboSize;
-  targets: Array<{ playerId: string; handSize: number }>;
-  targetPlayerId?: string;
-  requestedCardType?: CardType;
-}
-
-export interface ComboResolvedPayload {
-  playerId: string;
-  targetPlayerId: string;
-  comboSize: ComboSize;
-  requestedCardType?: CardType;
-  cardStolen: boolean;
-}
-
 export const CardRemovalReason = {
   PLAYED: "PLAYED",
   STOLEN: "STOLEN",
@@ -121,11 +104,6 @@ export type SeeTheFuturePeekPayload = ShowedCardsToPlayerPayload;
 export interface CardGivenPayload {
   playerIdFrom: string;
   playerIdTo: string;
-}
-
-export interface ComboTargetSelectedPayload {
-  playerId: string;
-  targetPlayerId: string;
 }
 
 export type CardReceivedPayload =
