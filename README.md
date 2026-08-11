@@ -756,11 +756,11 @@ player-status rendering; Oleksandr exposed attack state in the reconnect payload
 
 | Feature | Description | Contributors |
 | --- | --- | --- |
-| Application metrics | Request counts, latency histograms, and per-operation success/failure counters | Oleksandr |
-| Prometheus | 5-second scrape of the backend plus blackbox probes | Oleksandr |
-| Grafana | Provisioned datasource and a Backend Metrics dashboard | Oleksandr |
+| Application metrics | HTTP request counts and latency histograms plus account and Socket.IO game-operation outcomes | Oleksandr |
+| Prometheus | 10-second application scrape, 30-second blackbox probes, and three user-facing alert rules | Oleksandr |
+| Grafana | Provisioned datasource and a nine-panel Health dashboard implementing RED plus edge availability | Oleksandr |
 | Availability probing | HTTP, HTTPS, and TCP probes against nginx, frontend, backend, and Postgres | Oleksandr |
-| Alerting | `ServiceUnavailable` rule routed to Telegram with recovery notifications | Oleksandr |
+| Alerting | Critical availability and operation-failure alerts plus a latency warning, routed to Telegram with recovery notifications | Oleksandr |
 
 ---
 
@@ -871,15 +871,15 @@ through room broadcasts.
 **Why:** A system that cannot be observed cannot be operated.
 
 **How:** The backend exposes Prometheus metrics on a dedicated registry: default Node
-process metrics, a request counter and latency histogram labelled by method, templated
-route, and status code, and a business-operation counter tracking success and failure for
-ten named operations. Prometheus scrapes every 5 seconds. A blackbox exporter probes nginx
-over HTTPS, the frontend, the backend, and Postgres over TCP. Grafana is provisioned as
-code — datasource, dashboard provider, and a Backend Metrics dashboard — and secured with
-admin credentials from the environment. An alerting rule fires when any probe fails for 30
-seconds, routed through Alertmanager to Telegram with recovery notifications. The metrics
-endpoint is deliberately blocked at the nginx edge so it is reachable only from inside the
-Docker network.
+process metrics, an HTTP counter and latency histogram labelled by method, templated route,
+and status code, plus low-cardinality account and Socket.IO game-operation counters.
+Prometheus scrapes application metrics every 10 seconds, while Blackbox Exporter probes the
+real HTTPS user path and internal HTTP/TCP dependencies every 30 seconds. Grafana is
+provisioned as code with a datasource and a nine-panel Health dashboard implementing RED
+(Rate, Errors, Duration) plus edge availability. Three Prometheus rules detect unavailable
+services, repeated user-operation server errors, and high p95 backend latency; Alertmanager
+routes firing and resolved notifications to Telegram. Grafana requires administrator
+credentials, and Nginx blocks the backend metrics endpoint at the public edge.
 
 ### 9. Frontend framework — Minor, 1 pt
 
@@ -1114,9 +1114,10 @@ the app being up, and blocking the metrics endpoint at the edge.
 
 **Monitoring.** Built the entire observability stack alone: the backend metrics module,
 Prometheus configuration and scrape jobs, the blackbox exporter and its probe modules,
-Grafana provisioning and the Backend Metrics dashboard, the availability alerting rule, and
-Alertmanager with Telegram delivery via Docker secrets. Also wrote the monitoring
-operations guide, the most thorough piece of documentation in the repository.
+Grafana provisioning and the Health dashboard, three user-facing alert rules, and
+Alertmanager with Telegram firing and recovery notifications via Docker secrets. Also
+wrote the monitoring operations guide, the most thorough piece of documentation in the
+repository.
 
 **Authentication.** Owns the auth subsystem: the auth service (register, login, refresh,
 logout), the controllers, JWT payload and environment-secret validation, refresh-token

@@ -2,28 +2,30 @@
 
 Local monitoring for `ft_transcendence` provides:
 
-- backend application metrics;
+- backend HTTP, account-operation, and game-operation metrics;
 - a provisioned user-facing health dashboard;
 - external HTTPS and internal availability checks;
 - Prometheus alert rules for availability, user operations, and latency;
 - optional Telegram notifications when an alert fires or resolves.
 
 The setup intentionally stays small for local development. It does not collect
-container CPU or memory metrics and does not probe game or Socket.IO traffic.
+container CPU or memory metrics and does not run a dedicated Socket.IO
+connection probe.
 
 ## Architecture
 
 ```text
-backend /metrics ────────────────┐
-                                 ├─> Prometheus ─> Grafana
-Blackbox availability probes ────┘       │
-                                         └─> alert rules
-                                              │
-                                              v
-                                      Alertmanager (optional)
-                                              │
-                                              v
-                                           Telegram
+HTTP middleware ──┐
+Socket.IO handlers ┴─> backend /metrics ───┐
+                                           ├─> Prometheus ─> Grafana
+Blackbox probes ────────────────────────────┘       │
+                                                   └─> alert rules
+                                                        │
+                                                        v
+                                                Alertmanager (optional)
+                                                        │
+                                                        v
+                                                     Telegram
 ```
 
 Prometheus stores metrics and evaluates alert rules. Grafana reads Prometheus
@@ -34,7 +36,7 @@ active and resolved alerts; it does not perform checks itself.
 
 | Area | Implementation |
 | --- | --- |
-| Application metrics | Backend `GET /metrics` |
+| Application metrics | HTTP RED signals plus account and game operation outcomes at backend `GET /metrics` |
 | Visualization | Provisioned Health Grafana dashboard |
 | Edge availability | Frontend and backend through HTTPS Nginx |
 | Internal diagnostics | Nginx, frontend, backend, and PostgreSQL probes |
@@ -43,7 +45,7 @@ active and resolved alerts; it does not perform checks itself.
 | Notifications | Optional Telegram receiver |
 
 The monitoring scope does not include cAdvisor, postgres-exporter, host resource
-metrics, Socket.IO alerts, or automatic paging.
+metrics, a dedicated Socket.IO connection alert, or automatic remediation.
 
 ## Services
 
@@ -58,6 +60,13 @@ metrics, Socket.IO alerts, or automatic paging.
 An internal target uses the Docker service name and container port. It is not a
 host address. For example, Prometheus reaches Blackbox Exporter at
 `blackbox:9115`, while that port is not published on the developer's machine.
+
+All Compose services, including the one-shot `libraries` dependency installer,
+use the single `transcendence_net` bridge network. A second application network
+would not provide useful isolation while Prometheus and Blackbox Exporter need
+to reach all monitored targets. Public access is controlled with published
+ports and Nginx routes instead: Grafana requires authentication, while backend
+`/metrics` is not exposed through Nginx.
 
 ## Files
 
@@ -191,6 +200,16 @@ Implemented application metrics:
 | `user_operation_total` | Counter | `operation`, `status` | Auth, profile, and friend operation results |
 | `game_operation_total` | Counter | `operation`, `status` | Socket.IO game operation results |
 
+Operation counters use three outcome values:
+
+- `success`: the requested operation completed;
+- `rejected`: an expected validation, authentication, authorization, or
+  game-rule rejection;
+- `server_error`: an unexpected backend or dependency failure.
+
+Expected client mistakes such as an invalid password or a disallowed move are
+visible on the dashboard but do not trigger a critical alert.
+
 Metric labels must remain low-cardinality. Do not use user IDs, game IDs, room
 IDs, socket IDs, email addresses, usernames, tokens, IP addresses, raw query
 strings, or message content as labels.
@@ -264,6 +283,10 @@ The availability alert intentionally uses only `layer="edge"`. Internal probes
 remain diagnostic signals and do not create duplicate notifications for the
 same user-visible incident.
 
+`UserOperationsFailing` deliberately evaluates only `server_error` outcomes.
+It ignores `rejected` operations because a `401`, validation failure, or illegal
+game action does not mean the service itself is unhealthy.
+
 Alert delivery timing is intentionally conservative for local development:
 
 | Setting | Value | Purpose |
@@ -304,10 +327,17 @@ Provisioned dashboard:
 infra/monitoring/grafana/dashboards/backend-api.json
 ```
 
-The `Health` dashboard combines edge availability, active critical alerts,
-global and per-route p95 latency, account and game operation outcomes, HTTP
-response classes, and request rate. These panels cover the RED signals: Rate,
-Errors, and Duration.
+The single `Health` dashboard contains nine panels:
+
+| Signal | Panels | Question answered |
+| --- | --- | --- |
+| Availability | Web availability, API, Critical alerts | Can users reach the application, and is a critical rule firing? |
+| Duration | Backend p95, Latency by route (p95) | Is the backend slow, and which route is responsible? |
+| Errors | Account operation outcomes, Game operation outcomes, HTTP responses | Are requests or user-facing workflows failing? |
+| Rate | Request Rate | How much HTTP traffic is the backend serving? |
+
+Together these panels implement the RED method: Rate, Errors, and Duration,
+with edge availability added as the top-level user signal.
 
 Grafana administrator credentials come from `infra/env/.env`. Anonymous access
 is disabled by Grafana by default. An unauthenticated API request should return
@@ -350,8 +380,36 @@ independent `/health` endpoint.
    make alerts-down
    ```
 
-
 ## Troubleshooting
+
+### Nginx returns `502`
+
+If the backend process is unreachable, Nginx returns `502 Bad Gateway`. This
+incident is detected by the API availability probe and
+`ServiceUnavailable`.
+
+Check the user path and the corresponding Prometheus signal:
+
+```bash
+curl -sk -o /dev/null -w '%{http_code}\n' \
+  https://localhost:${NGINX_HTTPS_PORT}/api
+
+curl -sG http://localhost:${PROMETHEUS_PORT}/api/v1/query \
+  --data-urlencode \
+  'query=probe_success{service="backend",layer="edge"}'
+```
+
+### A container is `Up`, but its application is unavailable
+
+Container state only proves that its PID 1 is running. In development,
+`tsx watch` can remain alive after the child backend process exits. Verify the
+service with the API probe or `up{job="backend"}`, inspect backend logs, and
+restart the backend after resolving the underlying error:
+
+```bash
+docker logs ft-backend --tail 100
+docker restart ft-backend
+```
 
 ### No Telegram message
 
