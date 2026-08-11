@@ -1295,7 +1295,6 @@ export class GameRoom extends Scene implements GameRoomHandlers {
     if (!hand) return;
 
     const { position, size } = hand.getTopCardBounds();
-    hand.removeCard();
 
     const cardCover = this.textures.get(Textures.cardCover).get();
     const cardConfig: CardConfig = {
