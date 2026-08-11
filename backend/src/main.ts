@@ -39,4 +39,7 @@ async function startServer(): Promise<void> {
   });
 }
 
-void startServer();
+void startServer().catch((error: unknown) => {
+  console.error("Failed to start server:", getDatabaseErrorMessage(error));
+  process.exit(1);
+});
