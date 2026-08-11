@@ -52,5 +52,17 @@
 
     width: 26px;
     height: 26px;
+    font-size: 22px;
+  }
+}
+
+@media only screen and (min-width: 1920px) {
+  .plusButton {
+    bottom: 5px;
+    right: 5px;
+
+    width: 40px;
+    height: 40px;
+    font-size: 30px;
   }
 }
