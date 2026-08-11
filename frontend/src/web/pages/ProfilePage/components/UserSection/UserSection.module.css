@@ -10,6 +10,10 @@
   padding-inline-start: 25px;
 }
 
+.section.readOnly {
+  display: flex;
+}
+
 .avatar {
   grid-area: avatar;
 }
@@ -66,6 +70,14 @@
     column-gap: 10px;
   }
 
+  .section.readOnly {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "avatar"
+      "nameContainer";
+  }
+
   .avatar {
     justify-self: center;
   }
@@ -86,7 +98,7 @@
   .section {
     --top-padding: 83px;
 
-    grid-template-columns: minmax(0, auto) auto;
+    grid-template-columns: minmax(0, 1fr) max-content;
     grid-template-areas:
       "avatar avatar"
       "nameContainer editButton"
@@ -95,6 +107,17 @@
     column-gap: 0;
     padding-top: var(--top-padding);
     padding-bottom: 33px;
+  }
+
+  .section.readOnly {
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "avatar"
+      "nameContainer";
+  }
+
+  .readOnly .nameContainer {
+    justify-self: center;
   }
 
   .section .avatar {
@@ -106,6 +129,7 @@
     font-size: 30px;
     line-height: 39px;
     justify-self: flex-end;
+    /* margin-left: 6rem; */
   }
 }
 
