@@ -1,25 +1,42 @@
 import "dotenv/config";
+import { setTimeout as delay } from "node:timers/promises";
+
 import { ensureDatabaseConnection } from "./utils";
 import app from "./app";
 
 const { PORT = 3000 } = process.env;
+const DATABASE_RETRY_DELAY_MS = 2000;
 
-async function startServer() {
-  try {
-    await ensureDatabaseConnection();
+function getDatabaseErrorMessage(error: unknown): string {
+  const message = error instanceof Error ? error.message : String(error);
 
-    console.log("Database connection established");
+  return message.split("Message: `")[1]?.replace("`", "") ?? message;
+}
 
-    app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
-    });
-  } catch (error) {
-    const msg =
-      (error as Error).message.split("Message: `")[1]?.replace("`", "") ??
-      (error as Error).message;
-    console.error("Database connection failed:", msg);
-    process.exit(1);
+async function waitForDatabaseConnection(): Promise<void> {
+  for (;;) {
+    try {
+      await ensureDatabaseConnection();
+      console.log("Database connection established");
+
+      return;
+    } catch (error) {
+      console.error(
+        `Database connection failed. Retrying in ${DATABASE_RETRY_DELAY_MS} ms:`,
+        getDatabaseErrorMessage(error),
+      );
+
+      await delay(DATABASE_RETRY_DELAY_MS);
+    }
   }
 }
 
-startServer();
+async function startServer(): Promise<void> {
+  await waitForDatabaseConnection();
+
+  app.listen(PORT, () => {
+    console.log(`Server is running on port ${PORT}`);
+  });
+}
+
+void startServer();
