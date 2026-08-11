@@ -62,8 +62,9 @@ channels:
     address: play-combo
     title: Play a cat-card combo
     description: >
-      Declare a combo of two or three matching cat cards. The server answers with
-      `COMBO_SELECTION_REQUESTED` on the acting socket to collect the target.
+      Declare a combo of two or three matching cat cards. Once the Nope window
+      closes, the machine drives target and card selection through the
+      `WAITING_FOR_*` events and the matching `choose-card-*` client events.
     messages:
       playCombo:
         name: PlayCombo
@@ -71,37 +72,6 @@ channels:
         contentType: application/json
         payload:
           $ref: "./gameplay.schemas.yaml#/components/schemas/PlayComboPayload"
-
-  selectComboTarget:
-    address: select-combo-target
-    title: Select the combo target
-    description: >
-      Name the player a declared combo is aimed at.
-
-
-      Failures on this event are reported on `resolve-combo-error`; there is no
-      `select-combo-target-error`.
-    messages:
-      selectComboTarget:
-        name: SelectComboTarget
-        title: Select combo target
-        contentType: application/json
-        payload:
-          $ref: "./gameplay.schemas.yaml#/components/schemas/SelectComboTargetPayload"
-
-  resolveCombo:
-    address: resolve-combo
-    title: Resolve a combo
-    description: >
-      Carry out a declared combo. Sent up to three ways depending on the step — see
-      `ResolveComboPayload`.
-    messages:
-      resolveCombo:
-        name: ResolveCombo
-        title: Resolve combo
-        contentType: application/json
-        payload:
-          $ref: "./gameplay.schemas.yaml#/components/schemas/ResolveComboPayload"
 
   playDefuse:
     address: play-defuse
@@ -145,17 +115,48 @@ channels:
         payload:
           $ref: "./gameplay.schemas.yaml#/components/schemas/SelectPlayerPayload"
 
-  giveCard:
-    address: give-card
-    title: Give a card to another player
-    description: Hand over a chosen card, satisfying a Favor.
+  chooseCardId:
+    address: choose-card-id
+    title: Choose a card by id
+    description: >
+      Name a specific card from your own hand. Sent by the player satisfying a
+      Favor, in response to `WAITING_FOR_FAVOR_CARD_SELECTION`.
     messages:
-      giveCard:
-        name: GiveCard
-        title: Give card
+      chooseCardId:
+        name: ChooseCardId
+        title: Choose card id
         contentType: application/json
         payload:
-          $ref: "./gameplay.schemas.yaml#/components/schemas/GiveCardPayload"
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ChooseCardIdPayload"
+
+  chooseCardIndex:
+    address: choose-card-index
+    title: Choose a card by position
+    description: >
+      Pick a card blindly by its position in the target's hand, resolving a two-card
+      combo. Sent in response to `WAITING_FOR_RANDOM_CARD_SELECTION`.
+    messages:
+      chooseCardIndex:
+        name: ChooseCardIndex
+        title: Choose card index
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ChooseCardIndexPayload"
+
+  chooseCardType:
+    address: choose-card-type
+    title: Choose a card type
+    description: >
+      Name the card type demanded by a three-card combo. Sent in response to
+      `WAITING_FOR_CARD_TYPE_SELECTION`. If the target holds none, the server
+      answers `NO_CARD_OF_REQUESTED_TYPE`.
+    messages:
+      chooseCardType:
+        name: ChooseCardType
+        title: Choose card type
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/ChooseCardTypePayload"
 
   seenTheFuture:
     address: seen-the-future
@@ -231,21 +232,6 @@ channels:
         payload:
           $ref: "./gameplay.schemas.yaml#/components/schemas/DefusePromptPayload"
 
-  comboSelectionRequested:
-    address: COMBO_SELECTION_REQUESTED
-    title: Combo selection requested
-    description: >
-      Asks the acting player to pick a combo target, and for a three-card combo a
-      card type. Sent privately to that one player — every window they have open —
-      despite the SCREAMING_SNAKE name that elsewhere marks public events.
-    messages:
-      comboSelectionRequested:
-        name: ComboSelectionRequested
-        title: Combo selection requested
-        contentType: application/json
-        payload:
-          $ref: "./gameplay.schemas.yaml#/components/schemas/ComboSelectionRequestedPayload"
-
   # ------------------------------------------------------------------
   # Server -> Client: public (room)
   # ------------------------------------------------------------------
@@ -318,48 +304,33 @@ channels:
         payload:
           $ref: "./gameplay.schemas.yaml#/components/schemas/ComboPlayedPayload"
 
-  comboTargetSelected:
-    address: COMBO_TARGET_SELECTED
-    title: Combo target selected
-    description: The acting player named their combo target.
-    messages:
-      comboTargetSelected:
-        name: ComboTargetSelected
-        title: Combo target selected
-        contentType: application/json
-        payload:
-          $ref: "./gameplay.schemas.yaml#/components/schemas/ComboTargetSelectedPayload"
-
-  comboTargetCleared:
-    address: COMBO_TARGET_CLEARED
-    title: Combo target cleared
-    description: The combo finished; clients should drop any target highlight. No payload.
-    messages:
-      empty:
-        name: ComboTargetCleared
-        title: Combo target cleared
-        payload:
-          $ref: "../common/common.schemas.yaml#/components/schemas/EmptyPayload"
-
-  comboResolved:
-    address: COMBO_RESOLVED
-    title: Combo resolved
+  cardStolen:
+    address: CARD_STOLEN
+    title: Card stolen
     description: >
-      The combo was carried out.
-
-
-      For a two-card combo this is one room-wide emit. For a three-card combo the
-      server emits it three separate times with two different payloads: the actor and
-      the target each receive a copy including `requestedCardType`, and everyone else
-      receives a redacted copy without it. Clients must not assume every player saw
-      the same payload.
+      A card changed hands via a cat-card combo. Names both players; the card type is
+      included only for a three-card combo, where it was already public.
     messages:
-      comboResolved:
-        name: ComboResolved
-        title: Combo resolved
+      cardStolen:
+        name: CardStolen
+        title: Card stolen
         contentType: application/json
         payload:
-          $ref: "./gameplay.schemas.yaml#/components/schemas/ComboResolvedPayload"
+          $ref: "./gameplay.schemas.yaml#/components/schemas/CardStolenPayload"
+
+  noCardOfRequestedType:
+    address: NO_CARD_OF_REQUESTED_TYPE
+    title: No card of requested type
+    description: >
+      A three-card combo named a type the target does not hold. Nothing changes
+      hands and the turn continues.
+    messages:
+      noCardOfRequestedType:
+        name: NoCardOfRequestedType
+        title: No card of requested type
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/NoCardOfRequestedTypePayload"
 
   cardGiven:
     address: CARD_GIVEN
@@ -512,8 +483,12 @@ channels:
     address: WAITING_FOR_FAVOR_CARD_SELECTION
     title: Waiting for favor card selection
     description: >
-      The game is waiting for the named player to hand over a card. The payload names
-      who everyone is waiting on.
+      The game is waiting for the named player to hand over a card, answering with
+      `choose-card-id`. The payload names who everyone is waiting on.
+
+
+      Note the constant behind this address is `WAITING_FOR_CARD_ID_SELECTION`; the
+      wire name kept the older `FAVOR` wording.
     messages:
       playerId:
         name: WaitingForFavorCardSelection
@@ -521,6 +496,37 @@ channels:
         contentType: application/json
         payload:
           $ref: "./gameplay.schemas.yaml#/components/schemas/PlayerIdPayload"
+
+  waitingForRandomCardSelection:
+    address: WAITING_FOR_RANDOM_CARD_SELECTION
+    title: Waiting for random card selection
+    description: >
+      The game is waiting for the actor to pick a blind card position from the named
+      target's hand, answering with `choose-card-index`. Resolves a two-card combo.
+
+
+      Note the constant behind this address is `WAITING_FOR_CARD_INDEX_SELECTION`.
+    messages:
+      targetPlayerId:
+        name: WaitingForRandomCardSelection
+        title: Waiting for random card selection
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/TargetPlayerIdPayload"
+
+  waitingForCardTypeSelection:
+    address: WAITING_FOR_CARD_TYPE_SELECTION
+    title: Waiting for card type selection
+    description: >
+      The game is waiting for the actor to name a card type to demand from the named
+      target, answering with `choose-card-type`. Resolves a three-card combo.
+    messages:
+      targetPlayerId:
+        name: WaitingForCardTypeSelection
+        title: Waiting for card type selection
+        contentType: application/json
+        payload:
+          $ref: "./gameplay.schemas.yaml#/components/schemas/TargetPlayerIdPayload"
 
   gameOver:
     address: GAME_OVER
@@ -586,42 +592,16 @@ operations:
       $ref: "#/channels/playCombo"
     summary: Declare a cat-card combo.
     description: >
-      Emits `card-removed` to the acting socket; the machine then sends
-      `COMBO_SELECTION_REQUESTED` to that same socket to collect the target. On
-      failure emits `play-combo-error`.
+      Emits `card-removed` to the acting socket and `COMBO_PLAYED` to the room except
+      the actor, opening a Nope window. Once that window closes the machine drives
+      selection via `WAITING_FOR_PLAYER_SELECTION` and then either
+      `WAITING_FOR_RANDOM_CARD_SELECTION` (two cards) or
+      `WAITING_FOR_CARD_TYPE_SELECTION` (three cards). On failure emits
+      `play-combo-error`.
     tags:
       - name: Gameplay
     messages:
       - $ref: "#/channels/playCombo/messages/playCombo"
-
-  onSelectComboTarget:
-    action: receive
-    channel:
-      $ref: "#/channels/selectComboTarget"
-    summary: Name the target of a declared combo.
-    description: >
-      Emits `COMBO_TARGET_SELECTED` to the whole room. On failure emits
-      `resolve-combo-error`, not a dedicated event.
-    tags:
-      - name: Gameplay
-    messages:
-      - $ref: "#/channels/selectComboTarget/messages/selectComboTarget"
-
-  onResolveCombo:
-    action: receive
-    channel:
-      $ref: "#/channels/resolveCombo"
-    summary: Carry out a declared combo.
-    description: >
-      When the combo is only being declared, emits `COMBO_PLAYED` to the room except
-      the actor. When it resolves, emits `card-removed` to the victim and
-      `card-received` to the thief if a card was taken, then `COMBO_TARGET_CLEARED`
-      and `COMBO_RESOLVED` — the latter fanned out asymmetrically for a three-card
-      combo. On failure emits `resolve-combo-error`.
-    tags:
-      - name: Gameplay
-    messages:
-      - $ref: "#/channels/resolveCombo/messages/resolveCombo"
 
   onPlayDefuse:
     action: receive
@@ -663,20 +643,49 @@ operations:
     messages:
       - $ref: "#/channels/selectPlayer/messages/selectPlayer"
 
-  onGiveCard:
+  onChooseCardId:
     action: receive
     channel:
-      $ref: "#/channels/giveCard"
-    summary: Hand a card to another player.
+      $ref: "#/channels/chooseCardId"
+    summary: Hand over a named card, satisfying a Favor.
     description: >
       Emits `card-removed` to the giver's socket, `card-received` to the receiver's,
       and `CARD_GIVEN` to the whole room. Both private emits go through the socket
       map, so a player who is disconnected silently misses them. On failure emits
-      `give-card-error`.
+      `choose-card-id-error`.
     tags:
       - name: Gameplay
     messages:
-      - $ref: "#/channels/giveCard/messages/giveCard"
+      - $ref: "#/channels/chooseCardId/messages/chooseCardId"
+
+  onChooseCardIndex:
+    action: receive
+    channel:
+      $ref: "#/channels/chooseCardIndex"
+    summary: Take a blind card, resolving a two-card combo.
+    description: >
+      Emits `card-removed` to the victim's socket, `card-received` to the thief's, and
+      `CARD_STOLEN` to the whole room — without the card type, since a blind pick must
+      not be revealed. On failure emits `choose-card-index-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/chooseCardIndex/messages/chooseCardIndex"
+
+  onChooseCardType:
+    action: receive
+    channel:
+      $ref: "#/channels/chooseCardType"
+    summary: Demand a card type, resolving a three-card combo.
+    description: >
+      If the target holds the named type, emits `card-removed` to the victim,
+      `card-received` to the thief, and `CARD_STOLEN` to the room including
+      `cardType`. If they hold none, emits `NO_CARD_OF_REQUESTED_TYPE` instead and
+      nothing changes hands. On failure emits `choose-card-type-error`.
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/chooseCardType/messages/chooseCardType"
 
   onSeenTheFuture:
     action: receive
@@ -732,16 +741,6 @@ operations:
     messages:
       - $ref: "#/channels/defusePrompt/messages/defusePrompt"
 
-  sendComboSelectionRequested:
-    action: send
-    channel:
-      $ref: "#/channels/comboSelectionRequested"
-    summary: Ask the acting player to complete their combo (player, all windows).
-    tags:
-      - name: Gameplay
-    messages:
-      - $ref: "#/channels/comboSelectionRequested/messages/comboSelectionRequested"
-
   # --- Sent by the server: public ---
   sendCardDrawn:
     action: send
@@ -793,39 +792,28 @@ operations:
     messages:
       - $ref: "#/channels/comboPlayed/messages/comboPlayed"
 
-  sendComboTargetSelected:
+  sendCardStolen:
     action: send
     channel:
-      $ref: "#/channels/comboTargetSelected"
-    summary: Announce the chosen combo target (room, all).
-    tags:
-      - name: Gameplay
-    messages:
-      - $ref: "#/channels/comboTargetSelected/messages/comboTargetSelected"
-
-  sendComboTargetCleared:
-    action: send
-    channel:
-      $ref: "#/channels/comboTargetCleared"
-    summary: Announce that the combo finished (room, all).
-    tags:
-      - name: Gameplay
-    messages:
-      - $ref: "#/channels/comboTargetCleared/messages/empty"
-
-  sendComboResolved:
-    action: send
-    channel:
-      $ref: "#/channels/comboResolved"
-    summary: Announce the combo outcome (room, all — redacted for bystanders).
+      $ref: "#/channels/cardStolen"
+    summary: Announce a combo theft (room, all).
     description: >
-      A two-card combo is a single room-wide emit. A three-card combo is emitted
-      three times: to the actor, to the target, and to everyone else with
-      `requestedCardType` stripped out.
+      Emitted once room-wide. The payload carries `cardType` only for a three-card
+      combo; a two-card combo takes a blind card, so its type stays hidden.
     tags:
       - name: Gameplay
     messages:
-      - $ref: "#/channels/comboResolved/messages/comboResolved"
+      - $ref: "#/channels/cardStolen/messages/cardStolen"
+
+  sendNoCardOfRequestedType:
+    action: send
+    channel:
+      $ref: "#/channels/noCardOfRequestedType"
+    summary: Announce that a three-card combo found nothing (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/noCardOfRequestedType/messages/noCardOfRequestedType"
 
   sendCardGiven:
     action: send
@@ -956,6 +944,26 @@ operations:
       - name: Gameplay
     messages:
       - $ref: "#/channels/waitingForFavorCardSelection/messages/playerId"
+
+  sendWaitingForRandomCardSelection:
+    action: send
+    channel:
+      $ref: "#/channels/waitingForRandomCardSelection"
+    summary: Announce that a blind card pick is pending (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/waitingForRandomCardSelection/messages/targetPlayerId"
+
+  sendWaitingForCardTypeSelection:
+    action: send
+    channel:
+      $ref: "#/channels/waitingForCardTypeSelection"
+    summary: Announce that a card type demand is pending (room, all).
+    tags:
+      - name: Gameplay
+    messages:
+      - $ref: "#/channels/waitingForCardTypeSelection/messages/targetPlayerId"
 
   sendGameOver:
     action: send

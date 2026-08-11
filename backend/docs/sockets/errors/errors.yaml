@@ -135,22 +135,6 @@ channels:
         payload:
           $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
 
-  resolveComboError:
-    address: resolve-combo-error
-    title: Resolve combo error
-    description: >
-      Sent to the acting socket when `resolve-combo` and `select-combo-target` fails.
-      Note this channel serves two client events: `resolve-combo` and also
-      `select-combo-target`, which has no dedicated error event of its own.
-    messages:
-      socketError:
-        name: ResolveComboError
-        title: Resolve combo error
-        summary: Sent to the acting socket when `resolve-combo` and `select-combo-target` fails.
-        contentType: application/json
-        payload:
-          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
-
   playDefuseError:
     address: play-defuse-error
     title: Play defuse error
@@ -193,20 +177,6 @@ channels:
         payload:
           $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
 
-  giveCardError:
-    address: give-card-error
-    title: Give card error
-    description: >
-      Sent to the acting socket when `give-card` fails.
-    messages:
-      socketError:
-        name: GiveCardError
-        title: Give card error
-        summary: Sent to the acting socket when `give-card` fails.
-        contentType: application/json
-        payload:
-          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
-
   seenTheFutureError:
     address: seen-the-future-error
     title: Seen the future error
@@ -217,6 +187,48 @@ channels:
         name: SeenTheFutureError
         title: Seen the future error
         summary: Sent to the acting socket when `seen-the-future` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  chooseCardIdError:
+    address: choose-card-id-error
+    title: Choose card id error
+    description: >
+      Sent to the acting socket when `choose-card-id` fails.
+    messages:
+      socketError:
+        name: ChooseCardIdError
+        title: Choose card id error
+        summary: Sent to the acting socket when `choose-card-id` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  chooseCardIndexError:
+    address: choose-card-index-error
+    title: Choose card index error
+    description: >
+      Sent to the acting socket when `choose-card-index` fails.
+    messages:
+      socketError:
+        name: ChooseCardIndexError
+        title: Choose card index error
+        summary: Sent to the acting socket when `choose-card-index` fails.
+        contentType: application/json
+        payload:
+          $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
+
+  chooseCardTypeError:
+    address: choose-card-type-error
+    title: Choose card type error
+    description: >
+      Sent to the acting socket when `choose-card-type` fails.
+    messages:
+      socketError:
+        name: ChooseCardTypeError
+        title: Choose card type error
+        summary: Sent to the acting socket when `choose-card-type` fails.
         contentType: application/json
         payload:
           $ref: "./errors.schemas.yaml#/components/schemas/SocketErrorPayload"
@@ -312,16 +324,6 @@ operations:
     messages:
       - $ref: "#/channels/playComboError/messages/socketError"
 
-  sendResolveComboError:
-    action: send
-    channel:
-      $ref: "#/channels/resolveComboError"
-    summary: Emitted to the acting socket when `resolve-combo` and `select-combo-target` fails.
-    tags:
-      - name: Errors
-    messages:
-      - $ref: "#/channels/resolveComboError/messages/socketError"
-
   sendPlayDefuseError:
     action: send
     channel:
@@ -352,16 +354,6 @@ operations:
     messages:
       - $ref: "#/channels/selectPlayerError/messages/socketError"
 
-  sendGiveCardError:
-    action: send
-    channel:
-      $ref: "#/channels/giveCardError"
-    summary: Emitted to the acting socket when `give-card` fails.
-    tags:
-      - name: Errors
-    messages:
-      - $ref: "#/channels/giveCardError/messages/socketError"
-
   sendSeenTheFutureError:
     action: send
     channel:
@@ -371,3 +363,33 @@ operations:
       - name: Errors
     messages:
       - $ref: "#/channels/seenTheFutureError/messages/socketError"
+
+  sendChooseCardIdError:
+    action: send
+    channel:
+      $ref: "#/channels/chooseCardIdError"
+    summary: Emitted to the acting socket when `choose-card-id` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/chooseCardIdError/messages/socketError"
+
+  sendChooseCardIndexError:
+    action: send
+    channel:
+      $ref: "#/channels/chooseCardIndexError"
+    summary: Emitted to the acting socket when `choose-card-index` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/chooseCardIndexError/messages/socketError"
+
+  sendChooseCardTypeError:
+    action: send
+    channel:
+      $ref: "#/channels/chooseCardTypeError"
+    summary: Emitted to the acting socket when `choose-card-type` fails.
+    tags:
+      - name: Errors
+    messages:
+      - $ref: "#/channels/chooseCardTypeError/messages/socketError"
