@@ -11,7 +11,7 @@ export { default as shuffleSpritesheet } from "./cloud.png";
 export { default as dead } from "./dead.png";
 export { default as nopeSpritesheet } from "./nope.png";
 export { default as boomExplosionSpritesheet } from "./boom-explosion.png";
-export { default as fireSpriteSheet } from "./fire.png";
+export { default as fireSpriteSheet } from "./fire.webp";
 export { default as nuclearSpritesheet } from "./nuclear-loop.png";
 export { default as coolCat } from "./cool-cat.webp";
 export { default as scaleMeterBar } from "./scale_meter_bar.png";
