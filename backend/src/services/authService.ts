@@ -44,7 +44,7 @@ function getRefreshTokenExpiresAt(): Date {
   return new Date(Date.now() + REFRESH_TOKEN_LIFETIME_MS);
 }
 
-export async function deleteExpiredRefreshSessions(): Promise<number> {
+async function deleteExpiredRefreshSessions(): Promise<number> {
   const result = await prisma.userSession.deleteMany({
     where: {
       expiresAt: {

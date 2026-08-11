@@ -8,7 +8,7 @@ import { isUserOnline } from "sockets/onlineUsers";
 
 // Project level
 
-export function toUserWithOnlineStatus<T extends { id: UserId }>(
+function toUserWithOnlineStatus<T extends { id: UserId }>(
   user: T,
 ): T & { isOnline: boolean } {
   return {
