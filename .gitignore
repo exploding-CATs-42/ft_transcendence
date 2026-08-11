@@ -72,7 +72,6 @@ backend.env
 .env.*
 !.env.example
 infra/env/.env
-infra/secrets/
 
 
 # parcel-bundler cache (https://parceljs.org/)
