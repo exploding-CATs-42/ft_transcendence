@@ -1,961 +1,299 @@
-# Full Game State Trace — Interface Mutations
+# Game State Trace — How `GameContext` Mutates
 
-> Tracks how every interface (GameState, TurnState, PendingAction, NopeChain, FavorState, Deck, Player)
-> changes across the full 21-turn game. Shows the relationship between objects at each step.
+The state machine keeps **one flat object**, `GameContext`, defined in
+[gameMachine.ts](../../../packages/game/src/gameMachine.ts). There is no separate
+`GameState`, no `TurnState`, no discard pile, and no turn phase stored in context —
+the phase *is* the machine's state node.
 
----
+This file traces how each field changes, action by action. Every mutation below is a
+real `assign` in [actions.ts](../../../packages/game/src/actions.ts). For the matching
+socket traffic, see [full-actions-trace.md](./full-actions-trace.md).
 
-## Initial State After Deal
+## The whole shape
 
-```
-GameState {
-  gameId: "game-1"
-  status: PLAYING
-  winnerId: null
-  createdAt: 1700000000
-  startedAt: 1700000010
-  finishedAt: null
+```ts
+interface GameContext {
+  players: Player[];                       // turn order IS array order
+  deck: Deck;                              // index 0 is the top of the draw pile
+  currentTurnPlayerId: string | null;
+  lastDrawnCard: Card | null;
+  lastPlayedCards: Card[] | null;          // most recent play, 1 card or a combo
+  countdownEndsAt: number | null;
+  turnsCount: number;                      // draws still owed — the wire's attackCount
+  isUnderAttack: boolean;
+  nopeWindow: NopeWindow | null;
+  selectedPlayerId: string | null;         // target of the pending action
+  pendingAction: PendingActionType | null;
+  givenCard: Card | null;
+}
 
-  rules: {
-    dealtCardsPerPlayer: 7
-    defusesDealtPerPlayer: 1
-    maxDefusesShuffledBack: 2
-    totalDefuses: 6
-    seeTheFutureCount: 3
-    minPlayers: 2
-    maxPlayers: 5
-    fasterVariantRemoveFraction: 0.33
-    nopeWindowMs: 3000
-  }
+interface Player {
+  id: string;
+  name: string;
+  avatarUrl: string | null;
+  hand: Card[];
+  isConfirmed: boolean;
+  isAlive: boolean;
+}
 
-  players: [
-    { playerId: "A", displayName: "Alice", isAlive: true, turnOrder: 0,
-      hand: [defuse_inst_a, stf_inst_1, skip_inst_1, taco_inst_1, taco_inst_2, nope_inst_1, beard_inst_1] }
-    { playerId: "B", displayName: "Bob", isAlive: true, turnOrder: 1,
-      hand: [defuse_inst_b, attack_inst_1, catter_inst_1, catter_inst_2, catter_inst_3, shuffle_inst_1, hairy_inst_1] }
-    { playerId: "C", displayName: "Charlie", isAlive: true, turnOrder: 2,
-      hand: [defuse_inst_c, favor_inst_1, nope_inst_2, rainbow_inst_1, rainbow_inst_2, skip_inst_6, beard_inst_2] }
-    { playerId: "D", displayName: "Diana", isAlive: true, turnOrder: 3,
-      hand: [defuse_inst_d, attack_inst_3, stf_inst_4, taco_inst_4, shuffle_inst_4, hairy_inst_2, nope_inst_3] }
-    { playerId: "E", displayName: "Eve", isAlive: true, turnOrder: 4,
-      hand: [defuse_inst_e, favor_inst_2, beard_inst_3, beard_inst_4, beard_inst_5, catter_inst_4, skip_inst_5] }
-  ]
-
-  deck: {
-    drawPile: [ek_inst_1, shuffle_inst_3, attack_inst_2, ...14 more cards..., ek_inst_2, ...more..., ek_inst_3, ek_inst_4]
-    discardPile: []
-  }
-  // drawPile.length = 16 (56 total - 40 dealt to players)
-  // Includes: 4 Exploding Kittens + 1 extra Defuse + 11 normal cards
-
-  turn: {
-    currentPlayerId: "A"
-    phase: ACTION
-    attackCount: 1
-    isUnderAttack: false
-    pendingAction: null
-    nopeChain: null
-    favorState: null
-    turnNumber: 1
-  }
+interface NopeWindow {
+  cards: Card[];                           // what is being Noped
+  lastPlayerId: string;                    // who acted most recently
+  nopeCount: number;                       // even = executes, odd = cancelled
+  endsAt: number;
 }
 ```
 
----
+Four things surprise people:
 
-## Turn 1 — A: See the Future + Skip
+- **There is no discard pile.** A played card is filtered out of the hand and is gone.
+  `lastPlayedCards` is the only trace of it, and the next play overwrites that.
+- **Turn order is array position.** No `turnOrder` field. Advancing the turn walks
+  `players` forward, skipping anyone with `isAlive: false`.
+- **An eliminated player keeps their hand.** `explodePlayer` only flips
+  `isAlive: false`; the cards stay in the array and simply stop being reachable.
+- **`turnsCount` is not a turn counter.** It is the number of draws the current player
+  still owes. `1` for a normal turn, `2` after an Attack. There is no turn number in
+  context at all.
 
-### 1a. A plays See the Future
+## Field-by-field: who writes what
 
-```
-A.hand BEFORE: [defuse_inst_a, stf_inst_1, skip_inst_1, taco_inst_1, taco_inst_2, nope_inst_1, beard_inst_1]
+| Field | Written by | Cleared by |
+|---|---|---|
+| `players` | `addPlayer`, `playCard`, `playCombo`, `drawCard`, `defuseExplodingKitten`, `insertKitten`, `explodePlayer`, `passCardBy*` | never |
+| `deck` | `shuffleDeck`, `drawCard`, `insertKitten` | never |
+| `currentTurnPlayerId` | `changeTurn`, `changeTurnUnderAttack` | never |
+| `lastDrawnCard` | `drawCard` | never (overwritten) |
+| `lastPlayedCards` | `playCard`, `playCombo`, `defuseExplodingKitten` | set to `null` on an invalid play |
+| `turnsCount` | `drawCard` (−1), `skipTurn` (−1), `changeTurn` (=1), `changeTurnUnderAttack` (=2 or +2) | never |
+| `isUnderAttack` | `changeTurn` (false), `changeTurnUnderAttack` (true) | never |
+| `nopeWindow` | `setNopeWindow`, `addNope` | `clearNopeWindow` |
+| `selectedPlayerId` | `selectPlayer` | `clearSelectedPlayer` |
+| `pendingAction` | `playCard`, `playCombo` | `clearPendingAction` |
+| `givenCard` | `passCardById`, `passCardByIndex`, `passCardByType` | `clearGivenCard` |
 
-MUTATION: remove stf_inst_1 from A.hand → deck.discardPile
-  A.hand: [...6 cards, stf_inst_1 removed]
-  deck.discardPile: [stf_inst_1]
-
-MUTATION: create PendingAction + NopeChain, set phase
-  turn.phase: ACTION → NOPE_WINDOW
-  turn.pendingAction: null → {
-    actionId: "uuid-1"
-    type: SEE_THE_FUTURE
-    playerId: "A"
-    cards: [stf_inst_1]
-    targetPlayerId: undefined
-    namedCardType: undefined
-    isNoped: false
-    nopeWindowExpiresAt: 1700000013000
-  }
-  turn.nopeChain: null → {
-    pendingActionId: "uuid-1"
-    entries: []
-  }
-```
-
-### 1b. Timer expires → See the Future resolves
-
-```
-CHECK: turn.pendingAction.isNoped === false → execute
-
-READ: turn.pendingAction.type === SEE_THE_FUTURE
-READ: deck.drawPile.slice(0, rules.seeTheFutureCount)
-  → [ek_inst_1, shuffle_inst_3, attack_inst_2]
-  (deck is NOT modified, only peeked)
-
-MUTATION: clear PendingAction + NopeChain, set phase
-  turn.phase: NOPE_WINDOW → ACTION
-  turn.pendingAction: {...} → null
-  turn.nopeChain: {...} → null
-
-PRIVATE → A: SEE_THE_FUTURE_PEEK { cards: [ek_inst_1, shuffle_inst_3, attack_inst_2] }
-```
-
-### 1c. A plays Skip
-
-```
-MUTATION: remove skip_inst_1 from A.hand → deck.discardPile
-  A.hand: [...5 cards, skip_inst_1 removed]
-  deck.discardPile: [skip_inst_1, stf_inst_1]
-
-MUTATION: create PendingAction + NopeChain, set phase
-  turn.phase: ACTION → NOPE_WINDOW
-  turn.pendingAction: null → {
-    actionId: "uuid-2"
-    type: SKIP
-    playerId: "A"
-    cards: [skip_inst_1]
-    isNoped: false
-    nopeWindowExpiresAt: 1700000016000
-  }
-  turn.nopeChain: null → { pendingActionId: "uuid-2", entries: [] }
-```
-
-### 1d. Timer expires → Skip resolves
-
-```
-CHECK: turn.pendingAction.isNoped === false → execute
-READ: turn.pendingAction.type === SKIP
-
-SKIP LOGIC:
-  turn.attackCount was 1
-  turn.attackCount-- → 0
-  attackCount === 0 → turn ends
-
-MUTATION: clear PendingAction + NopeChain
-  turn.pendingAction: {...} → null
-  turn.nopeChain: {...} → null
-
-MUTATION: advance turn
-  turn.currentPlayerId: "A" → "B"
-  turn.phase: NOPE_WINDOW → ACTION
-  turn.attackCount: 0 → 1 (reset for new turn)
-  turn.isUnderAttack: false
-  turn.turnNumber: 1 → 2
-
-A.hand AFTER: [defuse_inst_a, taco_inst_1, taco_inst_2, nope_inst_1, beard_inst_1]  (5 cards)
-```
+Note `playCard` sets `pendingAction` for every card **except** `NOPE` — a Nope is not
+itself a pending action, it modifies the one already in flight.
 
 ---
 
-## Turn 2 — B: Pair Combo + Draw EK + Defuse + Insert + Draw
+## Initial state after the deal
 
-### 2a. B plays pair of Cattermelons targeting C
-
-```
-B.hand BEFORE: [defuse_inst_b, attack_inst_1, catter_inst_1, catter_inst_2, catter_inst_3, shuffle_inst_1, hairy_inst_1]
-
-MUTATION: remove catter_inst_1, catter_inst_2 from B.hand → deck.discardPile
-  B.hand: [defuse_inst_b, attack_inst_1, catter_inst_3, shuffle_inst_1, hairy_inst_1]
-  deck.discardPile: [catter_inst_2, catter_inst_1, skip_inst_1, stf_inst_1]
-
-MUTATION: create PendingAction + NopeChain, set phase
-  turn.phase: ACTION → NOPE_WINDOW
-  turn.pendingAction: null → {
-    actionId: "uuid-3"
-    type: CAT_PAIR
-    playerId: "B"
-    cards: [catter_inst_1, catter_inst_2]
-    targetPlayerId: "C"
-    isNoped: false
-    nopeWindowExpiresAt: ...
-  }
-  turn.nopeChain: null → { pendingActionId: "uuid-3", entries: [] }
-```
-
-### 2b. Timer expires → Pair resolves
+Five players, so: 7 others + 1 Defuse each, and a 16-card deck holding 4 kittens.
 
 ```
-CHECK: turn.pendingAction.isNoped === false → execute
-READ: turn.pendingAction.type === CAT_PAIR
-READ: turn.pendingAction.targetPlayerId === "C"
-
-PAIR LOGIC: pick random card from C.hand → nope_inst_2
-
-MUTATION: transfer card
-  C.hand: [defuse_inst_c, favor_inst_1, nope_inst_2, rainbow_inst_1, rainbow_inst_2, skip_inst_6, beard_inst_2]
-    → remove nope_inst_2
-    → [defuse_inst_c, favor_inst_1, rainbow_inst_1, rainbow_inst_2, skip_inst_6, beard_inst_2]
-  B.hand: [defuse_inst_b, attack_inst_1, catter_inst_3, shuffle_inst_1, hairy_inst_1]
-    → add nope_inst_2
-    → [defuse_inst_b, attack_inst_1, catter_inst_3, shuffle_inst_1, hairy_inst_1, nope_inst_2]
-
-MUTATION: clear PendingAction + NopeChain, set phase
-  turn.phase: NOPE_WINDOW → ACTION
-  turn.pendingAction: {...} → null
-  turn.nopeChain: {...} → null
+players: [
+  { id: "A", name: "Alice",   isAlive: true, isConfirmed: true, hand: [8 cards] },
+  { id: "B", name: "Bob",     isAlive: true, isConfirmed: true, hand: [8 cards] },
+  { id: "C", name: "Charlie", isAlive: true, isConfirmed: true, hand: [8 cards] },
+  { id: "D", name: "Diana",   isAlive: true, isConfirmed: true, hand: [8 cards] },
+  { id: "E", name: "Eve",     isAlive: true, isConfirmed: true, hand: [8 cards] },
+]
+deck:                 [16 cards, 4 of them EXPLODING_KITTEN]
+currentTurnPlayerId:  "A"
+lastDrawnCard:        null
+lastPlayedCards:      null
+countdownEndsAt:      null
+turnsCount:           1
+isUnderAttack:        false
+nopeWindow:           null
+selectedPlayerId:     null
+pendingAction:        null
+givenCard:            null
 ```
 
-### 2c. B draws → Exploding Kitten
-
-```
-MUTATION: draw from deck
-  deck.drawPile: [ek_inst_1, shuffle_inst_3, attack_inst_2, ...]
-    → shift() returns ek_inst_1
-    → [shuffle_inst_3, attack_inst_2, ...]
-
-CHECK: drawn card type === EXPLODING_KITTEN
-  (card is NOT added to hand, NOT added to discard — it's held in limbo)
-
-MUTATION: set phase
-  turn.phase: ACTION → DEFUSE_PROMPT
-```
-
-### 2d. B plays Defuse
-
-```
-MUTATION: remove defuse_inst_b from B.hand → deck.discardPile
-  B.hand: [attack_inst_1, catter_inst_3, shuffle_inst_1, hairy_inst_1, nope_inst_2]
-  deck.discardPile: [defuse_inst_b, catter_inst_2, catter_inst_1, ...]
-
-MUTATION: set phase
-  turn.phase: DEFUSE_PROMPT → INSERT_KITTEN
-```
-
-### 2e. B inserts kitten at position 13
-
-```
-MUTATION: insert ek_inst_1 into deck.drawPile at index 13
-  deck.drawPile.splice(13, 0, ek_inst_1)
-  deck.drawPile.length: 15 → 16
-
-MUTATION: set phase
-  turn.phase: INSERT_KITTEN → ACTION
-  (attackCount unchanged, B still owes a draw)
-```
-
-### 2f. B draws normal card
-
-```
-MUTATION: draw from deck
-  deck.drawPile: [shuffle_inst_3, attack_inst_2, ...]
-    → shift() returns shuffle_inst_3
-  deck.drawPile.length: 16 → 15
-
-MUTATION: add to hand
-  B.hand: → add shuffle_inst_3
-    → [attack_inst_1, catter_inst_3, shuffle_inst_1, hairy_inst_1, nope_inst_2, shuffle_inst_3]
-
-DRAW LOGIC:
-  turn.attackCount was 1
-  turn.attackCount-- → 0
-  attackCount === 0 → turn ends
-
-MUTATION: advance turn
-  turn.currentPlayerId: "B" → "C"
-  turn.phase: ACTION
-  turn.attackCount: 0 → 1
-  turn.isUnderAttack: false
-  turn.turnNumber: 2 → 3
-
-B.hand AFTER: [attack_inst_1, catter_inst_3, shuffle_inst_1, hairy_inst_1, nope_inst_2, shuffle_inst_3]  (6 cards, no Defuse)
-```
+`currentTurnPlayerId` starts as `null` and the first `changeTurn` resolves it to
+`players[0]` — `findIndex` returns `-1`, and `(-1 + 1) % 5 === 0`.
 
 ---
 
-## Turn 3 — C: Favor on D
+## Playing a card
 
-### 3a. C plays Favor targeting D
-
-```
-C.hand BEFORE: [defuse_inst_c, favor_inst_1, rainbow_inst_1, rainbow_inst_2, skip_inst_6, beard_inst_2]
-
-MUTATION: remove favor_inst_1 from C.hand → deck.discardPile
-  C.hand: [defuse_inst_c, rainbow_inst_1, rainbow_inst_2, skip_inst_6, beard_inst_2]
-
-MUTATION: create PendingAction + NopeChain, set phase
-  turn.phase: ACTION → NOPE_WINDOW
-  turn.pendingAction: null → {
-    actionId: "uuid-4"
-    type: FAVOR
-    playerId: "C"
-    cards: [favor_inst_1]
-    targetPlayerId: "D"      ← target stored here during Nope window
-    isNoped: false
-    nopeWindowExpiresAt: ...
-  }
-  turn.nopeChain: null → { pendingActionId: "uuid-4", entries: [] }
-  turn.favorState: null       ← not yet, still in Nope window
-```
-
-### 3b. Timer expires → Favor resolves
+`play-card` with See the Future, from A's hand of 8:
 
 ```
-CHECK: turn.pendingAction.isNoped === false → execute
-READ: turn.pendingAction.type === FAVOR
-READ: turn.pendingAction.targetPlayerId === "D"   ← handoff source
+playCard
+  players[A].hand      8 cards → 7 cards        (card 26 filtered out)
+  lastPlayedCards      null → [card 26]
+  pendingAction        null → SEE_THE_FUTURE
 
-MUTATION: create FavorState from PendingAction fields (THE HANDOFF)
-  turn.favorState: null → {
-    requesterId: "C"                ← from pendingAction.playerId
-    targetPlayerId: "D"             ← from pendingAction.targetPlayerId
-  }
-
-MUTATION: clear PendingAction + NopeChain, set phase
-  turn.phase: NOPE_WINDOW → FAVOR_SELECT
-  turn.pendingAction: {...} → null    ← destroyed after handoff
-  turn.nopeChain: {...} → null
-
-  PendingAction is now null. FavorState carries the context forward.
+setNopeWindow
+  nopeWindow           null → { cards: [card 26],
+                                lastPlayerId: "A",
+                                nopeCount: 0,
+                                endsAt: now + 3000 }
 ```
 
-### 3c. D gives a card (FAVOR_GIVE)
+If the card is not in the hand, `playCard` returns only `{ lastPlayedCards: null }` —
+the hand is untouched and no window opens.
+
+### A Nope, and a counter-Nope
+
+Each Nope is a `playCard` (removing the Nope from the hand, without setting
+`pendingAction`) plus an `addNope`:
 
 ```
-READ: turn.favorState.targetPlayerId === "D" (validate sender)
-READ: turn.favorState.requesterId === "C" (who receives)
+D Nopes:
+  players[D].hand      → card 34 filtered out
+  nopeWindow           nopeCount 0 → 1, lastPlayerId "D", endsAt reset to now + 3000
 
-D.hand BEFORE: [defuse_inst_d, attack_inst_3, stf_inst_4, taco_inst_4, shuffle_inst_4, hairy_inst_2, nope_inst_3]
-
-MUTATION: transfer taco_inst_4 from D → C
-  D.hand: → remove taco_inst_4
-    → [defuse_inst_d, attack_inst_3, stf_inst_4, shuffle_inst_4, hairy_inst_2, nope_inst_3]
-  C.hand: → add taco_inst_4
-    → [defuse_inst_c, rainbow_inst_1, rainbow_inst_2, skip_inst_6, beard_inst_2, taco_inst_4]
-
-MUTATION: clear FavorState, set phase
-  turn.favorState: {...} → null
-  turn.phase: FAVOR_SELECT → ACTION
+A counter-Nopes:
+  players[A].hand      → card 31 filtered out
+  nopeWindow           nopeCount 1 → 2, lastPlayerId "A", endsAt reset to now + 3000
 ```
 
-### 3d. C draws normal card
+`nopeCount` is the whole mechanism: the `isNoped` guard reads its parity. Even means
+the action executes, odd means it is cancelled. `endsAt` moving each time is why a
+Nope can always be Noped back.
+
+### The window closing
 
 ```
-MUTATION: draw + add to hand
-  deck.drawPile → shift() → beard_inst_5
-  C.hand → add beard_inst_5
-    → [defuse_inst_c, rainbow_inst_1, rainbow_inst_2, skip_inst_6, beard_inst_2, taco_inst_4, beard_inst_5]
-
-DRAW LOGIC: attackCount 1 → 0 → turn ends
-
-MUTATION: advance turn
-  turn.currentPlayerId: "C" → "D"
-  turn.turnNumber: 3 → 4
-
-C.hand AFTER: 7 cards
+clearNopeWindow
+  nopeWindow           { ... } → null
 ```
+
+The pending effect then runs from `lastPlayedCards` / `pendingAction`, which is why
+those two survive the window rather than being cleared with it.
 
 ---
 
-## Turn 4 — D: Shuffle + Draw
-
-### 4a. D plays Shuffle
+## Drawing
 
 ```
-MUTATION: remove shuffle_inst_4 from D.hand → discardPile
-MUTATION: create PendingAction { type: SHUFFLE, ... } + NopeChain, phase → NOPE_WINDOW
+drawCard
+  deck                 splice(0, 1) — index 0 is the top
+  players[X].hand      card appended
+  lastDrawnCard        null → the drawn card
+  turnsCount           n → n − 1
 ```
 
-### 4b. Timer expires → Shuffle resolves
+The turn does not end here. The machine goes to `CHECKING_REMAINING_TURNS`, and
+`turnsCount > 0` keeps the same player going. That single decrement is why an
+Exploding Kitten drawn mid-attack still costs one of the owed draws.
+
+### Kitten drawn, then defused
+
+The kitten lands in the hand like any other card first — `drawCard` does not special
+case it. Then:
 
 ```
-CHECK: isNoped === false → execute
-READ: type === SHUFFLE
+defuseExplodingKitten
+  players[X].hand      Defuse filtered out (first one found, by type)
+  lastPlayedCards      → [the Defuse]
 
-MUTATION: shuffle deck
-  deck.drawPile = shuffle(deck.drawPile)
-  (same cards, random new order, length unchanged)
-
-MUTATION: clear PendingAction + NopeChain, phase → ACTION
+insertKitten
+  deck                 splice(position, 0, lastDrawnCard)
+                       position clamped to [0, deck.length]
+  players[X].hand      lastDrawnCard filtered out by id
 ```
 
-### 4c. D draws normal card
+Two details worth knowing: the position is **clamped, not rejected**, so an
+out-of-range index silently becomes the top or the bottom; and the kitten is removed
+from the hand by `id`, matching the exact instance that was drawn.
+
+### Kitten drawn with no Defuse
 
 ```
-MUTATION: draw favor_inst_3 → D.hand
-DRAW LOGIC: attackCount 1 → 0 → turn ends
-
-MUTATION: advance turn → E, turnNumber: 4 → 5
-
-D.hand AFTER: [defuse_inst_d, attack_inst_3, stf_inst_4, hairy_inst_2, nope_inst_3, favor_inst_3]  (6 cards)
+explodePlayer
+  players[X].isAlive   true → false
 ```
 
----
-
-## Turn 5 — E: Favor on A + Skip
-
-### 5a. E plays Favor targeting A
-
-```
-MUTATION: remove favor_inst_2 from E.hand → discardPile
-MUTATION: create PendingAction { type: FAVOR, targetPlayerId: "A", ... } + NopeChain, phase → NOPE_WINDOW
-```
-
-### 5b. Timer expires → Favor resolves
-
-```
-MUTATION: HANDOFF → create FavorState { requesterId: "E", targetPlayerId: "A" }
-MUTATION: clear PendingAction + NopeChain, phase → FAVOR_SELECT
-```
-
-### 5c. A gives beard_inst_1 to E
-
-```
-MUTATION: transfer beard_inst_1
-  A.hand: → remove beard_inst_1 → [defuse_inst_a, taco_inst_1, taco_inst_2, nope_inst_1]
-  E.hand: → add beard_inst_1
-
-MUTATION: clear FavorState, phase → ACTION
-```
-
-### 5d. E plays Skip
-
-```
-MUTATION: remove skip_inst_5 from E.hand → discardPile
-MUTATION: create PendingAction { type: SKIP, ... } + NopeChain, phase → NOPE_WINDOW
-
-Timer expires → execute
-SKIP LOGIC: attackCount 1 → 0 → turn ends
-
-MUTATION: advance turn → A, turnNumber: 5 → 6
-
-E.hand AFTER: [defuse_inst_e, beard_inst_3, beard_inst_4, beard_inst_5, catter_inst_4, beard_inst_1]  (6 cards)
-```
+That is all. The hand is left as it was — `hand` still holds every card the player
+had, kitten included. Nothing reads it again, because every lookup filters on
+`isAlive`.
 
 ---
 
-## Turn 6 — A: Pair Combo (steal E's Defuse) + Draw
-
-### 6a. A plays pair of Tacocats targeting E
+## Skip and Attack
 
 ```
-A.hand BEFORE: [defuse_inst_a, taco_inst_1, taco_inst_2, nope_inst_1]
-
-MUTATION: remove taco_inst_1, taco_inst_2 from A.hand → discardPile
-  A.hand: [defuse_inst_a, nope_inst_1]
-
-MUTATION: create PendingAction + NopeChain, phase → NOPE_WINDOW
-  turn.pendingAction: {
-    type: CAT_PAIR
-    playerId: "A"
-    cards: [taco_inst_1, taco_inst_2]
-    targetPlayerId: "E"
-  }
+skipTurn                 turnsCount  n → n − 1
+changeTurn               turnsCount  → 1        isUnderAttack → false
+changeTurnUnderAttack    turnsCount  → isUnderAttack ? turnsCount + 2 : 2
+                                                isUnderAttack → true
 ```
 
-### 6b. Timer expires → Pair resolves
+`skipTurn` only runs on the branch where the player owes more than one draw. On a
+normal turn the machine emits `TURN_SKIPPED` and goes straight to changing the turn,
+so `turnsCount` is untouched and the event reports `1`.
 
-```
-PAIR LOGIC: random card from E.hand → defuse_inst_e
+`changeTurnUnderAttack` stacking is the reason a chain of Attacks escalates: an
+un-attacked player passes `2`, an already-attacked one passes `turnsCount + 2`.
 
-MUTATION: transfer
-  E.hand: → remove defuse_inst_e
-    → [beard_inst_3, beard_inst_4, beard_inst_5, catter_inst_4, beard_inst_1]
-  A.hand: → add defuse_inst_e
-    → [defuse_inst_a, nope_inst_1, defuse_inst_e]
-
-  *** E now has NO DEFUSE ***
-  *** A now has 2 DEFUSES ***
-
-MUTATION: clear PendingAction + NopeChain, phase → ACTION
-```
-
-### 6c. A draws normal card
-
-```
-MUTATION: draw hairy_inst_6 → A.hand
-  A.hand → [defuse_inst_a, nope_inst_1, defuse_inst_e, hairy_inst_6]
-DRAW LOGIC: attackCount 1 → 0 → turn ends
-
-MUTATION: advance turn → B, turnNumber: 6 → 7
-```
+Both go through `changeTurnState`, which walks forward from the current player and
+returns the first with `isAlive: true` — so eliminations close the ring automatically.
 
 ---
 
-## Turn 7 — B: Attack + Nope + Counter-Nope
+## Targeted actions: Favor and combos
 
-### 7a. B plays Attack
-
-```
-MUTATION: remove attack_inst_1 from B.hand → discardPile
-MUTATION: create PendingAction { type: ATTACK, ... } + NopeChain, phase → NOPE_WINDOW
-  turn.pendingAction: {
-    actionId: "uuid-9"
-    type: ATTACK
-    playerId: "B"
-    cards: [attack_inst_1]
-    isNoped: false
-    nopeWindowExpiresAt: ...
-  }
-  turn.nopeChain: { pendingActionId: "uuid-9", entries: [] }
-```
-
-### 7b. D plays Nope
+These are the only actions that span several client events, and they use three fields
+that nothing else touches.
 
 ```
-MUTATION: remove nope_inst_3 from D.hand → discardPile
-  D.hand: [defuse_inst_d, attack_inst_3, stf_inst_4, hairy_inst_2, favor_inst_3]
+selectPlayer             selectedPlayerId  null → target id
 
-MUTATION: append to NopeChain, flip parity, reset timer
-  turn.nopeChain.entries: []
-    → [{ playerId: "D", cardInstanceId: "nope_inst_3" }]
-  turn.pendingAction.isNoped: false → true        ← entries.length=1, 1%2===1
-  turn.pendingAction.nopeWindowExpiresAt: reset to now() + 3000
+passCardById             (choose-card-id — Favor, the giver picks)
+passCardByIndex          (choose-card-index — two-card combo, blind position)
+passCardByType           (choose-card-type — three-card combo, named type)
+  players[from].hand     card removed
+  players[to].hand       card inserted at a RANDOM index
+  givenCard              null → the card
 ```
 
-### 7c. B counter-Nopes (using Nope stolen from C in turn 2)
+All three resolve the same pair: `from` is `selectedPlayerId`, `to` is
+`currentTurnPlayerId`. They differ only in how they locate the card — by id, by
+position, or by type.
 
-```
-MUTATION: remove nope_inst_2 from B.hand → discardPile
-  B.hand: [catter_inst_3, shuffle_inst_1, hairy_inst_1, shuffle_inst_3]
+The random insert is deliberate. If the card landed at a predictable index, a
+two-card combo's blind pick would leak: the thief would know where their own new card
+sits, and by elimination, something about the order of the hand it came from.
 
-MUTATION: append to NopeChain, flip parity, reset timer
-  turn.nopeChain.entries:
-    [{ playerId: "D", cardInstanceId: "nope_inst_3" }]
-    → [
-        { playerId: "D", cardInstanceId: "nope_inst_3" },
-        { playerId: "B", cardInstanceId: "nope_inst_2" }
-      ]
-  turn.pendingAction.isNoped: true → false         ← entries.length=2, 2%2===0
-  turn.pendingAction.nopeWindowExpiresAt: reset to now() + 3000
-```
+`passCardByType` is the one that can find nothing. When the target holds no card of
+the named type the machine emits `NO_CARD_OF_REQUESTED_TYPE` instead and no transfer
+happens.
 
-### 7d. Timer expires → Attack resolves
-
-```
-CHECK: turn.pendingAction.isNoped === false → execute
-READ: turn.pendingAction.type === ATTACK
-
-ATTACK LOGIC:
-  turn.isUnderAttack === false → FLAT 2
-  next player (C) gets attackCount = 2
-
-MUTATION: clear PendingAction + NopeChain
-  turn.pendingAction: {...} → null
-  turn.nopeChain: {...} → null
-
-MUTATION: advance turn (Attack bypasses draw)
-  turn.currentPlayerId: "B" → "C"
-  turn.phase: NOPE_WINDOW → ACTION
-  turn.attackCount: → 2           ← from Attack
-  turn.isUnderAttack: → true      ← created by Attack
-  turn.turnNumber: 7 → 8
-
-B.hand AFTER: [catter_inst_3, shuffle_inst_1, hairy_inst_1, shuffle_inst_3]  (4 cards, no Defuse, no Nope)
-```
+Afterwards three cleanups run — `clearPendingAction`, `clearSelectedPlayer`,
+`clearGivenCard` — returning `pendingAction`, `selectedPlayerId` and `givenCard` to
+`null`.
 
 ---
 
-## Turn 8 — C: Skip (under attack) + Draw
-
-### 8a. C plays Skip while under attack
+## Shuffle
 
 ```
-TurnState BEFORE: { currentPlayer: C, attackCount: 2, isUnderAttack: true }
-
-MUTATION: remove skip_inst_6 → discardPile
-MUTATION: create PendingAction { type: SKIP } + NopeChain, phase → NOPE_WINDOW
+shuffleDeck
+  deck                 shuffled copy — context.deck.slice() then shuffle
 ```
 
-### 8b. Timer expires → Skip resolves
-
-```
-CHECK: isNoped === false → execute
-READ: type === SKIP
-
-SKIP LOGIC (under attack):
-  turn.attackCount was 2
-  turn.attackCount-- → 1
-  attackCount > 0 → back to ACTION, player owes more draws
-
-MUTATION: clear PendingAction + NopeChain, phase → ACTION
-  (turn does NOT advance, C still has draws to complete)
-```
-
-### 8c. C draws normal card
-
-```
-MUTATION: draw catter_inst_7 → C.hand
-DRAW LOGIC:
-  turn.attackCount was 1
-  turn.attackCount-- → 0
-  attackCount === 0 → turn ends
-
-MUTATION: advance turn → D, turnNumber: 8 → 9
-  turn.attackCount: → 1 (reset)
-  turn.isUnderAttack: → false
-
-C used Skip to reduce 2 draws to 1. Total draws: 1 instead of 2.
-```
+A new array, not an in-place shuffle. Any `SEE_THE_FUTURE_PEEK` a client is holding is
+now worthless, which is what `DECK_SHUFFLED` exists to tell them.
 
 ---
 
-## Turn 9 — D: Attack (stacking)
-
-### 9a. D plays Attack while not under attack
+## Game over
 
 ```
-TurnState: { currentPlayer: D, attackCount: 1, isUnderAttack: false }
-
-MUTATION: remove attack_inst_3 → discardPile
-MUTATION: create PendingAction { type: ATTACK } + NopeChain, phase → NOPE_WINDOW
+explodePlayer            players[X].isAlive → false
 ```
 
-### 9b. Timer expires → Attack resolves
-
-```
-ATTACK LOGIC:
-  turn.isUnderAttack === false → FLAT 2
-  next player: E (alive), gets attackCount = 2
-
-MUTATION: advance turn
-  turn.currentPlayerId: "D" → "E"
-  turn.attackCount: → 2
-  turn.isUnderAttack: → true
-  turn.turnNumber: 9 → 10
-```
+Then the `IS_ONLY_ONE_PLAYER_LEFT_ALIVE` guard decides between `CHANGING_TURN` and
+`GAME_OVER`. The winner is read out of `players` at that point; context has no
+`winnerId` field. Anything durable — who won, when the game started and finished —
+lives in the database `GameRecord`, not in the machine.
 
 ---
 
-## Turn 10 — E: Draw twice (no Defuse) → ELIMINATED
-
-### 10a. E draws first card (normal)
-
-```
-TurnState: { currentPlayer: E, attackCount: 2, isUnderAttack: true }
-E.hand: [beard_inst_3, beard_inst_4, beard_inst_5, catter_inst_4, beard_inst_1]
-  *** NO DEFUSE ***
-
-MUTATION: draw hairy_inst_8 → E.hand
-DRAW LOGIC: attackCount 2 → 1, still > 0 → back to ACTION
-```
-
-### 10b. E draws second card → Exploding Kitten
-
-```
-MUTATION: draw from deck → ek_inst_2 (EXPLODING_KITTEN)
-  deck.drawPile → shift() → ek_inst_2
-
-CHECK: type === EXPLODING_KITTEN
-MUTATION: phase → DEFUSE_PROMPT
-
-CHECK: E.hand contains DEFUSE? → NO
-
-MUTATION: eliminate E
-  E.isAlive: true → false
-  E.hand: [beard_inst_3, beard_inst_4, beard_inst_5, catter_inst_4, beard_inst_1, hairy_inst_8]
-    → all cards + ek_inst_2 moved to deck.discardPile
-    → E.hand: []
-
-PRIVATE → E: CARD_REMOVED × 6 { reason: EXPLODED } + CARD_REMOVED { ek_inst_2, EXPLODED }
-
-CHECK: alive players count?
-  A(alive), B(alive), C(alive), D(alive) = 4 → game continues
-
-MUTATION: advance turn → A (next alive after E)
-  turn.currentPlayerId: "E" → "A"
-  turn.turnNumber: 10 → 11
-```
-
----
-
-## Turns 11–12 (abbreviated)
-
-### Turn 11 — A: See the Future + Draw
-
-```
-A peeks: [normal, normal, ek_inst_3]. Safe to draw top.
-A draws normal card. Turn ends → B.
-```
-
-### Turn 12 — B: Draw → Exploding Kitten → No Defuse → ELIMINATED
-
-```
-B draws ek_inst_3. B has no Defuse (used in turn 2).
-B.isAlive: true → false
-B.hand → all to discardPile
-
-Alive: A, C, D (3 players). Turn order now skips B and E.
-Advance → C, turnNumber: 13.
-```
-
----
-
-## Turn 13 — C: Pair Combo (Rainbow-Ralphing Cats) + Draw
-
-### 13a. C plays pair targeting D
-
-```
-MUTATION: remove rainbow_inst_1, rainbow_inst_2 from C.hand → discardPile
-MUTATION: create PendingAction { type: CAT_PAIR, targetPlayerId: "D" } + NopeChain, phase → NOPE_WINDOW
-```
-
-### 13b. Timer expires → Pair resolves
-
-```
-PAIR LOGIC: random card from D.hand → stf_inst_4
-
-MUTATION: transfer
-  D.hand: → remove stf_inst_4
-  C.hand: → add stf_inst_4
-
-MUTATION: clear, phase → ACTION
-```
-
-### 13c. C draws normally
-
-```
-Turn ends → D, turnNumber: 14.
-```
-
----
-
-## Turn 14 — D: Favor (Noped by A) + Draw EK + Defuse + Insert + Draw
-
-### 14a. D plays Favor targeting A
-
-```
-MUTATION: remove favor_inst_3 → discardPile
-MUTATION: create PendingAction { type: FAVOR, targetPlayerId: "A" } + NopeChain, phase → NOPE_WINDOW
-```
-
-### 14b. A plays Nope
-
-```
-MUTATION: remove nope_inst_1 from A.hand → discardPile
-MUTATION: append to NopeChain
-  turn.nopeChain.entries: [] → [{ playerId: "A", cardInstanceId: "nope_inst_1" }]
-  turn.pendingAction.isNoped: false → true
-  turn.pendingAction.nopeWindowExpiresAt: reset
-```
-
-### 14c. Timer expires → Favor cancelled
-
-```
-CHECK: turn.pendingAction.isNoped === true → CANCELLED
-
-MUTATION: clear PendingAction + NopeChain, phase → ACTION
-  turn.pendingAction: {...} → null
-  turn.nopeChain: {...} → null
-  turn.favorState: still null     ← FavorState was NEVER CREATED because action was Noped
-  
-  Favor card + Nope card both stay on discardPile (lost per rules).
-  D still needs to draw.
-```
-
-### 14d. D draws Exploding Kitten
-
-```
-MUTATION: draw → ek_inst_4 (EXPLODING_KITTEN)
-MUTATION: phase → DEFUSE_PROMPT
-
-D has defuse_inst_d.
-```
-
-### 14e. D plays Defuse
-
-```
-MUTATION: remove defuse_inst_d from D.hand → discardPile
-MUTATION: phase → INSERT_KITTEN
-```
-
-### 14f. D inserts kitten at position 0 (top — trap for A)
-
-```
-MUTATION: deck.drawPile.splice(0, 0, ek_inst_4)
-  ek_inst_4 is now the top card of the deck
-
-MUTATION: phase → ACTION (D still owes a draw)
-```
-
-### 14g. D draws normal card
-
-```
-MUTATION: draw → deck.drawPile.shift()
-  This draws ek_inst_4... wait, D just placed it at position 0.
-  Actually after insert, drawPile[0] = ek_inst_4. D draws the kitten they just placed!
-
-  Correction: D would draw their own kitten. This is a mistake in the game narrative.
-  In practice D would put the kitten deeper. Let's say D puts it at position 1 instead.
-
-CORRECTED: D inserts at position 1
-  deck.drawPile[0] = some normal card
-  deck.drawPile[1] = ek_inst_4
-
-MUTATION: draw normal card from position 0 → D.hand
-DRAW LOGIC: attackCount 1 → 0 → turn ends
-
-MUTATION: advance turn → A (skip B and E, both dead)
-  turn.turnNumber: 14 → 15
-
-D.hand AFTER: no Defuse remaining
-```
-
----
-
-## Turn 15 — A: Draw → EK at position 0 (D placed kitten at 1, now shifted to 0)
-
-```
-After D drew from position 0, the kitten at position 1 shifted to position 0.
-
-A draws → ek_inst_4 (EXPLODING_KITTEN)
-phase → DEFUSE_PROMPT
-
-A has 2 Defuses: defuse_inst_a, defuse_inst_e
-
-MUTATION: remove defuse_inst_a → discardPile
-MUTATION: phase → INSERT_KITTEN
-
-A inserts at position 1.
-MUTATION: deck.drawPile.splice(1, 0, ek_inst_4)
-
-phase → ACTION (A still owes a draw)
-
-A draws normal card. attackCount 1 → 0 → turn ends.
-
-MUTATION: advance → C (skip B, E dead), turnNumber: 15 → 16
-
-A.hand AFTER: still has defuse_inst_e (1 Defuse remaining)
-```
-
----
-
-## Turns 16-21 (abbreviated — game concludes)
-
-### Turn 16 — C: See the Future + Shuffle + Draw
-
-```
-C uses stf_inst_4 (stolen from D). Sees kitten at position 1. Plays Shuffle.
-Deck reshuffled. Draws normal card. Turn ends → D.
-```
-
-### Turn 17 — D: Draw → EK → No Defuse → ELIMINATED
-
-```
-D draws Exploding Kitten. No Defuse (used turn 14).
-D.isAlive: true → false
-Alive: A, C (2 players). Advance → A.
-```
-
-### Turn 18 — A: Draw normal
-
-```
-A draws. Turn ends → C.
-```
-
-### Turn 19 — C: Draw → EK → Defuse → Insert → Draw
-
-```
-C draws EK. Plays defuse_inst_c. Inserts kitten at position 0.
-Draws normal card. Turn ends → A.
-C.hand AFTER: no Defuse remaining.
-```
-
-### Turn 20 — A: Draw → EK (placed by C) → Defuse → Insert → Draw
-
-```
-A draws kitten placed by C. Plays defuse_inst_e (last Defuse).
-Inserts kitten at position 0. Draws normal card. Turn ends → C.
-A.hand AFTER: no Defuse remaining.
-```
-
-### Turn 21 — C: Draw → EK → No Defuse → ELIMINATED → GAME OVER
-
-```
-C draws kitten placed by A.
-C has no Defuse.
-
-MUTATION: eliminate C
-  C.isAlive: true → false
-
-CHECK: alive players count?
-  A(alive) = 1 → GAME OVER
-
-MUTATION:
-  GameState.winnerId: null → "A"
-  GameState.status: PLAYING → FINISHED
-  GameState.finishedAt: null → 1700001200
-
-BROADCAST: GAME_OVER { winnerId: "A" }
-```
-
----
-
-## Interface Lifecycle Summary
-
-### PendingAction lifecycle (created and destroyed 14 times)
-
-```
-Created: when any card or combo is played
-  ← populated from PlayCardAction or PlayComboAction fields
-  ← always paired with NopeChain creation
-  ← phase always set to NOPE_WINDOW
-
-Lives: during NOPE_WINDOW phase only
-  ← isNoped flips on each Nope entry
-  ← nopeWindowExpiresAt resets on each Nope entry
-
-Destroyed: when timer expires
-  ← if FAVOR + executed: targetPlayerId handed off to FavorState before destruction
-  ← always paired with NopeChain destruction
-  ← phase always changes away from NOPE_WINDOW
-```
-
-### NopeChain lifecycle (always paired with PendingAction)
-
-```
-Created: simultaneously with PendingAction, starts with empty entries
-Modified: entries.push() on each PLAY_NOPE
-Destroyed: simultaneously with PendingAction on timer expiry
-Never exists without PendingAction. Never outlives PendingAction.
-```
-
-### FavorState lifecycle (created only when Favor resolves)
-
-```
-NOT created: when Favor card is played (that creates PendingAction)
-NOT created: when Favor is Noped (PendingAction destroyed, FavorState never touched)
-Created: only when Favor's Nope window resolves with executed=true
-  ← requesterId from PendingAction.playerId
-  ← targetPlayerId from PendingAction.targetPlayerId
-  ← phase set to FAVOR_SELECT
-
-Lives: during FAVOR_SELECT phase only
-Destroyed: when target sends FAVOR_GIVE
-  ← phase returns to ACTION
-```
-
-### Deck mutations
-
-```
-drawPile.shift()           → every DRAW_CARD
-drawPile.splice(i, 0, ek)  → every INSERT_KITTEN
-shuffle(drawPile)           → every SHUFFLE resolved
-discardPile.unshift(card)   → every card played, every Nope, every Defuse
-```
-
-### Player.hand mutations
-
-```
-Remove: card played (PLAYED), card stolen (STOLEN), card given (GIVEN_AWAY), eliminated (EXPLODED)
-Add: card drawn (fromId: null), card received via combo (fromId: playerId), card received via Favor (fromId: playerId)
-Clear: entire hand on elimination → discardPile
-```
-
-### Turn advancement patterns
-
-```
-Normal end:    attackCount reaches 0 after draw → next alive player, attackCount=1, isUnderAttack=false
-Attack end:    Attack resolves → next alive player, attackCount=2 (or stacked), isUnderAttack=true
-Skip end:      attackCount reaches 0 after Skip decrement → next alive player
-Elimination:   player dies → next alive player, attackCount=1, isUnderAttack=false
-```
+## Not in context
+
+Worth stating plainly, because earlier drafts of this document assumed otherwise:
+
+| Not a context field | Where it actually lives |
+|---|---|
+| `gameId`, `status`, `winnerId`, `createdAt`, `startedAt`, `finishedAt` | the DB `GameRecord` |
+| `rules` | the `DEFAULT_GAME_RULES` module constant |
+| `phase` / `TurnPhase` | the machine's own state node |
+| `turnNumber` | nowhere — nothing counts turns |
+| `discardPile` | nowhere — played cards are discarded by being filtered out |
+| `turnOrder` | nowhere — order is `players` array position |

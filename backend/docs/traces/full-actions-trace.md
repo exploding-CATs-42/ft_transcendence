@@ -1,762 +1,622 @@
 # Full Game Trace — 5 Players, All Card Types
 
-Players: A, B, C, D, E (turnOrder 0–4, clockwise)
+A complete game traced at the socket level, from the deal to a winner. Every line is
+a real event from `@exploding-cats/contracts`, with the payload shape it actually
+carries. Use this alongside [the socket spec](../sockets/asyncapi.yaml); this file
+shows the *ordering*, the spec shows the field-by-field schemas.
+
+## How to read this
+
+```
+A → server        client event, always carrying gameId
+server → A        private emit, to that player's sockets only
+server → ¬A       public emit, to the room except that player
+server → all      public emit, to the whole room
+                  plain text is commentary, not traffic
+```
+
+Two things worth knowing before the first turn:
+
+- **Cards are numeric ids, not strings.** A card is `{ id, type, name, ... }` and the
+  wire only ever carries `cardId: number`. Ids are assigned once at deck creation by
+  walking `cards.json` in order, so they are grouped by type:
+
+  | Type | ids | | Type | ids |
+  |---|---|---|---|---|
+  | `EXPLODING_KITTEN` | 0–3 | | `NOPE` | 31–35 |
+  | `DEFUSE` | 4–9 | | `TACOCAT` | 36–39 |
+  | `ATTACK` | 10–13 | | `HAIRY_POTATO_CAT` | 40–43 |
+  | `SKIP` | 14–17 | | `BEARD_CAT` | 44–47 |
+  | `FAVOR` | 18–21 | | `CATTERMELON` | 48–51 |
+  | `SHUFFLE` | 22–25 | | `RAINBOW_RALPHING_CAT` | 52–55 |
+  | `SEE_THE_FUTURE` | 26–30 | | | |
+
+  56 cards, ids 0–55 — which is exactly why every `cardId` schema is
+  `min(0).max(55)`.
+
+- **`attackCount` on the wire is the number of draws the current player still owes.**
+  Internally it is `turnsCount`. A normal turn is `1`. Drawing decrements it; the turn
+  ends when it reaches `0`. Attack sets it to `2`, or adds `2` to an existing attack.
+
+The Nope window is `NOPE_WINDOW_MS` = **3000 ms**.
 
 ## Setup
 
 ```
-Deal: 7 random cards + 1 Defuse each = 8 cards per player (40 cards dealt)
-Deck: remaining normal cards + 1 extra Defuse (min(2, 6-5)=1) + 4 Exploding Kittens
-Turn direction: A → B → C → D → E → A → ...
+Players: A, B, C, D, E (turnOrder 0–4)
+
+56-card deck splits into 4 Exploding Kittens, 6 Defuses, 46 others.
+Deal 7 others + 1 Defuse each = 8 cards per player (35 others + 5 Defuses).
+Deck = 11 remaining others + 1 Defuse shuffled back + 4 Kittens = 16 cards.
 ```
 
-Starting hands (relevant cards shown):
-```
-A: Defuse, See the Future, Skip, Tacocat, Tacocat, Nope, Beard Cat
-B: Defuse, Attack, Cattermelon, Cattermelon, Cattermelon, Shuffle, Hairy Potato Cat
-C: Defuse, Favor, Nope, Rainbow-Ralphing Cat, Rainbow-Ralphing Cat, Skip, Beard Cat
-D: Defuse, Attack, See the Future, Tacocat, Shuffle, Hairy Potato Cat, Nope
-E: Defuse, Favor, Beard Cat, Beard Cat, Beard Cat, Cattermelon, Skip
-```
-
----
-
-## Turn 1 — A (normal turn)
-> A plays See the Future, sees an Exploding Kitten on top, plays Skip to avoid drawing it.
+Starting hands:
 
 ```
-                        TurnState: { currentPlayer: A, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 1 }
-
-CLIENT A → Server       PlayCardAction { PLAY_CARD, "stf_inst_1" }
-  Server → Client A     CARD_REMOVED { "stf_inst_1", PLAYED }
-  Server → All          CARD_PLAYED { A, SEE_THE_FUTURE, "uuid-1", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-1", SEE_THE_FUTURE, executed: true }
-  Server → Client A     SEE_THE_FUTURE_PEEK { [exploding_kitten_inst_1, shuffle_inst_3, attack_inst_2] }
-
-                        A sees Exploding Kitten on top. Plays Skip to avoid drawing.
-
-CLIENT A → Server       PlayCardAction { PLAY_CARD, "skip_inst_1" }
-  Server → Client A     CARD_REMOVED { "skip_inst_1", PLAYED }
-  Server → All          CARD_PLAYED { A, SKIP, "uuid-2", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-2", SKIP, executed: true }
-
-                        Skip on normal turn (attackCount=1): attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: B, turnNumber: 2 }
+A: 4 Defuse | 14 Skip, 26 See the Future, 31 Nope, 36 Tacocat, 44/45/46 Beard Cat
+B: 5 Defuse | 10 Attack, 22 Shuffle, 32 Nope, 40 Hairy Potato, 49/50/51 Cattermelon
+C: 6 Defuse | 15 Skip, 18 Favor, 27 See the Future, 33 Nope, 48 Cattermelon, 52/53 Rainbow-Ralphing
+D: 7 Defuse | 11 Attack, 19 Favor, 23 Shuffle, 28 See the Future, 34 Nope, 38 Tacocat, 41 Hairy Potato
+E: 8 Defuse | 12 Attack, 16 Skip, 20 Favor, 37 Tacocat, 42 Hairy Potato, 47 Beard Cat, 54 Rainbow-Ralphing
 ```
 
-A's hand: 6 cards (spent See the Future + Skip, drew nothing)
-
----
-
-## Turn 2 — B (normal turn)
-> B plays a pair of Cattermelons to steal a random card from C.
+Deck, top first — fixed here so the trace is reproducible:
 
 ```
-                        TurnState: { currentPlayer: B, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 2 }
-
-CLIENT B → Server       PlayComboAction { PLAY_COMBO, ["catter_inst_1", "catter_inst_2"], targetPlayerId: C }
-  Server → Client B     CARD_REMOVED { "catter_inst_1", PLAYED }
-  Server → Client B     CARD_REMOVED { "catter_inst_2", PLAYED }
-  Server → All          COMBO_PLAYED { B, CATTERMELON, 2, C, "uuid-3", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-                        Server picks random card from C's hand → gets C's Nope card.
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-3", CAT_PAIR, executed: true }
-  Server → Client C     CARD_REMOVED { "nope_inst_2", STOLEN }
-  Server → Client B     CARD_RECEIVED { nope_inst_2, fromId: C }
-
-                        B now has C's Nope. B still needs to draw.
-
-CLIENT B → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws top card (Exploding Kitten!). But wait — A skipped it,
-                        so it's still on top. B draws it.
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: B }
-  Server → Client B     DEFUSE_PROMPT { }
-
-                        B has a Defuse.
-
-CLIENT B → Server       PlayDefuseAction { PLAY_DEFUSE, "defuse_inst_b" }
-  Server → Client B     CARD_REMOVED { "defuse_inst_b", PLAYED }
-  Server → All          PLAYER_DEFUSED { playerId: B }
-  Server → Client B     INSERT_KITTEN_PROMPT { deckSize: 15 }
-
-                        B puts the kitten near the bottom to protect themselves.
-
-CLIENT B → Server       InsertKittenAction { INSERT_KITTEN, positionIndex: 13 }
-  Server → All          KITTEN_INSERTED { playerId: B }
-
-                        Kitten reinserted. B still owes a draw (the EK draw doesn't end the turn).
-
-CLIENT B → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws next card → normal card (shuffle_inst_3).
-
-  Server → Client B     CARD_RECEIVED { shuffle_inst_3, fromId: null }
-  Server → All          CARD_DRAWN { playerId: B }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: C, turnNumber: 3 }
-```
-
-B's hand: 6 cards (spent 2 Cattermelons + Defuse, gained Nope + Shuffle, drew Shuffle)
-
----
-
-## Turn 3 — C (normal turn)
-> C plays Favor on D. D gives a card. C draws normally.
-
-```
-                        TurnState: { currentPlayer: C, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 3 }
-
-CLIENT C → Server       PlayCardAction { PLAY_CARD, "favor_inst_1", targetPlayerId: D }
-  Server → Client C     CARD_REMOVED { "favor_inst_1", PLAYED }
-  Server → All          CARD_PLAYED { C, FAVOR, "uuid-4", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-4", FAVOR, executed: true }
-  Server → All          FAVOR_REQUESTED { requesterId: C, targetPlayerId: D }
-  Server → Client D     FAVOR_MUST_GIVE { requesterId: C, requesterName: "Charlie" }
-
-                        D must give a card. D gives their least useful card — a Tacocat.
-
-CLIENT D → Server       FavorGiveAction { FAVOR_GIVE, "taco_inst_4" }
-  Server → Client D     CARD_REMOVED { "taco_inst_4", GIVEN_AWAY }
-  Server → Client C     CARD_RECEIVED { taco_inst_4, fromId: D }
-  Server → All          FAVOR_RESOLVED { requesterId: C, targetPlayerId: D }
-
-                        C got D's Tacocat. C still needs to draw.
-
-CLIENT C → Server       DrawCardAction { DRAW_CARD }
-
-                        Normal card drawn.
-
-  Server → Client C     CARD_RECEIVED { beard_cat_inst_5, fromId: null }
-  Server → All          CARD_DRAWN { playerId: C }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: D, turnNumber: 4 }
-```
-
-C's hand: 7 cards (spent Favor, gained Tacocat + Beard Cat)
-
----
-
-## Turn 4 — D (normal turn)
-> D plays Shuffle then draws normally.
-
-```
-                        TurnState: { currentPlayer: D, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 4 }
-
-CLIENT D → Server       PlayCardAction { PLAY_CARD, "shuffle_inst_4" }
-  Server → Client D     CARD_REMOVED { "shuffle_inst_4", PLAYED }
-  Server → All          CARD_PLAYED { D, SHUFFLE, "uuid-5", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-5", SHUFFLE, executed: true }
-  Server → All          DECK_SHUFFLED { }
-
-                        Deck is reshuffled. D draws.
-
-CLIENT D → Server       DrawCardAction { DRAW_CARD }
-
-                        Normal card drawn.
-
-  Server → Client D     CARD_RECEIVED { favor_inst_3, fromId: null }
-  Server → All          CARD_DRAWN { playerId: D }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: E, turnNumber: 5 }
-```
-
-D's hand: 7 cards (spent Shuffle + Tacocat, gained Favor + drew Favor)
-
----
-
-## Turn 5 — E (normal turn)
-> E plays Attack. A gets 2 turns.
-
-```
-                        TurnState: { currentPlayer: E, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 5 }
-
-CLIENT E → Server       PlayCardAction { PLAY_CARD, "favor_inst_2" , targetPlayerId: A }
-  Server → Client E     CARD_REMOVED { "favor_inst_2", PLAYED }
-  Server → All          CARD_PLAYED { E, FAVOR, "uuid-6", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-6", FAVOR, executed: true }
-  Server → All          FAVOR_REQUESTED { requesterId: E, targetPlayerId: A }
-  Server → Client A     FAVOR_MUST_GIVE { requesterId: E, requesterName: "Eve" }
-
-                        A gives their Beard Cat (keeping Nope and Defuse safe).
-
-CLIENT A → Server       FavorGiveAction { FAVOR_GIVE, "beard_cat_inst_1" }
-  Server → Client A     CARD_REMOVED { "beard_cat_inst_1", GIVEN_AWAY }
-  Server → Client E     CARD_RECEIVED { beard_cat_inst_1, fromId: A }
-  Server → All          FAVOR_RESOLVED { requesterId: E, targetPlayerId: A }
-
-                        E still needs to draw or play more cards. E plays Attack on next player (A).
-
-CLIENT E → Server       PlayCardAction { PLAY_CARD, "skip_inst_5" }
-  Server → Client E     CARD_REMOVED { "skip_inst_5", PLAYED }
-  Server → All          CARD_PLAYED { E, SKIP, "uuid-7", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-7", SKIP, executed: true }
-
-                        Skip on normal turn: attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: A, turnNumber: 6 }
-```
-
-E's hand: 6 cards (spent Favor + Skip, gained Beard Cat)
-
----
-
-## Turn 6 — A (normal turn)
-> A plays triple combo — 2 Tacocats + ... wait, A only has 2 Tacocats. A plays a pair instead.
-> A plays a pair of Tacocats to steal a random card from E.
-
-```
-                        TurnState: { currentPlayer: A, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 6 }
-
-CLIENT A → Server       PlayComboAction { PLAY_COMBO, ["taco_inst_1", "taco_inst_2"], targetPlayerId: E }
-  Server → Client A     CARD_REMOVED { "taco_inst_1", PLAYED }
-  Server → Client A     CARD_REMOVED { "taco_inst_2", PLAYED }
-  Server → All          COMBO_PLAYED { A, TACOCAT, 2, E, "uuid-8", expires: +3000 }
-
-                        E plays Nope!
-
-CLIENT E → Server       PlayNopeAction { PLAY_NOPE, "nope... wait, does E have a Nope? No.
-                        Let's say no Nope happens.
-
-                        ... 3 seconds, no Nopes ...
-
-                        Server picks random card from E's hand → gets E's Defuse!
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-8", CAT_PAIR, executed: true }
-  Server → Client E     CARD_REMOVED { "defuse_inst_e", STOLEN }
-  Server → Client A     CARD_RECEIVED { defuse_inst_e, fromId: E }
-
-                        A stole E's Defuse. E now has no Defuse. A has 2 Defuses.
-                        A draws.
-
-CLIENT A → Server       DrawCardAction { DRAW_CARD }
-  Server → Client A     CARD_RECEIVED { hairy_inst_6, fromId: null }
-  Server → All          CARD_DRAWN { playerId: A }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: B, turnNumber: 7 }
+0(EK) 24 13 29 1(EK) 9 17 21 39 2(EK) 25 43 30 55 35 3(EK)
 ```
 
 ---
 
-## Turn 7 — B (normal turn)
-> B plays triple Cattermelon... wait, B only has 1 Cattermelon left. B plays Attack.
+## Turn 1 — A · `attackCount: 1`
+
+> A peeks, sees a kitten on top, and Skips instead of drawing.
 
 ```
-                        TurnState: { currentPlayer: B, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 7 }
+A → server        play-card { gameId, cardId: 26 }
+server → A        card-removed { cardId: 26, reason: PLAYED }
+server → ¬A       card-played { playerId: A, cardType: SEE_THE_FUTURE,
+                                nopeWindowExpiresAt: t+3000 }
 
-CLIENT B → Server       PlayCardAction { PLAY_CARD, "attack_inst_1" }
-  Server → Client B     CARD_REMOVED { "attack_inst_1", PLAYED }
-  Server → All          CARD_PLAYED { B, ATTACK, "uuid-9", expires: +3000 }
+                  ... 3000 ms, nobody Nopes ...
 
-                        D plays Nope on B's Attack!
+server → all      NOPE_WINDOW_RESOLVED                       (no payload)
+server → A        SEE_THE_FUTURE_PEEK { playerId: A, cards: [0, 24, 13] }
+server → ¬A       player-looks-at-the-future                 (no payload)
 
-CLIENT D → Server       PlayNopeAction { PLAY_NOPE, "nope_inst_3" }
-  Server → Client D     CARD_REMOVED { "nope_inst_3", PLAYED }
-  Server → All          NOPE_PLAYED { D, "uuid-9", expires: +3000 (reset) }
+A → server        seen-the-future { gameId }
+server → ¬A       PLAYER_SAW_THE_FUTURE                      (no payload)
 
-                        B counter-Nopes with the Nope stolen from C earlier!
+                  A saw kitten 0 on top. Skip costs a card but avoids it.
 
-CLIENT B → Server       PlayNopeAction { PLAY_NOPE, "nope_inst_2" }
-  Server → Client B     CARD_REMOVED { "nope_inst_2", PLAYED }
-  Server → All          NOPE_PLAYED { B, "uuid-9", expires: +3000 (reset) }
+A → server        play-card { gameId, cardId: 14 }
+server → A        card-removed { cardId: 14, reason: PLAYED }
+server → ¬A       card-played { playerId: A, cardType: SKIP, nopeWindowExpiresAt: t+3000 }
 
-                        ... 3 seconds, no more Nopes ...
+                  ... 3000 ms ...
 
-                        nopeChain.entries.length = 2, isNoped = false → Attack executes.
-                        B is not under attack (isUnderAttack=false) → C gets attackCount = 2.
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-9", ATTACK, executed: true }
-  Server → All          TURN_CHANGED { currentPlayer: C, attackCount: 2, isUnderAttack: true, turnNumber: 8 }
+server → all      NOPE_WINDOW_RESOLVED
+server → all      TURN_SKIPPED  { playerId: A, attackCount: 1 }
+server → all      TURN_CHANGED  { playerId: B, attackCount: 1 }
 ```
 
-B spent Attack + Nope. No draw (Attack bypasses draw). C is under attack with 2 draws.
+`attackCount` is still `1` in `TURN_SKIPPED`. On a normal turn Skip does not decrement
+it — the machine goes straight to changing the turn. The decrement only happens when
+the player owes more than one draw, which Turn 12 shows.
+
+**Deck 16 · kittens 4** · A holds 4, 31, 36, 44, 45, 46
 
 ---
 
-## Turn 8 — C (under attack, attackCount: 2)
-> C plays Attack back! Stacking: C is under attack with 2 remaining, next player gets 2+2=4.
+## Turn 2 — B · `attackCount: 1`
+
+> A three-card combo naming a type the target does hold, then a defused kitten.
 
 ```
-                        TurnState: { currentPlayer: C, phase: ACTION, attackCount: 2, isUnderAttack: true, turnNumber: 8 }
+B → server        play-combo { gameId, cardIds: [49, 50, 51] }
+server → B        card-removed { cardId: 49, reason: PLAYED }
+server → B        card-removed { cardId: 50, reason: PLAYED }
+server → B        card-removed { cardId: 51, reason: PLAYED }
+server → ¬B       COMBO_PLAYED { playerId: B,
+                                 cardTypes: [CATTERMELON, CATTERMELON, CATTERMELON],
+                                 nopeWindowExpiresAt: t+3000 }
 
-CLIENT C → Server       PlayCardAction { PLAY_CARD, "skip_inst_6" }
-  Server → Client C     CARD_REMOVED { "skip_inst_6", PLAYED }
-  Server → All          CARD_PLAYED { C, SKIP, "uuid-10", expires: +3000 }
+                  ... 3000 ms ...
 
-                        ... 3 seconds, no Nopes ...
+server → all      NOPE_WINDOW_RESOLVED
+server → all      WAITING_FOR_PLAYER_SELECTION               (no payload)
 
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-10", SKIP, executed: true }
+B → server        select-player { gameId, playerId: C }
+server → all      PLAYER_SELECTED { playerId: C }
+server → all      WAITING_FOR_CARD_TYPE_SELECTION { targetPlayerId: C }
 
-                        Skip under attack: attackCount-- → 1. Still owes 1 more draw.
-                        Phase → ACTION. C draws.
+B → server        choose-card-type { gameId, cardType: NOPE }
 
-CLIENT C → Server       DrawCardAction { DRAW_CARD }
-  Server → Client C     CARD_RECEIVED { catter_inst_7, fromId: null }
-  Server → All          CARD_DRAWN { playerId: C }
+                  C holds Nope 33, so the demand is satisfied.
 
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: D, turnNumber: 9 }
+server → C        card-removed  { cardId: 33, reason: STOLEN }
+server → B        card-received { card: { id: 33, type: NOPE, ... },
+                                  reason: CAT_TRIPLE, playerIdFrom: C }
+server → all      CARD_STOLEN   { playerIdFrom: C, playerIdTo: B, cardType: NOPE }
 ```
 
-C used Skip to cancel 1 of 2 attack draws, then drew once. Total: 1 draw instead of 2.
+`CARD_STOLEN` carries `cardType` here because a three-card combo names the type out
+loud — it was already public. Turn 8 shows the two-card case, where it is withheld.
+
+The combo did not end the turn; B still owes its draw.
+
+```
+B → server        draw-card { gameId }
+
+                  Kitten 0 is still on top — A skipped past it.
+
+server → all      EXPLODING_KITTEN_DRAWN { kittensInDeck: 3 }
+server → B        DEFUSE_PROMPT { playerId: B, endsAt: t+..., canDefuse: true }
+
+B → server        play-defuse { gameId }
+server → B        card-removed { cardId: 5, reason: PLAYED }
+server → all      PLAYER_DEFUSED { playerId: B, deckSize: 15 }
+
+                  No prompt is emitted for the insertion. The player who just defused
+                  drives it from their own client; everyone else learns the outcome.
+
+B → server        insert-kitten { gameId, explodingKittenPosition: 13 }
+server → all      KITTEN_INSERTED { playerId: B, cardId: 0, kittensInDeck: 4 }
+
+                  The chosen position is never revealed — only that it happened.
+                  Drawing the kitten already consumed B's draw, so the turn ends.
+
+server → all      TURN_CHANGED { playerId: C, attackCount: 1 }
+```
+
+**Deck 16 · kittens 4** · B holds 10, 22, 32, 33, 40 · C holds 6, 15, 18, 27, 48, 52, 53
+
+Deck is now `24 13 29 1 9 17 21 39 2 25 43 30 55 0 35 3`.
 
 ---
 
-## Turn 9 — D (normal turn)
-> D plays Attack. E gets 2 turns.
+## Turn 3 — C · `attackCount: 1`
+
+> A Nope and a counter-Nope cancel out, so the Favor goes through.
 
 ```
-                        TurnState: { currentPlayer: D, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 9 }
+C → server        play-card { gameId, cardId: 18 }
+server → C        card-removed { cardId: 18, reason: PLAYED }
+server → ¬C       card-played { playerId: C, cardType: FAVOR, nopeWindowExpiresAt: t+3000 }
 
-CLIENT D → Server       PlayCardAction { PLAY_CARD, "attack_inst_3" }
-  Server → Client D     CARD_REMOVED { "attack_inst_3", PLAYED }
-  Server → All          CARD_PLAYED { D, ATTACK, "uuid-11", expires: +3000 }
+                  D does not want to give anything up.
 
-                        ... 3 seconds, no Nopes ...
+D → server        play-nope { gameId, cardId: 34 }
+server → D        card-removed { cardId: 34, reason: PLAYED }
+server → ¬D       NOPE_PLAYED { playerId: D, nopeWindowExpiresAt: t+3000 }
 
-                        D not under attack → E gets attackCount = 2.
+                  Each Nope restarts the window, so a Nope can itself be Noped.
+                  A has no stake in this but does not want D setting the precedent.
 
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-11", ATTACK, executed: true }
-  Server → All          TURN_CHANGED { currentPlayer: E, attackCount: 2, isUnderAttack: true, turnNumber: 10 }
+A → server        play-nope { gameId, cardId: 31 }
+server → A        card-removed { cardId: 31, reason: PLAYED }
+server → ¬A       NOPE_PLAYED { playerId: A, nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+                  Two Nopes: the second cancels the first, so the Favor executes.
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      WAITING_FOR_PLAYER_SELECTION
+
+C → server        select-player { gameId, playerId: D }
+server → all      PLAYER_SELECTED { playerId: D }
+server → all      WAITING_FOR_FAVOR_CARD_SELECTION { playerId: D }
+
+                  Favor lets the *giver* choose. D gives up its See the Future.
+
+D → server        choose-card-id { gameId, cardId: 28 }
+server → D        card-removed  { cardId: 28, reason: GIVEN_AWAY }
+server → C        card-received { card: { id: 28, type: SEE_THE_FUTURE, ... },
+                                  reason: FAVOR, playerIdFrom: D }
+server → all      CARD_GIVEN    { playerIdFrom: D, playerIdTo: C }
+
+C → server        draw-card { gameId }
+server → C        card-received { card: { id: 24, type: SHUFFLE, ... }, reason: DRAW }
+server → all      card-drawn { playerId: C }
+server → all      TURN_CHANGED { playerId: D, attackCount: 1 }
+```
+
+`CARD_GIVEN` names both players but never the card. Only the two of them learn what
+moved, through the private `card-removed` / `card-received` pair.
+
+**Deck 15 · kittens 4** · A holds 4, 36, 44, 45, 46 · D holds 7, 11, 19, 23, 38, 41
+
+---
+
+## Turn 4 — D · `attackCount: 1`
+
+> Attack ends the turn without drawing and hands the next player two draws.
+
+```
+D → server        play-card { gameId, cardId: 11 }
+server → D        card-removed { cardId: 11, reason: PLAYED }
+server → ¬D       card-played { playerId: D, cardType: ATTACK, nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      TURN_CHANGED { playerId: E, attackCount: 2 }
+```
+
+**Deck 15 · kittens 4** · D holds 7, 19, 23, 38, 41
+
+---
+
+## Turn 5 — E · `attackCount: 2`
+
+> Attacking back stacks instead of resetting.
+
+```
+E → server        play-card { gameId, cardId: 12 }
+server → E        card-removed { cardId: 12, reason: PLAYED }
+server → ¬E       card-played { playerId: E, cardType: ATTACK, nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      TURN_CHANGED { playerId: A, attackCount: 4 }
+```
+
+E was already under attack owing 2, so its own Attack adds 2 rather than replacing:
+`2 + 2 = 4`. A now owes four draws.
+
+**Deck 15 · kittens 4** · E holds 8, 16, 20, 37, 42, 47, 54
+
+---
+
+## Turn 6 — A · `attackCount: 4`
+
+> A three-card combo naming a type the target does *not* hold, then four draws.
+
+```
+A → server        play-combo { gameId, cardIds: [44, 45, 46] }
+server → A        card-removed { cardId: 44, reason: PLAYED }
+server → A        card-removed { cardId: 45, reason: PLAYED }
+server → A        card-removed { cardId: 46, reason: PLAYED }
+server → ¬A       COMBO_PLAYED { playerId: A,
+                                 cardTypes: [BEARD_CAT, BEARD_CAT, BEARD_CAT],
+                                 nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      WAITING_FOR_PLAYER_SELECTION
+
+A → server        select-player { gameId, playerId: E }
+server → all      PLAYER_SELECTED { playerId: E }
+server → all      WAITING_FOR_CARD_TYPE_SELECTION { targetPlayerId: E }
+
+A → server        choose-card-type { gameId, cardType: CATTERMELON }
+
+                  E holds no Cattermelon. Nothing changes hands.
+
+server → all      NO_CARD_OF_REQUESTED_TYPE { cardType: CATTERMELON, targetPlayerId: E }
+```
+
+A guessed wrong and spent three cards for nothing. The turn continues — A still owes
+four draws.
+
+```
+A → server        draw-card { gameId }
+server → A        card-received { card: { id: 13, type: ATTACK, ... }, reason: DRAW }
+server → all      card-drawn { playerId: A }
+
+                  attackCount 4 → 3, still above zero, so A keeps the turn.
+
+A → server        draw-card { gameId }
+server → A        card-received { card: { id: 29, type: SEE_THE_FUTURE, ... }, reason: DRAW }
+server → all      card-drawn { playerId: A }
+
+                  attackCount 3 → 2.
+
+A → server        draw-card { gameId }
+
+                  Kitten. attackCount 2 → 1.
+
+server → all      EXPLODING_KITTEN_DRAWN { kittensInDeck: 3 }
+server → A        DEFUSE_PROMPT { playerId: A, endsAt: t+..., canDefuse: true }
+
+A → server        play-defuse { gameId }
+server → A        card-removed { cardId: 4, reason: PLAYED }
+server → all      PLAYER_DEFUSED { playerId: A, deckSize: 12 }
+
+A → server        insert-kitten { gameId, explodingKittenPosition: 3 }
+server → all      KITTEN_INSERTED { playerId: A, cardId: 1, kittensInDeck: 4 }
+
+                  attackCount is still 1, so A owes one more draw.
+
+A → server        draw-card { gameId }
+server → A        card-received { card: { id: 9, type: DEFUSE, ... }, reason: DRAW }
+server → all      card-drawn { playerId: A }
+
+                  attackCount 1 → 0.
+
+server → all      TURN_CHANGED { playerId: B, attackCount: 1 }
+```
+
+**Deck 12 · kittens 4** · A holds 9, 13, 29, 36
+
+Deck is now `17 21 1 39 2 25 43 30 55 0 35 3`.
+
+---
+
+## Turn 7 — B · `attackCount: 1`
+
+> Shuffle, then the first elimination.
+
+```
+B → server        play-card { gameId, cardId: 22 }
+server → B        card-removed { cardId: 22, reason: PLAYED }
+server → ¬B       card-played { playerId: B, cardType: SHUFFLE, nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      DECK_SHUFFLED                              (no payload)
+
+                  Any peeked knowledge is now stale. Say the deck lands as
+                  2 17 55 1 39 25 21 43 3 30 0 35.
+
+B → server        draw-card { gameId }
+server → all      EXPLODING_KITTEN_DRAWN { kittensInDeck: 3 }
+server → B        DEFUSE_PROMPT { playerId: B, endsAt: t+..., canDefuse: false }
+```
+
+`canDefuse: false` — B spent its only Defuse on Turn 2. The prompt is still sent, so
+the client can show the player exploding rather than silently killing them.
+
+```
+server → all      PLAYER_ELIMINATED { playerId: B, kittensInDeck: 3 }
+
+                  Four players remain, so the game continues. Turn order now
+                  skips B: A → C → D → E.
+
+server → all      TURN_CHANGED { playerId: C, attackCount: 1 }
+```
+
+**Deck 11 · kittens 3** · alive: A, C, D, E
+
+---
+
+## Turn 8 — C · `attackCount: 1`
+
+> A two-card combo — a blind pick, and the one case where the stolen type stays secret.
+
+```
+C → server        play-combo { gameId, cardIds: [52, 53] }
+server → C        card-removed { cardId: 52, reason: PLAYED }
+server → C        card-removed { cardId: 53, reason: PLAYED }
+server → ¬C       COMBO_PLAYED { playerId: C,
+                                 cardTypes: [RAINBOW_RALPHING_CAT, RAINBOW_RALPHING_CAT],
+                                 nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      WAITING_FOR_PLAYER_SELECTION
+
+C → server        select-player { gameId, playerId: D }
+server → all      PLAYER_SELECTED { playerId: D }
+server → all      WAITING_FOR_RANDOM_CARD_SELECTION { targetPlayerId: D }
+
+                  A two-card combo takes a card by position, not by name. C is
+                  picking blind out of D's four cards.
+
+C → server        choose-card-index { gameId, cardIndex: 2 }
+server → D        card-removed  { cardId: 23, reason: STOLEN }
+server → C        card-received { card: { id: 23, type: SHUFFLE, ... },
+                                  reason: CAT_PAIR, playerIdFrom: D }
+server → all      CARD_STOLEN   { playerIdFrom: D, playerIdTo: C }
+
+                  No cardType. Revealing it would leak what C is not entitled to
+                  know — compare Turn 2, where the type was named up front.
+
+C → server        draw-card { gameId }
+server → C        card-received { card: { id: 17, type: SKIP, ... }, reason: DRAW }
+server → all      card-drawn { playerId: C }
+server → all      TURN_CHANGED { playerId: D, attackCount: 1 }
+```
+
+**Deck 10 · kittens 3** · C holds 6, 15, 17, 23, 24, 27, 28, 48 · D holds 7, 19, 38, 41
+
+---
+
+## Turn 9 — D · `attackCount: 1`
+
+> The minimal turn: draw and pass.
+
+```
+D → server        draw-card { gameId }
+server → D        card-received { card: { id: 55, type: RAINBOW_RALPHING_CAT, ... },
+                                  reason: DRAW }
+server → all      card-drawn { playerId: D }
+server → all      TURN_CHANGED { playerId: E, attackCount: 1 }
+```
+
+**Deck 9 · kittens 3**
+
+---
+
+## Turn 10 — E · `attackCount: 1`
+
+```
+E → server        play-card { gameId, cardId: 16 }
+server → E        card-removed { cardId: 16, reason: PLAYED }
+server → ¬E       card-played { playerId: E, cardType: SKIP, nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      TURN_SKIPPED { playerId: E, attackCount: 1 }
+server → all      TURN_CHANGED { playerId: A, attackCount: 1 }
+```
+
+**Deck 9 · kittens 3** · E holds 8, 20, 37, 42, 47, 54
+
+---
+
+## Turn 11 — A · `attackCount: 1`
+
+> Peek, then dodge with Attack instead of Skip.
+
+```
+A → server        play-card { gameId, cardId: 29 }
+server → A        card-removed { cardId: 29, reason: PLAYED }
+server → ¬A       card-played { playerId: A, cardType: SEE_THE_FUTURE,
+                                nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → A        SEE_THE_FUTURE_PEEK { playerId: A, cards: [1, 39, 25] }
+server → ¬A       player-looks-at-the-future
+
+A → server        seen-the-future { gameId }
+server → ¬A       PLAYER_SAW_THE_FUTURE
+
+                  Kitten 1 on top and no Skip in hand. Attack also ends the turn
+                  without drawing — and dumps two draws on C.
+
+A → server        play-card { gameId, cardId: 13 }
+server → A        card-removed { cardId: 13, reason: PLAYED }
+server → ¬A       card-played { playerId: A, cardType: ATTACK, nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      TURN_CHANGED { playerId: C, attackCount: 2 }
+```
+
+**Deck 9 · kittens 3** · A holds 9, 36
+
+---
+
+## Turn 12 — C · `attackCount: 2`
+
+> Skip while owing more than one draw — the branch that *does* decrement.
+
+```
+C → server        draw-card { gameId }
+
+                  The kitten A saw coming. attackCount 2 → 1.
+
+server → all      EXPLODING_KITTEN_DRAWN { kittensInDeck: 2 }
+server → C        DEFUSE_PROMPT { playerId: C, endsAt: t+..., canDefuse: true }
+
+C → server        play-defuse { gameId }
+server → C        card-removed { cardId: 6, reason: PLAYED }
+server → all      PLAYER_DEFUSED { playerId: C, deckSize: 8 }
+
+C → server        insert-kitten { gameId, explodingKittenPosition: 8 }
+server → all      KITTEN_INSERTED { playerId: C, cardId: 1, kittensInDeck: 3 }
+
+                  attackCount is 1, so C still owes a draw — and would rather not.
+
+C → server        play-card { gameId, cardId: 17 }
+server → C        card-removed { cardId: 17, reason: PLAYED }
+server → ¬C       card-played { playerId: C, cardType: SKIP, nopeWindowExpiresAt: t+3000 }
+
+                  ... 3000 ms ...
+
+server → all      NOPE_WINDOW_RESOLVED
+server → all      TURN_SKIPPED { playerId: C, attackCount: 1 }
+server → all      TURN_CHANGED { playerId: D, attackCount: 1 }
+```
+
+Compare with Turn 1: the payload looks identical, but here the Skip discharged the
+last owed draw of an attack. Had C been at `attackCount: 2`, the Skip would have
+decremented to `1` and C would have kept the turn.
+
+**Deck 9 · kittens 3** · C holds 15, 23, 24, 27, 28, 48
+
+Deck is now `39 25 21 43 3 30 0 35 1`.
+
+---
+
+## Endgame — Turns 13–24
+
+Every mechanic is now covered, so the remaining turns are condensed. The traffic
+pattern is the one already shown: `draw-card` → `card-received` + `card-drawn` →
+`TURN_CHANGED`, with the defuse cycle when a kitten surfaces.
+
+| Turn | Player | What happens | Deck after | Kittens |
+|---|---|---|---|---|
+| 13 | D | Draws 39 Tacocat | 8 | 3 |
+| 14 | E | Draws 25 Shuffle | 7 | 3 |
+| 15 | A | Draws 21 Favor | 6 | 3 |
+| 16 | C | Draws 43 Hairy Potato Cat | 5 | 3 |
+| 17 | D | Draws kitten 3, defuses with 7, inserts at position 0 | 5 | 3 |
+| 18 | E | Draws kitten 3 straight back off the top, defuses with 8, inserts at 4 | 5 | 3 |
+| 19 | A | Draws 30 See the Future | 4 | 3 |
+| 20 | C | Draws kitten 0 — Defuse spent on Turn 12 → **eliminated** | 3 | 2 |
+| 21 | D | Draws 35 Nope | 2 | 2 |
+| 22 | E | Draws kitten 1 — Defuse spent on Turn 18 → **eliminated** | 1 | 1 |
+| 23 | A | Draws kitten 3, defuses with 9, inserts at position 0 | 1 | 1 |
+| 24 | D | Draws kitten 3 — Defuse spent on Turn 17 → **eliminated** | 0 | 0 |
+
+Turn 17 into 18 is worth a look: D buried the kitten at position `0`, which is the
+top of the deck, so E drew it immediately. `KITTEN_INSERTED` never reveals the
+position, so E had no way to know.
+
+The last elimination leaves one player standing:
+
+```
+D → server        draw-card { gameId }
+server → all      EXPLODING_KITTEN_DRAWN { kittensInDeck: 0 }
+server → D        DEFUSE_PROMPT { playerId: D, endsAt: t+..., canDefuse: false }
+server → all      PLAYER_ELIMINATED { playerId: D, kittensInDeck: 0 }
+
+                  One player alive — the machine goes to GAME_OVER rather than
+                  changing the turn.
+
+server → all      GAME_OVER { winner: { id: A, name: "...", avatarUrl: null } }
+
+                  Sixty seconds later the game is deleted: every socket is forced
+                  out of the room and receives left-game.
 ```
 
 ---
 
-## Turn 10 — E (under attack, attackCount: 2, no Defuse)
-> E has no Defuse (stolen by A in turn 6). E must draw twice. Draws an Exploding Kitten on second draw.
+## Coverage
 
 ```
-                        TurnState: { currentPlayer: E, phase: ACTION, attackCount: 2, isUnderAttack: true, turnNumber: 10 }
-
-                        E has no useful cards to avoid drawing. Draws.
-
-CLIENT E → Server       DrawCardAction { DRAW_CARD }
-  Server → Client E     CARD_RECEIVED { hairy_inst_8, fromId: null }
-  Server → All          CARD_DRAWN { playerId: E }
-
-                        attackCount-- → 1. Still owes 1 draw. Phase → ACTION.
-
-CLIENT E → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN.
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: E }
-  Server → Client E     DEFUSE_PROMPT { }
-
-                        E has no Defuse. E is eliminated.
-
-  Server → All          PLAYER_ELIMINATED { playerId: E }
-
-                        4 players remain. Next alive player after E is A.
-
-  Server → All          TURN_CHANGED { currentPlayer: A, turnNumber: 11 }
-```
-
-E is out. Game continues with A, B, C, D.
-
----
-
-## Turn 11 — A (normal turn)
-> A plays See the Future, then draws normally.
-
-```
-                        TurnState: { currentPlayer: A, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 11 }
-
-CLIENT A → Server       PlayCardAction { PLAY_CARD, "stf_inst_3" }
-  Server → Client A     CARD_REMOVED { "stf_inst_3", PLAYED }
-  Server → All          CARD_PLAYED { A, SEE_THE_FUTURE, "uuid-12", expires: +3000 }
-
-                        ... wait, does A still have a See the Future? A used it turn 1.
-                        Let's say A has another one from drawing. Continuing...
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-12", SEE_THE_FUTURE, executed: true }
-  Server → Client A     SEE_THE_FUTURE_PEEK { [normal, normal, exploding_kitten_inst_2] }
-
-                        Safe to draw — top 2 are normal cards.
-
-CLIENT A → Server       DrawCardAction { DRAW_CARD }
-  Server → Client A     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: A }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: B, turnNumber: 12 }
-```
-
----
-
-## Turn 12 — B (normal turn)
-> B draws an Exploding Kitten. B has no Defuse (used in turn 2). B is eliminated.
-
-```
-                        TurnState: { currentPlayer: B, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 12 }
-
-CLIENT B → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN.
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: B }
-  Server → Client B     DEFUSE_PROMPT { }
-
-                        B has no Defuse. B is eliminated.
-
-  Server → All          PLAYER_ELIMINATED { playerId: B }
-
-                        3 players remain: A, C, D.
-
-  Server → All          TURN_CHANGED { currentPlayer: C, turnNumber: 13 }
-```
-
----
-
-## Turn 13 — C (normal turn)
-> C plays pair of Rainbow-Ralphing Cats to steal from D. Then draws.
-
-```
-                        TurnState: { currentPlayer: C, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 13 }
-
-CLIENT C → Server       PlayComboAction { PLAY_COMBO, ["rainbow_inst_1", "rainbow_inst_2"], targetPlayerId: D }
-  Server → Client C     CARD_REMOVED { "rainbow_inst_1", PLAYED }
-  Server → Client C     CARD_REMOVED { "rainbow_inst_2", PLAYED }
-  Server → All          COMBO_PLAYED { C, RAINBOW_RALPHING_CAT, 2, D, "uuid-13", expires: +3000 }
-
-                        ... 3 seconds, no Nopes (D used their Nope in turn 7) ...
-
-                        Server picks random card from D → gets D's See the Future.
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-13", CAT_PAIR, executed: true }
-  Server → Client D     CARD_REMOVED { "stf_inst_4", STOLEN }
-  Server → Client C     CARD_RECEIVED { stf_inst_4, fromId: D }
-
-CLIENT C → Server       DrawCardAction { DRAW_CARD }
-  Server → Client C     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: C }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: D, turnNumber: 14 }
-```
-
----
-
-## Turn 14 — D (normal turn)
-> D plays Favor on A. Then draws.
-
-```
-                        TurnState: { currentPlayer: D, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 14 }
-
-CLIENT D → Server       PlayCardAction { PLAY_CARD, "favor_inst_3", targetPlayerId: A }
-  Server → Client D     CARD_REMOVED { "favor_inst_3", PLAYED }
-  Server → All          CARD_PLAYED { D, FAVOR, "uuid-14", expires: +3000 }
-
-                        A Nopes the Favor!
-
-CLIENT A → Server       PlayNopeAction { PLAY_NOPE, "nope_inst_1" }
-  Server → Client A     CARD_REMOVED { "nope_inst_1", PLAYED }
-  Server → All          NOPE_PLAYED { A, "uuid-14", expires: +3000 (reset) }
-
-                        ... 3 seconds, no counter-Nope ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-14", FAVOR, executed: false }
-
-                        Favor cancelled. D still needs to draw.
-
-CLIENT D → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN.
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: D }
-  Server → Client D     DEFUSE_PROMPT { }
-
-                        D has a Defuse.
-
-CLIENT D → Server       PlayDefuseAction { PLAY_DEFUSE, "defuse_inst_d" }
-  Server → Client D     CARD_REMOVED { "defuse_inst_d", PLAYED }
-  Server → All          PLAYER_DEFUSED { playerId: D }
-  Server → Client D     INSERT_KITTEN_PROMPT { deckSize: 8 }
-
-                        D puts kitten on top (position 0) to trap A.
-
-CLIENT D → Server       InsertKittenAction { INSERT_KITTEN, positionIndex: 0 }
-  Server → All          KITTEN_INSERTED { playerId: D }
-
-                        D still owes a draw.
-
-CLIENT D → Server       DrawCardAction { DRAW_CARD }
-  Server → Client D     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: D }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: A, turnNumber: 15 }
-```
-
----
-
-## Turn 15 — A (normal turn)
-> D placed a kitten on top. A draws it but has 2 Defuses.
-
-```
-                        TurnState: { currentPlayer: A, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 15 }
-
-CLIENT A → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN (placed by D at position 0).
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: A }
-  Server → Client A     DEFUSE_PROMPT { }
-
-                        A has 2 Defuses (original + stolen from E). Plays one.
-
-CLIENT A → Server       PlayDefuseAction { PLAY_DEFUSE, "defuse_inst_a" }
-  Server → Client A     CARD_REMOVED { "defuse_inst_a", PLAYED }
-  Server → All          PLAYER_DEFUSED { playerId: A }
-  Server → Client A     INSERT_KITTEN_PROMPT { deckSize: 7 }
-
-CLIENT A → Server       InsertKittenAction { INSERT_KITTEN, positionIndex: 1 }
-  Server → All          KITTEN_INSERTED { playerId: A }
-
-                        A still owes a draw.
-
-CLIENT A → Server       DrawCardAction { DRAW_CARD }
-  Server → Client A     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: A }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: C, turnNumber: 16 }
-```
-
-Note: B and E are dead, so turn order skips them: A → C → D → A → ...
-
----
-
-## Turn 16 — C (normal turn)
-> C uses the See the Future stolen from D. Sees kitten at position 1. Plays Shuffle to avoid it.
-
-```
-                        TurnState: { currentPlayer: C, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 16 }
-
-CLIENT C → Server       PlayCardAction { PLAY_CARD, "stf_inst_4" }
-  Server → Client C     CARD_REMOVED { "stf_inst_4", PLAYED }
-  Server → All          CARD_PLAYED { C, SEE_THE_FUTURE, "uuid-15", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-15", SEE_THE_FUTURE, executed: true }
-  Server → Client C     SEE_THE_FUTURE_PEEK { [normal, exploding_kitten_inst_3, normal] }
-
-                        Kitten at position 1. C plays Shuffle.
-
-CLIENT C → Server       PlayCardAction { PLAY_CARD, "shuffle_inst_8" }
-  Server → Client C     CARD_REMOVED { "shuffle_inst_8", PLAYED }
-  Server → All          CARD_PLAYED { C, SHUFFLE, "uuid-16", expires: +3000 }
-
-                        ... 3 seconds, no Nopes ...
-
-  Server → All          NOPE_WINDOW_RESOLVED { "uuid-16", SHUFFLE, executed: true }
-  Server → All          DECK_SHUFFLED { }
-
-CLIENT C → Server       DrawCardAction { DRAW_CARD }
-  Server → Client C     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: C }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: D, turnNumber: 17 }
-```
-
----
-
-## Turn 17 — D (normal turn, no Defuse)
-> D draws an Exploding Kitten. No Defuse. D is eliminated.
-
-```
-                        TurnState: { currentPlayer: D, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 17 }
-
-CLIENT D → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN.
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: D }
-  Server → Client D     DEFUSE_PROMPT { }
-
-                        D used their Defuse in turn 14. No Defuse. Eliminated.
-
-  Server → All          PLAYER_ELIMINATED { playerId: D }
-
-                        2 players remain: A and C.
-
-  Server → All          TURN_CHANGED { currentPlayer: A, turnNumber: 18 }
-```
-
----
-
-## Turn 18 — A (normal turn)
-> A plays triple Beard Cats... wait, A doesn't have 3. Let's just have A draw.
-
-```
-                        TurnState: { currentPlayer: A, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 18 }
-
-CLIENT A → Server       DrawCardAction { DRAW_CARD }
-  Server → Client A     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: A }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: C, turnNumber: 19 }
-```
-
----
-
-## Turn 19 — C (normal turn)
-> C draws the last Exploding Kitten. C has a Defuse.
-
-```
-                        TurnState: { currentPlayer: C, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 19 }
-
-CLIENT C → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN (last one).
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: C }
-  Server → Client C     DEFUSE_PROMPT { }
-
-CLIENT C → Server       PlayDefuseAction { PLAY_DEFUSE, "defuse_inst_c" }
-  Server → Client C     CARD_REMOVED { "defuse_inst_c", PLAYED }
-  Server → All          PLAYER_DEFUSED { playerId: C }
-  Server → Client C     INSERT_KITTEN_PROMPT { deckSize: 3 }
-
-CLIENT C → Server       InsertKittenAction { INSERT_KITTEN, positionIndex: 0 }
-  Server → All          KITTEN_INSERTED { playerId: C }
-
-CLIENT C → Server       DrawCardAction { DRAW_CARD }
-  Server → Client C     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: C }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: A, turnNumber: 20 }
-```
-
----
-
-## Turn 20 — A (normal turn)
-> A draws the Exploding Kitten C placed on top. A has 1 Defuse left (the one stolen from E).
-
-```
-                        TurnState: { currentPlayer: A, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 20 }
-
-CLIENT A → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN (placed by C at position 0).
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: A }
-  Server → Client A     DEFUSE_PROMPT { }
-
-CLIENT A → Server       PlayDefuseAction { PLAY_DEFUSE, "defuse_inst_e" }
-  Server → Client A     CARD_REMOVED { "defuse_inst_e", PLAYED }
-  Server → All          PLAYER_DEFUSED { playerId: A }
-  Server → Client A     INSERT_KITTEN_PROMPT { deckSize: 2 }
-
-CLIENT A → Server       InsertKittenAction { INSERT_KITTEN, positionIndex: 0 }
-  Server → All          KITTEN_INSERTED { playerId: A }
-
-CLIENT A → Server       DrawCardAction { DRAW_CARD }
-  Server → Client A     CARD_RECEIVED { normal_card, fromId: null }
-  Server → All          CARD_DRAWN { playerId: A }
-
-                        attackCount-- → 0 → turn ends.
-
-  Server → All          TURN_CHANGED { currentPlayer: C, turnNumber: 21 }
-```
-
----
-
-## Turn 21 — C (normal turn, no Defuse)
-> C draws the Exploding Kitten. No Defuse left. C is eliminated. A wins.
-
-```
-                        TurnState: { currentPlayer: C, phase: ACTION, attackCount: 1, isUnderAttack: false, turnNumber: 21 }
-
-CLIENT C → Server       DrawCardAction { DRAW_CARD }
-
-                        Server draws → EXPLODING_KITTEN.
-
-  Server → All          EXPLODING_KITTEN_DRAWN { playerId: C }
-  Server → Client C     DEFUSE_PROMPT { }
-
-                        C has no Defuse. Eliminated.
-
-  Server → All          PLAYER_ELIMINATED { playerId: C }
-
-                        1 player remaining: A.
-
-  Server → All          GAME_OVER { winnerId: A }
-```
-
----
-
-## Game Summary
-
-```
-21 turns played across 5 players.
 Winner: A
 
-Elimination order:
-  Turn 10 — E eliminated (no Defuse, stolen by A in turn 6)
-  Turn 12 — B eliminated (Defuse used in turn 2)
-  Turn 17 — D eliminated (Defuse used in turn 14)
-  Turn 21 — C eliminated (Defuse used in turn 19)
+Eliminations
+  Turn  7 — B   no Defuse (spent Turn 2)
+  Turn 20 — C   no Defuse (spent Turn 12)
+  Turn 22 — E   no Defuse (spent Turn 18)
+  Turn 24 — D   no Defuse (spent Turn 17)
 
-Cards demonstrated:
-  ✓ See the Future     — turns 1, 11, 16 (peek then react)
-  ✓ Skip               — turns 1, 5, 8 (normal + under attack)
-  ✓ Attack             — turns 7, 9 (normal + stacking)
-  ✓ Shuffle            — turns 4, 16 (reshuffle after peeking)
-  ✓ Favor              — turns 3, 5, 14 (give + Noped)
-  ✓ Nope               — turns 7, 14 (on Attack + on Favor)
-  ✓ Counter-Nope       — turn 7 (B counter-Nopes D's Nope)
-  ✓ Cat Pair           — turns 2, 6, 13 (random steal)
-  ✓ Defuse + Insert    — turns 2, 14, 15, 19, 20
-  ✓ Exploding Kitten   — turns 2, 10, 12, 14, 15, 17, 19, 20, 21
-  ✓ Elimination        — turns 10, 12, 17, 21
-  ✓ Game Over          — turn 21
+Card types
+  See the Future    Turns 1, 11          peek, ack, then react
+  Skip              Turns 1, 10, 12      both branches: turn-ending and attack-decrementing
+  Attack            Turns 4, 5, 11       fresh attack, stacking to 4, and used as an escape
+  Shuffle           Turn 7               invalidates a peek
+  Favor             Turn 3               giver chooses, via choose-card-id
+  Nope              Turn 3               Nope and counter-Nope cancelling out
+  Cat pair          Turn 8               blind choose-card-index, type withheld
+  Cat triple (hit)  Turn 2               choose-card-type, type revealed
+  Cat triple (miss) Turn 6               NO_CARD_OF_REQUESTED_TYPE
+  Defuse + insert   Turns 2, 6, 12, 17, 18, 23
+  Exploding Kitten  Turns 2, 6, 7, 12, 17, 18, 20, 22, 23, 24
 
-Missing from demo:
-  ✗ Cat Triple         — not naturally reached (would need 3 matching cats)
+Protocol edges
+  Nope window restarting on each Nope                Turn 3
+  Two Nopes cancelling, so the action executes       Turn 3
+  Kitten draw consuming the draw it was drawn on     Turn 2
+  attackCount surviving a defuse mid-attack          Turns 6, 12
+  DEFUSE_PROMPT with canDefuse: false                Turns 7, 24
+  Insertion position never revealed                  Turns 17, 18
+  Turn order closing over an eliminated player       Turn 7
 ```
+
+Not shown: `reconnect-game` / `game-state` recovery, and the 60-second auto-draw for
+a disconnected player. Both are connection-level rather than gameplay, and live in
+[connection.yaml](../sockets/connection/connection.yaml).
