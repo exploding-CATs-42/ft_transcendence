@@ -189,6 +189,7 @@ Implemented application metrics:
 | `http_requests_total` | Counter | `method`, `route`, `status_code` | Request count |
 | `http_request_duration_seconds` | Histogram | `method`, `route`, `status_code` | Request duration |
 | `user_operation_total` | Counter | `operation`, `status` | Auth, profile, and friend operation results |
+| `game_operation_total` | Counter | `operation`, `status` | Socket.IO game operation results |
 
 Metric labels must remain low-cardinality. Do not use user IDs, game IDs, room
 IDs, socket IDs, email addresses, usernames, tokens, IP addresses, raw query
@@ -256,7 +257,7 @@ Prometheus evaluates three user-facing rules:
 | Alert | Severity | Condition | Purpose |
 | --- | --- | --- | --- |
 | `ServiceUnavailable` | critical | Edge frontend or backend probe fails for 30 seconds | Detects that users cannot reach the application |
-| `UserOperationsFailing` | critical | At least three monitored operations return server errors within two minutes, sustained for 10 seconds | Detects failures in authentication, profile, or friendship workflows |
+| `UserOperationsFailing` | critical | At least three account or game operations return server errors within two minutes, sustained for 10 seconds | Detects failures in user-facing workflows |
 | `BackendLatencyHigh` | warning | Backend p95 exceeds 500 ms with at least 20 requests in one minute, sustained for 20 seconds | Detects meaningful latency degradation while avoiding low-traffic noise |
 
 The availability alert intentionally uses only `layer="edge"`. Internal probes
@@ -304,9 +305,9 @@ infra/monitoring/grafana/dashboards/backend-api.json
 ```
 
 The `Health` dashboard combines edge availability, active critical alerts,
-global and per-route p95 latency, user operation outcomes, HTTP response
-classes, and request rate. These panels cover the RED signals: Rate, Errors,
-and Duration.
+global and per-route p95 latency, account and game operation outcomes, HTTP
+response classes, and request rate. These panels cover the RED signals: Rate,
+Errors, and Duration.
 
 Grafana administrator credentials come from `infra/env/.env`. Anonymous access
 is disabled by Grafana by default. An unauthenticated API request should return

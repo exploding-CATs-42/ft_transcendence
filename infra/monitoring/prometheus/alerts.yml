@@ -22,8 +22,16 @@ groups:
   - name: transcendence-user-operations
     rules:
       - alert: UserOperationsFailing
-        expr:
-          sum(increase(user_operation_total{status="server_error"}[2m])) >= 3
+        expr: |
+          (
+            sum(increase(user_operation_total{status="server_error"}[2m]))
+            or vector(0)
+          )
+          +
+          (
+            sum(increase(game_operation_total{status="server_error"}[2m]))
+            or vector(0)
+          ) >= 3
         for: 10s
         labels:
           severity: critical
@@ -31,9 +39,11 @@ groups:
         annotations:
           summary: "Critical user operations are failing"
           description:
-            "At least three authentication, profile, or friendship operations
-            returned server errors within two minutes."
-          impact: "Users may be unable to sign in or manage their account."
+            "At least three account or game operations returned server errors
+            within two minutes."
+          impact:
+            "Users may be unable to sign in, manage their account, or play the
+            game."
           action: "Inspect backend logs and PostgreSQL availability."
 
   - name: backend-performance

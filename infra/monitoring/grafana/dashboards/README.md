@@ -30,13 +30,13 @@ queries.
 
 | Dashboard | File | Content |
 | --- | --- | --- |
-| Health | `backend-api.json` | Edge availability, active critical alerts, backend latency, user operation outcomes, HTTP response classes, and request rate |
+| Health | `backend-api.json` | Edge availability, active critical alerts, backend latency, account and game operation outcomes, HTTP response classes, and request rate |
 
 The dashboard presents the user-facing health of the application and follows
 the RED monitoring method:
 
 - **Rate:** backend requests per second.
-- **Errors:** HTTP response classes and failed user operations.
+- **Errors:** HTTP response classes and failed account or game operations.
 - **Duration:** global and per-route p95 request latency.
 
 Blackbox Exporter checks whether users can reach the frontend and backend
