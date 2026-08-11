@@ -93,6 +93,9 @@ const EditPlayerModal = ({ isOpen, toggleModal, user, updateUser }: Props) => {
       BadRequestErrorResponse<keyof UpdateMeRequestBody>
     >;
 
+    if (err.response?.status === 413) {
+      toast.error("The uploaded file is too large.");
+    }
     if (err.response?.status !== 400) {
       toast.error(err.message);
       return;
