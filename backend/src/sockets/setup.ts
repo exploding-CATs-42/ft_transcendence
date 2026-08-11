@@ -13,6 +13,14 @@ import {
 import { isUserOnline } from "./onlineUsers";
 import { cancelAutoPlay, startAutoPlayForCurrentTurnPlayer } from "./autoPlay";
 
+function broadcastOnlineStatusSafely(userId: UserId, isOnline: boolean): void {
+  void broadcastOnlineStatusToFriends(userId, isOnline).catch(
+    (error: unknown) => {
+      console.error("Failed to broadcast online status:", error);
+    },
+  );
+}
+
 export const initSockets = (io: Server) => {
   io.use(socketAuthMiddleware);
 
@@ -22,7 +30,7 @@ export const initSockets = (io: Server) => {
     const cameOnline = !isUserOnline(userId);
     socket.join(userId);
     if (cameOnline) {
-      broadcastOnlineStatusToFriends(userId, true);
+      broadcastOnlineStatusSafely(userId, true);
       broadcastPlayerReconnected(userId);
       cancelAutoPlay(userId);
     }
@@ -33,7 +41,7 @@ export const initSockets = (io: Server) => {
     socket.on("disconnect", () => {
       const wentOffline = !isUserOnline(userId);
       if (wentOffline) {
-        broadcastOnlineStatusToFriends(userId, false);
+        broadcastOnlineStatusSafely(userId, false);
         broadcastPlayerDisconnected(userId);
         startAutoPlayForCurrentTurnPlayer(userId);
       }
