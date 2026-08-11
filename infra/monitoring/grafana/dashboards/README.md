@@ -30,7 +30,7 @@ queries.
 
 | Dashboard | File | Content |
 | --- | --- | --- |
-| Health | `backend-api.json` | Edge availability, active critical alerts, backend latency, account and game operation outcomes, HTTP response classes, and request rate |
+| Health | `backend-api.json` | Nine panels covering edge availability, active critical alerts, global and per-route p95 latency, account and game operation outcomes, HTTP response classes, and request rate |
 
 The dashboard presents the user-facing health of the application and follows
 the RED monitoring method:
@@ -43,11 +43,17 @@ Blackbox Exporter checks whether users can reach the frontend and backend
 through the external HTTPS Nginx entry point. Prometheus alert state is also
 shown directly on the dashboard.
 
+The dashboard is intentionally focused on user-visible signals. Container CPU,
+memory, and filesystem panels are omitted because they would require additional
+exporters without improving the required evaluation scenarios.
+
 ## Updating a Dashboard
 
-Export the updated dashboard as JSON and replace the corresponding file in this
-directory. Keep the provisioned datasource UID as `prometheus`, then restart
-Grafana if the provisioned version is not refreshed automatically:
+The dashboard is provisioned from Git and should be treated as code. UI edits
+are useful for experimentation but are not the source of truth. Export the
+finished dashboard JSON and replace the corresponding file in this directory.
+Keep the datasource UID as `prometheus`, then restart Grafana if the
+provisioned version is not refreshed automatically:
 
 ```bash
 docker restart ft-grafana
