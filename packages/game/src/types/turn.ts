@@ -30,26 +30,6 @@ export const PendingActionType = {
 export type PendingActionType =
   (typeof PendingActionType)[keyof typeof PendingActionType];
 
-export type ComboSize = 2 | 3;
-
-export interface PendingCombo {
-  playerId: string;
-  comboSize: ComboSize;
-  targetPlayerId?: string;
-  requestedCardType?: CardType;
-}
-
-export interface TurnState {
-  currentPlayerId: string;
-  phase: TurnPhase;
-  attackCount: number;
-  isUnderAttack: boolean;
-  pendingAction: PendingAction | null;
-  nopeChain: NopeChain | null;
-  favorState: FavorState | null;
-  turnNumber: number;
-}
-
 export interface PendingAction {
   actionId: string;
   type: PendingActionType;

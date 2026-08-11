@@ -24,8 +24,6 @@ export const leaveGame = () => {
   emit(ClientEvents.LEAVE_GAME);
 };
 
-export const syncGameState = () => emit(ClientEvents.RECONNECT_GAME);
-
 export function connectToGameSession(
   socket: Socket,
   gameId: string,
