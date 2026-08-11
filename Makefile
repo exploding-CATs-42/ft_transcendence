@@ -1,4 +1,4 @@
-COMPOSE = docker compose --env-file infra/env/.env -f infra/docker/compose.dev.yml
+COMPOSE = docker compose --env-file infra/env/.env -f infra/docker/compose.dev.yml --profile alerts
 
 BACKEND_WD = -w /app/backend
 
@@ -39,13 +39,13 @@ clean: ## Stop containers and prune Docker images/build cache
 ## -------------------------
 
 alerts-up: ## Start Telegram alert notifications
-	$(COMPOSE) --profile alerts up -d alertmanager
+	$(COMPOSE) up -d alertmanager
 
 alerts-down: ## Stop Telegram alert notifications
-	$(COMPOSE) --profile alerts stop alertmanager
+	$(COMPOSE) stop alertmanager
 
 alerts-status: ## Show Telegram alerts service status
-	$(COMPOSE) --profile alerts ps alertmanager
+	$(COMPOSE) ps alertmanager
 
 ## -------------------------
 ## Logs
