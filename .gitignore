@@ -72,7 +72,8 @@ backend.env
 .env.*
 !.env.example
 infra/env/.env
-
+infra/secrets/telegram_bot_token
+infra/secrets/telegram_chat_id
 
 # parcel-bundler cache (https://parceljs.org/)
 .cache
