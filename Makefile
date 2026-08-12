@@ -34,6 +34,13 @@ clean: ## Stop containers and prune Docker images/build cache
 	docker image prune -f
 	docker builder prune -f
 
+fclean:  ## Remove project containers, networks, volumes, images and build cache
+	$(COMPOSE) down --volumes --rmi all --remove-orphans 
+	docker builder prune -f
+
+rebuild: fclean ## Rebuild all projects with removing containers, networks, volumes, images and build cache
+	$(MAKE) setup
+
 ## -------------------------
 ## Monitoring
 ## -------------------------
@@ -236,4 +243,4 @@ test-backend test-orm test-attack \
 format-check format-fix format-check-frontend format-fix-frontend format-check-backend format-fix-backend \
 lint-check lint-fix lint-check-frontend lint-fix-frontend lint-check-backend lint-fix-backend \
 typecheck typecheck-frontend typecheck-backend \
-code-quality-check code-quality-fix volumes alerts-up alerts-down alerts-status
+code-quality-check code-quality-fix volumes alerts-up alerts-down alerts-status fclean rebuild
