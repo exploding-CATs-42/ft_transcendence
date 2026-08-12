@@ -80,20 +80,6 @@ db-shell: ## Open psql shell inside postgres container
 	$(COMPOSE) exec postgres psql -U transcendence -d transcendence
 
 ## -------------------------
-## Dependencies
-## -------------------------
-
-deps: ## Install dependencies in backend and frontend containers
-	$(COMPOSE) exec backend sh -c "CI=true pnpm install"
-	$(COMPOSE) exec frontend sh -c "CI=true pnpm install"
-
-deps-backend: ## Install backend dependencies
-	$(COMPOSE) exec backend sh -c "CI=true pnpm install"
-
-deps-frontend: ## Install frontend dependencies
-	$(COMPOSE) exec frontend sh -c "CI=true pnpm install"
-
-## -------------------------
 ## Prisma / Database
 ## -------------------------
 
@@ -245,7 +231,6 @@ help: ## Show available make commands
 .PHONY: help all up build setup down re ps clean \
 logs logs-backend logs-frontend logs-nginx logs-postgres \
 backend-shell frontend-shell db-shell \
-deps deps-backend deps-frontend \
 prisma-format prisma-validate prisma-generate prisma-migrate prisma-deploy prisma-reset seed \
 test-backend test-orm test-attack \
 format-check format-fix format-check-frontend format-fix-frontend format-check-backend format-fix-backend \
