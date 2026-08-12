@@ -150,6 +150,8 @@ services:
       - backend_node_modules:/app/backend/node_modules
       - contracts_node_modules:/app/packages/contracts/node_modules
       - game_node_modules:/app/packages/game/node_modules
+    networks:
+      - transcendence_net
 
 volumes:
   postgres_data:
